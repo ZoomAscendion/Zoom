@@ -31,7 +31,7 @@ This document provides comprehensive data mapping for the Bronze layer in the Me
 ### 1. USERS Entity Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Transformation Rule |
-|--------------|--------------|--------------|--------------|--------------|--------------|--------------------|
+|--------------|--------------|--------------|--------------|--------------|--------------|---------------------|
 | zoom_bronze_schema | BZ_USERS | USER_ID | zoom_raw_schema | USERS | USER_ID | 1-1 Mapping |
 | zoom_bronze_schema | BZ_USERS | USER_NAME | zoom_raw_schema | USERS | USER_NAME | 1-1 Mapping |
 | zoom_bronze_schema | BZ_USERS | EMAIL | zoom_raw_schema | USERS | EMAIL | 1-1 Mapping |
@@ -44,7 +44,7 @@ This document provides comprehensive data mapping for the Bronze layer in the Me
 ### 2. MEETINGS Entity Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Transformation Rule |
-|--------------|--------------|--------------|--------------|--------------|--------------|--------------------|
+|--------------|--------------|--------------|--------------|--------------|--------------|---------------------|
 | zoom_bronze_schema | BZ_MEETINGS | MEETING_ID | zoom_raw_schema | MEETINGS | MEETING_ID | 1-1 Mapping |
 | zoom_bronze_schema | BZ_MEETINGS | HOST_ID | zoom_raw_schema | MEETINGS | HOST_ID | 1-1 Mapping |
 | zoom_bronze_schema | BZ_MEETINGS | MEETING_TOPIC | zoom_raw_schema | MEETINGS | MEETING_TOPIC | 1-1 Mapping |
@@ -58,7 +58,7 @@ This document provides comprehensive data mapping for the Bronze layer in the Me
 ### 3. PARTICIPANTS Entity Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Transformation Rule |
-|--------------|--------------|--------------|--------------|--------------|--------------|--------------------|
+|--------------|--------------|--------------|--------------|--------------|--------------|---------------------|
 | zoom_bronze_schema | BZ_PARTICIPANTS | PARTICIPANT_ID | zoom_raw_schema | PARTICIPANTS | PARTICIPANT_ID | 1-1 Mapping |
 | zoom_bronze_schema | BZ_PARTICIPANTS | MEETING_ID | zoom_raw_schema | PARTICIPANTS | MEETING_ID | 1-1 Mapping |
 | zoom_bronze_schema | BZ_PARTICIPANTS | USER_ID | zoom_raw_schema | PARTICIPANTS | USER_ID | 1-1 Mapping |
@@ -71,7 +71,7 @@ This document provides comprehensive data mapping for the Bronze layer in the Me
 ### 4. FEATURE_USAGE Entity Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Transformation Rule |
-|--------------|--------------|--------------|--------------|--------------|--------------|--------------------|
+|--------------|--------------|--------------|--------------|--------------|--------------|---------------------|
 | zoom_bronze_schema | BZ_FEATURE_USAGE | USAGE_ID | zoom_raw_schema | FEATURE_USAGE | USAGE_ID | 1-1 Mapping |
 | zoom_bronze_schema | BZ_FEATURE_USAGE | MEETING_ID | zoom_raw_schema | FEATURE_USAGE | MEETING_ID | 1-1 Mapping |
 | zoom_bronze_schema | BZ_FEATURE_USAGE | FEATURE_NAME | zoom_raw_schema | FEATURE_USAGE | FEATURE_NAME | 1-1 Mapping |
@@ -84,7 +84,7 @@ This document provides comprehensive data mapping for the Bronze layer in the Me
 ### 5. SUPPORT_TICKETS Entity Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Transformation Rule |
-|--------------|--------------|--------------|--------------|--------------|--------------|--------------------|
+|--------------|--------------|--------------|--------------|--------------|--------------|---------------------|
 | zoom_bronze_schema | BZ_SUPPORT_TICKETS | TICKET_ID | zoom_raw_schema | SUPPORT_TICKETS | TICKET_ID | 1-1 Mapping |
 | zoom_bronze_schema | BZ_SUPPORT_TICKETS | USER_ID | zoom_raw_schema | SUPPORT_TICKETS | USER_ID | 1-1 Mapping |
 | zoom_bronze_schema | BZ_SUPPORT_TICKETS | TICKET_TYPE | zoom_raw_schema | SUPPORT_TICKETS | TICKET_TYPE | 1-1 Mapping |
@@ -97,7 +97,7 @@ This document provides comprehensive data mapping for the Bronze layer in the Me
 ### 6. BILLING_EVENTS Entity Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Transformation Rule |
-|--------------|--------------|--------------|--------------|--------------|--------------|--------------------|
+|--------------|--------------|--------------|--------------|--------------|--------------|---------------------|
 | zoom_bronze_schema | BZ_BILLING_EVENTS | EVENT_ID | zoom_raw_schema | BILLING_EVENTS | EVENT_ID | 1-1 Mapping |
 | zoom_bronze_schema | BZ_BILLING_EVENTS | USER_ID | zoom_raw_schema | BILLING_EVENTS | USER_ID | 1-1 Mapping |
 | zoom_bronze_schema | BZ_BILLING_EVENTS | EVENT_TYPE | zoom_raw_schema | BILLING_EVENTS | EVENT_TYPE | 1-1 Mapping |
@@ -110,7 +110,7 @@ This document provides comprehensive data mapping for the Bronze layer in the Me
 ### 7. LICENSES Entity Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Transformation Rule |
-|--------------|--------------|--------------|--------------|--------------|--------------|--------------------|
+|--------------|--------------|--------------|--------------|--------------|--------------|---------------------|
 | zoom_bronze_schema | BZ_LICENSES | LICENSE_ID | zoom_raw_schema | LICENSES | LICENSE_ID | 1-1 Mapping |
 | zoom_bronze_schema | BZ_LICENSES | LICENSE_TYPE | zoom_raw_schema | LICENSES | LICENSE_TYPE | 1-1 Mapping |
 | zoom_bronze_schema | BZ_LICENSES | ASSIGNED_TO_USER_ID | zoom_raw_schema | LICENSES | ASSIGNED_TO_USER_ID | 1-1 Mapping |
@@ -123,7 +123,7 @@ This document provides comprehensive data mapping for the Bronze layer in the Me
 ### 8. WEBINARS Entity Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Transformation Rule |
-|--------------|--------------|--------------|--------------|--------------|--------------|--------------------|
+|--------------|--------------|--------------|--------------|--------------|--------------|---------------------|
 | zoom_bronze_schema | BZ_WEBINARS | WEBINAR_ID | zoom_raw_schema | WEBINARS | WEBINAR_ID | 1-1 Mapping |
 | zoom_bronze_schema | BZ_WEBINARS | HOST_ID | zoom_raw_schema | WEBINARS | HOST_ID | 1-1 Mapping |
 | zoom_bronze_schema | BZ_WEBINARS | WEBINAR_TOPIC | zoom_raw_schema | WEBINARS | WEBINAR_TOPIC | 1-1 Mapping |
