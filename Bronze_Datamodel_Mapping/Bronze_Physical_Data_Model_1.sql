@@ -1,9 +1,9 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*: [Leave empty]
+## *Created on*:   
 ## *Description*: Bronze Layer Physical Data Model for Zoom Platform Analytics System
 ## *Version*: 1
-## *Updated on*: [Leave empty]
+## *Updated on*: 
 _____________________________________________
 
 -- =====================================================
