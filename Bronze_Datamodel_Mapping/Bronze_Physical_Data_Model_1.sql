@@ -1,19 +1,16 @@
 _____________________________________________
--- Author: AAVA
--- Created on: 2024-12-19
--- Description: Bronze Layer Physical Data Model for Zoom Platform Analytics System
--- Version: 1
--- Updated on: 2024-12-19
--- Target Database: DB_POC_ZOOM
--- Target Schema: BRONZE
--- Medallion Architecture Layer: Bronze (Raw Data Ingestion Layer)
+## *Author*: AAVA
+## *Created on*:   
+## *Description*: Bronze Layer Physical Data Model for Zoom Platform Analytics System
+## *Version*: 1 
+## *Updated on*: 
 _____________________________________________
 
-/*
-=============================================================================
-BRONZE LAYER PHYSICAL DATA MODEL - ZOOM PLATFORM ANALYTICS SYSTEM
-=============================================================================
+-- =============================================================================
+-- BRONZE LAYER PHYSICAL DATA MODEL - ZOOM PLATFORM ANALYTICS SYSTEM
+-- =============================================================================
 
+/*
 Purpose: This script creates the Bronze layer tables for the Medallion architecture
 of the Zoom Platform Analytics System. The Bronze layer serves as the raw data
 ingestion layer, storing data in its original format with minimal transformation.
