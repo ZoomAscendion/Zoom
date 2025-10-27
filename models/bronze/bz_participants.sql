@@ -3,10 +3,11 @@
 -- Source: RAW.PARTICIPANTS
 -- Target: BRONZE.bz_participants
 -- Author: DBT Data Engineer
--- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('bz_audit_log') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'bz_participants', CURRENT_TIMESTAMP(), 'DBT', 0, 'STARTED' WHERE '{{ this.name }}' != 'bz_audit_log'",
+    post_hook="INSERT INTO {{ ref('bz_audit_log') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'bz_participants', CURRENT_TIMESTAMP(), 'DBT', 1, 'COMPLETED' WHERE '{{ this.name }}' != 'bz_audit_log'"
 ) }}
 
 WITH raw_participants AS (
@@ -25,17 +26,13 @@ WITH raw_participants AS (
 cleansed_participants AS (
     SELECT 
         -- 1-1 mapping from raw to bronze as per mapping specification
-        TRIM(MEETING_ID) as meeting_id,
-        TRIM(USER_ID) as user_id,
-        JOIN_TIME as join_time,
-        LEAVE_TIME as leave_time,
-        LOAD_TIMESTAMP as load_timestamp,
-        COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) as update_timestamp,
-        TRIM(UPPER(SOURCE_SYSTEM)) as source_system,
-        
-        -- Audit fields for bronze layer
-        CURRENT_TIMESTAMP() as bronze_created_at,
-        'SUCCESS' as process_status
+        TRIM(MEETING_ID)::STRING as meeting_id,
+        TRIM(USER_ID)::STRING as user_id,
+        JOIN_TIME::TIMESTAMP_NTZ as join_time,
+        LEAVE_TIME::TIMESTAMP_NTZ as leave_time,
+        LOAD_TIMESTAMP::TIMESTAMP_NTZ as load_timestamp,
+        COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP)::TIMESTAMP_NTZ as update_timestamp,
+        TRIM(UPPER(SOURCE_SYSTEM))::STRING as source_system
         
     FROM raw_participants
     WHERE MEETING_ID IS NOT NULL
