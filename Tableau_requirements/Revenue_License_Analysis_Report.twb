@@ -21,25 +21,47 @@
     </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
   </_.fcp.AnimationOnByDefault.false...style>
   <datasources>
-    <datasource caption='GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS) (GOLD)' inline='true' name='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' version='18.1'>
+    <datasource caption='Revenue License Data (ZOOM.GOLD)' inline='true' name='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' version='18.1'>
       <connection class='federated'>
         <named-connections>
-          <named-connection caption='NWZLYVS-MU54263.snowflakecomputing.com' name='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8'>
+          <named-connection caption='NWZLYVS-MU54263.snowflakecomputing.com' name='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F'>
             <connection authentication='Username Password' class='snowflake' dbname='ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='NWZLYVS-MU54263.snowflakecomputing.com' service='ACCOUNTADMIN' username='THEJASHWANI' password='Thejashwani@04' warehouse='COMPUTE_WH' />
           </named-connection>
         </named-connections>
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' name='GO_BILLING_FACTS' table='[ZOOM].[GOLD].[GO_BILLING_FACTS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' name='GO_BILLING_FACTS' table='[ZOOM].[GOLD].[GO_BILLING_FACTS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' name='GO_MEETING_FACTS' table='[ZOOM].[GOLD].[GO_MEETING_FACTS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' name='GO_MEETING_FACTS' table='[ZOOM].[GOLD].[GO_MEETING_FACTS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' name='GO_USAGE_FACTS' table='[ZOOM].[GOLD].[GO_USAGE_FACTS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' name='GO_USAGE_FACTS' table='[ZOOM].[GOLD].[GO_USAGE_FACTS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' name='GO_TIME_DIMENSION' table='[ZOOM].[GOLD].[GO_TIME_DIMENSION]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' name='GO_TIME_DIMENSION' table='[ZOOM].[GOLD].[GO_TIME_DIMENSION]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='GO_BILLING_FACTS' table='[ZOOM].[GOLD].[GO_BILLING_FACTS]' type='table'>
+          <join expression='[GO_BILLING_FACTS].[USER_ID] = [GO_USER_DIMENSION].[USER_ID]' join='inner' type='qtable'>
+            <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+          </join>
+          <join expression='[GO_BILLING_FACTS].[ORGANIZATION_ID] = [GO_ORGANIZATION_DIMENSION].[ORGANIZATION_ID]' join='inner' type='qtable'>
+            <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
+          </join>
+          <join expression='[GO_USER_DIMENSION].[USER_ID] = [GO_MEETING_FACTS].[HOST_ID]' join='left' type='qtable'>
+            <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='GO_MEETING_FACTS' table='[ZOOM].[GOLD].[GO_MEETING_FACTS]' type='table' />
+          </join>
+          <join expression='[GO_USER_DIMENSION].[USER_ID] = [GO_USAGE_FACTS].[USER_ID]' join='left' type='qtable'>
+            <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='GO_USAGE_FACTS' table='[ZOOM].[GOLD].[GO_USAGE_FACTS]' type='table' />
+          </join>
+          <join expression='[GO_BILLING_FACTS].[EVENT_DATE] = [GO_TIME_DIMENSION].[DATE_KEY]' join='left' type='qtable'>
+            <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='GO_TIME_DIMENSION' table='[ZOOM].[GOLD].[GO_TIME_DIMENSION]' type='table' />
+          </join>
+        </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='GO_BILLING_FACTS' table='[ZOOM].[GOLD].[GO_BILLING_FACTS]' type='table'>
+          <join expression='[GO_BILLING_FACTS].[USER_ID] = [GO_USER_DIMENSION].[USER_ID]' join='inner' type='qtable'>
+            <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+          </join>
+          <join expression='[GO_BILLING_FACTS].[ORGANIZATION_ID] = [GO_ORGANIZATION_DIMENSION].[ORGANIZATION_ID]' join='inner' type='qtable'>
+            <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
+          </join>
+          <join expression='[GO_USER_DIMENSION].[USER_ID] = [GO_MEETING_FACTS].[HOST_ID]' join='left' type='qtable'>
+            <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='GO_MEETING_FACTS' table='[ZOOM].[GOLD].[GO_MEETING_FACTS]' type='table' />
+          </join>
+          <join expression='[GO_USER_DIMENSION].[USER_ID] = [GO_USAGE_FACTS].[USER_ID]' join='left' type='qtable'>
+            <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='GO_USAGE_FACTS' table='[ZOOM].[GOLD].[GO_USAGE_FACTS]' type='table' />
+          </join>
+          <join expression='[GO_BILLING_FACTS].[EVENT_DATE] = [GO_TIME_DIMENSION].[DATE_KEY]' join='left' type='qtable'>
+            <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='GO_TIME_DIMENSION' table='[ZOOM].[GOLD].[GO_TIME_DIMENSION]' type='table' />
+          </join>
+        </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
         <metadata-records>
           <metadata-record class='column'>
             <remote-name>AMOUNT</remote-name>
@@ -55,28 +77,28 @@
             <contains-null>true</contains-null>
           </metadata-record>
           <metadata-record class='column'>
-            <remote-name>EVENT_DATE</remote-name>
-            <remote-type>7</remote-type>
-            <local-name>[EVENT_DATE]</local-name>
-            <parent-name>[GO_BILLING_FACTS]</parent-name>
-            <remote-alias>EVENT_DATE</remote-alias>
-            <ordinal>2</ordinal>
-            <local-type>date</local-type>
-            <aggregation>Year</aggregation>
-            <contains-null>true</contains-null>
-          </metadata-record>
-          <metadata-record class='column'>
             <remote-name>EVENT_TYPE</remote-name>
             <remote-type>129</remote-type>
             <local-name>[EVENT_TYPE]</local-name>
             <parent-name>[GO_BILLING_FACTS]</parent-name>
             <remote-alias>EVENT_TYPE</remote-alias>
-            <ordinal>3</ordinal>
+            <ordinal>2</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <width>100</width>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>EVENT_DATE</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[EVENT_DATE]</local-name>
+            <parent-name>[GO_BILLING_FACTS]</parent-name>
+            <remote-alias>EVENT_DATE</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>LICENSE_TYPE</remote-name>
@@ -118,40 +140,70 @@
             <collation flag='0' name='binary' />
           </metadata-record>
           <metadata-record class='column'>
-            <remote-name>CONTRACT_END_DATE</remote-name>
-            <remote-type>7</remote-type>
-            <local-name>[CONTRACT_END_DATE]</local-name>
-            <parent-name>[GO_ORGANIZATION_DIMENSION]</parent-name>
-            <remote-alias>CONTRACT_END_DATE</remote-alias>
+            <remote-name>REGION_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[REGION_NAME]</local-name>
+            <parent-name>[GO_GEOGRAPHY_DIMENSION]</parent-name>
+            <remote-alias>REGION_NAME</remote-alias>
             <ordinal>7</ordinal>
-            <local-type>date</local-type>
-            <aggregation>Year</aggregation>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>100</width>
             <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DURATION_MINUTES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[DURATION_MINUTES]</local-name>
+            <parent-name>[GO_MEETING_FACTS]</parent-name>
+            <remote-alias>DURATION_MINUTES</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MONTH_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MONTH_NAME]</local-name>
+            <parent-name>[GO_TIME_DIMENSION]</parent-name>
+            <remote-alias>MONTH_NAME</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>20</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
           </metadata-record>
         </metadata-records>
       </connection>
       <aliases enabled='yes' />
       <column caption='Amount' datatype='real' name='[AMOUNT]' role='measure' type='quantitative' />
+      <column caption='Duration Minutes' datatype='integer' name='[DURATION_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Email Address' datatype='string' name='[EMAIL_ADDRESS]' role='dimension' type='nominal' />
       <column caption='Event Date' datatype='date' name='[EVENT_DATE]' role='dimension' type='ordinal' />
       <column caption='Event Type' datatype='string' name='[EVENT_TYPE]' role='dimension' type='nominal' />
       <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
-      <column caption='Email Address' datatype='string' name='[EMAIL_ADDRESS]' role='dimension' type='nominal' />
+      <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
       <column caption='Organization Name' datatype='string' name='[ORGANIZATION_NAME]' role='dimension' type='nominal' />
-      <column caption='Contract End Date' datatype='date' name='[CONTRACT_END_DATE]' role='dimension' type='ordinal' />
-      <column caption='Email Masked' datatype='string' name='[Calculation_J0K1L2M3N4O5P6Q7]' role='dimension' type='nominal'>
-        <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],1)+&quot;****@&quot;+RIGHT([EMAIL_ADDRESS],FIND(&quot;@&quot;,[EMAIL_ADDRESS])+3)' />
+      <column caption='Region Name' datatype='string' name='[REGION_NAME]' role='dimension' type='nominal' />
+      <column caption='Email Masked' datatype='string' name='[Calculation_D0E1F2A3B4C5D6E7]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],1)+&quot;****@&quot;+RIGHT([EMAIL_ADDRESS],LEN([EMAIL_ADDRESS])-FIND(&quot;@&quot;,[EMAIL_ADDRESS]))' />
       </column>
-      <column caption='Monthly Recurring Revenue' datatype='real' name='[Calculation_K1L2M3N4O5P6Q7R8]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='SUM(IF MONTH([EVENT_DATE]) = MONTH(TODAY()) AND YEAR([EVENT_DATE]) = YEAR(TODAY()) THEN [AMOUNT] END)' />
-      </column>
-      <column caption='License Utilization Rate' datatype='real' name='[Calculation_L2M3N4O5P6Q7R8S9]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNTD([LICENSE_TYPE]) / 100.0' />
-      </column>
-      <column caption='Revenue by License Type' datatype='real' name='[Calculation_M3N4O5P6Q7R8S9T0]' role='measure' type='quantitative'>
+      <column caption='Monthly Recurring Revenue' datatype='real' name='[Calculation_E1F2A3B4C5D6E7F8]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='SUM([AMOUNT])' />
       </column>
-      <column caption='Upcoming License Expirations' datatype='integer' name='[Calculation_N4O5P6Q7R8S9T0U1]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNT(IF DATEDIFF(&quot;day&quot;,TODAY(),[CONTRACT_END_DATE]) &lt;= 30 THEN [CONTRACT_END_DATE] END)' />
+      <column caption='Revenue by License Type' datatype='real' name='[Calculation_F2A3B4C5D6E7F8A9]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([AMOUNT])' />
+      </column>
+      <column caption='License Utilization Rate' datatype='real' name='[Calculation_A3B4C5D6E7F8A9B0]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([LICENSE_TYPE]) / 100.0' />
+      </column>
+      <column caption='Usage Correlation' datatype='real' name='[Calculation_B4C5D6E7F8A9B0C1]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='CORR([DURATION_MINUTES], [AMOUNT])' />
       </column>
       <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
       <semantic-values>
@@ -171,21 +223,22 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS) (GOLD)' name='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' />
+            <datasource caption='Revenue License Data (ZOOM.GOLD)' name='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' />
           </datasources>
-          <datasource-dependencies datasource='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8'>
-            <column caption='Event Date' datatype='date' name='[EVENT_DATE]' role='dimension' type='ordinal' />
-            <column caption='Monthly Recurring Revenue' datatype='real' name='[Calculation_K1L2M3N4O5P6Q7R8]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='SUM(IF MONTH([EVENT_DATE]) = MONTH(TODAY()) AND YEAR([EVENT_DATE]) = YEAR(TODAY()) THEN [AMOUNT] END)' />
+          <datasource-dependencies datasource='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F'>
+            <column caption='Monthly Recurring Revenue' datatype='real' name='[Calculation_E1F2A3B4C5D6E7F8]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM([AMOUNT])' />
             </column>
+            <column caption='Amount' datatype='real' name='[AMOUNT]' role='measure' type='quantitative' />
+            <column caption='Event Date' datatype='date' name='[EVENT_DATE]' role='dimension' type='ordinal' />
             <column-instance column='[EVENT_DATE]' derivation='Month-Trunc' name='[tmn:EVENT_DATE:qk]' pivot='key' type='quantitative' />
-            <column-instance column='[Calculation_K1L2M3N4O5P6Q7R8]' derivation='Sum' name='[sum:Calculation_K1L2M3N4O5P6Q7R8:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_E1F2A3B4C5D6E7F8]' derivation='Sum' name='[sum:Calculation_E1F2A3B4C5D6E7F8:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
         <style>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[sum:Calculation_K1L2M3N4O5P6Q7R8:qk]' palette='blue_10_0' type='interpolated' />
+            <encoding attr='color' field='[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[sum:Calculation_E1F2A3B4C5D6E7F8:qk]' palette='green_10_0' type='interpolated' />
           </style-rule>
         </style>
         <panes>
@@ -195,7 +248,7 @@
             </view>
             <mark class='Line' />
             <encodings>
-              <color column='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[sum:Calculation_K1L2M3N4O5P6Q7R8:qk]' />
+              <color column='[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[sum:Calculation_E1F2A3B4C5D6E7F8:qk]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -205,10 +258,10 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[sum:Calculation_K1L2M3N4O5P6Q7R8:qk]</rows>
-        <cols>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[tmn:EVENT_DATE:qk]</cols>
+        <rows>[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[sum:Calculation_E1F2A3B4C5D6E7F8:qk]</rows>
+        <cols>[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[tmn:EVENT_DATE:qk]</cols>
       </table>
-      <simple-id uuid='{B7C8D9E0-F1A2-B3C4-D5E6-F7A8B9C0D1E2}' />
+      <simple-id uuid='{A8B9C0D1-E2F3-A4B5-C6D7-E8F9A0B1C2D3}' />
     </worksheet>
     <worksheet name='Revenue Distribution by License Type'>
       <layout-options>
@@ -221,15 +274,16 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS) (GOLD)' name='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' />
+            <datasource caption='Revenue License Data (ZOOM.GOLD)' name='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' />
           </datasources>
-          <datasource-dependencies datasource='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8'>
-            <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
-            <column caption='Revenue by License Type' datatype='real' name='[Calculation_M3N4O5P6Q7R8S9T0]' role='measure' type='quantitative'>
+          <datasource-dependencies datasource='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F'>
+            <column caption='Revenue by License Type' datatype='real' name='[Calculation_F2A3B4C5D6E7F8A9]' role='measure' type='quantitative'>
               <calculation class='tableau' formula='SUM([AMOUNT])' />
             </column>
+            <column caption='Amount' datatype='real' name='[AMOUNT]' role='measure' type='quantitative' />
+            <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
             <column-instance column='[LICENSE_TYPE]' derivation='None' name='[none:LICENSE_TYPE:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calculation_M3N4O5P6Q7R8S9T0]' derivation='Sum' name='[sum:Calculation_M3N4O5P6Q7R8S9T0:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_F2A3B4C5D6E7F8A9]' derivation='Sum' name='[sum:Calculation_F2A3B4C5D6E7F8A9:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
@@ -241,7 +295,7 @@
             </view>
             <mark class='Bar' />
             <encodings>
-              <color column='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[none:LICENSE_TYPE:nk]' />
+              <color column='[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[none:LICENSE_TYPE:nk]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -251,60 +305,10 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[sum:Calculation_M3N4O5P6Q7R8S9T0:qk]</rows>
-        <cols>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[none:LICENSE_TYPE:nk]</cols>
+        <rows>[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[sum:Calculation_F2A3B4C5D6E7F8A9:qk]</rows>
+        <cols>[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[none:LICENSE_TYPE:nk]</cols>
       </table>
-      <simple-id uuid='{C8D9E0F1-A2B3-C4D5-E6F7-A8B9C0D1E2F3}' />
-    </worksheet>
-    <worksheet name='License Expiration Table'>
-      <layout-options>
-        <title>
-          <formatted-text>
-            <run>Upcoming License Expirations</run>
-          </formatted-text>
-        </title>
-      </layout-options>
-      <table>
-        <view>
-          <datasources>
-            <datasource caption='GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS) (GOLD)' name='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' />
-          </datasources>
-          <datasource-dependencies datasource='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8'>
-            <column caption='Organization Name' datatype='string' name='[ORGANIZATION_NAME]' role='dimension' type='nominal' />
-            <column caption='Contract End Date' datatype='date' name='[CONTRACT_END_DATE]' role='dimension' type='ordinal' />
-            <column caption='Email Masked' datatype='string' name='[Calculation_J0K1L2M3N4O5P6Q7]' role='dimension' type='nominal'>
-              <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],1)+&quot;****@&quot;+RIGHT([EMAIL_ADDRESS],FIND(&quot;@&quot;,[EMAIL_ADDRESS])+3)' />
-            </column>
-            <column-instance column='[ORGANIZATION_NAME]' derivation='None' name='[none:ORGANIZATION_NAME:nk]' pivot='key' type='nominal' />
-            <column-instance column='[CONTRACT_END_DATE]' derivation='None' name='[none:CONTRACT_END_DATE:ok]' pivot='key' type='ordinal' />
-            <column-instance column='[Calculation_J0K1L2M3N4O5P6Q7]' derivation='None' name='[none:Calculation_J0K1L2M3N4O5P6Q7:nk]' pivot='key' type='nominal' />
-          </datasource-dependencies>
-          <filter class='categorical' column='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[none:CONTRACT_END_DATE:ok]'>
-            <groupfilter function='range' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate'>
-              <groupfilter function='level-members' level='[none:CONTRACT_END_DATE:ok]' />
-            </groupfilter>
-          </filter>
-          <aggregation value='true' />
-        </view>
-        <style />
-        <panes>
-          <pane selection-relaxation-option='selection-relaxation-allow'>
-            <view>
-              <breakdown value='auto' />
-            </view>
-            <mark class='Text' />
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
-          </pane>
-        </panes>
-        <rows>([federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[none:ORGANIZATION_NAME:nk] / [federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[none:Calculation_J0K1L2M3N4O5P6Q7:nk])</rows>
-        <cols>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[none:CONTRACT_END_DATE:ok]</cols>
-      </table>
-      <simple-id uuid='{D9E0F1A2-B3C4-D5E6-F7A8-B9C0D1E2F3A4}' />
+      <simple-id uuid='{B9C0D1E2-F3A4-B5C6-D7E8-F9A0B1C2D3E4}' />
     </worksheet>
     <worksheet name='Geographic Revenue Distribution'>
       <layout-options>
@@ -317,12 +321,17 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS) (GOLD)' name='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8' />
+            <datasource caption='Revenue License Data (ZOOM.GOLD)' name='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' />
           </datasources>
-          <datasource-dependencies datasource='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8'>
-            <column caption='Organization Name' datatype='string' name='[ORGANIZATION_NAME]' role='dimension' type='nominal' />
+          <datasource-dependencies datasource='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F'>
             <column caption='Amount' datatype='real' name='[AMOUNT]' role='measure' type='quantitative' />
+            <column caption='Organization Name' datatype='string' name='[ORGANIZATION_NAME]' role='dimension' type='nominal' />
+            <column caption='Email Masked' datatype='string' name='[Calculation_D0E1F2A3B4C5D6E7]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],1)+&quot;****@&quot;+RIGHT([EMAIL_ADDRESS],LEN([EMAIL_ADDRESS])-FIND(&quot;@&quot;,[EMAIL_ADDRESS]))' />
+            </column>
+            <column caption='Email Address' datatype='string' name='[EMAIL_ADDRESS]' role='dimension' type='nominal' />
             <column-instance column='[ORGANIZATION_NAME]' derivation='None' name='[none:ORGANIZATION_NAME:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_D0E1F2A3B4C5D6E7]' derivation='None' name='[none:Calculation_D0E1F2A3B4C5D6E7:nk]' pivot='key' type='nominal' />
             <column-instance column='[AMOUNT]' derivation='Sum' name='[sum:AMOUNT:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
@@ -332,7 +341,7 @@
             <format attr='width' value='143' />
           </style-rule>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[sum:AMOUNT:qk]' palette='red_blue_diverging_10_0' type='interpolated' />
+            <encoding attr='color' field='[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[sum:AMOUNT:qk]' palette='red_blue_diverging_10_0' type='interpolated' />
           </style-rule>
         </style>
         <panes>
@@ -342,8 +351,9 @@
             </view>
             <mark class='Square' />
             <encodings>
-              <color column='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[sum:AMOUNT:qk]' />
-              <size column='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[sum:AMOUNT:qk]' />
+              <color column='[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[sum:AMOUNT:qk]' />
+              <size column='[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[sum:AMOUNT:qk]' />
+              <lod column='[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[none:Calculation_D0E1F2A3B4C5D6E7:nk]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -357,10 +367,10 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8].[none:ORGANIZATION_NAME:nk]</rows>
+        <rows>[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[none:ORGANIZATION_NAME:nk]</rows>
         <cols />
       </table>
-      <simple-id uuid='{E0F1A2B3-C4D5-E6F7-A8B9-C0D1E2F3A4B5}' />
+      <simple-id uuid='{C0D1E2F3-A4B5-C6D7-E8F9-A0B1C2D3E4F5}' />
     </worksheet>
   </worksheets>
   <windows saved-dpi-scale-factor='1.5' source-height='44'>
@@ -385,7 +395,7 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{F1A2B3C4-D5E6-F7A8-B9C0-D1E2F3A4B5C6}' />
+      <simple-id uuid='{D1E2F3A4-B5C6-D7E8-F9A0-B1C2D3E4F5A6}' />
     </window>
   </windows>
 </workbook>
