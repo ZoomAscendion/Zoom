@@ -3,10 +3,11 @@
 -- Source: RAW.LICENSES
 -- Target: BRONZE.bz_licenses
 -- Author: DBT Data Engineer
--- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('bz_audit_log') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'bz_licenses', CURRENT_TIMESTAMP(), 'DBT', 0, 'STARTED' WHERE '{{ this.name }}' != 'bz_audit_log'",
+    post_hook="INSERT INTO {{ ref('bz_audit_log') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'bz_licenses', CURRENT_TIMESTAMP(), 'DBT', 1, 'COMPLETED' WHERE '{{ this.name }}' != 'bz_audit_log'"
 ) }}
 
 WITH raw_licenses AS (
@@ -25,17 +26,13 @@ WITH raw_licenses AS (
 cleansed_licenses AS (
     SELECT 
         -- 1-1 mapping from raw to bronze as per mapping specification
-        TRIM(UPPER(LICENSE_TYPE)) as license_type,
-        TRIM(ASSIGNED_TO_USER_ID) as assigned_to_user_id,
-        START_DATE as start_date,
-        END_DATE as end_date,
-        LOAD_TIMESTAMP as load_timestamp,
-        COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) as update_timestamp,
-        TRIM(UPPER(SOURCE_SYSTEM)) as source_system,
-        
-        -- Audit fields for bronze layer
-        CURRENT_TIMESTAMP() as bronze_created_at,
-        'SUCCESS' as process_status
+        TRIM(UPPER(LICENSE_TYPE))::STRING as license_type,
+        TRIM(ASSIGNED_TO_USER_ID)::STRING as assigned_to_user_id,
+        START_DATE::DATE as start_date,
+        END_DATE::DATE as end_date,
+        LOAD_TIMESTAMP::TIMESTAMP_NTZ as load_timestamp,
+        COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP)::TIMESTAMP_NTZ as update_timestamp,
+        TRIM(UPPER(SOURCE_SYSTEM))::STRING as source_system
         
     FROM raw_licenses
     WHERE LICENSE_TYPE IS NOT NULL
