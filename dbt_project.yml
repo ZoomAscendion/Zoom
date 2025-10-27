@@ -30,12 +30,7 @@ models:
           UPDATE {{ ref('bz_audit_log') }}
           SET processing_time = DATEDIFF('second', load_timestamp, CURRENT_TIMESTAMP()),
               status = 'COMPLETED'
-          WHERE source_table = '{{ this.name }}'
+          WHERE source_table = '{{ this.name }}' 
             AND status = 'STARTED'
-            AND load_timestamp = (
-              SELECT MAX(load_timestamp)
-              FROM {{ ref('bz_audit_log') }}
-              WHERE source_table = '{{ this.name }}'
-                AND status = 'STARTED'
-            )
+            AND load_timestamp = (SELECT MAX(load_timestamp) FROM {{ ref('bz_audit_log') }} WHERE source_table = '{{ this.name }}' AND status = 'STARTED')
         {% endif %}
