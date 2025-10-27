@@ -1,0 +1,233 @@
+{
+  "database": "DB_POC_ZOOM",
+  "schema": "UTILITY",
+  "extraction_timestamp": "2024-12-19",
+  "tables_and_views": {
+    "SECRET4BRONZE": {
+      "type": "TABLE",
+      "business_description": "Configuration table for Bronze layer secrets and application settings",
+      "columns": [
+        {
+          "name": "APP_NAME",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Name of the application or service",
+          "constraints": "Not Null",
+          "domain_values": "Application identifiers"
+        },
+        {
+          "name": "CONFIG_KEY",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Configuration parameter key identifier",
+          "constraints": "Not Null",
+          "domain_values": "Configuration keys"
+        },
+        {
+          "name": "CONFIG_VALUE",
+          "data_type": "VARCHAR(5000)",
+          "business_description": "Configuration parameter value",
+          "constraints": "Nullable",
+          "domain_values": "Configuration values"
+        },
+        {
+          "name": "DESCRIPTION",
+          "data_type": "VARCHAR(500)",
+          "business_description": "Description of the configuration parameter",
+          "constraints": "Nullable",
+          "domain_values": "Text descriptions"
+        },
+        {
+          "name": "IS_SENSITIVE",
+          "data_type": "BOOLEAN",
+          "business_description": "Flag indicating if the configuration contains sensitive data",
+          "constraints": "Nullable",
+          "domain_values": "TRUE/FALSE"
+        },
+        {
+          "name": "CREATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was created",
+          "constraints": "Nullable",
+          "domain_values": "Timestamp values"
+        },
+        {
+          "name": "UPDATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was last updated",
+          "constraints": "Nullable",
+          "domain_values": "Timestamp values"
+        }
+      ]
+    },
+    "SECRET4GOLD": {
+      "type": "TABLE",
+      "business_description": "Configuration table for Gold layer secrets and application settings",
+      "columns": [
+        {
+          "name": "APP_NAME",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Name of the application or service",
+          "constraints": "Not Null",
+          "domain_values": "Application identifiers"
+        },
+        {
+          "name": "CONFIG_KEY",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Configuration parameter key identifier",
+          "constraints": "Not Null",
+          "domain_values": "Configuration keys"
+        },
+        {
+          "name": "CONFIG_VALUE",
+          "data_type": "VARCHAR(5000)",
+          "business_description": "Configuration parameter value",
+          "constraints": "Nullable",
+          "domain_values": "Configuration values"
+        },
+        {
+          "name": "DESCRIPTION",
+          "data_type": "VARCHAR(500)",
+          "business_description": "Description of the configuration parameter",
+          "constraints": "Nullable",
+          "domain_values": "Text descriptions"
+        },
+        {
+          "name": "IS_SENSITIVE",
+          "data_type": "BOOLEAN",
+          "business_description": "Flag indicating if the configuration contains sensitive data",
+          "constraints": "Nullable",
+          "domain_values": "TRUE/FALSE"
+        },
+        {
+          "name": "CREATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was created",
+          "constraints": "Nullable",
+          "domain_values": "Timestamp values"
+        },
+        {
+          "name": "UPDATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was last updated",
+          "constraints": "Nullable",
+          "domain_values": "Timestamp values"
+        }
+      ]
+    },
+    "SECRET4SILVER": {
+      "type": "TABLE",
+      "business_description": "Configuration table for Silver layer secrets and application settings",
+      "columns": [
+        {
+          "name": "APP_NAME",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Name of the application or service",
+          "constraints": "Not Null",
+          "domain_values": "Application identifiers"
+        },
+        {
+          "name": "CONFIG_KEY",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Configuration parameter key identifier",
+          "constraints": "Not Null",
+          "domain_values": "Configuration keys"
+        },
+        {
+          "name": "CONFIG_VALUE",
+          "data_type": "VARCHAR(5000)",
+          "business_description": "Configuration parameter value",
+          "constraints": "Nullable",
+          "domain_values": "Configuration values"
+        },
+        {
+          "name": "DESCRIPTION",
+          "data_type": "VARCHAR(500)",
+          "business_description": "Description of the configuration parameter",
+          "constraints": "Nullable",
+          "domain_values": "Text descriptions"
+        },
+        {
+          "name": "IS_SENSITIVE",
+          "data_type": "BOOLEAN",
+          "business_description": "Flag indicating if the configuration contains sensitive data",
+          "constraints": "Nullable",
+          "domain_values": "TRUE/FALSE"
+        },
+        {
+          "name": "CREATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was created",
+          "constraints": "Nullable",
+          "domain_values": "Timestamp values"
+        },
+        {
+          "name": "UPDATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was last updated",
+          "constraints": "Nullable",
+          "domain_values": "Timestamp values"
+        }
+      ]
+    },
+    "SECRETS_STORE": {
+      "type": "TABLE",
+      "business_description": "Main secrets store table for application configuration management",
+      "columns": [
+        {
+          "name": "APP_NAME",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Name of the application or service",
+          "constraints": "Not Null",
+          "domain_values": "Application identifiers"
+        },
+        {
+          "name": "CONFIG_KEY",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Configuration parameter key identifier",
+          "constraints": "Not Null",
+          "domain_values": "Configuration keys"
+        },
+        {
+          "name": "CONFIG_VALUE",
+          "data_type": "VARCHAR(5000)",
+          "business_description": "Configuration parameter value",
+          "constraints": "Nullable",
+          "domain_values": "Configuration values"
+        },
+        {
+          "name": "DESCRIPTION",
+          "data_type": "VARCHAR(500)",
+          "business_description": "Description of the configuration parameter",
+          "constraints": "Nullable",
+          "domain_values": "Text descriptions"
+        },
+        {
+          "name": "IS_SENSITIVE",
+          "data_type": "BOOLEAN",
+          "business_description": "Flag indicating if the configuration contains sensitive data",
+          "constraints": "Nullable",
+          "domain_values": "TRUE/FALSE"
+        },
+        {
+          "name": "CREATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was created",
+          "constraints": "Nullable",
+          "domain_values": "Timestamp values"
+        },
+        {
+          "name": "UPDATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was last updated",
+          "constraints": "Nullable",
+          "domain_values": "Timestamp values"
+        }
+      ]
+    }
+  },
+  "summary": {
+    "total_tables": 4,
+    "total_views": 0,
+    "total_columns": 28,
+    "data_governance_notes": "All tables follow consistent schema pattern for configuration management across different data layers (Bronze, Silver, Gold) with proper timestamp tracking and sensitivity flags for data governance."
+  }
+}
