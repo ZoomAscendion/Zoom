@@ -3,10 +3,11 @@
 -- Source: RAW.SUPPORT_TICKETS
 -- Target: BRONZE.bz_support_tickets
 -- Author: DBT Data Engineer
--- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('bz_audit_log') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'bz_support_tickets', CURRENT_TIMESTAMP(), 'DBT', 0, 'STARTED' WHERE '{{ this.name }}' != 'bz_audit_log'",
+    post_hook="INSERT INTO {{ ref('bz_audit_log') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'bz_support_tickets', CURRENT_TIMESTAMP(), 'DBT', 1, 'COMPLETED' WHERE '{{ this.name }}' != 'bz_audit_log'"
 ) }}
 
 WITH raw_support_tickets AS (
@@ -25,17 +26,13 @@ WITH raw_support_tickets AS (
 cleansed_support_tickets AS (
     SELECT 
         -- 1-1 mapping from raw to bronze as per mapping specification
-        TRIM(USER_ID) as user_id,
-        TRIM(UPPER(TICKET_TYPE)) as ticket_type,
-        TRIM(UPPER(RESOLUTION_STATUS)) as resolution_status,
-        OPEN_DATE as open_date,
-        LOAD_TIMESTAMP as load_timestamp,
-        COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) as update_timestamp,
-        TRIM(UPPER(SOURCE_SYSTEM)) as source_system,
-        
-        -- Audit fields for bronze layer
-        CURRENT_TIMESTAMP() as bronze_created_at,
-        'SUCCESS' as process_status
+        TRIM(USER_ID)::STRING as user_id,
+        TRIM(UPPER(TICKET_TYPE))::STRING as ticket_type,
+        TRIM(UPPER(RESOLUTION_STATUS))::STRING as resolution_status,
+        OPEN_DATE::DATE as open_date,
+        LOAD_TIMESTAMP::TIMESTAMP_NTZ as load_timestamp,
+        COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP)::TIMESTAMP_NTZ as update_timestamp,
+        TRIM(UPPER(SOURCE_SYSTEM))::STRING as source_system
         
     FROM raw_support_tickets
     WHERE USER_ID IS NOT NULL
