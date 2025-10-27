@@ -21,15 +21,15 @@
     </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
   </_.fcp.AnimationOnByDefault.false...style>
   <datasources>
-    <datasource caption='GO_BILLING_FACTS' inline='true' name='federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e' version='18.1'>
+    <datasource caption='GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS) (GOLD)' inline='true' name='federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c' version='18.1'>
       <connection class='federated'>
         <named-connections>
-          <named-connection caption='cmmoeui-dh77804.snowflakecomputing.com' name='snowflake.7t9ikc509qxymk17b056f0gehr4g'>
-            <connection authentication='Username Password' class='snowflake' dbname='ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='cmmoeui-dh77804.snowflakecomputing.com' service='ACCOUNTADMIN' username='THEJASHWANI' password='Thejashwani@04' warehouse='COMPUTE_WH' />
+          <named-connection caption='NWZLYVS-MU54263.snowflakecomputing.com' name='snowflake.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c'>
+            <connection authentication='Username Password' class='snowflake' dbname='ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='NWZLYVS-MU54263.snowflakecomputing.com' service='ACCOUNTADMIN' username='THEJASHWANI' password='Thejashwani@04' warehouse='COMPUTE_WH' />
           </named-connection>
         </named-connections>
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.7t9ikc509qxymk17b056f0gehr4g' name='GO_BILLING_FACTS' table='[ZOOM].[GOLD].[GO_BILLING_FACTS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.7t9ikc509qxymk17b056f0gehr4g' name='GO_BILLING_FACTS' table='[ZOOM].[GOLD].[GO_BILLING_FACTS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c' name='GO_BILLING_FACTS' table='[ZOOM].[GOLD].[GO_BILLING_FACTS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c' name='GO_BILLING_FACTS' table='[ZOOM].[GOLD].[GO_BILLING_FACTS]' type='table' />
         <metadata-records>
           <metadata-record class='column'>
             <remote-name>BILLING_FACT_ID</remote-name>
@@ -43,7 +43,12 @@
             <width>50</width>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_BILLING_FACTS_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS)_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>EVENT_TYPE</remote-name>
@@ -57,7 +62,12 @@
             <width>100</width>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_BILLING_FACTS_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS)_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>AMOUNT</remote-name>
@@ -71,7 +81,11 @@
             <precision>10</precision>
             <scale>2</scale>
             <contains-null>true</contains-null>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_BILLING_FACTS_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_DECIMAL&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_NUMERIC&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS)_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>EVENT_DATE</remote-name>
@@ -83,21 +97,27 @@
             <local-type>date</local-type>
             <aggregation>Year</aggregation>
             <contains-null>true</contains-null>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_BILLING_FACTS_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_TYPE_DATE&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_TYPE_DATE&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS)_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
-            <remote-name>PAYMENT_METHOD</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[PAYMENT_METHOD]</local-name>
+            <remote-name>BILLING_PERIOD_START</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[BILLING_PERIOD_START]</local-name>
             <parent-name>[GO_BILLING_FACTS]</parent-name>
-            <remote-alias>PAYMENT_METHOD</remote-alias>
+            <remote-alias>BILLING_PERIOD_START</remote-alias>
             <ordinal>5</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <width>50</width>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_BILLING_FACTS_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_TYPE_DATE&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_TYPE_DATE&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS)_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
         </metadata-records>
       </connection>
@@ -106,40 +126,40 @@
       <column caption='Event Type' datatype='string' name='[EVENT_TYPE]' role='dimension' type='nominal' />
       <column caption='Amount' datatype='real' name='[AMOUNT]' role='measure' type='quantitative' />
       <column caption='Event Date' datatype='date' name='[EVENT_DATE]' role='dimension' type='ordinal' />
-      <column caption='Payment Method' datatype='string' name='[PAYMENT_METHOD]' role='dimension' type='nominal' />
-      <column caption='Monthly Recurring Revenue' datatype='real' name='[Calculation_MRR]' role='measure' type='quantitative'>
+      <column caption='Billing Period Start' datatype='date' name='[BILLING_PERIOD_START]' role='dimension' type='ordinal' />
+      <column caption='Monthly Recurring Revenue' datatype='real' name='[Calculation_A8B9C0D1E2F3A4B5C6D7]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='SUM([AMOUNT])' />
       </column>
-      <column caption='Total Revenue' datatype='real' name='[Calculation_Total_Revenue]' role='measure' type='quantitative'>
+      <column caption='Revenue by License Type' datatype='real' name='[Calculation_B9C0D1E2F3A4B5C6D7E8]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='SUM([AMOUNT])' />
       </column>
-      <column caption='Revenue by Plan Type' datatype='real' name='[Calculation_Revenue_By_Plan]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='SUM([AMOUNT])' />
+      <column caption='License Utilization Rate' datatype='real' name='[Calculation_C0D1E2F3A4B5C6D7E8F9]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([BILLING_FACT_ID])/100' />
       </column>
-      <_.fcp.ObjectModelTableType.true...column caption='GO_BILLING_FACTS' datatype='table' name='[__tableau_internal_object_id__].[GO_BILLING_FACTS_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='GO_BILLING_FACTS' datatype='table' name='[__tableau_internal_object_id__].[GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS)_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1]' role='measure' type='quantitative' />
       <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
       <semantic-values>
         <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
       </semantic-values>
       <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
         <objects>
-          <object caption='GO_BILLING_FACTS' id='GO_BILLING_FACTS_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2'>
+          <object caption='GO_BILLING_FACTS' id='GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS)_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1'>
             <properties context=''>
-              <relation connection='snowflake.7t9ikc509qxymk17b056f0gehr4g' name='GO_BILLING_FACTS' table='[ZOOM].[GOLD].[GO_BILLING_FACTS]' type='table' />
+              <relation connection='snowflake.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c' name='GO_BILLING_FACTS' table='[ZOOM].[GOLD].[GO_BILLING_FACTS]' type='table' />
             </properties>
           </object>
         </objects>
       </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
     </datasource>
-    <datasource caption='GO_USER_DIMENSION' inline='true' name='federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f' version='18.1'>
+    <datasource caption='GO_USER_DIMENSION (ZOOM.GO_USER_DIMENSION) (GOLD)' inline='true' name='federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d' version='18.1'>
       <connection class='federated'>
         <named-connections>
-          <named-connection caption='cmmoeui-dh77804.snowflakecomputing.com' name='snowflake.8t0ikc509qxymk17b056f0gehr4h'>
-            <connection authentication='Username Password' class='snowflake' dbname='ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='cmmoeui-dh77804.snowflakecomputing.com' service='ACCOUNTADMIN' username='THEJASHWANI' password='Thejashwani@04' warehouse='COMPUTE_WH' />
+          <named-connection caption='NWZLYVS-MU54263.snowflakecomputing.com' name='snowflake.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d'>
+            <connection authentication='Username Password' class='snowflake' dbname='ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='NWZLYVS-MU54263.snowflakecomputing.com' service='ACCOUNTADMIN' username='THEJASHWANI' password='Thejashwani@04' warehouse='COMPUTE_WH' />
           </named-connection>
         </named-connections>
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.8t0ikc509qxymk17b056f0gehr4h' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.8t0ikc509qxymk17b056f0gehr4h' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
         <metadata-records>
           <metadata-record class='column'>
             <remote-name>USER_ID</remote-name>
@@ -153,7 +173,12 @@
             <width>50</width>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_USER_DIMENSION_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_USER_DIMENSION (ZOOM.GO_USER_DIMENSION)_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>EMAIL_ADDRESS</remote-name>
@@ -167,7 +192,12 @@
             <width>320</width>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_USER_DIMENSION_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_USER_DIMENSION (ZOOM.GO_USER_DIMENSION)_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>LICENSE_TYPE</remote-name>
@@ -181,7 +211,12 @@
             <width>100</width>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_USER_DIMENSION_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_USER_DIMENSION (ZOOM.GO_USER_DIMENSION)_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
         </metadata-records>
       </connection>
@@ -189,36 +224,33 @@
       <column caption='User Id' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
       <column caption='Email Address' datatype='string' name='[EMAIL_ADDRESS]' role='dimension' type='nominal' />
       <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
-      <column caption='Masked Email' datatype='string' name='[Calculation_Masked_Email]' role='dimension' type='nominal'>
-        <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],1)+&quot;****@&quot;+RIGHT(SPLIT([EMAIL_ADDRESS],&quot;@&quot;,2),10)' />
+      <column caption='Email Masked' datatype='string' name='[Calculation_D1E2F3A4B5C6D7E8F9A0]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],1)+&quot;****@&quot;+RIGHT([EMAIL_ADDRESS],FIND([EMAIL_ADDRESS],&quot;@&quot;)+1)' />
       </column>
-      <column caption='License Utilization Rate' datatype='real' name='[Calculation_License_Utilization]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNT([USER_ID]) / 100.0' />
-      </column>
-      <_.fcp.ObjectModelTableType.true...column caption='GO_USER_DIMENSION' datatype='table' name='[__tableau_internal_object_id__].[GO_USER_DIMENSION_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='GO_USER_DIMENSION' datatype='table' name='[__tableau_internal_object_id__].[GO_USER_DIMENSION (ZOOM.GO_USER_DIMENSION)_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2]' role='measure' type='quantitative' />
       <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
       <semantic-values>
         <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
       </semantic-values>
       <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
         <objects>
-          <object caption='GO_USER_DIMENSION' id='GO_USER_DIMENSION_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3'>
+          <object caption='GO_USER_DIMENSION' id='GO_USER_DIMENSION (ZOOM.GO_USER_DIMENSION)_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2'>
             <properties context=''>
-              <relation connection='snowflake.8t0ikc509qxymk17b056f0gehr4h' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+              <relation connection='snowflake.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
             </properties>
           </object>
         </objects>
       </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
     </datasource>
-    <datasource caption='GO_ORGANIZATION_DIMENSION' inline='true' name='federated.9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a' version='18.1'>
+    <datasource caption='GO_ORGANIZATION_DIMENSION (ZOOM.GO_ORGANIZATION_DIMENSION) (GOLD)' inline='true' name='federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e' version='18.1'>
       <connection class='federated'>
         <named-connections>
-          <named-connection caption='cmmoeui-dh77804.snowflakecomputing.com' name='snowflake.9t1ikc509qxymk17b056f0gehr4i'>
-            <connection authentication='Username Password' class='snowflake' dbname='ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='cmmoeui-dh77804.snowflakecomputing.com' service='ACCOUNTADMIN' username='THEJASHWANI' password='Thejashwani@04' warehouse='COMPUTE_WH' />
+          <named-connection caption='NWZLYVS-MU54263.snowflakecomputing.com' name='snowflake.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e'>
+            <connection authentication='Username Password' class='snowflake' dbname='ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='NWZLYVS-MU54263.snowflakecomputing.com' service='ACCOUNTADMIN' username='THEJASHWANI' password='Thejashwani@04' warehouse='COMPUTE_WH' />
           </named-connection>
         </named-connections>
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.9t1ikc509qxymk17b056f0gehr4i' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.9t1ikc509qxymk17b056f0gehr4i' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
         <metadata-records>
           <metadata-record class='column'>
             <remote-name>ORGANIZATION_ID</remote-name>
@@ -232,7 +264,12 @@
             <width>50</width>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_ORGANIZATION_DIMENSION_C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3F4]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_ORGANIZATION_DIMENSION (ZOOM.GO_ORGANIZATION_DIMENSION)_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>ORGANIZATION_NAME</remote-name>
@@ -246,23 +283,28 @@
             <width>500</width>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_ORGANIZATION_DIMENSION_C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3F4]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_ORGANIZATION_DIMENSION (ZOOM.GO_ORGANIZATION_DIMENSION)_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
         </metadata-records>
       </connection>
       <aliases enabled='yes' />
       <column caption='Organization Id' datatype='string' name='[ORGANIZATION_ID]' role='dimension' type='nominal' />
       <column caption='Organization Name' datatype='string' name='[ORGANIZATION_NAME]' role='dimension' type='nominal' />
-      <_.fcp.ObjectModelTableType.true...column caption='GO_ORGANIZATION_DIMENSION' datatype='table' name='[__tableau_internal_object_id__].[GO_ORGANIZATION_DIMENSION_C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3F4]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='GO_ORGANIZATION_DIMENSION' datatype='table' name='[__tableau_internal_object_id__].[GO_ORGANIZATION_DIMENSION (ZOOM.GO_ORGANIZATION_DIMENSION)_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3]' role='measure' type='quantitative' />
       <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
       <semantic-values>
         <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
       </semantic-values>
       <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
         <objects>
-          <object caption='GO_ORGANIZATION_DIMENSION' id='GO_ORGANIZATION_DIMENSION_C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3F4'>
+          <object caption='GO_ORGANIZATION_DIMENSION' id='GO_ORGANIZATION_DIMENSION (ZOOM.GO_ORGANIZATION_DIMENSION)_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3'>
             <properties context=''>
-              <relation connection='snowflake.9t1ikc509qxymk17b056f0gehr4i' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
+              <relation connection='snowflake.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
             </properties>
           </object>
         </objects>
@@ -281,21 +323,21 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='GO_BILLING_FACTS' name='federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e' />
+            <datasource caption='GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS) (GOLD)' name='federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c' />
           </datasources>
-          <datasource-dependencies datasource='federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e'>
+          <datasource-dependencies datasource='federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c'>
             <column caption='Event Date' datatype='date' name='[EVENT_DATE]' role='dimension' type='ordinal' />
-            <column caption='Monthly Recurring Revenue' datatype='real' name='[Calculation_MRR]' role='measure' type='quantitative'>
+            <column caption='Monthly Recurring Revenue' datatype='real' name='[Calculation_A8B9C0D1E2F3A4B5C6D7]' role='measure' type='quantitative'>
               <calculation class='tableau' formula='SUM([AMOUNT])' />
             </column>
             <column-instance column='[EVENT_DATE]' derivation='Month-Trunc' name='[tmn:EVENT_DATE:qk]' pivot='key' type='quantitative' />
-            <column-instance column='[Calculation_MRR]' derivation='None' name='[none:Calculation_MRR:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_A8B9C0D1E2F3A4B5C6D7]' derivation='Sum' name='[sum:Calculation_A8B9C0D1E2F3A4B5C6D7:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
         <style>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e].[none:Calculation_MRR:qk]' palette='green_10_0' type='interpolated' />
+            <encoding attr='color' field='[federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c].[sum:Calculation_A8B9C0D1E2F3A4B5C6D7:qk]' palette='green_10_0' type='interpolated' />
           </style-rule>
         </style>
         <panes>
@@ -304,6 +346,9 @@
               <breakdown value='auto' />
             </view>
             <mark class='Line' />
+            <encodings>
+              <color column='[federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c].[sum:Calculation_A8B9C0D1E2F3A4B5C6D7:qk]' />
+            </encodings>
             <style>
               <style-rule element='mark'>
                 <format attr='mark-labels-show' value='true' />
@@ -312,8 +357,8 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e].[none:Calculation_MRR:qk]</rows>
-        <cols>[federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e].[tmn:EVENT_DATE:qk]</cols>
+        <rows>[federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c].[sum:Calculation_A8B9C0D1E2F3A4B5C6D7:qk]</rows>
+        <cols>[federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c].[tmn:EVENT_DATE:qk]</cols>
       </table>
       <simple-id uuid='{A8B9C0D1-E2F3-A4B5-C6D7-E8F9A0B1C2D3}' />
     </worksheet>
@@ -328,18 +373,18 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='GO_USER_DIMENSION' name='federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f' />
-            <datasource caption='GO_BILLING_FACTS' name='federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e' />
+            <datasource caption='GO_USER_DIMENSION (ZOOM.GO_USER_DIMENSION) (GOLD)' name='federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d' />
+            <datasource caption='GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS) (GOLD)' name='federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c' />
           </datasources>
-          <datasource-dependencies datasource='federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f'>
+          <datasource-dependencies datasource='federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d'>
             <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
             <column-instance column='[LICENSE_TYPE]' derivation='None' name='[none:LICENSE_TYPE:nk]' pivot='key' type='nominal' />
           </datasource-dependencies>
-          <datasource-dependencies datasource='federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e'>
-            <column caption='Revenue by Plan Type' datatype='real' name='[Calculation_Revenue_By_Plan]' role='measure' type='quantitative'>
+          <datasource-dependencies datasource='federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c'>
+            <column caption='Revenue by License Type' datatype='real' name='[Calculation_B9C0D1E2F3A4B5C6D7E8]' role='measure' type='quantitative'>
               <calculation class='tableau' formula='SUM([AMOUNT])' />
             </column>
-            <column-instance column='[Calculation_Revenue_By_Plan]' derivation='None' name='[none:Calculation_Revenue_By_Plan:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_B9C0D1E2F3A4B5C6D7E8]' derivation='Sum' name='[sum:Calculation_B9C0D1E2F3A4B5C6D7E8:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
@@ -351,7 +396,7 @@
             </view>
             <mark class='Bar' />
             <encodings>
-              <color column='[federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f].[none:LICENSE_TYPE:nk]' />
+              <color column='[federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d].[none:LICENSE_TYPE:nk]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -361,8 +406,8 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e].[none:Calculation_Revenue_By_Plan:qk]</rows>
-        <cols>[federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f].[none:LICENSE_TYPE:nk]</cols>
+        <rows>[federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c].[sum:Calculation_B9C0D1E2F3A4B5C6D7E8:qk]</rows>
+        <cols>[federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d].[none:LICENSE_TYPE:nk]</cols>
       </table>
       <simple-id uuid='{B9C0D1E2-F3A4-B5C6-D7E8-F9A0B1C2D3E4}' />
     </worksheet>
@@ -377,18 +422,16 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='GO_ORGANIZATION_DIMENSION' name='federated.9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a' />
-            <datasource caption='GO_BILLING_FACTS' name='federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e' />
+            <datasource caption='GO_ORGANIZATION_DIMENSION (ZOOM.GO_ORGANIZATION_DIMENSION) (GOLD)' name='federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e' />
+            <datasource caption='GO_BILLING_FACTS (ZOOM.GO_BILLING_FACTS) (GOLD)' name='federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c' />
           </datasources>
-          <datasource-dependencies datasource='federated.9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a'>
+          <datasource-dependencies datasource='federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e'>
             <column caption='Organization Name' datatype='string' name='[ORGANIZATION_NAME]' role='dimension' type='nominal' />
             <column-instance column='[ORGANIZATION_NAME]' derivation='None' name='[none:ORGANIZATION_NAME:nk]' pivot='key' type='nominal' />
           </datasource-dependencies>
-          <datasource-dependencies datasource='federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e'>
-            <column caption='Total Revenue' datatype='real' name='[Calculation_Total_Revenue]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='SUM([AMOUNT])' />
-            </column>
-            <column-instance column='[Calculation_Total_Revenue]' derivation='None' name='[none:Calculation_Total_Revenue:qk]' pivot='key' type='quantitative' />
+          <datasource-dependencies datasource='federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c'>
+            <column caption='Amount' datatype='real' name='[AMOUNT]' role='measure' type='quantitative' />
+            <column-instance column='[AMOUNT]' derivation='Sum' name='[sum:AMOUNT:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
@@ -397,7 +440,7 @@
             <format attr='width' value='143' />
           </style-rule>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e].[none:Calculation_Total_Revenue:qk]' palette='red_blue_diverging_10_0' type='interpolated' />
+            <encoding attr='color' field='[federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c].[sum:AMOUNT:qk]' palette='red_blue_diverging_10_0' type='interpolated' />
           </style-rule>
         </style>
         <panes>
@@ -407,8 +450,8 @@
             </view>
             <mark class='Square' />
             <encodings>
-              <color column='[federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e].[none:Calculation_Total_Revenue:qk]' />
-              <size column='[federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e].[none:Calculation_Total_Revenue:qk]' />
+              <color column='[federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c].[sum:AMOUNT:qk]' />
+              <size column='[federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c].[sum:AMOUNT:qk]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -422,64 +465,10 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a].[none:ORGANIZATION_NAME:nk]</rows>
+        <rows>[federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e].[none:ORGANIZATION_NAME:nk]</rows>
         <cols />
       </table>
       <simple-id uuid='{C0D1E2F3-A4B5-C6D7-E8F9-A0B1C2D3E4F5}' />
-    </worksheet>
-    <worksheet name='License Utilization Table'>
-      <layout-options>
-        <title>
-          <formatted-text>
-            <run>License Utilization Analysis</run>
-          </formatted-text>
-        </title>
-      </layout-options>
-      <table>
-        <view>
-          <datasources>
-            <datasource caption='GO_USER_DIMENSION' name='federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f' />
-          </datasources>
-          <datasource-dependencies datasource='federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f'>
-            <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
-            <column caption='Masked Email' datatype='string' name='[Calculation_Masked_Email]' role='dimension' type='nominal'>
-              <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],1)+&quot;****@&quot;+RIGHT(SPLIT([EMAIL_ADDRESS],&quot;@&quot;,2),10)' />
-            </column>
-            <column caption='License Utilization Rate' datatype='real' name='[Calculation_License_Utilization]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='COUNT([USER_ID]) / 100.0' />
-            </column>
-            <column-instance column='[LICENSE_TYPE]' derivation='None' name='[none:LICENSE_TYPE:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calculation_Masked_Email]' derivation='None' name='[none:Calculation_Masked_Email:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calculation_License_Utilization]' derivation='None' name='[none:Calculation_License_Utilization:qk]' pivot='key' type='quantitative' />
-          </datasource-dependencies>
-          <aggregation value='true' />
-        </view>
-        <style>
-          <style-rule element='cell'>
-            <format attr='width' value='241' />
-          </style-rule>
-        </style>
-        <panes>
-          <pane selection-relaxation-option='selection-relaxation-allow'>
-            <view>
-              <breakdown value='auto' />
-            </view>
-            <mark class='Text' />
-            <encodings>
-              <lod column='[federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f].[none:Calculation_Masked_Email:nk]' />
-            </encodings>
-            <style>
-              <style-rule element='pane'>
-                <format attr='minwidth' value='-1' />
-                <format attr='maxwidth' value='-1' />
-              </style-rule>
-            </style>
-          </pane>
-        </panes>
-        <rows>[federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f].[none:Calculation_License_Utilization:qk]</rows>
-        <cols>([federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f].[none:LICENSE_TYPE:nk] / [federated.8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f].[none:Calculation_Masked_Email:nk])</cols>
-      </table>
-      <simple-id uuid='{D1E2F3A4-B5C6-D7E8-F9A0-B1C2D3E4F5A6}' />
     </worksheet>
   </worksheets>
   <windows saved-dpi-scale-factor='1.5' source-height='44'>
@@ -504,7 +493,7 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{E2F3A4B5-C6D7-E8F9-A0B1-C2D3E4F5A6B7}' />
+      <simple-id uuid='{D1E2F3A4-B5C6-D7E8-F9A0-B1C2D3E4F5A6}' />
     </window>
   </windows>
 </workbook>
