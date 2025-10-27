@@ -12,13 +12,13 @@
 
 WITH audit_data AS (
     SELECT 
-        {{ dbt_utils.generate_surrogate_key(['execution_id', 'pipeline_name', 'start_time']) }} AS audit_id,
+        {{ dbt_utils.generate_surrogate_key(['pipeline_name', 'start_time']) }} AS audit_id,
         'zoom_silver_pipeline' AS pipeline_name,
         CURRENT_TIMESTAMP() AS start_time,
         NULL AS end_time,
         'RUNNING' AS status,
         NULL AS error_message,
-        {{ dbt_utils.generate_surrogate_key(['pipeline_name', 'start_time']) }} AS execution_id,
+        {{ dbt_utils.generate_surrogate_key(['pipeline_name', 'CURRENT_TIMESTAMP()']) }} AS execution_id,
         CURRENT_TIMESTAMP() AS execution_start_time,
         NULL AS execution_end_time,
         NULL AS execution_duration_seconds,
@@ -36,5 +36,5 @@ WITH audit_data AS (
 SELECT * FROM audit_data
 
 {% if is_incremental() %}
-  WHERE load_timestamp > (SELECT MAX(load_timestamp) FROM {{ this }})
+  WHERE load_timestamp > (SELECT COALESCE(MAX(load_timestamp), '1900-01-01') FROM {{ this }})
 {% endif %}
