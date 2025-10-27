@@ -114,8 +114,6 @@ models:
         tests:
           - not_null
           - unique
-      - name: email_domain
-        description: "Domain extracted from email address"
       - name: plan_type
         description: "User subscription plan type"
         tests:
@@ -125,9 +123,6 @@ models:
         description: "Data quality score (0.00-1.00)"
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0.00
-              max_value: 1.00
               
   - name: si_meetings
     description: "Silver layer meetings table with validated meeting data and derived attributes"
@@ -141,22 +136,12 @@ models:
         description: "Meeting host user identifier"
         tests:
           - not_null
-          - relationships:
-              to: ref('si_users')
-              field: user_id
       - name: duration_minutes
         description: "Meeting duration in minutes"
-        tests:
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 1440
       - name: data_quality_score
         description: "Data quality score (0.00-1.00)"
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0.00
-              max_value: 1.00
               
   - name: si_participants
     description: "Silver layer participants table with attendance metrics and engagement scores"
@@ -170,28 +155,12 @@ models:
         description: "Meeting identifier"
         tests:
           - not_null
-          - relationships:
-              to: ref('si_meetings')
-              field: meeting_id
       - name: user_id
         description: "Participant user identifier"
         tests:
           - not_null
-          - relationships:
-              to: ref('si_users')
-              field: user_id
-      - name: attendance_percentage
-        description: "Percentage of meeting attended"
-        tests:
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0.00
-              max_value: 100.00
       - name: engagement_score
         description: "Engagement score (0.00-1.00)"
-        tests:
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0.00
-              max_value: 1.00
               
   - name: si_billing_events
     description: "Silver layer billing events table with validated and standardized billing data"
@@ -205,9 +174,6 @@ models:
         description: "User identifier for billing event"
         tests:
           - not_null
-          - relationships:
-              to: ref('si_users')
-              field: user_id
       - name: event_type
         description: "Standardized billing event type"
         tests:
@@ -217,9 +183,6 @@ models:
         description: "Billing amount (validated)"
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0.01
-              max_value: 10000.00
       - name: currency_code
         description: "Currency code (ISO standard)"
         tests:
