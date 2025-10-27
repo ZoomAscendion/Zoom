@@ -21,15 +21,19 @@
     </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
   </_.fcp.AnimationOnByDefault.false...style>
   <datasources>
-    <datasource caption='GO_DATA_QUALITY_ERRORS (ZOOM.GO_DATA_QUALITY_ERRORS) (GOLD)' inline='true' name='federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b' version='18.1'>
+    <datasource caption='GO_DATA_QUALITY_ERRORS (ZOOM.GO_DATA_QUALITY_ERRORS) (GOLD)' inline='true' name='federated.1b2c3d4e5f678901' version='18.1'>
       <connection class='federated'>
         <named-connections>
-          <named-connection caption='NWZLYVS-MU54263.snowflakecomputing.com' name='snowflake.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b'>
+          <named-connection caption='NWZLYVS-MU54263.snowflakecomputing.com' name='snowflake.2b3c4d5e6f789012'>
             <connection authentication='Username Password' class='snowflake' dbname='ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='NWZLYVS-MU54263.snowflakecomputing.com' service='ACCOUNTADMIN' username='THEJASHWANI' password='Thejashwani@04' warehouse='COMPUTE_WH' />
           </named-connection>
         </named-connections>
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b' name='GO_DATA_QUALITY_ERRORS' table='[ZOOM].[GOLD].[GO_DATA_QUALITY_ERRORS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b' name='GO_DATA_QUALITY_ERRORS' table='[ZOOM].[GOLD].[GO_DATA_QUALITY_ERRORS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2b3c4d5e6f789012' name='GO_DATA_QUALITY_ERRORS' table='[ZOOM].[GOLD].[GO_DATA_QUALITY_ERRORS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2b3c4d5e6f789012' name='GO_DATA_QUALITY_ERRORS' table='[ZOOM].[GOLD].[GO_DATA_QUALITY_ERRORS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2b3c4d5e6f789012' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2b3c4d5e6f789012' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2b3c4d5e6f789012' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2b3c4d5e6f789012' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
         <metadata-records>
           <metadata-record class='column'>
             <remote-name>ERROR_ID</remote-name>
@@ -40,6 +44,7 @@
             <ordinal>1</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
+            <width>50</width>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
           </metadata-record>
@@ -52,6 +57,7 @@
             <ordinal>2</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
+            <width>100</width>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
           </metadata-record>
@@ -75,6 +81,7 @@
             <ordinal>4</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
+            <width>50</width>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
           </metadata-record>
@@ -89,96 +96,74 @@
             <aggregation>Year</aggregation>
             <contains-null>true</contains-null>
           </metadata-record>
-        </metadata-records>
-      </connection>
-      <aliases enabled='yes' />
-      <column caption='Error Id' datatype='string' name='[ERROR_ID]' role='dimension' type='nominal' />
-      <column caption='Error Type' datatype='string' name='[ERROR_TYPE]' role='dimension' type='nominal' />
-      <column caption='Error Timestamp' datatype='datetime' name='[ERROR_TIMESTAMP]' role='dimension' type='ordinal' />
-      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
-      <column caption='Resolution Timestamp' datatype='datetime' name='[RESOLUTION_TIMESTAMP]' role='dimension' type='ordinal' />
-      <column caption='Ticket Volume by Type' datatype='integer' name='[Calculation_E5F6A7B8C9D0E1F2]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNT([ERROR_ID])' />
-      </column>
-      <column caption='Average Resolution Time' datatype='real' name='[Calculation_F6A7B8C9D0E1F2A3]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='AVG(DATEDIFF(&quot;hour&quot;,[ERROR_TIMESTAMP],[RESOLUTION_TIMESTAMP]))' />
-      </column>
-      <column caption='First Contact Resolution Rate' datatype='real' name='[Calculation_A7B8C9D0E1F2A3B4]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='SUM(IF [RESOLUTION_STATUS] = &quot;Resolved&quot; THEN 1 ELSE 0 END) / COUNT([ERROR_ID])' />
-      </column>
-      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
-    </datasource>
-    <datasource caption='GO_USER_DIMENSION (ZOOM.GO_USER_DIMENSION) (GOLD)' inline='true' name='federated.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c' version='18.1'>
-      <connection class='federated'>
-        <named-connections>
-          <named-connection caption='NWZLYVS-MU54263.snowflakecomputing.com' name='snowflake.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c'>
-            <connection authentication='Username Password' class='snowflake' dbname='ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='NWZLYVS-MU54263.snowflakecomputing.com' service='ACCOUNTADMIN' username='THEJASHWANI' password='Thejashwani@04' warehouse='COMPUTE_WH' />
-          </named-connection>
-        </named-connections>
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
-        <metadata-records>
           <metadata-record class='column'>
             <remote-name>USER_ID</remote-name>
             <remote-type>129</remote-type>
             <local-name>[USER_ID]</local-name>
             <parent-name>[GO_USER_DIMENSION]</parent-name>
             <remote-alias>USER_ID</remote-alias>
-            <ordinal>1</ordinal>
+            <ordinal>6</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
+            <width>50</width>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
           </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>EMAIL_ADDRESS</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[EMAIL_ADDRESS]</local-name>
-            <parent-name>[GO_USER_DIMENSION]</parent-name>
-            <remote-alias>EMAIL_ADDRESS</remote-alias>
-            <ordinal>2</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-          </metadata-record>
-        </metadata-records>
-      </connection>
-      <aliases enabled='yes' />
-      <column caption='User Id' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
-      <column caption='Email Address' datatype='string' name='[EMAIL_ADDRESS]' role='dimension' type='nominal' />
-      <column caption='Masked Email' datatype='string' name='[Calculation_B8C9D0E1F2A3B4C5]' role='dimension' type='nominal'>
-        <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],1)+&quot;****@&quot;+RIGHT([EMAIL_ADDRESS],FIND([EMAIL_ADDRESS],&quot;@&quot;)+1)' />
-      </column>
-      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
-    </datasource>
-    <datasource caption='GO_ORGANIZATION_DIMENSION (ZOOM.GO_ORGANIZATION_DIMENSION) (GOLD)' inline='true' name='federated.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d' version='18.1'>
-      <connection class='federated'>
-        <named-connections>
-          <named-connection caption='NWZLYVS-MU54263.snowflakecomputing.com' name='snowflake.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d'>
-            <connection authentication='Username Password' class='snowflake' dbname='ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='NWZLYVS-MU54263.snowflakecomputing.com' service='ACCOUNTADMIN' username='THEJASHWANI' password='Thejashwani@04' warehouse='COMPUTE_WH' />
-          </named-connection>
-        </named-connections>
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
-        <metadata-records>
           <metadata-record class='column'>
             <remote-name>ORGANIZATION_NAME</remote-name>
             <remote-type>129</remote-type>
             <local-name>[ORGANIZATION_NAME]</local-name>
             <parent-name>[GO_ORGANIZATION_DIMENSION]</parent-name>
             <remote-alias>ORGANIZATION_NAME</remote-alias>
-            <ordinal>1</ordinal>
+            <ordinal>7</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
+            <width>500</width>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
           </metadata-record>
         </metadata-records>
       </connection>
       <aliases enabled='yes' />
+      <column caption='Error ID' datatype='string' name='[ERROR_ID]' role='dimension' type='nominal' />
+      <column caption='Error Type' datatype='string' name='[ERROR_TYPE]' role='dimension' type='nominal' />
+      <column caption='Error Timestamp' datatype='datetime' name='[ERROR_TIMESTAMP]' role='dimension' type='ordinal' />
+      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+      <column caption='Resolution Timestamp' datatype='datetime' name='[RESOLUTION_TIMESTAMP]' role='dimension' type='ordinal' />
+      <column caption='User ID' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
       <column caption='Organization Name' datatype='string' name='[ORGANIZATION_NAME]' role='dimension' type='nominal' />
+      <column caption='Ticket Volume by Type' datatype='integer' name='[Calculation_TICKET_VOLUME]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([ERROR_ID])' />
+      </column>
+      <column caption='Average Resolution Time' datatype='real' name='[Calculation_AVG_RESOLUTION_TIME]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG(DATEDIFF(&quot;hour&quot;, [ERROR_TIMESTAMP], [RESOLUTION_TIMESTAMP]))' />
+      </column>
+      <column caption='User to Ticket Ratio' datatype='real' name='[Calculation_USER_TICKET_RATIO]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([ERROR_ID]) / COUNTD([USER_ID])' />
+      </column>
       <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+        <objects>
+          <object caption='GO_DATA_QUALITY_ERRORS' id='GO_DATA_QUALITY_ERRORS_B2C3D4E5F6789012'>
+            <properties context=''>
+              <relation connection='snowflake.2b3c4d5e6f789012' name='GO_DATA_QUALITY_ERRORS' table='[ZOOM].[GOLD].[GO_DATA_QUALITY_ERRORS]' type='table' />
+            </properties>
+          </object>
+          <object caption='GO_USER_DIMENSION' id='GO_USER_DIMENSION_C3D4E5F678901234'>
+            <properties context=''>
+              <relation connection='snowflake.2b3c4d5e6f789012' name='GO_USER_DIMENSION' table='[ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+            </properties>
+          </object>
+          <object caption='GO_ORGANIZATION_DIMENSION' id='GO_ORGANIZATION_DIMENSION_D4E5F67890123456'>
+            <properties context=''>
+              <relation connection='snowflake.2b3c4d5e6f789012' name='GO_ORGANIZATION_DIMENSION' table='[ZOOM].[GOLD].[GO_ORGANIZATION_DIMENSION]' type='table' />
+            </properties>
+          </object>
+        </objects>
+      </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
     </datasource>
   </datasources>
   <worksheets>
@@ -193,15 +178,15 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='GO_DATA_QUALITY_ERRORS (ZOOM.GO_DATA_QUALITY_ERRORS) (GOLD)' name='federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b' />
+            <datasource caption='GO_DATA_QUALITY_ERRORS (ZOOM.GO_DATA_QUALITY_ERRORS) (GOLD)' name='federated.1b2c3d4e5f678901' />
           </datasources>
-          <datasource-dependencies datasource='federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b'>
+          <datasource-dependencies datasource='federated.1b2c3d4e5f678901'>
             <column caption='Error Type' datatype='string' name='[ERROR_TYPE]' role='dimension' type='nominal' />
-            <column caption='Ticket Volume by Type' datatype='integer' name='[Calculation_E5F6A7B8C9D0E1F2]' role='measure' type='quantitative'>
+            <column caption='Ticket Volume by Type' datatype='integer' name='[Calculation_TICKET_VOLUME]' role='measure' type='quantitative'>
               <calculation class='tableau' formula='COUNT([ERROR_ID])' />
             </column>
             <column-instance column='[ERROR_TYPE]' derivation='None' name='[none:ERROR_TYPE:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calculation_E5F6A7B8C9D0E1F2]' derivation='None' name='[none:Calculation_E5F6A7B8C9D0E1F2:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_TICKET_VOLUME]' derivation='Sum' name='[sum:Calculation_TICKET_VOLUME:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
@@ -213,7 +198,7 @@
             </view>
             <mark class='Bar' />
             <encodings>
-              <color column='[federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b].[none:ERROR_TYPE:nk]' />
+              <color column='[federated.1b2c3d4e5f678901].[none:ERROR_TYPE:nk]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -223,10 +208,10 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b].[none:Calculation_E5F6A7B8C9D0E1F2:qk]</rows>
-        <cols>[federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b].[none:ERROR_TYPE:nk]</cols>
+        <rows>[federated.1b2c3d4e5f678901].[sum:Calculation_TICKET_VOLUME:qk]</rows>
+        <cols>[federated.1b2c3d4e5f678901].[none:ERROR_TYPE:nk]</cols>
       </table>
-      <simple-id uuid='{E5F6A7B8-C9D0-E1F2-A3B4-C5D6E7F8A9B0}' />
+      <simple-id uuid='{E5F67890-1234-5678-9ABC-DEF012345678}' />
     </worksheet>
     <worksheet name='Average Resolution Time Trend'>
       <layout-options>
@@ -239,21 +224,21 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='GO_DATA_QUALITY_ERRORS (ZOOM.GO_DATA_QUALITY_ERRORS) (GOLD)' name='federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b' />
+            <datasource caption='GO_DATA_QUALITY_ERRORS (ZOOM.GO_DATA_QUALITY_ERRORS) (GOLD)' name='federated.1b2c3d4e5f678901' />
           </datasources>
-          <datasource-dependencies datasource='federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b'>
+          <datasource-dependencies datasource='federated.1b2c3d4e5f678901'>
             <column caption='Error Timestamp' datatype='datetime' name='[ERROR_TIMESTAMP]' role='dimension' type='ordinal' />
-            <column caption='Average Resolution Time' datatype='real' name='[Calculation_F6A7B8C9D0E1F2A3]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='AVG(DATEDIFF(&quot;hour&quot;,[ERROR_TIMESTAMP],[RESOLUTION_TIMESTAMP]))' />
+            <column caption='Average Resolution Time' datatype='real' name='[Calculation_AVG_RESOLUTION_TIME]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG(DATEDIFF(&quot;hour&quot;, [ERROR_TIMESTAMP], [RESOLUTION_TIMESTAMP]))' />
             </column>
-            <column-instance column='[ERROR_TIMESTAMP]' derivation='Day-Trunc' name='[tdy:ERROR_TIMESTAMP:qk]' pivot='key' type='quantitative' />
-            <column-instance column='[Calculation_F6A7B8C9D0E1F2A3]' derivation='None' name='[none:Calculation_F6A7B8C9D0E1F2A3:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[ERROR_TIMESTAMP]' derivation='Month-Trunc' name='[tmn:ERROR_TIMESTAMP:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_AVG_RESOLUTION_TIME]' derivation='Sum' name='[sum:Calculation_AVG_RESOLUTION_TIME:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
         <style>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b].[none:Calculation_F6A7B8C9D0E1F2A3:qk]' palette='orange_10_0' type='interpolated' />
+            <encoding attr='color' field='[federated.1b2c3d4e5f678901].[sum:Calculation_AVG_RESOLUTION_TIME:qk]' palette='orange_10_0' type='interpolated' />
           </style-rule>
         </style>
         <panes>
@@ -270,10 +255,10 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b].[none:Calculation_F6A7B8C9D0E1F2A3:qk]</rows>
-        <cols>[federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b].[tdy:ERROR_TIMESTAMP:qk]</cols>
+        <rows>[federated.1b2c3d4e5f678901].[sum:Calculation_AVG_RESOLUTION_TIME:qk]</rows>
+        <cols>[federated.1b2c3d4e5f678901].[tmn:ERROR_TIMESTAMP:qk]</cols>
       </table>
-      <simple-id uuid='{F6A7B8C9-D0E1-F2A3-B4C5-D6E7F8A9B0C1}' />
+      <simple-id uuid='{F6789012-3456-789A-BCDE-F01234567890}' />
     </worksheet>
   </worksheets>
   <windows saved-dpi-scale-factor='1.5' source-height='44'>
@@ -298,7 +283,7 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{A7B8C9D0-E1F2-A3B4-C5D6-E7F8A9B0C1D2}' />
+      <simple-id uuid='{12345678-90AB-CDEF-0123-456789ABCDEF}' />
     </window>
   </windows>
 </workbook>
