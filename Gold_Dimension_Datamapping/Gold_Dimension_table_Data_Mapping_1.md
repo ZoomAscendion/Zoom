@@ -34,7 +34,7 @@ This document provides comprehensive data mapping specifications for transformin
 ### 2.1 User Dimension Data Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Transformation Rule |
-|--------------|--------------|--------------|--------------|--------------|--------------|--------------------|
+|--------------|--------------|--------------|--------------|--------------|--------------|---------------------|
 | GOLD | Go_USER_DIMENSION | user_dimension_id | - | - | - | NUMBER AUTOINCREMENT (Snowflake sequence) |
 | GOLD | Go_USER_DIMENSION | user_name | SILVER | Si_USERS | user_name | TRIM(UPPER(COALESCE(user_name, 'UNKNOWN'))) |
 | GOLD | Go_USER_DIMENSION | email_address | SILVER | Si_USERS | email | LOWER(TRIM(email)) |
@@ -106,7 +106,7 @@ WHEN NOT MATCHED THEN INSERT (
 ### 3.1 Time Dimension Data Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Transformation Rule |
-|--------------|--------------|--------------|--------------|--------------|--------------|--------------------|
+|--------------|--------------|--------------|--------------|--------------|--------------|---------------------|
 | GOLD | Go_TIME_DIMENSION | time_dimension_id | - | - | - | NUMBER AUTOINCREMENT (Snowflake sequence) |
 | GOLD | Go_TIME_DIMENSION | date_key | - | - | - | Generated date sequence from 2020-01-01 to 2030-12-31 |
 | GOLD | Go_TIME_DIMENSION | year | - | - | - | EXTRACT(YEAR FROM date_key) |
@@ -164,7 +164,7 @@ WHERE date_key <= '2030-12-31';
 ### 4.1 Feature Dimension Data Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Transformation Rule |
-|--------------|--------------|--------------|--------------|--------------|--------------|--------------------|
+|--------------|--------------|--------------|--------------|--------------|--------------|---------------------|
 | GOLD | Go_FEATURE_DIMENSION | feature_dimension_id | - | - | - | NUMBER AUTOINCREMENT (Snowflake sequence) |
 | GOLD | Go_FEATURE_DIMENSION | feature_name | SILVER | Si_FEATURE_USAGE | feature_name | TRIM(INITCAP(feature_name)) |
 | GOLD | Go_FEATURE_DIMENSION | feature_category | SILVER | Si_FEATURE_USAGE | feature_category | CASE WHEN feature_name LIKE '%Screen%' THEN 'Collaboration' WHEN feature_name LIKE '%Record%' THEN 'Recording' WHEN feature_name LIKE '%Chat%' THEN 'Communication' WHEN feature_name LIKE '%Breakout%' THEN 'Meeting Management' ELSE 'General' END |
@@ -240,7 +240,7 @@ GROUP BY feature_name;
 ### 5.1 License Dimension Data Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Transformation Rule |
-|--------------|--------------|--------------|--------------|--------------|--------------|--------------------|
+|--------------|--------------|--------------|--------------|--------------|--------------|---------------------|
 | GOLD | Go_LICENSE_DIMENSION | license_dimension_id | - | - | - | NUMBER AUTOINCREMENT (Snowflake sequence) |
 | GOLD | Go_LICENSE_DIMENSION | license_type | SILVER | Si_LICENSES | license_type | TRIM(INITCAP(license_type)) |
 | GOLD | Go_LICENSE_DIMENSION | license_description | - | - | - | CASE license_type WHEN 'Basic' THEN 'Basic plan with essential meeting features' WHEN 'Pro' THEN 'Professional plan with advanced features and cloud recording' WHEN 'Enterprise' THEN 'Enterprise plan with advanced security and admin features' WHEN 'Add-on' THEN 'Additional feature enhancement for existing plans' ELSE CONCAT('License Type: ', license_type) END |
