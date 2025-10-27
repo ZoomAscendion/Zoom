@@ -1,8 +1,8 @@
-name: 'zoom_bronze_pipeline'
+name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_bronze_pipeline'
+profile: 'zoom_silver_pipeline'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,6 +17,10 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_bronze_pipeline:
-    bronze:
-      +materialized: table
+  zoom_silver_pipeline:
+    +materialized: incremental
+    +on_schema_change: sync_all_columns
+    silver:
+      +materialized: incremental
+      +unique_key: "load_timestamp"
+      +incremental_strategy: "merge"
