@@ -5,49 +5,43 @@
     on_schema_change='sync_all_columns',
     incremental_strategy='merge',
     pre_hook="
-      {% if target.name != 'audit_log' %}
-        INSERT INTO {{ ref('audit_log') }} (
-          audit_id, pipeline_name, start_time, status, execution_id, 
-          execution_start_time, source_table, target_table, execution_status, 
-          processed_by, load_timestamp
-        )
-        VALUES (
-          '{{ dbt_utils.generate_surrogate_key(['si_users', run_started_at]) }}',
-          'si_users_transformation',
-          '{{ run_started_at }}',
-          'RUNNING',
-          '{{ invocation_id }}',
-          '{{ run_started_at }}',
-          'bz_users',
-          'si_users',
-          'STARTED',
-          'DBT_SILVER_PIPELINE',
-          '{{ run_started_at }}'
-        )
-      {% endif %}
+      INSERT INTO {{ ref('audit_log') }} (
+        audit_id, pipeline_name, start_time, status, execution_id, 
+        execution_start_time, source_table, target_table, execution_status, 
+        processed_by, load_timestamp
+      )
+      SELECT
+        MD5('si_users_' || CURRENT_TIMESTAMP()::VARCHAR),
+        'si_users_transformation',
+        CURRENT_TIMESTAMP(),
+        'RUNNING',
+        MD5('exec_' || CURRENT_TIMESTAMP()::VARCHAR),
+        CURRENT_TIMESTAMP(),
+        'bz_users',
+        'si_users',
+        'STARTED',
+        'DBT_SILVER_PIPELINE',
+        CURRENT_TIMESTAMP()
     ",
     post_hook="
-      {% if target.name != 'audit_log' %}
-        INSERT INTO {{ ref('audit_log') }} (
-          audit_id, pipeline_name, end_time, status, execution_id, 
-          execution_end_time, source_table, target_table, execution_status, 
-          processed_by, load_timestamp, records_processed
-        )
-        VALUES (
-          '{{ dbt_utils.generate_surrogate_key(['si_users_complete', run_started_at]) }}',
-          'si_users_transformation',
-          CURRENT_TIMESTAMP(),
-          'SUCCESS',
-          '{{ invocation_id }}',
-          CURRENT_TIMESTAMP(),
-          'bz_users',
-          'si_users',
-          'COMPLETED',
-          'DBT_SILVER_PIPELINE',
-          CURRENT_TIMESTAMP(),
-          (SELECT COUNT(*) FROM {{ this }})
-        )
-      {% endif %}
+      INSERT INTO {{ ref('audit_log') }} (
+        audit_id, pipeline_name, end_time, status, execution_id, 
+        execution_end_time, source_table, target_table, execution_status, 
+        processed_by, load_timestamp, records_processed
+      )
+      SELECT
+        MD5('si_users_complete_' || CURRENT_TIMESTAMP()::VARCHAR),
+        'si_users_transformation',
+        CURRENT_TIMESTAMP(),
+        'SUCCESS',
+        MD5('exec_complete_' || CURRENT_TIMESTAMP()::VARCHAR),
+        CURRENT_TIMESTAMP(),
+        'bz_users',
+        'si_users',
+        'COMPLETED',
+        'DBT_SILVER_PIPELINE',
+        CURRENT_TIMESTAMP(),
+        (SELECT COUNT(*) FROM {{ this }})
     "
   )
 }}
