@@ -1,0 +1,443 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20233.23.1017.0948 -->
+<workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
+  <datasources>
+    <datasource caption='GO_MONTHLY_USER_ACTIVITY (ZOOM.GO_MONTHLY_USER_ACTIVITY) (GOLD)' inline='true' name='federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='NWZLYVS-MU54263.snowflakecomputing.com' name='snowflake.4t6ikc509qxymk17b056f0gehr4d'>
+            <connection authentication='Username Password' class='snowflake' dbname='ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='NWZLYVS-MU54263.snowflakecomputing.com' service='ACCOUNTADMIN' username='THEJASHWANI' password='Thejashwani@04' warehouse='COMPUTE_WH' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.4t6ikc509qxymk17b056f0gehr4d' name='GO_MONTHLY_USER_ACTIVITY' table='[ZOOM].[GOLD].[GO_MONTHLY_USER_ACTIVITY]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.4t6ikc509qxymk17b056f0gehr4d' name='GO_MONTHLY_USER_ACTIVITY' table='[ZOOM].[GOLD].[GO_MONTHLY_USER_ACTIVITY]' type='table' />
+        <metadata-records>
+          <metadata-record class='column'>
+            <remote-name>ACTIVITY_MONTH</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[ACTIVITY_MONTH]</local-name>
+            <parent-name>[GO_MONTHLY_USER_ACTIVITY]</parent-name>
+            <remote-alias>ACTIVITY_MONTH</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_ID]</local-name>
+            <parent-name>[GO_MONTHLY_USER_ACTIVITY]</parent-name>
+            <remote-alias>USER_ID</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>50</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MEETINGS_HOSTED</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[MEETINGS_HOSTED]</local-name>
+            <parent-name>[GO_MONTHLY_USER_ACTIVITY]</parent-name>
+            <remote-alias>MEETINGS_HOSTED</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MEETINGS_ATTENDED</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[MEETINGS_ATTENDED]</local-name>
+            <parent-name>[GO_MONTHLY_USER_ACTIVITY]</parent-name>
+            <remote-alias>MEETINGS_ATTENDED</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TOTAL_HOSTING_MINUTES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[TOTAL_HOSTING_MINUTES]</local-name>
+            <parent-name>[GO_MONTHLY_USER_ACTIVITY]</parent-name>
+            <remote-alias>TOTAL_HOSTING_MINUTES</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TOTAL_ATTENDANCE_MINUTES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[TOTAL_ATTENDANCE_MINUTES]</local-name>
+            <parent-name>[GO_MONTHLY_USER_ACTIVITY]</parent-name>
+            <remote-alias>TOTAL_ATTENDANCE_MINUTES</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Activity Month' datatype='date' name='[ACTIVITY_MONTH]' role='dimension' type='ordinal' />
+      <column caption='User Id' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
+      <column caption='Meetings Hosted' datatype='integer' name='[MEETINGS_HOSTED]' role='measure' type='quantitative' />
+      <column caption='Meetings Attended' datatype='integer' name='[MEETINGS_ATTENDED]' role='measure' type='quantitative' />
+      <column caption='Total Hosting Minutes' datatype='integer' name='[TOTAL_HOSTING_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Total Attendance Minutes' datatype='integer' name='[TOTAL_ATTENDANCE_MINUTES]' role='measure' type='quantitative' />
+      <column caption='User Activity Score' datatype='real' name='[Calculation_E5F6A7B8C9D0E1F2]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='([MEETINGS_HOSTED] + [MEETINGS_ATTENDED]) * LOG(([TOTAL_HOSTING_MINUTES] + [TOTAL_ATTENDANCE_MINUTES]) + 1)' />
+      </column>
+      <column caption='Meeting Participation Rate' datatype='real' name='[Calculation_F6A7B8C9D0E1F2A3]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='[MEETINGS_ATTENDED] / ([MEETINGS_HOSTED] + [MEETINGS_ATTENDED])' />
+      </column>
+      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+    </datasource>
+    <datasource caption='GO_ENGAGEMENT_SUMMARY (ZOOM.GO_ENGAGEMENT_SUMMARY) (GOLD)' inline='true' name='federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='NWZLYVS-MU54263.snowflakecomputing.com' name='snowflake.5t7ikc509qxymk17b056f0gehr4e'>
+            <connection authentication='Username Password' class='snowflake' dbname='ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='NWZLYVS-MU54263.snowflakecomputing.com' service='ACCOUNTADMIN' username='THEJASHWANI' password='Thejashwani@04' warehouse='COMPUTE_WH' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.5t7ikc509qxymk17b056f0gehr4e' name='GO_ENGAGEMENT_SUMMARY' table='[ZOOM].[GOLD].[GO_ENGAGEMENT_SUMMARY]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.5t7ikc509qxymk17b056f0gehr4e' name='GO_ENGAGEMENT_SUMMARY' table='[ZOOM].[GOLD].[GO_ENGAGEMENT_SUMMARY]' type='table' />
+        <metadata-records>
+          <metadata-record class='column'>
+            <remote-name>SUMMARY_DATE</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[SUMMARY_DATE]</local-name>
+            <parent-name>[GO_ENGAGEMENT_SUMMARY]</parent-name>
+            <remote-alias>SUMMARY_DATE</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TOTAL_MEETINGS</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[TOTAL_MEETINGS]</local-name>
+            <parent-name>[GO_ENGAGEMENT_SUMMARY]</parent-name>
+            <remote-alias>TOTAL_MEETINGS</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>AVERAGE_PARTICIPATION_RATE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[AVERAGE_PARTICIPATION_RATE]</local-name>
+            <parent-name>[GO_ENGAGEMENT_SUMMARY]</parent-name>
+            <remote-alias>AVERAGE_PARTICIPATION_RATE</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>5</precision>
+            <scale>2</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TOTAL_CHAT_MESSAGES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[TOTAL_CHAT_MESSAGES]</local-name>
+            <parent-name>[GO_ENGAGEMENT_SUMMARY]</parent-name>
+            <remote-alias>TOTAL_CHAT_MESSAGES</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SCREEN_SHARE_SESSIONS</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[SCREEN_SHARE_SESSIONS]</local-name>
+            <parent-name>[GO_ENGAGEMENT_SUMMARY]</parent-name>
+            <remote-alias>SCREEN_SHARE_SESSIONS</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>AVERAGE_ATTENTION_SCORE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[AVERAGE_ATTENTION_SCORE]</local-name>
+            <parent-name>[GO_ENGAGEMENT_SUMMARY]</parent-name>
+            <remote-alias>AVERAGE_ATTENTION_SCORE</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>5</precision>
+            <scale>2</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Summary Date' datatype='date' name='[SUMMARY_DATE]' role='dimension' type='ordinal' />
+      <column caption='Total Meetings' datatype='integer' name='[TOTAL_MEETINGS]' role='measure' type='quantitative' />
+      <column caption='Average Participation Rate' datatype='real' name='[AVERAGE_PARTICIPATION_RATE]' role='measure' type='quantitative' />
+      <column caption='Total Chat Messages' datatype='integer' name='[TOTAL_CHAT_MESSAGES]' role='measure' type='quantitative' />
+      <column caption='Screen Share Sessions' datatype='integer' name='[SCREEN_SHARE_SESSIONS]' role='measure' type='quantitative' />
+      <column caption='Average Attention Score' datatype='real' name='[AVERAGE_ATTENTION_SCORE]' role='measure' type='quantitative' />
+      <column caption='Engagement Index' datatype='real' name='[Calculation_A7B8C9D0E1F2A3B4]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='([TOTAL_CHAT_MESSAGES] + [SCREEN_SHARE_SESSIONS]) / [TOTAL_MEETINGS]' />
+      </column>
+      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Monthly User Activity Trends'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Monthly User Activity Trends</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='GO_MONTHLY_USER_ACTIVITY (ZOOM.GO_MONTHLY_USER_ACTIVITY) (GOLD)' name='federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a' />
+          </datasources>
+          <datasource-dependencies datasource='federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a'>
+            <column caption='Activity Month' datatype='date' name='[ACTIVITY_MONTH]' role='dimension' type='ordinal' />
+            <column caption='Meetings Hosted' datatype='integer' name='[MEETINGS_HOSTED]' role='measure' type='quantitative' />
+            <column caption='Meetings Attended' datatype='integer' name='[MEETINGS_ATTENDED]' role='measure' type='quantitative' />
+            <column-instance column='[ACTIVITY_MONTH]' derivation='Month-Trunc' name='[tmn:ACTIVITY_MONTH:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[MEETINGS_HOSTED]' derivation='Sum' name='[sum:MEETINGS_HOSTED:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[MEETINGS_ATTENDED]' derivation='Sum' name='[sum:MEETINGS_ATTENDED:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a].[sum:MEETINGS_HOSTED:qk]' palette='orange_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+          <pane id='1' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a].[sum:MEETINGS_ATTENDED:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a].[sum:MEETINGS_ATTENDED:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>([federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a].[sum:MEETINGS_HOSTED:qk] + [federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a].[sum:MEETINGS_ATTENDED:qk])</rows>
+        <cols>[federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a].[tmn:ACTIVITY_MONTH:qk]</cols>
+      </table>
+      <simple-id uuid='{F7A8B9C0-D1E2-F3A4-B5C6-D7E8F9A0B1C2}' />
+    </worksheet>
+    <worksheet name='Engagement Metrics Overview'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Engagement Metrics Overview</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='GO_ENGAGEMENT_SUMMARY (ZOOM.GO_ENGAGEMENT_SUMMARY) (GOLD)' name='federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b' />
+          </datasources>
+          <datasource-dependencies datasource='federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b'>
+            <column caption='Summary Date' datatype='date' name='[SUMMARY_DATE]' role='dimension' type='ordinal' />
+            <column caption='Total Chat Messages' datatype='integer' name='[TOTAL_CHAT_MESSAGES]' role='measure' type='quantitative' />
+            <column caption='Screen Share Sessions' datatype='integer' name='[SCREEN_SHARE_SESSIONS]' role='measure' type='quantitative' />
+            <column caption='Average Attention Score' datatype='real' name='[AVERAGE_ATTENTION_SCORE]' role='measure' type='quantitative' />
+            <column-instance column='[SUMMARY_DATE]' derivation='Month-Trunc' name='[tmn:SUMMARY_DATE:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[TOTAL_CHAT_MESSAGES]' derivation='Sum' name='[sum:TOTAL_CHAT_MESSAGES:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[SCREEN_SHARE_SESSIONS]' derivation='Sum' name='[sum:SCREEN_SHARE_SESSIONS:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[AVERAGE_ATTENTION_SCORE]' derivation='Avg' name='[avg:AVERAGE_ATTENTION_SCORE:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b].[avg:AVERAGE_ATTENTION_SCORE:qk]' palette='purple_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b].[avg:AVERAGE_ATTENTION_SCORE:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+          <pane id='1' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b].[sum:SCREEN_SHARE_SESSIONS:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b].[sum:SCREEN_SHARE_SESSIONS:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>([federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b].[sum:TOTAL_CHAT_MESSAGES:qk] + [federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b].[sum:SCREEN_SHARE_SESSIONS:qk])</rows>
+        <cols>[federated.5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b].[tmn:SUMMARY_DATE:qk]</cols>
+      </table>
+      <simple-id uuid='{A8B9C0D1-E2F3-A4B5-C6D7-E8F9A0B1C2D3}' />
+    </worksheet>
+    <worksheet name='User Activity Heatmap'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>User Activity Heatmap</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='GO_MONTHLY_USER_ACTIVITY (ZOOM.GO_MONTHLY_USER_ACTIVITY) (GOLD)' name='federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a' />
+          </datasources>
+          <datasource-dependencies datasource='federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a'>
+            <column caption='Activity Month' datatype='date' name='[ACTIVITY_MONTH]' role='dimension' type='ordinal' />
+            <column caption='User Id' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
+            <column caption='User Activity Score' datatype='real' name='[Calculation_E5F6A7B8C9D0E1F2]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='([MEETINGS_HOSTED] + [MEETINGS_ATTENDED]) * LOG(([TOTAL_HOSTING_MINUTES] + [TOTAL_ATTENDANCE_MINUTES]) + 1)' />
+            </column>
+            <column-instance column='[ACTIVITY_MONTH]' derivation='Month-Trunc' name='[tmn:ACTIVITY_MONTH:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[USER_ID]' derivation='None' name='[none:USER_ID:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_E5F6A7B8C9D0E1F2]' derivation='Sum' name='[sum:Calculation_E5F6A7B8C9D0E1F2:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='cell'>
+            <format attr='width' value='143' />
+          </style-rule>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a].[sum:Calculation_E5F6A7B8C9D0E1F2:qk]' palette='red_blue_diverging_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Square' />
+            <encodings>
+              <color column='[federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a].[sum:Calculation_E5F6A7B8C9D0E1F2:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+              <style-rule element='pane'>
+                <format attr='minwidth' value='-1' />
+                <format attr='maxwidth' value='-1' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a].[none:USER_ID:nk]</rows>
+        <cols>[federated.4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a].[tmn:ACTIVITY_MONTH:qk]</cols>
+      </table>
+      <simple-id uuid='{B9C0D1E2-F3A4-B5C6-D7E8-F9A0B1C2D3E4}' />
+    </worksheet>
+  </worksheets>
+  <windows saved-dpi-scale-factor='1.5' source-height='44'>
+    <window class='worksheet' maximized='true' name='Monthly User Activity Trends'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{C0D1E2F3-A4B5-C6D7-E8F9-A0B1C2D3E4F5}' />
+    </window>
+  </windows>
+</workbook>
