@@ -3,10 +3,11 @@
 -- Source: RAW.USERS
 -- Target: BRONZE.bz_users
 -- Author: DBT Data Engineer
--- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('bz_audit_log') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'bz_users', CURRENT_TIMESTAMP(), 'DBT', 0, 'STARTED' WHERE '{{ this.name }}' != 'bz_audit_log'",
+    post_hook="INSERT INTO {{ ref('bz_audit_log') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'bz_users', CURRENT_TIMESTAMP(), 'DBT', 1, 'COMPLETED' WHERE '{{ this.name }}' != 'bz_audit_log'"
 ) }}
 
 WITH raw_users AS (
@@ -25,17 +26,13 @@ WITH raw_users AS (
 cleansed_users AS (
     SELECT 
         -- 1-1 mapping from raw to bronze as per mapping specification
-        TRIM(USER_NAME) as user_name,
-        TRIM(LOWER(EMAIL)) as email,
-        TRIM(COMPANY) as company,
-        TRIM(UPPER(PLAN_TYPE)) as plan_type,
-        LOAD_TIMESTAMP as load_timestamp,
-        COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) as update_timestamp,
-        TRIM(UPPER(SOURCE_SYSTEM)) as source_system,
-        
-        -- Audit fields for bronze layer
-        CURRENT_TIMESTAMP() as bronze_created_at,
-        'SUCCESS' as process_status
+        TRIM(USER_NAME)::STRING as user_name,
+        TRIM(LOWER(EMAIL))::STRING as email,
+        TRIM(COMPANY)::STRING as company,
+        TRIM(UPPER(PLAN_TYPE))::STRING as plan_type,
+        LOAD_TIMESTAMP::TIMESTAMP_NTZ as load_timestamp,
+        COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP)::TIMESTAMP_NTZ as update_timestamp,
+        TRIM(UPPER(SOURCE_SYSTEM))::STRING as source_system
         
     FROM raw_users
     WHERE USER_NAME IS NOT NULL
