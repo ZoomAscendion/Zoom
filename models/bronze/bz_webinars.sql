@@ -3,10 +3,11 @@
 -- Source: RAW.WEBINARS
 -- Target: BRONZE.bz_webinars
 -- Author: DBT Data Engineer
--- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('bz_audit_log') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'bz_webinars', CURRENT_TIMESTAMP(), 'DBT', 0, 'STARTED' WHERE '{{ this.name }}' != 'bz_audit_log'",
+    post_hook="INSERT INTO {{ ref('bz_audit_log') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'bz_webinars', CURRENT_TIMESTAMP(), 'DBT', 1, 'COMPLETED' WHERE '{{ this.name }}' != 'bz_audit_log'"
 ) }}
 
 WITH raw_webinars AS (
@@ -26,22 +27,18 @@ WITH raw_webinars AS (
 cleansed_webinars AS (
     SELECT 
         -- 1-1 mapping from raw to bronze as per mapping specification
-        TRIM(HOST_ID) as host_id,
-        TRIM(WEBINAR_TOPIC) as webinar_topic,
-        START_TIME as start_time,
-        END_TIME as end_time,
+        TRIM(HOST_ID)::STRING as host_id,
+        TRIM(WEBINAR_TOPIC)::STRING as webinar_topic,
+        START_TIME::TIMESTAMP_NTZ as start_time,
+        END_TIME::TIMESTAMP_NTZ as end_time,
         CASE 
             WHEN REGISTRANTS IS NULL THEN 0
             WHEN REGISTRANTS < 0 THEN 0
             ELSE REGISTRANTS 
-        END as registrants,
-        LOAD_TIMESTAMP as load_timestamp,
-        COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) as update_timestamp,
-        TRIM(UPPER(SOURCE_SYSTEM)) as source_system,
-        
-        -- Audit fields for bronze layer
-        CURRENT_TIMESTAMP() as bronze_created_at,
-        'SUCCESS' as process_status
+        END::NUMBER(38,0) as registrants,
+        LOAD_TIMESTAMP::TIMESTAMP_NTZ as load_timestamp,
+        COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP)::TIMESTAMP_NTZ as update_timestamp,
+        TRIM(UPPER(SOURCE_SYSTEM))::STRING as source_system
         
     FROM raw_webinars
     WHERE HOST_ID IS NOT NULL
