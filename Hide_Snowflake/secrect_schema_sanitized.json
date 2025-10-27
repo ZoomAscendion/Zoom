@@ -1,0 +1,366 @@
+{
+  "database": "DB_POC_ZOOM",
+  "schema": "UTILITY",
+  "extraction_timestamp": "2025-01-27T00:00:00Z",
+  "metadata_summary": {
+    "total_tables": 4,
+    "total_views": 0,
+    "total_objects": 4
+  },
+  "tables": {
+    "SECRET4BRONZE": {
+      "type": "TABLE",
+      "business_description": "Configuration table for Bronze layer DBT job settings and parameters",
+      "columns": [
+        {
+          "name": "APP_NAME",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Application name identifier for configuration grouping",
+          "constraints": "Not Null",
+          "domain_values": "DBTJOB"
+        },
+        {
+          "name": "CONFIG_KEY",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Configuration parameter key identifier",
+          "constraints": "Not Null",
+          "domain_values": "Job_ID"
+        },
+        {
+          "name": "CONFIG_VALUE",
+          "data_type": "VARCHAR(5000)",
+          "business_description": "Configuration parameter value",
+          "constraints": "Not Null",
+          "domain_values": "[MASKED_VALUE]"
+        },
+        {
+          "name": "DESCRIPTION",
+          "data_type": "VARCHAR(500)",
+          "business_description": "Human-readable description of the configuration parameter",
+          "constraints": "Nullable",
+          "domain_values": "DBT Cloud Job ID for Bronze Layer"
+        },
+        {
+          "name": "IS_SENSITIVE",
+          "data_type": "BOOLEAN",
+          "business_description": "Flag indicating if the configuration value contains sensitive information",
+          "constraints": "Not Null",
+          "domain_values": "false, true"
+        },
+        {
+          "name": "CREATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the configuration record was created",
+          "constraints": "Not Null",
+          "domain_values": "2025-10-23 09:14:36.564000"
+        },
+        {
+          "name": "UPDATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the configuration record was last updated",
+          "constraints": "Not Null",
+          "domain_values": "2025-10-23 09:14:36.564000"
+        }
+      ],
+      "sample_data": [
+        {
+          "APP_NAME": "DBTJOB",
+          "CONFIG_KEY": "Job_ID",
+          "CONFIG_VALUE": "[MASKED_VALUE]",
+          "DESCRIPTION": "DBT Cloud Job ID for Bronze Layer",
+          "IS_SENSITIVE": false,
+          "CREATED_AT": "2025-10-23 09:14:36.564000",
+          "UPDATED_AT": "2025-10-23 09:14:36.564000"
+        }
+      ]
+    },
+    "SECRET4GOLD": {
+      "type": "TABLE",
+      "business_description": "Configuration table for Gold layer DBT job settings and parameters",
+      "columns": [
+        {
+          "name": "APP_NAME",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Application name identifier for configuration grouping",
+          "constraints": "Not Null",
+          "domain_values": "DBTJOB"
+        },
+        {
+          "name": "CONFIG_KEY",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Configuration parameter key identifier",
+          "constraints": "Not Null",
+          "domain_values": "Job_ID"
+        },
+        {
+          "name": "CONFIG_VALUE",
+          "data_type": "VARCHAR(5000)",
+          "business_description": "Configuration parameter value",
+          "constraints": "Not Null",
+          "domain_values": "[MASKED_VALUE]"
+        },
+        {
+          "name": "DESCRIPTION",
+          "data_type": "VARCHAR(500)",
+          "business_description": "Human-readable description of the configuration parameter",
+          "constraints": "Nullable",
+          "domain_values": "DBT Cloud Job ID for Gold Layer"
+        },
+        {
+          "name": "IS_SENSITIVE",
+          "data_type": "BOOLEAN",
+          "business_description": "Flag indicating if the configuration value contains sensitive information",
+          "constraints": "Not Null",
+          "domain_values": "false, true"
+        },
+        {
+          "name": "CREATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the configuration record was created",
+          "constraints": "Not Null",
+          "domain_values": "2025-10-23 09:25:36.699000"
+        },
+        {
+          "name": "UPDATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the configuration record was last updated",
+          "constraints": "Not Null",
+          "domain_values": "2025-10-23 09:25:36.699000"
+        }
+      ],
+      "sample_data": [
+        {
+          "APP_NAME": "DBTJOB",
+          "CONFIG_KEY": "Job_ID",
+          "CONFIG_VALUE": "[MASKED_VALUE]",
+          "DESCRIPTION": "DBT Cloud Job ID for Gold Layer",
+          "IS_SENSITIVE": false,
+          "CREATED_AT": "2025-10-23 09:25:36.699000",
+          "UPDATED_AT": "2025-10-23 09:25:36.699000"
+        }
+      ]
+    },
+    "SECRET4SILVER": {
+      "type": "TABLE",
+      "business_description": "Configuration table for Silver layer DBT job settings and parameters",
+      "columns": [
+        {
+          "name": "APP_NAME",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Application name identifier for configuration grouping",
+          "constraints": "Not Null",
+          "domain_values": "DBTJOB"
+        },
+        {
+          "name": "CONFIG_KEY",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Configuration parameter key identifier",
+          "constraints": "Not Null",
+          "domain_values": "Job_ID"
+        },
+        {
+          "name": "CONFIG_VALUE",
+          "data_type": "VARCHAR(5000)",
+          "business_description": "Configuration parameter value",
+          "constraints": "Not Null",
+          "domain_values": "[MASKED_VALUE]"
+        },
+        {
+          "name": "DESCRIPTION",
+          "data_type": "VARCHAR(500)",
+          "business_description": "Human-readable description of the configuration parameter",
+          "constraints": "Nullable",
+          "domain_values": "DBT Cloud Job ID for Silver Layer"
+        },
+        {
+          "name": "IS_SENSITIVE",
+          "data_type": "BOOLEAN",
+          "business_description": "Flag indicating if the configuration value contains sensitive information",
+          "constraints": "Not Null",
+          "domain_values": "false, true"
+        },
+        {
+          "name": "CREATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the configuration record was created",
+          "constraints": "Not Null",
+          "domain_values": "2025-10-23 09:18:09.665000"
+        },
+        {
+          "name": "UPDATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the configuration record was last updated",
+          "constraints": "Not Null",
+          "domain_values": "2025-10-23 09:18:09.665000"
+        }
+      ],
+      "sample_data": [
+        {
+          "APP_NAME": "DBTJOB",
+          "CONFIG_KEY": "Job_ID",
+          "CONFIG_VALUE": "[MASKED_VALUE]",
+          "DESCRIPTION": "DBT Cloud Job ID for Silver Layer",
+          "IS_SENSITIVE": false,
+          "CREATED_AT": "2025-10-23 09:18:09.665000",
+          "UPDATED_AT": "2025-10-23 09:18:09.665000"
+        }
+      ]
+    },
+    "SECRETS_STORE": {
+      "type": "TABLE",
+      "business_description": "Central repository for application configuration parameters and sensitive credentials",
+      "columns": [
+        {
+          "name": "APP_NAME",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Application name identifier for configuration grouping",
+          "constraints": "Not Null",
+          "domain_values": "DBT, GITHUB"
+        },
+        {
+          "name": "CONFIG_KEY",
+          "data_type": "VARCHAR(100)",
+          "business_description": "Configuration parameter key identifier",
+          "constraints": "Not Null",
+          "domain_values": "Git_Branch, DBT_Base_URL, DBT_API_key, DBT_Account_ID, DBT_Project_name, repo, branch, token, repo_owner"
+        },
+        {
+          "name": "CONFIG_VALUE",
+          "data_type": "VARCHAR(5000)",
+          "business_description": "Configuration parameter value (may contain sensitive data)",
+          "constraints": "Not Null",
+          "domain_values": "[SENSITIVE_DATA_MASKED]"
+        },
+        {
+          "name": "DESCRIPTION",
+          "data_type": "VARCHAR(500)",
+          "business_description": "Human-readable description of the configuration parameter",
+          "constraints": "Nullable",
+          "domain_values": "Descriptive text for each configuration parameter"
+        },
+        {
+          "name": "IS_SENSITIVE",
+          "data_type": "BOOLEAN",
+          "business_description": "Flag indicating if the configuration value contains sensitive information",
+          "constraints": "Not Null",
+          "domain_values": "false, true"
+        },
+        {
+          "name": "CREATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the configuration record was created",
+          "constraints": "Not Null",
+          "domain_values": "Various timestamps from 2025-10-23"
+        },
+        {
+          "name": "UPDATED_AT",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the configuration record was last updated",
+          "constraints": "Not Null",
+          "domain_values": "Various timestamps from 2025-10-23"
+        }
+      ],
+      "sample_data": [
+        {
+          "APP_NAME": "DBT",
+          "CONFIG_KEY": "Git_Branch",
+          "CONFIG_VALUE": "[MASKED_SENSITIVE_VALUE]",
+          "DESCRIPTION": "GitHub Branch Name",
+          "IS_SENSITIVE": true,
+          "CREATED_AT": "2025-10-23 05:03:18.701000",
+          "UPDATED_AT": "2025-10-23 05:03:18.701000"
+        },
+        {
+          "APP_NAME": "DBT",
+          "CONFIG_KEY": "DBT_Base_URL",
+          "CONFIG_VALUE": "[MASKED_SENSITIVE_VALUE]",
+          "DESCRIPTION": "DBT Cloud Base URL",
+          "IS_SENSITIVE": true,
+          "CREATED_AT": "2025-10-23 05:03:18.701000",
+          "UPDATED_AT": "2025-10-23 05:03:18.701000"
+        },
+        {
+          "APP_NAME": "DBT",
+          "CONFIG_KEY": "DBT_API_key",
+          "CONFIG_VALUE": "[MASKED_SENSITIVE_VALUE]",
+          "DESCRIPTION": "DBT Cloud API Key",
+          "IS_SENSITIVE": true,
+          "CREATED_AT": "2025-10-23 05:03:18.701000",
+          "UPDATED_AT": "2025-10-23 05:03:18.701000"
+        },
+        {
+          "APP_NAME": "DBT",
+          "CONFIG_KEY": "DBT_Account_ID",
+          "CONFIG_VALUE": "[MASKED_SENSITIVE_VALUE]",
+          "DESCRIPTION": "DBT Cloud Account ID",
+          "IS_SENSITIVE": true,
+          "CREATED_AT": "2025-10-23 05:03:18.701000",
+          "UPDATED_AT": "2025-10-23 05:03:18.701000"
+        },
+        {
+          "APP_NAME": "DBT",
+          "CONFIG_KEY": "DBT_Project_name",
+          "CONFIG_VALUE": "[MASKED_SENSITIVE_VALUE]",
+          "DESCRIPTION": "DBT Cloud Project Name",
+          "IS_SENSITIVE": true,
+          "CREATED_AT": "2025-10-23 05:03:18.701000",
+          "UPDATED_AT": "2025-10-23 05:03:18.701000"
+        },
+        {
+          "APP_NAME": "GITHUB",
+          "CONFIG_KEY": "repo",
+          "CONFIG_VALUE": "[MASKED_VALUE]",
+          "DESCRIPTION": "GitHub Repository Name",
+          "IS_SENSITIVE": false,
+          "CREATED_AT": "2025-10-23 05:24:54.097000",
+          "UPDATED_AT": "2025-10-23 05:24:54.097000"
+        },
+        {
+          "APP_NAME": "GITHUB",
+          "CONFIG_KEY": "branch",
+          "CONFIG_VALUE": "[MASKED_VALUE]",
+          "DESCRIPTION": "Git Branch for deployment",
+          "IS_SENSITIVE": false,
+          "CREATED_AT": "2025-10-23 05:24:54.097000",
+          "UPDATED_AT": "2025-10-23 05:24:54.097000"
+        },
+        {
+          "APP_NAME": "GITHUB",
+          "CONFIG_KEY": "token",
+          "CONFIG_VALUE": "[MASKED_SENSITIVE_VALUE]",
+          "DESCRIPTION": "GitHub Personal Access Token - HIGHLY SENSITIVE",
+          "IS_SENSITIVE": true,
+          "CREATED_AT": "2025-10-23 05:24:54.097000",
+          "UPDATED_AT": "2025-10-23 05:24:54.097000"
+        },
+        {
+          "APP_NAME": "DBT",
+          "CONFIG_KEY": "repo_owner",
+          "CONFIG_VALUE": "[MASKED_VALUE]",
+          "DESCRIPTION": "GitHub repository owner for DBT project",
+          "IS_SENSITIVE": false,
+          "CREATED_AT": "2025-10-23 07:08:42.908000",
+          "UPDATED_AT": "2025-10-23 07:08:42.908000"
+        },
+        {
+          "APP_NAME": "DBT",
+          "CONFIG_KEY": "repo",
+          "CONFIG_VALUE": "[MASKED_VALUE]",
+          "DESCRIPTION": "GitHub repository name for DBT project",
+          "IS_SENSITIVE": false,
+          "CREATED_AT": "2025-10-23 07:08:42.908000",
+          "UPDATED_AT": "2025-10-23 07:08:42.908000"
+        }
+      ]
+    }
+  },
+  "views": {},
+  "data_governance": {
+    "sensitive_data_present": true,
+    "sensitive_tables": ["SECRETS_STORE"],
+    "compliance_notes": "This schema contains sensitive configuration data including API keys, tokens, and credentials. Access should be restricted and monitored. All sensitive values have been masked in this documentation for security purposes.",
+    "data_classification": "CONFIDENTIAL",
+    "masking_applied": true,
+    "masking_note": "All sensitive configuration values have been replaced with [MASKED_SENSITIVE_VALUE] or [MASKED_VALUE] placeholders to prevent exposure of credentials."
+  }
+}
