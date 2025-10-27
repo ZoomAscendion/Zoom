@@ -3,46 +3,7 @@
     materialized='incremental',
     unique_key='billing_event_id',
     on_schema_change='sync_all_columns',
-    incremental_strategy='merge',
-    pre_hook="
-      INSERT INTO {{ ref('audit_log') }} (
-        audit_id, pipeline_name, start_time, status, execution_id, 
-        execution_start_time, source_table, target_table, execution_status, 
-        processed_by, load_timestamp
-      )
-      SELECT
-        MD5('si_billing_events_' || CURRENT_TIMESTAMP()::VARCHAR),
-        'si_billing_events_transformation',
-        CURRENT_TIMESTAMP(),
-        'RUNNING',
-        MD5('exec_' || CURRENT_TIMESTAMP()::VARCHAR),
-        CURRENT_TIMESTAMP(),
-        'bz_billing_events',
-        'si_billing_events',
-        'STARTED',
-        'DBT_SILVER_PIPELINE',
-        CURRENT_TIMESTAMP()
-    ",
-    post_hook="
-      INSERT INTO {{ ref('audit_log') }} (
-        audit_id, pipeline_name, end_time, status, execution_id, 
-        execution_end_time, source_table, target_table, execution_status, 
-        processed_by, load_timestamp, records_processed
-      )
-      SELECT
-        MD5('si_billing_events_complete_' || CURRENT_TIMESTAMP()::VARCHAR),
-        'si_billing_events_transformation',
-        CURRENT_TIMESTAMP(),
-        'SUCCESS',
-        MD5('exec_complete_' || CURRENT_TIMESTAMP()::VARCHAR),
-        CURRENT_TIMESTAMP(),
-        'bz_billing_events',
-        'si_billing_events',
-        'COMPLETED',
-        'DBT_SILVER_PIPELINE',
-        CURRENT_TIMESTAMP(),
-        (SELECT COUNT(*) FROM {{ this }})
-    "
+    incremental_strategy='merge'
   )
 }}
 
