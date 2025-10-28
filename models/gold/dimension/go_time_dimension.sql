@@ -2,17 +2,23 @@
     materialized='table'
 ) }}
 
--- Gold Time Dimension Table - Simple version with basic date range
-WITH date_spine AS (
+-- Gold Time Dimension Table - Fixed version
+WITH number_series AS (
     SELECT 
-        '2020-01-01'::DATE + (ROW_NUMBER() OVER (ORDER BY 1) - 1) as date_key
+        (ROW_NUMBER() OVER (ORDER BY 1) - 1) as seq_num
     FROM (
         SELECT 1 FROM (VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10)) t1(c)
         CROSS JOIN (VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10)) t2(c)
         CROSS JOIN (VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10)) t3(c)
         CROSS JOIN (VALUES (1),(2),(3),(4)) t4(c)
     )
-    WHERE date_key <= '2030-12-31'::DATE
+),
+
+date_spine AS (
+    SELECT 
+        DATEADD('day', seq_num, '2020-01-01'::DATE) as date_key
+    FROM number_series
+    WHERE DATEADD('day', seq_num, '2020-01-01'::DATE) <= '2030-12-31'::DATE
 )
 
 SELECT 
