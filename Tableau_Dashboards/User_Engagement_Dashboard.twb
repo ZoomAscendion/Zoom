@@ -1,0 +1,592 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20233.23.1017.0948 -->
+<workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
+  <datasources>
+    <datasource caption='User Engagement Data' inline='true' name='federated.3c4d5e6f78901234567890abcdef0123' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.3c4d5e6f78901234567890ab'>
+            <connection authentication='Username Password' class='snowflake' dbname='DB_POC_ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' service='FR__POC__ADMIN__ZOOM' username='SATHYANARAYANAP' password='Sathyasnowflake@20' warehouse='WH_POC_ZOOM_DEV_XSMALL' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation type='join' join='inner'>
+          <clause type='join'>
+            <expression op='='>
+              <expression op='[GO_USER_DIMENSION].[USER_ID]' />
+              <expression op='[GO_PARTICIPANTS].[USER_ID]' />
+            </expression>
+          </clause>
+          <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f78901234567890ab' name='GO_USER_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+          <_.fcp.ObjectModelEncapsulateLegacy.false...relation type='join' join='left'>
+            <clause type='join'>
+              <expression op='='>
+                <expression op='[GO_PARTICIPANTS].[MEETING_ID]' />
+                <expression op='[GO_FEATURE_USAGE].[MEETING_ID]' />
+              </expression>
+            </clause>
+            <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f78901234567890ab' name='GO_PARTICIPANTS' table='[DB_POC_ZOOM].[GOLD].[GO_PARTICIPANTS]' type='table' />
+            <_.fcp.ObjectModelEncapsulateLegacy.false...relation type='join' join='left'>
+              <clause type='join'>
+                <expression op='='>
+                  <expression op='[GO_FEATURE_USAGE].[FEATURE_ID]' />
+                  <expression op='[GO_FEATURE_DIMENSION].[FEATURE_ID]' />
+                </expression>
+              </clause>
+              <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f78901234567890ab' name='GO_FEATURE_USAGE' table='[DB_POC_ZOOM].[GOLD].[GO_FEATURE_USAGE]' type='table' />
+              <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f78901234567890ab' name='GO_FEATURE_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_FEATURE_DIMENSION]' type='table' />
+            </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+          </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+        </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='join' join='inner'>
+          <clause type='join'>
+            <expression op='='>
+              <expression op='[GO_USER_DIMENSION].[USER_ID]' />
+              <expression op='[GO_PARTICIPANTS].[USER_ID]' />
+            </expression>
+          </clause>
+          <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f78901234567890ab' name='GO_USER_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+          <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='join' join='left'>
+            <clause type='join'>
+              <expression op='='>
+                <expression op='[GO_PARTICIPANTS].[MEETING_ID]' />
+                <expression op='[GO_FEATURE_USAGE].[MEETING_ID]' />
+              </expression>
+            </clause>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f78901234567890ab' name='GO_PARTICIPANTS' table='[DB_POC_ZOOM].[GOLD].[GO_PARTICIPANTS]' type='table' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='join' join='left'>
+              <clause type='join'>
+                <expression op='='>
+                  <expression op='[GO_FEATURE_USAGE].[FEATURE_ID]' />
+                  <expression op='[GO_FEATURE_DIMENSION].[FEATURE_ID]' />
+                </expression>
+              </clause>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f78901234567890ab' name='GO_FEATURE_USAGE' table='[DB_POC_ZOOM].[GOLD].[GO_FEATURE_USAGE]' type='table' />
+              <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f78901234567890ab' name='GO_FEATURE_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_FEATURE_DIMENSION]' type='table' />
+            </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+          </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <metadata-records>
+          <metadata-record class='column'>
+            <remote-name>USER_ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_ID]</local-name>
+            <parent-name>[GO_USER_DIMENSION]</parent-name>
+            <remote-alias>USER_ID</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_USER_DIMENSION_C3D4E5F67890ABCDEF1234567890CD]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>EMAIL_ADDRESS</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[EMAIL_ADDRESS]</local-name>
+            <parent-name>[GO_USER_DIMENSION]</parent-name>
+            <remote-alias>EMAIL_ADDRESS</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_USER_DIMENSION_C3D4E5F67890ABCDEF1234567890CD]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DEPARTMENT</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[DEPARTMENT]</local-name>
+            <parent-name>[GO_USER_DIMENSION]</parent-name>
+            <remote-alias>DEPARTMENT</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_USER_DIMENSION_C3D4E5F67890ABCDEF1234567890CD]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>LOCATION</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[LOCATION]</local-name>
+            <parent-name>[GO_USER_DIMENSION]</parent-name>
+            <remote-alias>LOCATION</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_USER_DIMENSION_C3D4E5F67890ABCDEF1234567890CD]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>JOIN_TIME</remote-name>
+            <remote-type>93</remote-type>
+            <local-name>[JOIN_TIME]</local-name>
+            <parent-name>[GO_PARTICIPANTS]</parent-name>
+            <remote-alias>JOIN_TIME</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_PARTICIPANTS_D4E5F67890ABCDEF1234567890ABCD]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DURATION_MINUTES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[DURATION_MINUTES]</local-name>
+            <parent-name>[GO_PARTICIPANTS]</parent-name>
+            <remote-alias>DURATION_MINUTES</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_PARTICIPANTS_D4E5F67890ABCDEF1234567890ABCD]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FEATURE_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[FEATURE_NAME]</local-name>
+            <parent-name>[GO_FEATURE_DIMENSION]</parent-name>
+            <remote-alias>FEATURE_NAME</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_FEATURE_DIMENSION_E5F67890ABCDEF1234567890BCDE]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USAGE_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[USAGE_COUNT]</local-name>
+            <parent-name>[GO_FEATURE_USAGE]</parent-name>
+            <remote-alias>USAGE_COUNT</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_FEATURE_USAGE_F67890ABCDEF1234567890BCDEF1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='User ID' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
+      <column caption='Email Address' datatype='string' name='[EMAIL_ADDRESS]' role='dimension' type='nominal' />
+      <column caption='Department' datatype='string' name='[DEPARTMENT]' role='dimension' type='nominal' />
+      <column caption='Location' datatype='string' name='[LOCATION]' role='dimension' type='nominal' />
+      <column caption='Join Time' datatype='datetime' name='[JOIN_TIME]' role='dimension' type='ordinal' />
+      <column caption='Duration Minutes' datatype='integer' name='[DURATION_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Feature Name' datatype='string' name='[FEATURE_NAME]' role='dimension' type='nominal' />
+      <column caption='Usage Count' datatype='integer' name='[USAGE_COUNT]' role='measure' type='quantitative' />
+      <column caption='Email Masked' datatype='string' name='[Calculation_3c4d5e6f78901234]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],1)+&quot;*******&quot;+RIGHT([EMAIL_ADDRESS],9)' />
+      </column>
+      <column caption='Active Users' datatype='integer' name='[Calculation_4d5e6f7890123456]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([USER_ID])' />
+      </column>
+      <column caption='User Engagement Score' datatype='real' name='[Calculation_5e6f789012345678]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([DURATION_MINUTES]) / COUNTD([GO_PARTICIPANTS].[MEETING_ID])' />
+      </column>
+      <column caption='Feature Adoption Rate' datatype='real' name='[Calculation_6f78901234567890]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([USAGE_COUNT]) / COUNTD([USER_ID])' />
+      </column>
+      <column caption='Department Usage' datatype='integer' name='[Calculation_789012345678901a]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([DURATION_MINUTES])' />
+      </column>
+      <_.fcp.ObjectModelTableType.true...column caption='GO_USER_DIMENSION' datatype='table' name='[__tableau_internal_object_id__].[GO_USER_DIMENSION_C3D4E5F67890ABCDEF1234567890CD]' role='measure' type='quantitative' />
+      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+        <objects>
+          <object caption='GO_USER_DIMENSION' id='GO_USER_DIMENSION_C3D4E5F67890ABCDEF1234567890CD'>
+            <properties context=''>
+              <relation connection='snowflake.3c4d5e6f78901234567890ab' name='GO_USER_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+            </properties>
+          </object>
+          <object caption='GO_PARTICIPANTS' id='GO_PARTICIPANTS_D4E5F67890ABCDEF1234567890ABCD'>
+            <properties context=''>
+              <relation connection='snowflake.3c4d5e6f78901234567890ab' name='GO_PARTICIPANTS' table='[DB_POC_ZOOM].[GOLD].[GO_PARTICIPANTS]' type='table' />
+            </properties>
+          </object>
+          <object caption='GO_FEATURE_DIMENSION' id='GO_FEATURE_DIMENSION_E5F67890ABCDEF1234567890BCDE'>
+            <properties context=''>
+              <relation connection='snowflake.3c4d5e6f78901234567890ab' name='GO_FEATURE_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_FEATURE_DIMENSION]' type='table' />
+            </properties>
+          </object>
+          <object caption='GO_FEATURE_USAGE' id='GO_FEATURE_USAGE_F67890ABCDEF1234567890BCDEF1'>
+            <properties context=''>
+              <relation connection='snowflake.3c4d5e6f78901234567890ab' name='GO_FEATURE_USAGE' table='[DB_POC_ZOOM].[GOLD].[GO_FEATURE_USAGE]' type='table' />
+            </properties>
+          </object>
+        </objects>
+      </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Active Users Over Time'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Active Users Over Time</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='User Engagement Data' name='federated.3c4d5e6f78901234567890abcdef0123' />
+          </datasources>
+          <datasource-dependencies datasource='federated.3c4d5e6f78901234567890abcdef0123'>
+            <column caption='Join Time' datatype='datetime' name='[JOIN_TIME]' role='dimension' type='ordinal' />
+            <column caption='Active Users' datatype='integer' name='[Calculation_4d5e6f7890123456]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD([USER_ID])' />
+            </column>
+            <column-instance column='[JOIN_TIME]' derivation='Month-Trunc' name='[tmn:JOIN_TIME:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_4d5e6f7890123456]' derivation='Sum' name='[sum:Calculation_4d5e6f7890123456:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.3c4d5e6f78901234567890abcdef0123].[sum:Calculation_4d5e6f7890123456:qk]' palette='blue_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.3c4d5e6f78901234567890abcdef0123].[sum:Calculation_4d5e6f7890123456:qk]</rows>
+        <cols>[federated.3c4d5e6f78901234567890abcdef0123].[tmn:JOIN_TIME:qk]</cols>
+      </table>
+      <simple-id uuid='{3C4D5E6F-7890-1234-5678-9ABCDEF01234}' />
+    </worksheet>
+    <worksheet name='User Engagement Scores'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>User Engagement Scores</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='User Engagement Data' name='federated.3c4d5e6f78901234567890abcdef0123' />
+          </datasources>
+          <datasource-dependencies datasource='federated.3c4d5e6f78901234567890abcdef0123'>
+            <column caption='Email Masked' datatype='string' name='[Calculation_3c4d5e6f78901234]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],1)+&quot;*******&quot;+RIGHT([EMAIL_ADDRESS],9)' />
+            </column>
+            <column caption='User Engagement Score' datatype='real' name='[Calculation_5e6f789012345678]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM([DURATION_MINUTES]) / COUNTD([GO_PARTICIPANTS].[MEETING_ID])' />
+            </column>
+            <column-instance column='[Calculation_3c4d5e6f78901234]' derivation='None' name='[none:Calculation_3c4d5e6f78901234:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_5e6f789012345678]' derivation='Sum' name='[sum:Calculation_5e6f789012345678:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.3c4d5e6f78901234567890abcdef0123].[sum:Calculation_5e6f789012345678:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.3c4d5e6f78901234567890abcdef0123].[sum:Calculation_5e6f789012345678:qk]</rows>
+        <cols>[federated.3c4d5e6f78901234567890abcdef0123].[none:Calculation_3c4d5e6f78901234:nk]</cols>
+      </table>
+      <simple-id uuid='{4D5E6F78-9012-3456-789A-BCDEF0123456}' />
+    </worksheet>
+    <worksheet name='Feature Adoption Rates'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Feature Adoption Rates</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='User Engagement Data' name='federated.3c4d5e6f78901234567890abcdef0123' />
+          </datasources>
+          <datasource-dependencies datasource='federated.3c4d5e6f78901234567890abcdef0123'>
+            <column caption='Feature Name' datatype='string' name='[FEATURE_NAME]' role='dimension' type='nominal' />
+            <column caption='Feature Adoption Rate' datatype='real' name='[Calculation_6f78901234567890]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM([USAGE_COUNT]) / COUNTD([USER_ID])' />
+            </column>
+            <column-instance column='[FEATURE_NAME]' derivation='None' name='[none:FEATURE_NAME:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_6f78901234567890]' derivation='Sum' name='[sum:Calculation_6f78901234567890:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.3c4d5e6f78901234567890abcdef0123].[sum:Calculation_6f78901234567890:qk]' palette='green_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.3c4d5e6f78901234567890abcdef0123].[sum:Calculation_6f78901234567890:qk]</rows>
+        <cols>[federated.3c4d5e6f78901234567890abcdef0123].[none:FEATURE_NAME:nk]</cols>
+      </table>
+      <simple-id uuid='{5E6F7890-1234-5678-9ABC-DEF012345678}' />
+    </worksheet>
+    <worksheet name='Geographic User Distribution'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Geographic User Distribution</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='User Engagement Data' name='federated.3c4d5e6f78901234567890abcdef0123' />
+          </datasources>
+          <datasource-dependencies datasource='federated.3c4d5e6f78901234567890abcdef0123'>
+            <column caption='Location' datatype='string' name='[LOCATION]' role='dimension' type='nominal' />
+            <column caption='Active Users' datatype='integer' name='[Calculation_4d5e6f7890123456]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD([USER_ID])' />
+            </column>
+            <column-instance column='[LOCATION]' derivation='None' name='[none:LOCATION:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_4d5e6f7890123456]' derivation='Sum' name='[sum:Calculation_4d5e6f7890123456:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Map' />
+            <encodings>
+              <color column='[federated.3c4d5e6f78901234567890abcdef0123].[sum:Calculation_4d5e6f7890123456:qk]' />
+              <size column='[federated.3c4d5e6f78901234567890abcdef0123].[sum:Calculation_4d5e6f7890123456:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.3c4d5e6f78901234567890abcdef0123].[sum:Calculation_4d5e6f7890123456:qk]</rows>
+        <cols>[federated.3c4d5e6f78901234567890abcdef0123].[none:LOCATION:nk]</cols>
+      </table>
+      <simple-id uuid='{6F789012-3456-789A-BCDE-F01234567890}' />
+    </worksheet>
+    <worksheet name='Department-wise Usage'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Department-wise Usage</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='User Engagement Data' name='federated.3c4d5e6f78901234567890abcdef0123' />
+          </datasources>
+          <datasource-dependencies datasource='federated.3c4d5e6f78901234567890abcdef0123'>
+            <column caption='Department' datatype='string' name='[DEPARTMENT]' role='dimension' type='nominal' />
+            <column caption='Department Usage' datatype='integer' name='[Calculation_789012345678901a]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM([DURATION_MINUTES])' />
+            </column>
+            <column-instance column='[DEPARTMENT]' derivation='None' name='[none:DEPARTMENT:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_789012345678901a]' derivation='Sum' name='[sum:Calculation_789012345678901a:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.3c4d5e6f78901234567890abcdef0123].[none:DEPARTMENT:nk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.3c4d5e6f78901234567890abcdef0123].[sum:Calculation_789012345678901a:qk]</rows>
+        <cols>[federated.3c4d5e6f78901234567890abcdef0123].[none:DEPARTMENT:nk]</cols>
+      </table>
+      <simple-id uuid='{789A0123-4567-89AB-CDEF-012345678901}' />
+    </worksheet>
+  </worksheets>
+  <dashboards>
+    <dashboard name='User Engagement Dashboard'>
+      <style />
+      <size maxheight='800' maxwidth='1200' minheight='800' minwidth='1200' />
+      <zones>
+        <zone h='100000' id='4' type='layout-basic' w='100000' x='0' y='0'>
+          <zone h='98000' id='5' param='[federated.3c4d5e6f78901234567890abcdef0123]' type='title' w='100000' x='0' y='0'>
+            <zone-style>
+              <format attr='border-color' value='#000000' />
+              <format attr='border-style' value='none' />
+              <format attr='border-width' value='0' />
+              <format attr='margin' value='4' />
+            </zone-style>
+          </zone>
+          <zone h='32000' id='6' name='Active Users Over Time' w='60000' x='0' y='2000'>
+            <zone-style>
+              <format attr='border-color' value='#000000' />
+              <format attr='border-style' value='none' />
+              <format attr='border-width' value='0' />
+              <format attr='margin' value='4' />
+            </zone-style>
+          </zone>
+          <zone h='32000' id='7' name='User Engagement Scores' w='40000' x='60000' y='2000'>
+            <zone-style>
+              <format attr='border-color' value='#000000' />
+              <format attr='border-style' value='none' />
+              <format attr='border-width' value='0' />
+              <format attr='margin' value='4' />
+            </zone-style>
+          </zone>
+          <zone h='32000' id='8' name='Feature Adoption Rates' w='50000' x='0' y='34000'>
+            <zone-style>
+              <format attr='border-color' value='#000000' />
+              <format attr='border-style' value='none' />
+              <format attr='border-width' value='0' />
+              <format attr='margin' value='4' />
+            </zone-style>
+          </zone>
+          <zone h='32000' id='9' name='Geographic User Distribution' w='50000' x='50000' y='34000'>
+            <zone-style>
+              <format attr='border-color' value='#000000' />
+              <format attr='border-style' value='none' />
+              <format attr='border-width' value='0' />
+              <format attr='margin' value='4' />
+            </zone-style>
+          </zone>
+          <zone h='32000' id='10' name='Department-wise Usage' w='100000' x='0' y='66000'>
+            <zone-style>
+              <format attr='border-color' value='#000000' />
+              <format attr='border-style' value='none' />
+              <format attr='border-width' value='0' />
+              <format attr='margin' value='4' />
+            </zone-style>
+          </zone>
+        </zone>
+      </zones>
+      <devicelayouts>
+        <devicelayout auto-generated='true' name='Phone'>
+          <size maxheight='700' minheight='700' sizing-mode='vscroll' />
+          <zones>
+            <zone h='100000' id='15' type='layout-basic' w='100000' x='0' y='0'>
+              <zone fixed-size='280' h='280' id='16' is-fixed='true' param='[federated.3c4d5e6f78901234567890abcdef0123]' type='title' w='100000' x='0' y='0'>
+                <zone-style>
+                  <format attr='border-color' value='#000000' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
+                  <format attr='margin' value='4' />
+                </zone-style>
+              </zone>
+              <zone h='100000' id='17' name='Active Users Over Time' w='100000' x='0' y='280'>
+                <zone-style>
+                  <format attr='border-color' value='#000000' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
+                  <format attr='margin' value='4' />
+                </zone-style>
+              </zone>
+            </zone>
+          </zones>
+        </devicelayout>
+      </devicelayouts>
+      <simple-id uuid='{89AB0123-4567-89AB-CDEF-012345678901}' />
+    </dashboard>
+  </dashboards>
+  <windows saved-dpi-scale-factor='1.5' source-height='44'>
+    <window class='dashboard' maximized='true' name='User Engagement Dashboard'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{9ABC0123-4567-89AB-CDEF-012345678901}' />
+    </window>
+  </windows>
+</workbook>
