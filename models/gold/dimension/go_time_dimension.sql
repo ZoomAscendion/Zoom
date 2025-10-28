@@ -2,17 +2,17 @@
     materialized='table'
 ) }}
 
--- Gold Time Dimension Table
-WITH date_range AS (
+-- Gold Time Dimension Table - Simple version with basic date range
+WITH date_spine AS (
     SELECT 
-        DATEADD('day', ROW_NUMBER() OVER (ORDER BY 1) - 1, '2020-01-01'::DATE) as date_key
+        '2020-01-01'::DATE + (ROW_NUMBER() OVER (ORDER BY 1) - 1) as date_key
     FROM (
-        SELECT 1 as dummy FROM (VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10)) t1(c)
+        SELECT 1 FROM (VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10)) t1(c)
         CROSS JOIN (VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10)) t2(c)
         CROSS JOIN (VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10)) t3(c)
         CROSS JOIN (VALUES (1),(2),(3),(4)) t4(c)
     )
-    QUALIFY date_key <= '2030-12-31'::DATE
+    WHERE date_key <= '2030-12-31'::DATE
 )
 
 SELECT 
@@ -42,4 +42,5 @@ SELECT
     -- Metadata columns
     CURRENT_DATE() as load_date,
     'SYSTEM_GENERATED' as source_system
-FROM date_range
+FROM date_spine
+LIMIT 4000 -- Limit to prevent excessive data generation
