@@ -1,0 +1,845 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20233.23.1017.0948                               -->
+<workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
+  <datasources>
+    <datasource caption='Meeting Analytics (DB_POC_ZOOM.GOLD)' inline='true' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
+            <connection authentication='Username Password' class='snowflake' dbname='DB_POC_ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' service='FR__POC__ADMIN__ZOOM' username='SATHYANARAYANAP' password='Sathyasnowflake@20' warehouse='WH_POC_ZOOM_DEV_XSMALL' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation type='join' join='inner'>
+          <clause type='join'>
+            <expression op='='>
+              <expression op='[GO_MEETING_FACTS].[MEETING_ID]' />
+              <expression op='[GO_PARTICIPANTS].[MEETING_ID]' />
+            </expression>
+          </clause>
+          <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='GO_MEETING_FACTS' table='[DB_POC_ZOOM].[GOLD].[GO_MEETING_FACTS]' type='table' />
+          <_.fcp.ObjectModelEncapsulateLegacy.false...relation type='join' join='inner'>
+            <clause type='join'>
+              <expression op='='>
+                <expression op='[GO_PARTICIPANTS].[USER_ID]' />
+                <expression op='[GO_USER_DIMENSION].[USER_ID]' />
+              </expression>
+            </clause>
+            <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='GO_PARTICIPANTS' table='[DB_POC_ZOOM].[GOLD].[GO_PARTICIPANTS]' type='table' />
+            <_.fcp.ObjectModelEncapsulateLegacy.false...relation type='join' join='inner'>
+              <clause type='join'>
+                <expression op='='>
+                  <expression op='DATETRUNC(&apos;day&apos;,[GO_MEETING_FACTS].[START_TIME])' />
+                  <expression op='[GO_TIME_DIMENSION].[DATE_KEY]' />
+                </expression>
+              </clause>
+              <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='GO_USER_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+              <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='GO_TIME_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_TIME_DIMENSION]' type='table' />
+            </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+          </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+        </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='join' join='inner'>
+          <clause type='join'>
+            <expression op='='>
+              <expression op='[GO_MEETING_FACTS].[MEETING_ID]' />
+              <expression op='[GO_PARTICIPANTS].[MEETING_ID]' />
+            </expression>
+          </clause>
+          <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='GO_MEETING_FACTS' table='[DB_POC_ZOOM].[GOLD].[GO_MEETING_FACTS]' type='table' />
+          <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='join' join='inner'>
+            <clause type='join'>
+              <expression op='='>
+                <expression op='[GO_PARTICIPANTS].[USER_ID]' />
+                <expression op='[GO_USER_DIMENSION].[USER_ID]' />
+              </expression>
+            </clause>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='GO_PARTICIPANTS' table='[DB_POC_ZOOM].[GOLD].[GO_PARTICIPANTS]' type='table' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='join' join='inner'>
+              <clause type='join'>
+                <expression op='='>
+                  <expression op='DATETRUNC(&apos;day&apos;,[GO_MEETING_FACTS].[START_TIME])' />
+                  <expression op='[GO_TIME_DIMENSION].[DATE_KEY]' />
+                </expression>
+              </clause>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='GO_USER_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+              <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='GO_TIME_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_TIME_DIMENSION]' type='table' />
+            </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+          </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[GO_MEETING_FACTS]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='context'>0</attribute>
+              <attribute datatype='string' name='gridOrigin'>&quot;A1:Z1:no:A1:Z1:0&quot;</attribute>
+              <attribute datatype='boolean' name='header'>true</attribute>
+              <attribute datatype='integer' name='outcome'>2</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MEETING_ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MEETING_ID]</local-name>
+            <parent-name>[GO_MEETING_FACTS]</parent-name>
+            <remote-alias>MEETING_ID</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>50</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_MEETING_FACTS_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MEETING_TOPIC</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MEETING_TOPIC]</local-name>
+            <parent-name>[GO_MEETING_FACTS]</parent-name>
+            <remote-alias>MEETING_TOPIC</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>500</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_MEETING_FACTS_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>START_TIME</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[START_TIME]</local-name>
+            <parent-name>[GO_MEETING_FACTS]</parent-name>
+            <remote-alias>START_TIME</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_TYPE_TIMESTAMP&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_TYPE_TIMESTAMP&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_MEETING_FACTS_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>END_TIME</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[END_TIME]</local-name>
+            <parent-name>[GO_MEETING_FACTS]</parent-name>
+            <remote-alias>END_TIME</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_TYPE_TIMESTAMP&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_TYPE_TIMESTAMP&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_MEETING_FACTS_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DURATION_MINUTES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[DURATION_MINUTES]</local-name>
+            <parent-name>[GO_MEETING_FACTS]</parent-name>
+            <remote-alias>DURATION_MINUTES</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_DECIMAL&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_NUMERIC&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_MEETING_FACTS_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PARTICIPANT_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[PARTICIPANT_COUNT]</local-name>
+            <parent-name>[GO_MEETING_FACTS]</parent-name>
+            <remote-alias>PARTICIPANT_COUNT</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_DECIMAL&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_NUMERIC&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_MEETING_FACTS_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>HOST_ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[HOST_ID]</local-name>
+            <parent-name>[GO_MEETING_FACTS]</parent-name>
+            <remote-alias>HOST_ID</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>50</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_MEETING_FACTS_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_ID (GO_PARTICIPANTS)]</local-name>
+            <parent-name>[GO_PARTICIPANTS]</parent-name>
+            <remote-alias>USER_ID</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>50</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_PARTICIPANTS_B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>JOIN_TIME</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[JOIN_TIME]</local-name>
+            <parent-name>[GO_PARTICIPANTS]</parent-name>
+            <remote-alias>JOIN_TIME</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_TYPE_TIMESTAMP&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_TYPE_TIMESTAMP&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_PARTICIPANTS_B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>LEAVE_TIME</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[LEAVE_TIME]</local-name>
+            <parent-name>[GO_PARTICIPANTS]</parent-name>
+            <remote-alias>LEAVE_TIME</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_TYPE_TIMESTAMP&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_TYPE_TIMESTAMP&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_PARTICIPANTS_B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_NAME]</local-name>
+            <parent-name>[GO_USER_DIMENSION]</parent-name>
+            <remote-alias>USER_NAME</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>255</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_USER_DIMENSION_C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>EMAIL_ADDRESS</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[EMAIL_ADDRESS]</local-name>
+            <parent-name>[GO_USER_DIMENSION]</parent-name>
+            <remote-alias>EMAIL_ADDRESS</remote-alias>
+            <ordinal>12</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>320</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_USER_DIMENSION_C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DEPARTMENT_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[DEPARTMENT_NAME]</local-name>
+            <parent-name>[GO_USER_DIMENSION]</parent-name>
+            <remote-alias>DEPARTMENT_NAME</remote-alias>
+            <ordinal>13</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>200</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_USER_DIMENSION_C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DATE_KEY</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[DATE_KEY]</local-name>
+            <parent-name>[GO_TIME_DIMENSION]</parent-name>
+            <remote-alias>DATE_KEY</remote-alias>
+            <ordinal>14</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_TYPE_DATE&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_TYPE_DATE&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_TIME_DIMENSION_D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MONTH_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MONTH_NAME]</local-name>
+            <parent-name>[GO_TIME_DIMENSION]</parent-name>
+            <remote-alias>MONTH_NAME</remote-alias>
+            <ordinal>15</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>20</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_TIME_DIMENSION_D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>YEAR</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[YEAR]</local-name>
+            <parent-name>[GO_TIME_DIMENSION]</parent-name>
+            <remote-alias>YEAR</remote-alias>
+            <ordinal>16</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_DECIMAL&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_NUMERIC&quot;</attribute>
+            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_TIME_DIMENSION_D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Meeting ID' datatype='string' name='[MEETING_ID]' role='dimension' type='nominal' />
+      <column caption='Meeting Topic' datatype='string' name='[MEETING_TOPIC]' role='dimension' type='nominal' />
+      <column caption='Start Time' datatype='datetime' name='[START_TIME]' role='dimension' type='ordinal' />
+      <column caption='End Time' datatype='datetime' name='[END_TIME]' role='dimension' type='ordinal' />
+      <column caption='Duration (Minutes)' datatype='integer' name='[DURATION_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Participant Count' datatype='integer' name='[PARTICIPANT_COUNT]' role='measure' type='quantitative' />
+      <column caption='Host ID' datatype='string' name='[HOST_ID]' role='dimension' type='nominal' />
+      <column caption='User ID' datatype='string' name='[USER_ID (GO_PARTICIPANTS)]' role='dimension' type='nominal' />
+      <column caption='Join Time' datatype='datetime' name='[JOIN_TIME]' role='dimension' type='ordinal' />
+      <column caption='Leave Time' datatype='datetime' name='[LEAVE_TIME]' role='dimension' type='ordinal' />
+      <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+      <column caption='Email Address' datatype='string' name='[EMAIL_ADDRESS]' role='dimension' type='nominal' />
+      <column caption='Department Name' datatype='string' name='[DEPARTMENT_NAME]' role='dimension' type='nominal' />
+      <column caption='Date' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+      <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+      <column caption='Year' datatype='integer' name='[YEAR]' role='measure' type='quantitative' />
+      <column caption='Email Masked' datatype='string' name='[Calculation_EmailMasked_123456789]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],3)+&quot;*****&quot;+RIGHT([EMAIL_ADDRESS],10)' />
+      </column>
+      <column caption='Meeting Quality Score' datatype='real' name='[Calculation_QualityScore_987654321]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='IF [DURATION_MINUTES] &gt; 60 AND [PARTICIPANT_COUNT] &gt; 2 THEN 5.0 ELSEIF [DURATION_MINUTES] &gt; 30 THEN 4.0 ELSEIF [DURATION_MINUTES] &gt; 15 THEN 3.0 ELSE 2.0 END' />
+      </column>
+      <column caption='Average Duration' datatype='real' name='[Calculation_AvgDuration_456789123]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([DURATION_MINUTES])' />
+      </column>
+      <_.fcp.ObjectModelTableType.true...column caption='GO_MEETING_FACTS' datatype='table' name='[__tableau_internal_object_id__].[GO_MEETING_FACTS_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='GO_PARTICIPANTS' datatype='table' name='[__tableau_internal_object_id__].[GO_PARTICIPANTS_B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='GO_USER_DIMENSION' datatype='table' name='[__tableau_internal_object_id__].[GO_USER_DIMENSION_C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='GO_TIME_DIMENSION' datatype='table' name='[__tableau_internal_object_id__].[GO_TIME_DIMENSION_D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9]' role='measure' type='quantitative' />
+      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+        <objects>
+          <object caption='GO_MEETING_FACTS' id='GO_MEETING_FACTS_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6'>
+            <properties context=''>
+              <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='GO_MEETING_FACTS' table='[DB_POC_ZOOM].[GOLD].[GO_MEETING_FACTS]' type='table' />
+            </properties>
+          </object>
+          <object caption='GO_PARTICIPANTS' id='GO_PARTICIPANTS_B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7'>
+            <properties context=''>
+              <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='GO_PARTICIPANTS' table='[DB_POC_ZOOM].[GOLD].[GO_PARTICIPANTS]' type='table' />
+            </properties>
+          </object>
+          <object caption='GO_USER_DIMENSION' id='GO_USER_DIMENSION_C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8'>
+            <properties context=''>
+              <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='GO_USER_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+            </properties>
+          </object>
+          <object caption='GO_TIME_DIMENSION' id='GO_TIME_DIMENSION_D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9'>
+            <properties context=''>
+              <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='GO_TIME_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_TIME_DIMENSION]' type='table' />
+            </properties>
+          </object>
+        </objects>
+      </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Total Meetings Over Time'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Total Meetings Over Time</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Meeting Analytics (DB_POC_ZOOM.GOLD)' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
+            <column caption='Date' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+            <column caption='Meeting ID' datatype='string' name='[MEETING_ID]' role='dimension' type='nominal' />
+            <column-instance column='[MEETING_ID]' derivation='CountD' name='[ctd:MEETING_ID:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[DATE_KEY]' derivation='Month-Trunc' name='[tmn:DATE_KEY:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[ctd:MEETING_ID:qk]' palette='blue_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[ctd:MEETING_ID:qk]</rows>
+        <cols>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[tmn:DATE_KEY:qk]</cols>
+      </table>
+      <simple-id uuid='{A1B2C3D4-E5F6-G7H8-I9J0-K1L2M3N4O5P6}' />
+    </worksheet>
+    <worksheet name='Average Meeting Duration by Month'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Average Meeting Duration by Month</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Meeting Analytics (DB_POC_ZOOM.GOLD)' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
+            <column caption='Duration (Minutes)' datatype='integer' name='[DURATION_MINUTES]' role='measure' type='quantitative' />
+            <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+            <column caption='Year' datatype='integer' name='[YEAR]' role='measure' type='quantitative' />
+            <column-instance column='[DURATION_MINUTES]' derivation='Avg' name='[avg:DURATION_MINUTES:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[MONTH_NAME]' derivation='None' name='[none:MONTH_NAME:nk]' pivot='key' type='nominal' />
+            <column-instance column='[YEAR]' derivation='None' name='[none:YEAR:ok]' pivot='key' type='ordinal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[avg:DURATION_MINUTES:qk]' palette='orange_blue_diverging_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[avg:DURATION_MINUTES:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[avg:DURATION_MINUTES:qk]</rows>
+        <cols>([federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:YEAR:ok] / [federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:MONTH_NAME:nk])</cols>
+      </table>
+      <simple-id uuid='{B2C3D4E5-F6G7-H8I9-J0K1-L2M3N4O5P6Q7}' />
+    </worksheet>
+    <worksheet name='Participant Count Distribution'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Participant Count Distribution</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Meeting Analytics (DB_POC_ZOOM.GOLD)' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
+            <column caption='Meeting ID' datatype='string' name='[MEETING_ID]' role='dimension' type='nominal' />
+            <column caption='Participant Count' datatype='integer' name='[PARTICIPANT_COUNT]' role='measure' type='quantitative' />
+            <column-instance column='[MEETING_ID]' derivation='Count' name='[cnt:MEETING_ID:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[PARTICIPANT_COUNT]' derivation='None' name='[none:PARTICIPANT_COUNT:ok]' pivot='key' type='ordinal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[cnt:MEETING_ID:qk]' palette='green_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[cnt:MEETING_ID:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[cnt:MEETING_ID:qk]</rows>
+        <cols>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:PARTICIPANT_COUNT:ok]</cols>
+      </table>
+      <simple-id uuid='{C3D4E5F6-G7H8-I9J0-K1L2-M3N4O5P6Q7R8}' />
+    </worksheet>
+    <worksheet name='Meeting Quality Metrics'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Meeting Quality Metrics</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Meeting Analytics (DB_POC_ZOOM.GOLD)' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
+            <column caption='Meeting Quality Score' datatype='real' name='[Calculation_QualityScore_987654321]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='IF [DURATION_MINUTES] &gt; 60 AND [PARTICIPANT_COUNT] &gt; 2 THEN 5.0 ELSEIF [DURATION_MINUTES] &gt; 30 THEN 4.0 ELSEIF [DURATION_MINUTES] &gt; 15 THEN 3.0 ELSE 2.0 END' />
+            </column>
+            <column caption='Department Name' datatype='string' name='[DEPARTMENT_NAME]' role='dimension' type='nominal' />
+            <column caption='Duration (Minutes)' datatype='integer' name='[DURATION_MINUTES]' role='measure' type='quantitative' />
+            <column caption='Participant Count' datatype='integer' name='[PARTICIPANT_COUNT]' role='measure' type='quantitative' />
+            <column-instance column='[Calculation_QualityScore_987654321]' derivation='Avg' name='[avg:Calculation_QualityScore_987654321:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[DEPARTMENT_NAME]' derivation='None' name='[none:DEPARTMENT_NAME:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[avg:Calculation_QualityScore_987654321:qk]' palette='red_blue_diverging_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Square' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[avg:Calculation_QualityScore_987654321:qk]' />
+              <size column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[avg:Calculation_QualityScore_987654321:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:DEPARTMENT_NAME:nk]</rows>
+        <cols />
+      </table>
+      <simple-id uuid='{D4E5F6G7-H8I9-J0K1-L2M3-N4O5P6Q7R8S9}' />
+    </worksheet>
+  </worksheets>
+  <dashboards>
+    <dashboard name='Meeting Analytics Dashboard'>
+      <style />
+      <size maxheight='800' maxwidth='1000' minheight='800' minwidth='1000' />
+      <zones>
+        <zone h='100000' id='4' type='layout-basic' w='100000' x='0' y='0'>
+          <zone h='98000' id='5' param='vert' type='layout-flow' w='98000' x='1000' y='1000'>
+            <zone h='48000' id='6' name='Total Meetings Over Time' w='98000' x='1000' y='1000'>
+              <zone-style>
+                <format attr='border-color' value='#000000' />
+                <format attr='border-style' value='none' />
+                <format attr='border-width' value='0' />
+                <format attr='margin' value='4' />
+              </zone-style>
+            </zone>
+            <zone h='48000' id='7' param='horz' type='layout-flow' w='98000' x='1000' y='50000'>
+              <zone h='48000' id='8' name='Average Meeting Duration by Month' w='48000' x='1000' y='50000'>
+                <zone-style>
+                  <format attr='border-color' value='#000000' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
+                  <format attr='margin' value='4' />
+                </zone-style>
+              </zone>
+              <zone h='48000' id='9' name='Participant Count Distribution' w='48000' x='50000' y='50000'>
+                <zone-style>
+                  <format attr='border-color' value='#000000' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
+                  <format attr='margin' value='4' />
+                </zone-style>
+              </zone>
+            </zone>
+          </zone>
+        </zone>
+        <zone h='100000' id='10' type='layout-basic' w='100000' x='0' y='0'>
+          <zone h='98000' id='11' name='Meeting Quality Metrics' w='98000' x='1000' y='1000'>
+            <zone-style>
+              <format attr='border-color' value='#000000' />
+              <format attr='border-style' value='none' />
+              <format attr='border-width' value='0' />
+              <format attr='margin' value='4' />
+            </zone-style>
+          </zone>
+        </zone>
+      </zones>
+      <devicelayouts>
+        <devicelayout name='phone'>
+          <size maxheight='700' maxwidth='400' minheight='700' minwidth='400' />
+          <zones>
+            <zone h='100000' id='12' type='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98000' id='13' param='vert' type='layout-flow' w='98000' x='1000' y='1000'>
+                <zone h='24000' id='14' name='Total Meetings Over Time' w='98000' x='1000' y='1000' />
+                <zone h='24000' id='15' name='Average Meeting Duration by Month' w='98000' x='1000' y='25000' />
+                <zone h='24000' id='16' name='Participant Count Distribution' w='98000' x='1000' y='50000' />
+                <zone h='24000' id='17' name='Meeting Quality Metrics' w='98000' x='1000' y='75000' />
+              </zone>
+            </zone>
+          </zones>
+        </devicelayout>
+      </devicelayouts>
+      <simple-id uuid='{E5F6G7H8-I9J0-K1L2-M3N4-O5P6Q7R8S9T0}' />
+    </dashboard>
+  </dashboards>
+  <windows saved-dpi-scale-factor='1.5' source-height='44'>
+    <window class='dashboard' maximized='true' name='Meeting Analytics Dashboard'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:DEPARTMENT_NAME:nk]</field>
+            <field>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[tmn:DATE_KEY:qk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{F6G7H8I9-J0K1-L2M3-N4O5-P6Q7R8S9T0U1}' />
+    </window>
+    <window class='worksheet' name='Total Meetings Over Time'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{G7H8I9J0-K1L2-M3N4-O5P6-Q7R8S9T0U1V2}' />
+    </window>
+    <window class='worksheet' name='Average Meeting Duration by Month'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{H8I9J0K1-L2M3-N4O5-P6Q7-R8S9T0U1V2W3}' />
+    </window>
+    <window class='worksheet' name='Participant Count Distribution'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{I9J0K1L2-M3N4-O5P6-Q7R8-S9T0U1V2W3X4}' />
+    </window>
+    <window class='worksheet' name='Meeting Quality Metrics'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{J0K1L2M3-N4O5-P6Q7-R8S9-T0U1V2W3X4Y5}' />
+    </window>
+  </windows>
+  <thumbnails>
+    <thumbnail height='192' name='Meeting Analytics Dashboard' width='192'>
+      iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAABYlAAAWJQFJUiTw
+      AAAfeUlEQVR4nO3dZ3Ac55ng8f8kTEIY5DDIORIMYBZlSqZIWbRly7ZseSXLa3sd68rnq9u7
+      rbqPV3t3dXe7e3UOWpV37Vr7HGTLok3JoimZEkSBUUhEzsAgzCDnCZjY9wE0RNqYJkxxZoDB
+      +6tSCWT3TD94OM/0291vUEiSJCEIu5Qy0gEIQiSFpQCcTmc4DiMIf7GwFIDH4wnHYYQotjQ5
+    </thumbnail>
+  </thumbnails>
+</workbook>
