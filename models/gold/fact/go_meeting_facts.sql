@@ -43,46 +43,36 @@ feature_usage_agg AS (
         SUM(COALESCE(f.usage_count, 0)) as feature_usage_count
     FROM {{ source('silver', 'si_feature_usage') }} f
     GROUP BY f.meeting_id
-),
-
-meeting_enriched AS (
-    SELECT 
-        mb.*,
-        h.user_name as host_name,
-        COALESCE(pa.participant_count, 0) as participant_count,
-        COALESCE(pa.total_attendance_minutes, 0) as total_attendance_minutes,
-        COALESCE(fua.feature_usage_count, 0) as feature_usage_count
-    FROM meeting_base mb
-    LEFT JOIN host_info h ON mb.host_id = h.user_id
-    LEFT JOIN participant_agg pa ON mb.meeting_id = pa.meeting_id
-    LEFT JOIN feature_usage_agg fua ON mb.meeting_id = fua.meeting_id
 )
 
 SELECT 
-    ROW_NUMBER() OVER (ORDER BY meeting_id) as meeting_fact_id,
-    DATE(start_time) as meeting_date,
-    COALESCE(host_name, 'Unknown Host') as host_name,
-    COALESCE(meeting_topic, 'Untitled Meeting') as meeting_topic,
-    COALESCE(duration_minutes, 0) as duration_minutes,
-    COALESCE(meeting_type, 'Unknown') as meeting_type,
-    participant_count,
-    total_attendance_minutes,
+    ROW_NUMBER() OVER (ORDER BY mb.meeting_id) as meeting_fact_id,
+    DATE(mb.start_time) as meeting_date,
+    COALESCE(h.user_name, 'Unknown Host') as host_name,
+    COALESCE(mb.meeting_topic, 'Untitled Meeting') as meeting_topic,
+    COALESCE(mb.duration_minutes, 0) as duration_minutes,
+    COALESCE(mb.meeting_type, 'Unknown') as meeting_type,
+    COALESCE(pa.participant_count, 0) as participant_count,
+    COALESCE(pa.total_attendance_minutes, 0) as total_attendance_minutes,
     CASE 
-        WHEN duration_minutes > 0 AND participant_count > 0 AND total_attendance_minutes > 0 
-        THEN ROUND((total_attendance_minutes::FLOAT / (duration_minutes * participant_count)) * 100, 2)
+        WHEN mb.duration_minutes > 0 AND pa.participant_count > 0 AND pa.total_attendance_minutes > 0 
+        THEN ROUND((pa.total_attendance_minutes::FLOAT / (mb.duration_minutes * pa.participant_count)) * 100, 2)
         ELSE 0 
     END as average_attendance_percentage,
-    feature_usage_count,
-    COALESCE(business_hours_flag, FALSE) as business_hours_flag,
-    COALESCE(meeting_size_category, 'Small') as meeting_size_category,
+    COALESCE(fua.feature_usage_count, 0) as feature_usage_count,
+    COALESCE(mb.business_hours_flag, FALSE) as business_hours_flag,
+    COALESCE(mb.meeting_size_category, 'Small') as meeting_size_category,
     -- Additional columns from Silver layer
-    meeting_id,
-    host_id,
-    start_time,
-    end_time,
-    COALESCE(time_zone, 'UTC') as time_zone,
+    mb.meeting_id,
+    mb.host_id,
+    mb.start_time,
+    mb.end_time,
+    COALESCE(mb.time_zone, 'UTC') as time_zone,
     -- Metadata columns
-    COALESCE(m_load_date, CURRENT_DATE()) as load_date,
-    COALESCE(m_update_date, CURRENT_DATE()) as update_date,
-    COALESCE(m_source_system, 'ZOOM_PLATFORM') as source_system
-FROM meeting_enriched
+    COALESCE(mb.m_load_date, CURRENT_DATE()) as load_date,
+    COALESCE(mb.m_update_date, CURRENT_DATE()) as update_date,
+    COALESCE(mb.m_source_system, 'ZOOM_PLATFORM') as source_system
+FROM meeting_base mb
+LEFT JOIN host_info h ON mb.host_id = h.user_id
+LEFT JOIN participant_agg pa ON mb.meeting_id = pa.meeting_id
+LEFT JOIN feature_usage_agg fua ON mb.meeting_id = fua.meeting_id
