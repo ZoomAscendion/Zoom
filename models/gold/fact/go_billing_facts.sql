@@ -26,42 +26,33 @@ user_info AS (
         u.plan_type,
         u.company
     FROM {{ source('silver', 'si_users') }} u
-),
-
-billing_enriched AS (
-    SELECT 
-        bb.*,
-        ui.user_name,
-        ui.plan_type,
-        ui.company
-    FROM billing_base bb
-    LEFT JOIN user_info ui ON bb.user_id = ui.user_id
 )
 
 SELECT 
-    ROW_NUMBER() OVER (ORDER BY billing_event_id) as billing_fact_id,
-    event_date as transaction_date,
-    COALESCE(user_name, 'Unknown User') as user_name,
-    COALESCE(event_type, 'Unknown') as event_type,
-    COALESCE(amount, 0.00) as amount,
-    COALESCE(currency_code, 'USD') as currency_code,
-    COALESCE(payment_method, 'Unknown') as payment_method,
-    COALESCE(transaction_status, 'Pending') as transaction_status,
-    COALESCE(plan_type, 'Free') as plan_type,
-    COALESCE(company, 'Individual') as company,
+    ROW_NUMBER() OVER (ORDER BY bb.billing_event_id) as billing_fact_id,
+    bb.event_date as transaction_date,
+    COALESCE(ui.user_name, 'Unknown User') as user_name,
+    COALESCE(bb.event_type, 'Unknown') as event_type,
+    COALESCE(bb.amount, 0.00) as amount,
+    COALESCE(bb.currency_code, 'USD') as currency_code,
+    COALESCE(bb.payment_method, 'Unknown') as payment_method,
+    COALESCE(bb.transaction_status, 'Pending') as transaction_status,
+    COALESCE(ui.plan_type, 'Free') as plan_type,
+    COALESCE(ui.company, 'Individual') as company,
     -- Revenue recognition calculation
     CASE 
-        WHEN event_type = 'Subscription' THEN amount
-        WHEN event_type = 'Upgrade' THEN amount
-        WHEN event_type = 'Refund' THEN -amount
-        ELSE amount 
+        WHEN bb.event_type = 'Subscription' THEN bb.amount
+        WHEN bb.event_type = 'Upgrade' THEN bb.amount
+        WHEN bb.event_type = 'Refund' THEN -bb.amount
+        ELSE bb.amount 
     END as revenue_recognition_amount,
     -- Additional columns from Silver layer
-    billing_event_id,
-    user_id,
-    event_date,
+    bb.billing_event_id,
+    bb.user_id,
+    bb.event_date,
     -- Metadata columns
-    COALESCE(b_load_date, CURRENT_DATE()) as load_date,
-    COALESCE(b_update_date, CURRENT_DATE()) as update_date,
-    COALESCE(b_source_system, 'ZOOM_BILLING') as source_system
-FROM billing_enriched
+    COALESCE(bb.b_load_date, CURRENT_DATE()) as load_date,
+    COALESCE(bb.b_update_date, CURRENT_DATE()) as update_date,
+    COALESCE(bb.b_source_system, 'ZOOM_BILLING') as source_system
+FROM billing_base bb
+LEFT JOIN user_info ui ON bb.user_id = ui.user_id
