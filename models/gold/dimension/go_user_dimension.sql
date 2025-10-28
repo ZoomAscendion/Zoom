@@ -18,7 +18,7 @@ WITH user_data AS (
         load_date,
         update_date,
         source_system,
-        ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY update_date DESC) as rn
+        ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY COALESCE(update_date, load_date, CURRENT_DATE()) DESC) as rn
     FROM {{ source('silver', 'si_users') }}
 ),
 
@@ -41,7 +41,7 @@ SELECT
     COALESCE(geographic_region, 'Unknown') as geographic_region,
     'Active' as user_status,
     -- SCD Type 2 columns
-    registration_date as effective_start_date,
+    COALESCE(registration_date, CURRENT_DATE()) as effective_start_date,
     '9999-12-31'::DATE as effective_end_date,
     TRUE as current_flag,
     -- Additional columns from Silver layer
