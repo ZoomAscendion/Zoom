@@ -30,46 +30,37 @@ user_info AS (
         u.company,
         u.plan_type
     FROM {{ source('silver', 'si_users') }} u
-),
-
-support_enriched AS (
-    SELECT 
-        sb.*,
-        ui.user_name,
-        ui.company,
-        ui.plan_type
-    FROM support_base sb
-    LEFT JOIN user_info ui ON sb.user_id = ui.user_id
 )
 
 SELECT 
-    ROW_NUMBER() OVER (ORDER BY support_ticket_id) as support_fact_id,
-    open_date as ticket_date,
-    COALESCE(user_name, 'Unknown User') as user_name,
-    COALESCE(ticket_type, 'General') as ticket_type,
-    COALESCE(priority_level, 'Medium') as priority_level,
-    COALESCE(resolution_status, 'Open') as resolution_status,
-    COALESCE(resolution_time_hours, 0) as resolution_time_hours,
-    COALESCE(first_response_time_hours, 0) as first_response_time_hours,
-    COALESCE(escalation_flag, FALSE) as escalation_flag,
+    ROW_NUMBER() OVER (ORDER BY sb.support_ticket_id) as support_fact_id,
+    sb.open_date as ticket_date,
+    COALESCE(ui.user_name, 'Unknown User') as user_name,
+    COALESCE(sb.ticket_type, 'General') as ticket_type,
+    COALESCE(sb.priority_level, 'Medium') as priority_level,
+    COALESCE(sb.resolution_status, 'Open') as resolution_status,
+    COALESCE(sb.resolution_time_hours, 0) as resolution_time_hours,
+    COALESCE(sb.first_response_time_hours, 0) as first_response_time_hours,
+    COALESCE(sb.escalation_flag, FALSE) as escalation_flag,
     -- SLA breach calculation
     CASE 
-        WHEN priority_level = 'Critical' AND first_response_time_hours > 1 THEN TRUE
-        WHEN priority_level = 'High' AND resolution_time_hours > 24 THEN TRUE
-        WHEN priority_level = 'Medium' AND resolution_time_hours > 72 THEN TRUE
-        ELSE COALESCE(sla_breach_flag, FALSE)
+        WHEN sb.priority_level = 'Critical' AND sb.first_response_time_hours > 1 THEN TRUE
+        WHEN sb.priority_level = 'High' AND sb.resolution_time_hours > 24 THEN TRUE
+        WHEN sb.priority_level = 'Medium' AND sb.resolution_time_hours > 72 THEN TRUE
+        ELSE COALESCE(sb.sla_breach_flag, FALSE)
     END as sla_breach_flag,
-    COALESCE(company, 'Individual') as company,
-    COALESCE(plan_type, 'Free') as plan_type,
+    COALESCE(ui.company, 'Individual') as company,
+    COALESCE(ui.plan_type, 'Free') as plan_type,
     'System_Agent' as assigned_agent,
     -- Additional columns from Silver layer
-    support_ticket_id,
-    user_id,
-    COALESCE(issue_description, 'No description provided') as issue_description,
-    open_date,
-    close_date,
+    sb.support_ticket_id,
+    sb.user_id,
+    COALESCE(sb.issue_description, 'No description provided') as issue_description,
+    sb.open_date,
+    sb.close_date,
     -- Metadata columns
-    COALESCE(s_load_date, CURRENT_DATE()) as load_date,
-    COALESCE(s_update_date, CURRENT_DATE()) as update_date,
-    COALESCE(s_source_system, 'ZOOM_SUPPORT') as source_system
-FROM support_enriched
+    COALESCE(sb.s_load_date, CURRENT_DATE()) as load_date,
+    COALESCE(sb.s_update_date, CURRENT_DATE()) as update_date,
+    COALESCE(sb.s_source_system, 'ZOOM_SUPPORT') as source_system
+FROM support_base sb
+LEFT JOIN user_info ui ON sb.user_id = ui.user_id
