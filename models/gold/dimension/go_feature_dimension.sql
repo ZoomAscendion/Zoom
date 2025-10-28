@@ -20,10 +20,10 @@ SELECT
     COALESCE(feature_name, 'Unknown Feature') as feature_name,
     COALESCE(feature_category, 'General') as feature_category,
     CASE 
-        WHEN feature_name LIKE '%screen%' THEN 'Screen sharing and collaboration feature'
-        WHEN feature_name LIKE '%chat%' THEN 'Communication and messaging feature'
-        WHEN feature_name LIKE '%record%' THEN 'Recording and playback feature'
-        WHEN feature_name LIKE '%poll%' THEN 'Engagement and interaction feature'
+        WHEN LOWER(feature_name) LIKE '%screen%' THEN 'Screen sharing and collaboration feature'
+        WHEN LOWER(feature_name) LIKE '%chat%' THEN 'Communication and messaging feature'
+        WHEN LOWER(feature_name) LIKE '%record%' THEN 'Recording and playback feature'
+        WHEN LOWER(feature_name) LIKE '%poll%' THEN 'Engagement and interaction feature'
         ELSE CONCAT('Platform feature: ', feature_name)
     END as feature_description,
     CASE 
