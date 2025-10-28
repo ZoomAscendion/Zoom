@@ -16,7 +16,7 @@ WITH license_data AS (
         load_date,
         update_date,
         source_system,
-        ROW_NUMBER() OVER (PARTITION BY license_id ORDER BY update_date DESC) as rn
+        ROW_NUMBER() OVER (PARTITION BY license_id ORDER BY COALESCE(update_date, load_date, CURRENT_DATE()) DESC) as rn
     FROM {{ source('silver', 'si_licenses') }}
 ),
 
@@ -75,7 +75,7 @@ SELECT
         ELSE 'Basic'
     END as support_level,
     -- SCD Type 2 columns
-    start_date as effective_start_date,
+    COALESCE(start_date, CURRENT_DATE()) as effective_start_date,
     COALESCE(end_date, '9999-12-31'::DATE) as effective_end_date,
     CASE WHEN end_date IS NULL OR end_date > CURRENT_DATE() THEN TRUE ELSE FALSE END as current_flag,
     -- Additional columns from Silver layer
