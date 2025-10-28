@@ -1,0 +1,195 @@
+version: 2
+
+models:
+  - name: go_process_audit
+    description: "Gold layer audit table for tracking ETL pipeline execution and performance"
+    columns:
+      - name: audit_key
+        description: "Unique audit key"
+        tests:
+          - not_null
+      - name: pipeline_name
+        description: "Name of the pipeline"
+      - name: execution_start_time
+        description: "Pipeline execution start time"
+      - name: execution_end_time
+        description: "Pipeline execution end time"
+      - name: source_table_name
+        description: "Source table name"
+      - name: target_table_name
+        description: "Target table name"
+      - name: execution_status
+        description: "Execution status"
+
+  - name: go_user_dimension
+    description: "Gold layer dimension table containing user profile information and attributes with SCD Type 2"
+    columns:
+      - name: user_dimension_id
+        description: "Unique identifier for user dimension"
+        tests:
+          - not_null
+          - unique
+      - name: user_name
+        description: "Name of the user"
+        tests:
+          - not_null
+      - name: email_address
+        description: "Email address of the user"
+      - name: plan_type
+        description: "Plan type of the user"
+      - name: current_flag
+        description: "Flag indicating if this is the current record"
+
+  - name: go_time_dimension
+    description: "Gold layer time dimension for temporal analysis and reporting"
+    columns:
+      - name: time_dimension_id
+        description: "Unique identifier for time dimension"
+        tests:
+          - not_null
+          - unique
+      - name: date_key
+        description: "Date key"
+        tests:
+          - not_null
+          - unique
+      - name: year
+        description: "Year"
+      - name: quarter
+        description: "Quarter"
+      - name: month
+        description: "Month"
+
+  - name: go_feature_dimension
+    description: "Gold layer dimension table for platform features and their categorization"
+    columns:
+      - name: feature_dimension_id
+        description: "Unique identifier for feature dimension"
+        tests:
+          - not_null
+          - unique
+      - name: feature_name
+        description: "Name of the feature"
+        tests:
+          - not_null
+      - name: feature_category
+        description: "Category of the feature"
+
+  - name: go_license_dimension
+    description: "Gold layer dimension table for license types and their attributes with SCD Type 2"
+    columns:
+      - name: license_dimension_id
+        description: "Unique identifier for license dimension"
+        tests:
+          - not_null
+          - unique
+      - name: license_type
+        description: "Type of license"
+        tests:
+          - not_null
+      - name: current_flag
+        description: "Flag indicating if this is the current record"
+
+  - name: go_meeting_facts
+    description: "Gold layer fact table capturing meeting activities and metrics for platform usage analytics"
+    columns:
+      - name: meeting_fact_id
+        description: "Unique identifier for meeting fact"
+        tests:
+          - not_null
+          - unique
+      - name: meeting_id
+        description: "Meeting identifier"
+        tests:
+          - not_null
+      - name: meeting_date
+        description: "Date of the meeting"
+        tests:
+          - not_null
+      - name: duration_minutes
+        description: "Duration of meeting in minutes"
+        tests:
+          - not_null
+
+  - name: go_billing_facts
+    description: "Gold layer fact table for financial transactions and revenue analysis"
+    columns:
+      - name: billing_fact_id
+        description: "Unique identifier for billing fact"
+        tests:
+          - not_null
+          - unique
+      - name: billing_event_id
+        description: "Billing event identifier"
+        tests:
+          - not_null
+      - name: transaction_date
+        description: "Date of the transaction"
+        tests:
+          - not_null
+      - name: amount
+        description: "Transaction amount"
+        tests:
+          - not_null
+
+  - name: go_support_facts
+    description: "Gold layer fact table for support ticket metrics and service reliability analysis"
+    columns:
+      - name: support_fact_id
+        description: "Unique identifier for support fact"
+        tests:
+          - not_null
+          - unique
+      - name: support_ticket_id
+        description: "Support ticket identifier"
+        tests:
+          - not_null
+      - name: ticket_date
+        description: "Date the ticket was opened"
+        tests:
+          - not_null
+
+  - name: go_participants
+    description: "Gold layer table for enhanced participant data with attendance analytics and engagement metrics"
+    columns:
+      - name: participant_gold_id
+        description: "Unique identifier for participant gold record"
+        tests:
+          - not_null
+          - unique
+      - name: participant_id
+        description: "Participant identifier"
+        tests:
+          - not_null
+      - name: meeting_id
+        description: "Meeting identifier"
+        tests:
+          - not_null
+
+  - name: go_webinars
+    description: "Gold layer table for enhanced webinar data with registration analytics and performance metrics"
+    columns:
+      - name: webinar_gold_id
+        description: "Unique identifier for webinar gold record"
+        tests:
+          - not_null
+          - unique
+      - name: webinar_id
+        description: "Webinar identifier"
+        tests:
+          - not_null
+
+  - name: go_feature_usage
+    description: "Gold layer table for enhanced platform feature utilization data with usage pattern analysis"
+    columns:
+      - name: feature_usage_gold_id
+        description: "Unique identifier for feature usage gold record"
+        tests:
+          - not_null
+          - unique
+      - name: feature_usage_id
+        description: "Feature usage identifier"
+        tests:
+          - not_null
+      - name: meeting_id
+        description: "Meeting identifier"
