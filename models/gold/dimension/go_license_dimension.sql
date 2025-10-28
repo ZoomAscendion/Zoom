@@ -3,29 +3,6 @@
 ) }}
 
 -- Gold License Dimension Table
-WITH license_data AS (
-    SELECT 
-        license_id,
-        license_type,
-        assigned_to_user_id,
-        start_date,
-        end_date,
-        license_status,
-        license_duration_days,
-        renewal_flag,
-        load_date,
-        update_date,
-        source_system,
-        ROW_NUMBER() OVER (PARTITION BY license_id ORDER BY COALESCE(update_date, load_date, CURRENT_DATE()) DESC) as rn
-    FROM {{ source('silver', 'si_licenses') }}
-),
-
-latest_license_data AS (
-    SELECT *
-    FROM license_data
-    WHERE rn = 1
-)
-
 SELECT 
     ROW_NUMBER() OVER (ORDER BY license_id) as license_dimension_id,
     COALESCE(license_type, 'Basic') as license_type,
@@ -90,4 +67,4 @@ SELECT
     COALESCE(load_date, CURRENT_DATE()) as load_date,
     COALESCE(update_date, CURRENT_DATE()) as update_date,
     COALESCE(source_system, 'ZOOM_LICENSING') as source_system
-FROM latest_license_data
+FROM {{ source('silver', 'si_licenses') }}
