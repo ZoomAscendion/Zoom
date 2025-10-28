@@ -3,31 +3,6 @@
 ) }}
 
 -- Gold User Dimension Table
-WITH user_data AS (
-    SELECT 
-        user_id,
-        user_name,
-        email,
-        email_domain,
-        company,
-        plan_type,
-        registration_date,
-        account_age_days,
-        user_segment,
-        geographic_region,
-        load_date,
-        update_date,
-        source_system,
-        ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY COALESCE(update_date, load_date, CURRENT_DATE()) DESC) as rn
-    FROM {{ source('silver', 'si_users') }}
-),
-
-latest_user_data AS (
-    SELECT *
-    FROM user_data
-    WHERE rn = 1
-)
-
 SELECT 
     ROW_NUMBER() OVER (ORDER BY user_id) as user_dimension_id,
     COALESCE(user_name, 'Unknown User') as user_name,
@@ -51,4 +26,4 @@ SELECT
     COALESCE(load_date, CURRENT_DATE()) as load_date,
     COALESCE(update_date, CURRENT_DATE()) as update_date,
     COALESCE(source_system, 'ZOOM_PLATFORM') as source_system
-FROM latest_user_data
+FROM {{ source('silver', 'si_users') }}
