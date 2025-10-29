@@ -4,25 +4,7 @@
 -- Created: 2024-12-19
 
 {{ config(
-    materialized='table',
-    pre_hook="""
-        {% if not is_incremental() %}
-            INSERT INTO {{ ref('bz_audit_log') }} (SOURCE_TABLE, PROCESS_START_TIME, STATUS, PROCESSED_BY)
-            SELECT 'BZ_USERS', CURRENT_TIMESTAMP(), 'STARTED', 'DBT_SYSTEM'
-            WHERE EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'BZ_AUDIT_LOG')
-        {% endif %}
-    """,
-    post_hook="""
-        INSERT INTO {{ ref('bz_audit_log') }} (SOURCE_TABLE, PROCESS_START_TIME, PROCESS_END_TIME, STATUS, RECORD_COUNT, PROCESSED_BY)
-        SELECT 
-            'BZ_USERS',
-            CURRENT_TIMESTAMP() - INTERVAL '1 MINUTE',
-            CURRENT_TIMESTAMP(),
-            'SUCCESS',
-            (SELECT COUNT(*) FROM {{ this }}),
-            'DBT_SYSTEM'
-        WHERE EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'BZ_AUDIT_LOG')
-    """
+    materialized='table'
 ) }}
 
 -- CTE for data validation and cleansing
