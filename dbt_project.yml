@@ -25,8 +25,6 @@ models:
     bronze:
       +materialized: table
       +on_schema_change: "fail"
-      +pre_hook: "{{ log('Starting transformation for ' ~ this.name, info=true) }}"
-      +post_hook: "{{ log('Completed transformation for ' ~ this.name, info=true) }}"
 
 # Global configurations
 vars:
@@ -49,21 +47,14 @@ snapshots:
 # Seeds configurations
 seeds:
   zoom_bronze_pipeline:
-    +schema: seeds
     +quote_columns: false
 
 # Test configurations
 tests:
   +store_failures: true
-  +schema: test_failures
 
 # Documentation configurations
 docs:
   generate: true
   serve:
     port: 8080
-
-# Dispatch configurations for packages
-dispatch:
-  - macro_namespace: dbt_utils
-    search_order: ['zoom_bronze_pipeline', 'dbt_utils']
