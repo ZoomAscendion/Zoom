@@ -1,0 +1,308 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20233.23.1017.0948                               -->
+<workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
+  <datasources>
+    <datasource caption='Platform Usage Data (DB_POC_ZOOM.GOLD)' inline='true' name='federated.platform_usage' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='A8977680256071-ASCENDION_PARTNER.snowflakecomputing.com' name='snowflake.platform_conn'>
+            <connection authentication='Username Password' class='snowflake' dbname='DB_POC_ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='A8977680256071-ASCENDION_PARTNER.snowflakecomputing.com' service='FR__POC__ADMIN__ZOOM' username='SATHYANARAYANAP' warehouse='WH_POC_ZOOM_DEV_XSMALL' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation type='join'>
+          <clause type='join'>
+            <expression op='='>
+              <expression op='[Go_Meeting_Facts].[HOST_ID]' />
+              <expression op='[Go_User_Dimension].[USER_ID]' />
+            </expression>
+          </clause>
+          <relation connection='snowflake.platform_conn' name='Go_Meeting_Facts' table='[DB_POC_ZOOM].[GOLD].[Go_Meeting_Facts]' type='table' />
+          <relation connection='snowflake.platform_conn' name='Go_User_Dimension' table='[DB_POC_ZOOM].[GOLD].[Go_User_Dimension]' type='table' />
+        </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='join'>
+          <clause type='join'>
+            <expression op='='>
+              <expression op='[Go_Meeting_Facts].[HOST_ID]' />
+              <expression op='[Go_User_Dimension].[USER_ID]' />
+            </expression>
+          </clause>
+          <relation connection='snowflake.platform_conn' name='Go_Meeting_Facts' table='[DB_POC_ZOOM].[GOLD].[Go_Meeting_Facts]' type='table' />
+          <relation connection='snowflake.platform_conn' name='Go_User_Dimension' table='[DB_POC_ZOOM].[GOLD].[Go_User_Dimension]' type='table' />
+        </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <metadata-records>
+          <metadata-record class='column'>
+            <remote-name>MEETING_ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MEETING_ID]</local-name>
+            <parent-name>[Go_Meeting_Facts]</parent-name>
+            <remote-alias>MEETING_ID</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>HOST_ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[HOST_ID]</local-name>
+            <parent-name>[Go_Meeting_Facts]</parent-name>
+            <remote-alias>HOST_ID</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DURATION_MINUTES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[DURATION_MINUTES]</local-name>
+            <parent-name>[Go_Meeting_Facts]</parent-name>
+            <remote-alias>DURATION_MINUTES</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>START_TIME</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[START_TIME]</local-name>
+            <parent-name>[Go_Meeting_Facts]</parent-name>
+            <remote-alias>START_TIME</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_ID]</local-name>
+            <parent-name>[Go_User_Dimension]</parent-name>
+            <remote-alias>USER_ID</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PLAN_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[PLAN_TYPE]</local-name>
+            <parent-name>[Go_User_Dimension]</parent-name>
+            <remote-alias>PLAN_TYPE</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Meeting ID' datatype='string' name='[MEETING_ID]' role='dimension' type='nominal' />
+      <column caption='Host ID' datatype='string' name='[HOST_ID]' role='dimension' type='nominal' />
+      <column caption='Duration Minutes' datatype='integer' name='[DURATION_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Start Time' datatype='datetime' name='[START_TIME]' role='dimension' type='ordinal' />
+      <column caption='User ID' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
+      <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Total Meeting Minutes' datatype='real' name='[Calculation_Total_Minutes]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([DURATION_MINUTES])' />
+      </column>
+      <column caption='Active Users Count' datatype='integer' name='[Calculation_Active_Users]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([HOST_ID])' />
+      </column>
+      <column caption='Average Meeting Duration' datatype='real' name='[Calculation_Avg_Duration]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([DURATION_MINUTES])' />
+      </column>
+      <column caption='DAU' datatype='integer' name='[Calculation_DAU]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD(IF DATEPART("day",[START_TIME]) = DATEPART("day",TODAY()) THEN [HOST_ID] END)' />
+      </column>
+      <column caption='WAU' datatype='integer' name='[Calculation_WAU]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD(IF DATEDIFF("day",[START_TIME],TODAY()) <= 7 THEN [HOST_ID] END)' />
+      </column>
+      <column caption='MAU' datatype='integer' name='[Calculation_MAU]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD(IF DATEDIFF("day",[START_TIME],TODAY()) <= 30 THEN [HOST_ID] END)' />
+      </column>
+      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Daily Weekly Monthly Active Users'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Daily, Weekly, Monthly Active Users Trends</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Platform Usage Data (DB_POC_ZOOM.GOLD)' name='federated.platform_usage' />
+          </datasources>
+          <datasource-dependencies datasource='federated.platform_usage'>
+            <column caption='Start Time' datatype='datetime' name='[START_TIME]' role='dimension' type='ordinal' />
+            <column caption='DAU' datatype='integer' name='[Calculation_DAU]' role='measure' type='quantitative' />
+            <column caption='WAU' datatype='integer' name='[Calculation_WAU]' role='measure' type='quantitative' />
+            <column caption='MAU' datatype='integer' name='[Calculation_MAU]' role='measure' type='quantitative' />
+            <column-instance column='[START_TIME]' derivation='Day-Trunc' name='[tdy:START_TIME:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_DAU]' derivation='Sum' name='[sum:Calculation_DAU:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_WAU]' derivation='Sum' name='[sum:Calculation_WAU:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_MAU]' derivation='Sum' name='[sum:Calculation_MAU:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.platform_usage].[Multiple Values]' type='palette'>
+              <map to='#1f77b4'>
+                <bucket>[federated.platform_usage].[sum:Calculation_DAU:qk]</bucket>
+              </map>
+              <map to='#ff7f0e'>
+                <bucket>[federated.platform_usage].[sum:Calculation_WAU:qk]</bucket>
+              </map>
+              <map to='#2ca02c'>
+                <bucket>[federated.platform_usage].[sum:Calculation_MAU:qk]</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.platform_usage].[Multiple Values]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>([federated.platform_usage].[sum:Calculation_DAU:qk] + ([federated.platform_usage].[sum:Calculation_WAU:qk] + [federated.platform_usage].[sum:Calculation_MAU:qk]))</rows>
+        <cols>[federated.platform_usage].[tdy:START_TIME:qk]</cols>
+      </table>
+      <simple-id uuid='{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}' />
+    </worksheet>
+    <worksheet name='Average Meeting Duration by Plan Type'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Average Meeting Duration by Plan Type</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Platform Usage Data (DB_POC_ZOOM.GOLD)' name='federated.platform_usage' />
+          </datasources>
+          <datasource-dependencies datasource='federated.platform_usage'>
+            <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+            <column caption='Average Meeting Duration' datatype='real' name='[Calculation_Avg_Duration]' role='measure' type='quantitative' />
+            <column-instance column='[PLAN_TYPE]' derivation='None' name='[none:PLAN_TYPE:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_Avg_Duration]' derivation='Sum' name='[sum:Calculation_Avg_Duration:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.platform_usage].[none:PLAN_TYPE:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.platform_usage].[sum:Calculation_Avg_Duration:qk]</rows>
+        <cols>[federated.platform_usage].[none:PLAN_TYPE:nk]</cols>
+      </table>
+      <simple-id uuid='{B2C3D4E5-F6G7-8901-BCDE-F23456789012}' />
+    </worksheet>
+    <worksheet name='Feature Usage Distribution'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Feature Usage Distribution</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Platform Usage Data (DB_POC_ZOOM.GOLD)' name='federated.platform_usage' />
+          </datasources>
+          <datasource-dependencies datasource='federated.platform_usage'>
+            <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+            <column caption='Total Meeting Minutes' datatype='real' name='[Calculation_Total_Minutes]' role='measure' type='quantitative' />
+            <column-instance column='[PLAN_TYPE]' derivation='None' name='[none:PLAN_TYPE:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_Total_Minutes]' derivation='Sum' name='[sum:Calculation_Total_Minutes:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Pie' />
+            <encodings>
+              <color column='[federated.platform_usage].[none:PLAN_TYPE:nk]' />
+              <size column='[federated.platform_usage].[sum:Calculation_Total_Minutes:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{C3D4E5F6-G7H8-9012-CDEF-345678901234}' />
+    </worksheet>
+  </worksheets>
+  <windows saved-dpi-scale-factor='1.5' source-height='44'>
+    <window class='worksheet' maximized='true' name='Daily Weekly Monthly Active Users'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{D4E5F6G7-H8I9-0123-DEFG-456789012345}' />
+    </window>
+  </windows>
+</workbook>
