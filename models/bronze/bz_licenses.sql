@@ -3,49 +3,20 @@
 -- Author: Data Engineering Team
 -- Created: 2024-12-19
 
-{{ config(
-    materialized='table'
-) }}
+{{ config(materialized='table') }}
 
--- CTE for data validation and cleansing
-WITH source_data AS (
-    SELECT 
-        -- Business columns from source (1:1 mapping)
-        LICENSE_ID,
-        LICENSE_TYPE,
-        ASSIGNED_TO_USER_ID,
-        START_DATE,
-        END_DATE,
-        
-        -- Metadata columns
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM,
-        
-        -- Data quality flags
-        CASE 
-            WHEN LICENSE_ID IS NULL THEN 'MISSING_LICENSE_ID'
-            WHEN LICENSE_TYPE IS NULL THEN 'MISSING_LICENSE_TYPE'
-            WHEN ASSIGNED_TO_USER_ID IS NULL THEN 'MISSING_USER_ID'
-            ELSE 'VALID'
-        END AS data_quality_flag
-        
-    FROM {{ source('raw', 'licenses') }}
-),
-
--- CTE for final data selection
-final_data AS (
-    SELECT 
-        LICENSE_ID,
-        LICENSE_TYPE,
-        ASSIGNED_TO_USER_ID,
-        START_DATE,
-        END_DATE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
-    FROM source_data
-    WHERE data_quality_flag = 'VALID'
-)
-
-SELECT * FROM final_data
+SELECT 
+    -- Business columns from source (1:1 mapping)
+    LICENSE_ID,
+    LICENSE_TYPE,
+    ASSIGNED_TO_USER_ID,
+    START_DATE,
+    END_DATE,
+    
+    -- Metadata columns
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM
+    
+FROM {{ source('raw', 'licenses') }}
+WHERE LICENSE_ID IS NOT NULL
