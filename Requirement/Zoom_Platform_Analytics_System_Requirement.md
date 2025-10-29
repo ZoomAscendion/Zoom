@@ -47,7 +47,7 @@ trends and areas for improvement.
 
 **KPIs and Metrics in the Report**
 
--   Daily/Weekly/Monthly Active Users (DAU and WAU and MAU)
+-   Daily, Weekly and Monthly Active Users (DAU and WAU and MAU)
 
 -   Total meeting minutes per day
 
