@@ -3,19 +3,18 @@
 -- Author: Data Engineering Team
 -- Created: 2024-12-19
 
-{{ config(
-    materialized='table'
-) }}
+{{ config(materialized='table') }}
 
--- Create audit log table structure
+-- Create audit log table structure with proper data types
 SELECT 
-    CAST(NULL AS NUMBER) as RECORD_ID,
-    CAST(NULL AS VARCHAR(255)) as SOURCE_TABLE,
-    CAST(NULL AS TIMESTAMP_NTZ(9)) as PROCESS_START_TIME,
-    CAST(NULL AS TIMESTAMP_NTZ(9)) as PROCESS_END_TIME,
-    CAST(NULL AS VARCHAR(50)) as STATUS,
-    CAST(NULL AS NUMBER(38,0)) as RECORD_COUNT,
-    CAST(NULL AS VARCHAR(16777216)) as ERROR_MESSAGE,
-    CAST(NULL AS VARCHAR(255)) as PROCESSED_BY,
+    ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP()) as RECORD_ID,
+    'AUDIT_LOG_INITIALIZATION' as SOURCE_TABLE,
+    CURRENT_TIMESTAMP() as PROCESS_START_TIME,
+    CURRENT_TIMESTAMP() as PROCESS_END_TIME,
+    'SUCCESS' as STATUS,
+    0 as RECORD_COUNT,
+    NULL as ERROR_MESSAGE,
+    'DBT_SYSTEM' as PROCESSED_BY,
     CURRENT_TIMESTAMP() as CREATED_TIMESTAMP
-WHERE FALSE -- This ensures no actual data is inserted, just table creation
+WHERE 1=1
+LIMIT 1
