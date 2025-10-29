@@ -1,9 +1,11 @@
-name: 'my_project'
+name: 'zoom_bronze_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'my_project'
+# This setting configures which "profile" dbt uses for this project.
+profile: 'zoom_bronze_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -16,3 +18,52 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Configuring models
+models:
+  zoom_bronze_pipeline:
+    # Config indicated by + and applies to all files under models/bronze/
+    bronze:
+      +materialized: table
+      +on_schema_change: "fail"
+      +pre_hook: "{{ log('Starting transformation for ' ~ this.name, info=true) }}"
+      +post_hook: "{{ log('Completed transformation for ' ~ this.name, info=true) }}"
+
+# Global configurations
+vars:
+  # The `start_date` variable will be accessible in all resources
+  start_date: '2024-01-01'
+  # The `end_date` variable will be accessible in all resources  
+  end_date: '2024-12-31'
+  # Source schema name
+  source_schema: 'RAW'
+  # Target schema name
+  target_schema: 'BRONZE'
+
+# Snapshot configurations
+snapshots:
+  zoom_bronze_pipeline:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: updated_timestamp
+
+# Seeds configurations
+seeds:
+  zoom_bronze_pipeline:
+    +schema: seeds
+    +quote_columns: false
+
+# Test configurations
+tests:
+  +store_failures: true
+  +schema: test_failures
+
+# Documentation configurations
+docs:
+  generate: true
+  serve:
+    port: 8080
+
+# Dispatch configurations for packages
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['zoom_bronze_pipeline', 'dbt_utils']
