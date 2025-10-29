@@ -20,9 +20,16 @@ models:
   zoom_bronze_pipeline:
     bronze:
       +materialized: table
+      +on_schema_change: "fail"
 
 vars:
   start_date: '2024-01-01'
   end_date: '2024-12-31'
   source_schema: 'RAW'
   target_schema: 'BRONZE'
+
+tests:
+  +store_failures: true
+
+docs:
+  generate: true
