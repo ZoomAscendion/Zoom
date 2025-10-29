@@ -3,51 +3,21 @@
 -- Author: Data Engineering Team
 -- Created: 2024-12-19
 
-{{ config(
-    materialized='table'
-) }}
+{{ config(materialized='table') }}
 
--- CTE for data validation and cleansing
-WITH source_data AS (
-    SELECT 
-        -- Business columns from source (1:1 mapping)
-        MEETING_ID,
-        HOST_ID,
-        MEETING_TOPIC,
-        START_TIME,
-        END_TIME,
-        DURATION_MINUTES,
-        
-        -- Metadata columns
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM,
-        
-        -- Data quality flags
-        CASE 
-            WHEN MEETING_ID IS NULL THEN 'MISSING_MEETING_ID'
-            WHEN HOST_ID IS NULL THEN 'MISSING_HOST_ID'
-            WHEN START_TIME IS NULL THEN 'MISSING_START_TIME'
-            ELSE 'VALID'
-        END AS data_quality_flag
-        
-    FROM {{ source('raw', 'meetings') }}
-),
-
--- CTE for final data selection
-final_data AS (
-    SELECT 
-        MEETING_ID,
-        HOST_ID,
-        MEETING_TOPIC,
-        START_TIME,
-        END_TIME,
-        DURATION_MINUTES,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
-    FROM source_data
-    WHERE data_quality_flag = 'VALID'
-)
-
-SELECT * FROM final_data
+SELECT 
+    -- Business columns from source (1:1 mapping)
+    MEETING_ID,
+    HOST_ID,
+    MEETING_TOPIC,
+    START_TIME,
+    END_TIME,
+    DURATION_MINUTES,
+    
+    -- Metadata columns
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM
+    
+FROM {{ source('raw', 'meetings') }}
+WHERE MEETING_ID IS NOT NULL
