@@ -6,35 +6,170 @@ sources:
     tables:
       - name: users
         description: "Raw user account information"
+        columns:
+          - name: user_id
+            description: "Unique identifier for each user account"
+            tests:
+              - not_null
+              - unique
+          - name: email
+            description: "Email address of the user - PII Data"
+            tests:
+              - not_null
+
       - name: meetings
         description: "Raw meeting session information"
+        columns:
+          - name: meeting_id
+            description: "Unique identifier for each meeting"
+            tests:
+              - not_null
+              - unique
+
       - name: participants
         description: "Raw meeting participant information"
+        columns:
+          - name: participant_id
+            description: "Unique identifier for each participant record"
+            tests:
+              - not_null
+              - unique
+
       - name: feature_usage
         description: "Raw platform feature usage tracking"
+        columns:
+          - name: usage_id
+            description: "Unique identifier for each feature usage record"
+            tests:
+              - not_null
+              - unique
+
       - name: support_tickets
         description: "Raw customer support ticket information"
+        columns:
+          - name: ticket_id
+            description: "Unique identifier for each support ticket"
+            tests:
+              - not_null
+              - unique
+
       - name: billing_events
         description: "Raw billing and financial transaction information"
+        columns:
+          - name: event_id
+            description: "Unique identifier for each billing event"
+            tests:
+              - not_null
+              - unique
+
       - name: licenses
         description: "Raw license management information"
+        columns:
+          - name: license_id
+            description: "Unique identifier for each license"
+            tests:
+              - not_null
+              - unique
+
       - name: webinars
         description: "Raw webinar session information"
+        columns:
+          - name: webinar_id
+            description: "Unique identifier for each webinar"
+            tests:
+              - not_null
+              - unique
 
 models:
+  - name: bz_audit_log
+    description: "Audit table for tracking data processing activities in Bronze layer"
+    columns:
+      - name: record_id
+        description: "Auto-incrementing unique identifier for audit record"
+        tests:
+          - not_null
+      - name: source_table
+        description: "Name of the source table being processed"
+        tests:
+          - not_null
+      - name: status
+        description: "Status of the processing operation"
+        tests:
+          - accepted_values:
+              values: ['SUCCESS', 'FAILED', 'PARTIAL']
+
   - name: bz_users
     description: "Bronze layer table storing raw user account data from Zoom platform"
+    columns:
+      - name: user_id
+        description: "Unique identifier for each user account"
+        tests:
+          - not_null
+          - unique
+      - name: email
+        description: "Email address of the user - PII Data"
+        tests:
+          - not_null
+
   - name: bz_meetings
     description: "Bronze layer table storing raw meeting session data from Zoom platform"
+    columns:
+      - name: meeting_id
+        description: "Unique identifier for each meeting"
+        tests:
+          - not_null
+          - unique
+
   - name: bz_participants
     description: "Bronze layer table storing raw participant data for meeting attendance tracking"
+    columns:
+      - name: participant_id
+        description: "Unique identifier for each participant record"
+        tests:
+          - not_null
+          - unique
+
   - name: bz_feature_usage
     description: "Bronze layer table storing raw feature usage data for platform analytics"
+    columns:
+      - name: usage_id
+        description: "Unique identifier for each feature usage record"
+        tests:
+          - not_null
+          - unique
+
   - name: bz_support_tickets
     description: "Bronze layer table storing raw support ticket data for customer service analytics"
+    columns:
+      - name: ticket_id
+        description: "Unique identifier for each support ticket"
+        tests:
+          - not_null
+          - unique
+
   - name: bz_billing_events
     description: "Bronze layer table storing raw billing event data for revenue analytics"
+    columns:
+      - name: event_id
+        description: "Unique identifier for each billing event"
+        tests:
+          - not_null
+          - unique
+
   - name: bz_licenses
     description: "Bronze layer table storing raw license data for license management analytics"
+    columns:
+      - name: license_id
+        description: "Unique identifier for each license"
+        tests:
+          - not_null
+          - unique
+
   - name: bz_webinars
     description: "Bronze layer table storing raw webinar session data from Zoom platform"
+    columns:
+      - name: webinar_id
+        description: "Unique identifier for each webinar"
+        tests:
+          - not_null
+          - unique
