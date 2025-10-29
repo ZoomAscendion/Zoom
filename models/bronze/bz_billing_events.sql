@@ -3,10 +3,7 @@
 -- Author: Data Engineering Team
 -- Created: 2024-12-19
 
-{{ config(
-    materialized='table',
-    post_hook="{{ audit_insert('BZ_BILLING_EVENTS', "(SELECT COUNT(*) FROM " ~ this ~ ")") }}"
-) }}
+{{ config(materialized='table') }}
 
 -- CTE for data validation and cleansing
 WITH source_data AS (
