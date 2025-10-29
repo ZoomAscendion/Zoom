@@ -1,0 +1,300 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20233.23.1017.0948                               -->
+<workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
+  <datasources>
+    <datasource caption='Service Reliability Data (DB_POC_ZOOM.GOLD)' inline='true' name='federated.service_reliability' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='A8977680256071-ASCENDION_PARTNER.snowflakecomputing.com' name='snowflake.service_conn'>
+            <connection authentication='Username Password' class='snowflake' dbname='DB_POC_ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='A8977680256071-ASCENDION_PARTNER.snowflakecomputing.com' service='FR__POC__ADMIN__ZOOM' username='SATHYANARAYANAP' warehouse='WH_POC_ZOOM_DEV_XSMALL' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation type='join'>
+          <clause type='join'>
+            <expression op='='>
+              <expression op='[Go_Data_Quality_Errors].[SOURCE_TABLE]' />
+              <expression op='[Go_User_Dimension].[USER_ID]' />
+            </expression>
+          </clause>
+          <relation connection='snowflake.service_conn' name='Go_Data_Quality_Errors' table='[DB_POC_ZOOM].[GOLD].[Go_Data_Quality_Errors]' type='table' />
+          <relation connection='snowflake.service_conn' name='Go_User_Dimension' table='[DB_POC_ZOOM].[GOLD].[Go_User_Dimension]' type='table' />
+        </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='join'>
+          <clause type='join'>
+            <expression op='='>
+              <expression op='[Go_Data_Quality_Errors].[SOURCE_TABLE]' />
+              <expression op='[Go_User_Dimension].[USER_ID]' />
+            </expression>
+          </clause>
+          <relation connection='snowflake.service_conn' name='Go_Data_Quality_Errors' table='[DB_POC_ZOOM].[GOLD].[Go_Data_Quality_Errors]' type='table' />
+          <relation connection='snowflake.service_conn' name='Go_User_Dimension' table='[DB_POC_ZOOM].[GOLD].[Go_User_Dimension]' type='table' />
+        </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <metadata-records>
+          <metadata-record class='column'>
+            <remote-name>ERROR_ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ERROR_ID]</local-name>
+            <parent-name>[Go_Data_Quality_Errors]</parent-name>
+            <remote-alias>ERROR_ID</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ERROR_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ERROR_TYPE]</local-name>
+            <parent-name>[Go_Data_Quality_Errors]</parent-name>
+            <remote-alias>ERROR_TYPE</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ERROR_DESCRIPTION</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ERROR_DESCRIPTION]</local-name>
+            <parent-name>[Go_Data_Quality_Errors]</parent-name>
+            <remote-alias>ERROR_DESCRIPTION</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DETECTED_AT</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[DETECTED_AT]</local-name>
+            <parent-name>[Go_Data_Quality_Errors]</parent-name>
+            <remote-alias>DETECTED_AT</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SEVERITY_LEVEL</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[SEVERITY_LEVEL]</local-name>
+            <parent-name>[Go_Data_Quality_Errors]</parent-name>
+            <remote-alias>SEVERITY_LEVEL</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_ID]</local-name>
+            <parent-name>[Go_User_Dimension]</parent-name>
+            <remote-alias>USER_ID</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ORGANIZATION_ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ORGANIZATION_ID]</local-name>
+            <parent-name>[Go_User_Dimension]</parent-name>
+            <remote-alias>ORGANIZATION_ID</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Error ID' datatype='string' name='[ERROR_ID]' role='dimension' type='nominal' />
+      <column caption='Error Type' datatype='string' name='[ERROR_TYPE]' role='dimension' type='nominal' />
+      <column caption='Error Description' datatype='string' name='[ERROR_DESCRIPTION]' role='dimension' type='nominal' />
+      <column caption='Detected At' datatype='datetime' name='[DETECTED_AT]' role='dimension' type='ordinal' />
+      <column caption='Severity Level' datatype='string' name='[SEVERITY_LEVEL]' role='dimension' type='nominal' />
+      <column caption='User ID' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
+      <column caption='Organization ID' datatype='string' name='[ORGANIZATION_ID]' role='dimension' type='nominal' />
+      <column caption='Ticket Volume by Type' datatype='integer' name='[Calculation_Ticket_Volume]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([ERROR_ID])' />
+      </column>
+      <column caption='Average Resolution Time' datatype='real' name='[Calculation_Avg_Resolution]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG(DATEDIFF("hour",[DETECTED_AT],NOW()))' />
+      </column>
+      <column caption='Tickets per 1000 Users' datatype='real' name='[Calculation_Tickets_Per_1000]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='(COUNT([ERROR_ID]) / COUNTD([USER_ID])) * 1000' />
+      </column>
+      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Ticket Volume by Error Type'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Ticket Volume by Error Type</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service Reliability Data (DB_POC_ZOOM.GOLD)' name='federated.service_reliability' />
+          </datasources>
+          <datasource-dependencies datasource='federated.service_reliability'>
+            <column caption='Error Type' datatype='string' name='[ERROR_TYPE]' role='dimension' type='nominal' />
+            <column caption='Ticket Volume by Type' datatype='integer' name='[Calculation_Ticket_Volume]' role='measure' type='quantitative' />
+            <column-instance column='[ERROR_TYPE]' derivation='None' name='[none:ERROR_TYPE:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_Ticket_Volume]' derivation='Sum' name='[sum:Calculation_Ticket_Volume:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.service_reliability].[none:ERROR_TYPE:nk]' type='palette' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.service_reliability].[none:ERROR_TYPE:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.service_reliability].[sum:Calculation_Ticket_Volume:qk]</rows>
+        <cols>[federated.service_reliability].[none:ERROR_TYPE:nk]</cols>
+      </table>
+      <simple-id uuid='{E5F6G7H8-I9J0-1234-EFGH-567890123456}' />
+    </worksheet>
+    <worksheet name='Average Resolution Time Trend'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Average Resolution Time Over Time</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service Reliability Data (DB_POC_ZOOM.GOLD)' name='federated.service_reliability' />
+          </datasources>
+          <datasource-dependencies datasource='federated.service_reliability'>
+            <column caption='Detected At' datatype='datetime' name='[DETECTED_AT]' role='dimension' type='ordinal' />
+            <column caption='Average Resolution Time' datatype='real' name='[Calculation_Avg_Resolution]' role='measure' type='quantitative' />
+            <column-instance column='[DETECTED_AT]' derivation='Day-Trunc' name='[tdy:DETECTED_AT:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_Avg_Resolution]' derivation='Sum' name='[sum:Calculation_Avg_Resolution:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.service_reliability].[sum:Calculation_Avg_Resolution:qk]' palette='blue_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.service_reliability].[sum:Calculation_Avg_Resolution:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.service_reliability].[sum:Calculation_Avg_Resolution:qk]</rows>
+        <cols>[federated.service_reliability].[tdy:DETECTED_AT:qk]</cols>
+      </table>
+      <simple-id uuid='{F6G7H8I9-J0K1-2345-FGHI-678901234567}' />
+    </worksheet>
+    <worksheet name='Support Efficiency Dashboard'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Support Team Efficiency Dashboard</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service Reliability Data (DB_POC_ZOOM.GOLD)' name='federated.service_reliability' />
+          </datasources>
+          <datasource-dependencies datasource='federated.service_reliability'>
+            <column caption='Severity Level' datatype='string' name='[SEVERITY_LEVEL]' role='dimension' type='nominal' />
+            <column caption='Tickets per 1000 Users' datatype='real' name='[Calculation_Tickets_Per_1000]' role='measure' type='quantitative' />
+            <column-instance column='[SEVERITY_LEVEL]' derivation='None' name='[none:SEVERITY_LEVEL:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_Tickets_Per_1000]' derivation='Sum' name='[sum:Calculation_Tickets_Per_1000:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Text' />
+            <encodings>
+              <text column='[federated.service_reliability].[sum:Calculation_Tickets_Per_1000:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.service_reliability].[none:SEVERITY_LEVEL:nk]</rows>
+        <cols />
+      </table>
+      <simple-id uuid='{G7H8I9J0-K1L2-3456-GHIJ-789012345678}' />
+    </worksheet>
+  </worksheets>
+  <windows saved-dpi-scale-factor='1.5' source-height='44'>
+    <window class='worksheet' maximized='true' name='Ticket Volume by Error Type'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{H8I9J0K1-L2M3-4567-HIJK-890123456789}' />
+    </window>
+  </windows>
+</workbook>
