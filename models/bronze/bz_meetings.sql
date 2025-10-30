@@ -8,13 +8,13 @@
     pre_hook="
         {% if this.name != 'bz_audit_log' %}
         INSERT INTO {{ ref('bz_audit_log') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS)
-        VALUES ('BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_PIPELINE', 'STARTED')
+        VALUES ('BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT', 'STARTED')
         {% endif %}
     ",
     post_hook="
         {% if this.name != 'bz_audit_log' %}
         INSERT INTO {{ ref('bz_audit_log') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS, RECORD_COUNT)
-        VALUES ('BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_PIPELINE', 
+        VALUES ('BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT', 
                 EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP() - (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_audit_log') }} WHERE SOURCE_TABLE = 'BZ_MEETINGS' AND STATUS = 'STARTED'))),
                 'COMPLETED', (SELECT COUNT(*) FROM {{ this }}))
         {% endif %}
