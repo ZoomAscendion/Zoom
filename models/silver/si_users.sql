@@ -2,15 +2,13 @@
   config(
     materialized='incremental',
     unique_key='user_id',
-    on_schema_change='sync_all_columns',
-    pre_hook="INSERT INTO {{ ref('audit_log') }} (audit_id, source_table, process_start_time, status, processed_by, load_date, source_system) SELECT '{{ invocation_id }}', 'SI_USERS', CURRENT_TIMESTAMP(), 'STARTED', 'DBT', CURRENT_DATE(), 'DBT_PIPELINE' WHERE '{{ this.name }}' != 'audit_log'",
-    post_hook="UPDATE {{ ref('audit_log') }} SET process_end_time = CURRENT_TIMESTAMP(), status = 'SUCCESS' WHERE audit_id = '{{ invocation_id }}' AND source_table = 'SI_USERS' AND '{{ this.name }}' != 'audit_log'"
+    on_schema_change='sync_all_columns'
   )
 }}
 
 WITH bronze_users AS (
     SELECT *
-    FROM {{ ref('bz_users') }}
+    FROM {{ source('bronze', 'bz_users') }}
     WHERE USER_ID IS NOT NULL
     {% if is_incremental() %}
         AND UPDATE_TIMESTAMP > (SELECT MAX(UPDATE_TIMESTAMP) FROM {{ this }})
@@ -20,9 +18,9 @@ WITH bronze_users AS (
 cleaned_users AS (
     SELECT 
         TRIM(USER_ID) AS user_id,
-        INITCAP(TRIM(USER_NAME)) AS user_name,
+        INITCAP(TRIM(COALESCE(USER_NAME, 'Unknown'))) AS user_name,
         LOWER(TRIM(EMAIL)) AS email,
-        INITCAP(TRIM(COMPANY)) AS company,
+        INITCAP(TRIM(COALESCE(COMPANY, 'Unknown'))) AS company,
         CASE 
             WHEN UPPER(TRIM(PLAN_TYPE)) IN ('FREE', 'BASIC', 'PRO', 'ENTERPRISE') 
             THEN UPPER(TRIM(PLAN_TYPE))
@@ -38,7 +36,7 @@ cleaned_users AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        {{ calculate_data_quality_score('si_users', ['USER_ID', 'USER_NAME', 'EMAIL', 'COMPANY', 'PLAN_TYPE']) }} AS data_quality_score,
+        {{ calculate_data_quality_score() }} AS data_quality_score,
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date
     FROM bronze_users
@@ -67,5 +65,5 @@ SELECT
     update_date
 FROM deduped_users
 WHERE rn = 1
-    AND email LIKE '%@%'
+    AND (email LIKE '%@%' OR email IS NULL)
     AND user_name IS NOT NULL
