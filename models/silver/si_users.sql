@@ -8,7 +8,7 @@
             source_tables_processed, target_tables_updated, load_date, update_date
         ) 
         SELECT 
-            '{{ invocation_id }}_users' as execution_id,
+            LEFT('{{ invocation_id }}_users', 500) as execution_id,
             'si_users_pipeline' as pipeline_name,
             CURRENT_TIMESTAMP() as start_time,
             'RUNNING' as status,
@@ -27,7 +27,7 @@
             status = 'SUCCESS',
             records_processed = (SELECT COUNT(*) FROM {{ this }}),
             execution_duration_seconds = DATEDIFF('second', start_time, CURRENT_TIMESTAMP())
-        WHERE execution_id = '{{ invocation_id }}_users'
+        WHERE execution_id = LEFT('{{ invocation_id }}_users', 500)
     "
 ) }}
 
@@ -78,13 +78,13 @@ cleansed_users AS (
         LOAD_TIMESTAMP as load_timestamp,
         UPDATE_TIMESTAMP as update_timestamp,
         SOURCE_SYSTEM as source_system,
-        -- Calculate data quality score
-        (
+        -- Calculate data quality score with proper decimal precision
+        CAST((
             CASE WHEN USER_ID IS NOT NULL AND TRIM(USER_ID) != '' THEN 0.25 ELSE 0 END +
             CASE WHEN USER_NAME IS NOT NULL AND TRIM(USER_NAME) != '' THEN 0.25 ELSE 0 END +
             CASE WHEN EMAIL IS NOT NULL AND REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$') THEN 0.25 ELSE 0 END +
             CASE WHEN PLAN_TYPE IN ('FREE', 'BASIC', 'PRO', 'ENTERPRISE') THEN 0.25 ELSE 0 END
-        ) as data_quality_score,
+        ) AS NUMBER(3,2)) as data_quality_score,
         CURRENT_DATE() as load_date,
         CURRENT_DATE() as update_date
     FROM bronze_users
