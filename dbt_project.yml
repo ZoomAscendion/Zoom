@@ -20,9 +20,8 @@ models:
   zoom_silver_pipeline:
     +materialized: table
     silver:
-      +materialized: incremental
+      +materialized: table
       +on_schema_change: sync_all_columns
-      +unique_key: "load_timestamp"
 
 vars:
   start_date: '2020-01-01'
