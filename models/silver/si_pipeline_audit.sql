@@ -32,7 +32,7 @@ WITH audit_base AS (
         CONCAT('Bronze to Silver transformation for ', SOURCE_TABLE) AS data_lineage_info,
         DATE(LOAD_TIMESTAMP) AS load_date,
         DATE(LOAD_TIMESTAMP) AS update_date,
-        COALESCE(SOURCE_SYSTEM, 'DBT_AUDIT_SYSTEM') AS source_system
+        'DBT_AUDIT_SYSTEM' AS source_system
     FROM {{ source('bronze', 'bz_audit_records') }}
     WHERE SOURCE_TABLE IS NOT NULL
     
