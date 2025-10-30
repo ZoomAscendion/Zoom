@@ -1,8 +1,8 @@
-name: 'zoom_bronze_pipeline'
+name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_bronze_pipeline'
+profile: 'zoom_silver_pipeline'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,12 +17,8 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_bronze_pipeline:
-    bronze:
-      +materialized: table
-
-vars:
-  start_date: '2024-01-01'
-  end_date: '2024-12-31'
-  source_schema: 'RAW'
-  target_schema: 'BRONZE'
+  zoom_silver_pipeline:
+    silver:
+      +materialized: incremental
+      +on_schema_change: sync_all_columns
+      +unique_key: "{{ this.name | replace('si_', '') | upper }}_ID"
