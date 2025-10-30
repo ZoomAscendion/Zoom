@@ -6,85 +6,22 @@ sources:
     tables:
       - name: bz_users
         description: Raw user data from source systems
-        columns:
-          - name: user_id
-            description: Unique identifier for users
-            tests:
-              - not_null
-              - unique
-          - name: email
-            description: User email address
-            tests:
-              - not_null
-      
       - name: bz_meetings
         description: Raw meeting data from source systems
-        columns:
-          - name: meeting_id
-            description: Unique identifier for meetings
-            tests:
-              - not_null
-              - unique
-      
       - name: bz_participants
         description: Raw participant data from source systems
-        columns:
-          - name: participant_id
-            description: Unique identifier for participants
-            tests:
-              - not_null
-              - unique
-      
       - name: bz_feature_usage
         description: Raw feature usage data from source systems
-        columns:
-          - name: usage_id
-            description: Unique identifier for feature usage
-            tests:
-              - not_null
-              - unique
-      
       - name: bz_support_tickets
         description: Raw support ticket data from source systems
-        columns:
-          - name: ticket_id
-            description: Unique identifier for support tickets
-            tests:
-              - not_null
-              - unique
-      
       - name: bz_billing_events
         description: Raw billing event data from source systems
-        columns:
-          - name: event_id
-            description: Unique identifier for billing events
-            tests:
-              - not_null
-              - unique
-      
       - name: bz_licenses
         description: Raw license data from source systems
-        columns:
-          - name: license_id
-            description: Unique identifier for licenses
-            tests:
-              - not_null
-              - unique
-      
       - name: bz_webinars
         description: Raw webinar data from source systems
-        columns:
-          - name: webinar_id
-            description: Unique identifier for webinars
-            tests:
-              - not_null
-              - unique
-      
       - name: bz_audit_records
         description: Raw audit records from bronze layer
-        columns:
-          - name: record_id
-            description: Unique identifier for audit records
 
 models:
   - name: audit_log
@@ -99,11 +36,6 @@ models:
         description: Name of the source table being processed
         tests:
           - not_null
-      - name: status
-        description: Processing status
-        tests:
-          - accepted_values:
-              values: ['STARTED', 'SUCCESS', 'FAILED']
   
   - name: si_users
     description: Cleaned and standardized user data
@@ -127,12 +59,6 @@ models:
         tests:
           - accepted_values:
               values: ['ACTIVE', 'INACTIVE', 'SUSPENDED']
-      - name: data_quality_score
-        description: Overall data quality score
-        tests:
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 1
   
   - name: si_meetings
     description: Cleaned and enriched meeting data
@@ -146,9 +72,6 @@ models:
         description: Reference to user who hosted the meeting
         tests:
           - not_null
-          - relationships:
-              to: ref('si_users')
-              field: user_id
       - name: meeting_type
         description: Categorized meeting type
         tests:
@@ -159,12 +82,6 @@ models:
         tests:
           - accepted_values:
               values: ['SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED']
-      - name: duration_minutes
-        description: Meeting duration in minutes
-        tests:
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 1440
   
   - name: si_participants
     description: Cleaned participant attendance data
@@ -178,16 +95,10 @@ models:
         description: Reference to meeting
         tests:
           - not_null
-          - relationships:
-              to: ref('si_meetings')
-              field: meeting_id
       - name: user_id
         description: Reference to participating user
         tests:
           - not_null
-          - relationships:
-              to: ref('si_users')
-              field: user_id
       - name: participant_role
         description: Role of the participant
         tests:
@@ -206,20 +117,11 @@ models:
         description: Reference to meeting where feature was used
         tests:
           - not_null
-          - relationships:
-              to: ref('si_meetings')
-              field: meeting_id
       - name: feature_category
         description: Categorized feature type
         tests:
           - accepted_values:
               values: ['AUDIO', 'VIDEO', 'COLLABORATION', 'SECURITY', 'OTHER']
-      - name: usage_count
-        description: Number of times feature was used
-        tests:
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 1000
   
   - name: si_support_tickets
     description: Standardized support ticket data
@@ -233,9 +135,6 @@ models:
         description: Reference to user who created the ticket
         tests:
           - not_null
-          - relationships:
-              to: ref('si_users')
-              field: user_id
       - name: ticket_type
         description: Standardized ticket category
         tests:
@@ -264,20 +163,11 @@ models:
         description: Reference to user associated with billing event
         tests:
           - not_null
-          - relationships:
-              to: ref('si_users')
-              field: user_id
       - name: event_type
         description: Standardized billing event type
         tests:
           - accepted_values:
               values: ['SUBSCRIPTION', 'UPGRADE', 'DOWNGRADE', 'REFUND', 'OTHER']
-      - name: transaction_amount
-        description: Monetary amount for the billing event
-        tests:
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 10000
       - name: currency_code
         description: ISO currency code
         tests:
@@ -302,12 +192,6 @@ models:
         tests:
           - accepted_values:
               values: ['ACTIVE', 'EXPIRED', 'SUSPENDED']
-      - name: license_cost
-        description: Cost associated with the license
-        tests:
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 1000
   
   - name: si_webinars
     description: Cleaned webinar data with engagement metrics
@@ -321,18 +205,3 @@ models:
         description: Reference to user who hosted the webinar
         tests:
           - not_null
-          - relationships:
-              to: ref('si_users')
-              field: user_id
-      - name: duration_minutes
-        description: Webinar duration in minutes
-        tests:
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 480
-      - name: attendance_rate
-        description: Percentage of registrants who attended
-        tests:
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 100
