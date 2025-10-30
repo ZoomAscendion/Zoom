@@ -1,0 +1,605 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- Zoom Platform Analytics - Revenue and License Analysis Report -->
+<workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
+  <datasources>
+    <datasource caption='Zoom Revenue Data (DB_POC_ZOOM.GOLD)' inline='true' name='federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8'>
+            <connection authentication='Username Password' class='snowflake' dbname='DB_POC_ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' service='FR__POC__ADMIN__ZOOM' username='SATHYANARAYANAP' warehouse='WH_POC_ZOOM_DEV_XSMALL' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation type='join' join='inner'>
+          <clause type='join'>
+            <expression op='='>
+              <expression op='[GO_BILLING_FACTS].[USER_ID]' />
+              <expression op='[GO_USER_DIMENSION].[USER_ID]' />
+            </expression>
+          </clause>
+          <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' name='GO_BILLING_FACTS' table='[DB_POC_ZOOM].[GOLD].[GO_BILLING_FACTS]' type='table' />
+          <_.fcp.ObjectModelEncapsulateLegacy.false...relation type='join' join='inner'>
+            <clause type='join'>
+              <expression op='='>
+                <expression op='[GO_USER_DIMENSION].[USER_ID]' />
+                <expression op='[GO_LICENSE_DIMENSION].[ASSIGNED_TO_USER_ID]' />
+              </expression>
+            </clause>
+            <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' name='GO_USER_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+            <_.fcp.ObjectModelEncapsulateLegacy.false...relation type='join' join='left'>
+              <clause type='join'>
+                <expression op='='>
+                  <expression op='[GO_LICENSE_DIMENSION].[LICENSE_TYPE]' />
+                  <expression op='[GO_MONTHLY_REVENUE_SUMMARY].[LICENSE_TYPE]' />
+                </expression>
+              </clause>
+              <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' name='GO_LICENSE_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_LICENSE_DIMENSION]' type='table' />
+              <_.fcp.ObjectModelEncapsulateLegacy.false...relation type='join' join='left'>
+                <clause type='join'>
+                  <expression op='='>
+                    <expression op='[GO_MONTHLY_REVENUE_SUMMARY].[REVENUE_MONTH]' />
+                    <expression op='[GO_TIME_DIMENSION].[DATE_KEY]' />
+                  </expression>
+                </clause>
+                <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' name='GO_MONTHLY_REVENUE_SUMMARY' table='[DB_POC_ZOOM].[GOLD].[GO_MONTHLY_REVENUE_SUMMARY]' type='table' />
+                <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' name='GO_TIME_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_TIME_DIMENSION]' type='table' />
+              </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+            </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+          </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+        </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='join' join='inner'>
+          <clause type='join'>
+            <expression op='='>
+              <expression op='[GO_BILLING_FACTS].[USER_ID]' />
+              <expression op='[GO_USER_DIMENSION].[USER_ID]' />
+            </expression>
+          </clause>
+          <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' name='GO_BILLING_FACTS' table='[DB_POC_ZOOM].[GOLD].[GO_BILLING_FACTS]' type='table' />
+          <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='join' join='inner'>
+            <clause type='join'>
+              <expression op='='>
+                <expression op='[GO_USER_DIMENSION].[USER_ID]' />
+                <expression op='[GO_LICENSE_DIMENSION].[ASSIGNED_TO_USER_ID]' />
+              </expression>
+            </clause>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' name='GO_USER_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='join' join='left'>
+              <clause type='join'>
+                <expression op='='>
+                  <expression op='[GO_LICENSE_DIMENSION].[LICENSE_TYPE]' />
+                  <expression op='[GO_MONTHLY_REVENUE_SUMMARY].[LICENSE_TYPE]' />
+                </expression>
+              </clause>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' name='GO_LICENSE_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_LICENSE_DIMENSION]' type='table' />
+              <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='join' join='left'>
+                <clause type='join'>
+                  <expression op='='>
+                    <expression op='[GO_MONTHLY_REVENUE_SUMMARY].[REVENUE_MONTH]' />
+                    <expression op='[GO_TIME_DIMENSION].[DATE_KEY]' />
+                  </expression>
+                </clause>
+                <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' name='GO_MONTHLY_REVENUE_SUMMARY' table='[DB_POC_ZOOM].[GOLD].[GO_MONTHLY_REVENUE_SUMMARY]' type='table' />
+                <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' name='GO_TIME_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_TIME_DIMENSION]' type='table' />
+              </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+            </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+          </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <metadata-records>
+          <metadata-record class='column'>
+            <remote-name>USER_ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_ID]</local-name>
+            <parent-name>[GO_USER_DIMENSION]</parent-name>
+            <remote-alias>USER_ID</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>EMAIL_ADDRESS</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[EMAIL_ADDRESS]</local-name>
+            <parent-name>[GO_USER_DIMENSION]</parent-name>
+            <remote-alias>EMAIL_ADDRESS</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COMPANY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[COMPANY]</local-name>
+            <parent-name>[GO_USER_DIMENSION]</parent-name>
+            <remote-alias>COMPANY</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COUNTRY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[COUNTRY]</local-name>
+            <parent-name>[GO_USER_DIMENSION]</parent-name>
+            <remote-alias>COUNTRY</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>EVENT_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[EVENT_TYPE]</local-name>
+            <parent-name>[GO_BILLING_FACTS]</parent-name>
+            <remote-alias>EVENT_TYPE</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>AMOUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[AMOUNT]</local-name>
+            <parent-name>[GO_BILLING_FACTS]</parent-name>
+            <remote-alias>AMOUNT</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>BILLING_DATE</remote-name>
+            <remote-type>93</remote-type>
+            <local-name>[BILLING_DATE]</local-name>
+            <parent-name>[GO_BILLING_FACTS]</parent-name>
+            <remote-alias>BILLING_DATE</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>LICENSE_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[LICENSE_TYPE]</local-name>
+            <parent-name>[GO_LICENSE_DIMENSION]</parent-name>
+            <remote-alias>LICENSE_TYPE</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>START_DATE</remote-name>
+            <remote-type>93</remote-type>
+            <local-name>[START_DATE]</local-name>
+            <parent-name>[GO_LICENSE_DIMENSION]</parent-name>
+            <remote-alias>START_DATE</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>END_DATE</remote-name>
+            <remote-type>93</remote-type>
+            <local-name>[END_DATE]</local-name>
+            <parent-name>[GO_LICENSE_DIMENSION]</parent-name>
+            <remote-alias>END_DATE</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TOTAL_REVENUE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[TOTAL_REVENUE]</local-name>
+            <parent-name>[GO_MONTHLY_REVENUE_SUMMARY]</parent-name>
+            <remote-alias>TOTAL_REVENUE</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>REVENUE_MONTH</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[REVENUE_MONTH]</local-name>
+            <parent-name>[GO_MONTHLY_REVENUE_SUMMARY]</parent-name>
+            <remote-alias>REVENUE_MONTH</remote-alias>
+            <ordinal>12</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DATE_KEY</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[DATE_KEY]</local-name>
+            <parent-name>[GO_TIME_DIMENSION]</parent-name>
+            <remote-alias>DATE_KEY</remote-alias>
+            <ordinal>13</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='User ID' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
+      <column caption='Email Address' datatype='string' name='[EMAIL_ADDRESS]' role='dimension' type='nominal' />
+      <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
+      <column caption='Country' datatype='string' name='[COUNTRY]' role='dimension' type='nominal' />
+      <column caption='Event Type' datatype='string' name='[EVENT_TYPE]' role='dimension' type='nominal' />
+      <column caption='Amount' datatype='real' name='[AMOUNT]' role='measure' type='quantitative' />
+      <column caption='Billing Date' datatype='datetime' name='[BILLING_DATE]' role='dimension' type='nominal' />
+      <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
+      <column caption='Start Date' datatype='datetime' name='[START_DATE]' role='dimension' type='nominal' />
+      <column caption='End Date' datatype='datetime' name='[END_DATE]' role='dimension' type='nominal' />
+      <column caption='Total Revenue' datatype='real' name='[TOTAL_REVENUE]' role='measure' type='quantitative' />
+      <column caption='Revenue Month' datatype='date' name='[REVENUE_MONTH]' role='dimension' type='nominal' />
+      <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='nominal' />
+      
+      <!-- Calculated Fields for Revenue KPIs -->
+      <column caption='Email Masked' datatype='string' name='[Calculation_EmailMasked]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],1)+&quot;*******&quot;+RIGHT([EMAIL_ADDRESS],9)' />
+      </column>
+      <column caption='Monthly Recurring Revenue (MRR)' datatype='real' name='[Calculation_MRR]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [EVENT_TYPE] = &quot;Subscription&quot; THEN [AMOUNT] END)' />
+      </column>
+      <column caption='Revenue by License Type' datatype='real' name='[Calculation_RevenueByLicense]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([AMOUNT])' />
+      </column>
+      <column caption='License Utilization Rate' datatype='real' name='[Calculation_LicenseUtilization]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD(IF [END_DATE] > TODAY() THEN [USER_ID] END) / COUNTD([USER_ID])' />
+      </column>
+      <column caption='License Expiration Trend' datatype='integer' name='[Calculation_ExpirationTrend]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT(IF DATEDIFF(&quot;day&quot;,TODAY(),[END_DATE]) &lt;= 30 THEN [USER_ID] END)' />
+      </column>
+      <column caption='Total Revenue Amount' datatype='real' name='[Calculation_TotalRevenue]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([AMOUNT])' />
+      </column>
+      <column caption='Churn Rate' datatype='real' name='[Calculation_ChurnRate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD(IF [END_DATE] &lt; TODAY() THEN [USER_ID] END) / COUNTD([USER_ID])' />
+      </column>
+      <column caption='Geographic Revenue' datatype='real' name='[Calculation_GeographicRevenue]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([AMOUNT])' />
+      </column>
+      
+      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='MRR Trends'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Monthly Recurring Revenue (MRR) Trends</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Revenue Data (DB_POC_ZOOM.GOLD)' name='federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' />
+          </datasources>
+          <datasource-dependencies datasource='federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8'>
+            <column caption='Revenue Month' datatype='date' name='[REVENUE_MONTH]' role='dimension' type='nominal' />
+            <column caption='Monthly Recurring Revenue (MRR)' datatype='real' name='[Calculation_MRR]' role='measure' type='quantitative' />
+            <column-instance column='[REVENUE_MONTH]' derivation='Month-Trunc' name='[tmn:REVENUE_MONTH:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_MRR]' derivation='Sum' name='[sum:Calculation_MRR:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[sum:Calculation_MRR:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[sum:Calculation_MRR:qk]</rows>
+        <cols>[federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[tmn:REVENUE_MONTH:qk]</cols>
+      </table>
+      <simple-id uuid='{M3N4O5P6-Q7R8-9012-MNOP-345678901234}' />
+    </worksheet>
+    <worksheet name='Revenue Distribution by License Type'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Revenue Distribution by License Type</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Revenue Data (DB_POC_ZOOM.GOLD)' name='federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' />
+          </datasources>
+          <datasource-dependencies datasource='federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8'>
+            <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
+            <column caption='Revenue Month' datatype='date' name='[REVENUE_MONTH]' role='dimension' type='nominal' />
+            <column caption='Revenue by License Type' datatype='real' name='[Calculation_RevenueByLicense]' role='measure' type='quantitative' />
+            <column-instance column='[LICENSE_TYPE]' derivation='None' name='[none:LICENSE_TYPE:nk]' pivot='key' type='nominal' />
+            <column-instance column='[REVENUE_MONTH]' derivation='Month-Trunc' name='[tmn:REVENUE_MONTH:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_RevenueByLicense]' derivation='Sum' name='[sum:Calculation_RevenueByLicense:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[none:LICENSE_TYPE:nk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[sum:Calculation_RevenueByLicense:qk]</rows>
+        <cols>([federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[tmn:REVENUE_MONTH:qk] / [federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[none:LICENSE_TYPE:nk])</cols>
+      </table>
+      <simple-id uuid='{N4O5P6Q7-R8S9-0123-NOPQ-456789012345}' />
+    </worksheet>
+    <worksheet name='Geographic Revenue Distribution'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Geographic Revenue Distribution Heat Map</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Revenue Data (DB_POC_ZOOM.GOLD)' name='federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' />
+          </datasources>
+          <datasource-dependencies datasource='federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8'>
+            <column caption='Country' datatype='string' name='[COUNTRY]' role='dimension' type='nominal' />
+            <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
+            <column caption='Geographic Revenue' datatype='real' name='[Calculation_GeographicRevenue]' role='measure' type='quantitative' />
+            <column-instance column='[COUNTRY]' derivation='None' name='[none:COUNTRY:nk]' pivot='key' type='nominal' />
+            <column-instance column='[COMPANY]' derivation='None' name='[none:COMPANY:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_GeographicRevenue]' derivation='Sum' name='[sum:Calculation_GeographicRevenue:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='cell'>
+            <format attr='width' value='143' />
+          </style-rule>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[sum:Calculation_GeographicRevenue:qk]' palette='red_blue_diverging_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Square' />
+            <encodings>
+              <color column='[federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[sum:Calculation_GeographicRevenue:qk]' />
+              <size column='[federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[sum:Calculation_GeographicRevenue:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[none:COMPANY:nk]</rows>
+        <cols>[federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[none:COUNTRY:nk]</cols>
+      </table>
+      <simple-id uuid='{O5P6Q7R8-S9T0-1234-OPQR-567890123456}' />
+    </worksheet>
+    <worksheet name='License Utilization Analysis'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>License Utilization and Expiration Analysis</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Revenue Data (DB_POC_ZOOM.GOLD)' name='federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8' />
+          </datasources>
+          <datasource-dependencies datasource='federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8'>
+            <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
+            <column caption='License Utilization Rate' datatype='real' name='[Calculation_LicenseUtilization]' role='measure' type='quantitative' />
+            <column caption='License Expiration Trend' datatype='integer' name='[Calculation_ExpirationTrend]' role='measure' type='quantitative' />
+            <column-instance column='[LICENSE_TYPE]' derivation='None' name='[none:LICENSE_TYPE:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_LicenseUtilization]' derivation='Avg' name='[avg:Calculation_LicenseUtilization:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_ExpirationTrend]' derivation='Sum' name='[sum:Calculation_ExpirationTrend:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Text' />
+            <encodings>
+              <text column='[federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[avg:Calculation_LicenseUtilization:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+          <pane id='1' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[sum:Calculation_ExpirationTrend:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Text' />
+            <encodings>
+              <text column='[federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[sum:Calculation_ExpirationTrend:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>([federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[avg:Calculation_LicenseUtilization:qk] + [federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[sum:Calculation_ExpirationTrend:qk])</rows>
+        <cols>[federated.3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8].[none:LICENSE_TYPE:nk]</cols>
+      </table>
+      <simple-id uuid='{P6Q7R8S9-T0U1-2345-PQRS-678901234567}' />
+    </worksheet>
+  </worksheets>
+  <windows saved-dpi-scale-factor='1.5' source-height='44'>
+    <window class='worksheet' maximized='true' name='MRR Trends'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{Q7R8S9T0-U1V2-3456-QRST-789012345678}' />
+    </window>
+    <window class='worksheet' name='Revenue Distribution by License Type'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{R8S9T0U1-V2W3-4567-RSTU-890123456789}' />
+    </window>
+    <window class='worksheet' name='Geographic Revenue Distribution'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{S9T0U1V2-W3X4-5678-STUV-901234567890}' />
+    </window>
+    <window class='worksheet' name='License Utilization Analysis'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{T0U1V2W3-X4Y5-6789-TUVW-012345678901}' />
+    </window>
+  </windows>
+</workbook>
