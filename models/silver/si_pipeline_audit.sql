@@ -7,7 +7,7 @@
 -- Audit table for tracking Silver layer pipeline execution
 WITH audit_base AS (
     SELECT 
-        {{ dbt_utils.generate_surrogate_key(['"audit_base"', 'current_timestamp()']) }} AS execution_id,
+        {{ dbt_utils.generate_surrogate_key(["'audit_base'", "current_timestamp()"]) }} AS execution_id,
         'Silver Pipeline Audit Base' AS pipeline_name,
         CURRENT_TIMESTAMP() AS start_time,
         CURRENT_TIMESTAMP() AS end_time,
