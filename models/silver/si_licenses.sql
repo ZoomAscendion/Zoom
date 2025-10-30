@@ -66,7 +66,7 @@ validated_licenses AS (
             ELSE 0.00
         END AS license_cost,
         'Yes' AS renewal_status,
-        CAST(ROUND(RANDOM() * 100, 2) AS NUMBER(5,2)) AS utilization_percentage,
+        CAST(ROUND(UNIFORM(0, 100, RANDOM()), 2) AS NUMBER(5,2)) AS utilization_percentage,
         l.load_timestamp,
         l.update_timestamp,
         l.source_system
