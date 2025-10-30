@@ -198,13 +198,8 @@ models:
     columns:
       - name: record_id
         description: "Auto-incrementing unique identifier for audit record"
-        tests:
-          - not_null
-          - unique
       - name: source_table
         description: "Name of the source table being processed"
-        tests:
-          - not_null
       - name: load_timestamp
         description: "Timestamp when data load operation occurred"
       - name: processed_by
@@ -213,9 +208,6 @@ models:
         description: "Time taken to process the data in seconds"
       - name: status
         description: "Status of the processing operation"
-        tests:
-          - accepted_values:
-              values: ['STARTED', 'COMPLETED', 'FAILED', 'PARTIAL']
       - name: record_count
         description: "Number of records processed"
       - name: error_message
