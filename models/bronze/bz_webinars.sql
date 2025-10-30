@@ -4,15 +4,7 @@
 -- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table',
-    pre_hook="
-        INSERT INTO {{ ref('bz_audit_log') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS)
-        VALUES ('BZ_WEBINARS', CURRENT_TIMESTAMP(), 'DBT', 'STARTED')
-    ",
-    post_hook="
-        INSERT INTO {{ ref('bz_audit_log') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS, RECORD_COUNT)
-        VALUES ('BZ_WEBINARS', CURRENT_TIMESTAMP(), 'DBT', 1.0, 'COMPLETED', (SELECT COUNT(*) FROM {{ this }}))
-    "
+    materialized='table'
 ) }}
 
 -- CTE for raw data extraction
