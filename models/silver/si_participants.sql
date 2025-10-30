@@ -3,8 +3,9 @@
     unique_key='participant_id',
     on_schema_change='sync_all_columns',
     pre_hook="
-        INSERT INTO {{ ref('audit_log') }} (
-            execution_id, pipeline_name, start_time, status, executed_by, execution_environment, source_system
+        INSERT INTO {{ this.database }}.{{ this.schema }}.si_pipeline_audit (
+            execution_id, pipeline_name, start_time, status, executed_by, execution_environment, source_system,
+            source_tables_processed, target_tables_updated, load_date, update_date
         ) 
         SELECT 
             '{{ invocation_id }}_participants' as execution_id,
@@ -13,10 +14,14 @@
             'RUNNING' as status,
             CURRENT_USER() as executed_by,
             'PROD' as execution_environment,
-            'DBT_SILVER_PIPELINE' as source_system
+            'DBT_SILVER_PIPELINE' as source_system,
+            'BZ_PARTICIPANTS' as source_tables_processed,
+            'SI_PARTICIPANTS' as target_tables_updated,
+            CURRENT_DATE() as load_date,
+            CURRENT_DATE() as update_date
     ",
     post_hook="
-        UPDATE {{ ref('audit_log') }}
+        UPDATE {{ this.database }}.{{ this.schema }}.si_pipeline_audit 
         SET 
             end_time = CURRENT_TIMESTAMP(),
             status = 'SUCCESS',
@@ -67,7 +72,7 @@ cleansed_participants AS (
             0
         ) as attendance_duration,
         CASE 
-            WHEN bp.USER_ID = m.host_id THEN 'Host'
+            WHEN m.host_id IS NOT NULL AND bp.USER_ID = m.host_id THEN 'Host'
             WHEN DATEDIFF('minute', bp.JOIN_TIME, COALESCE(bp.LEAVE_TIME, bp.JOIN_TIME)) > 30 THEN 'Participant'
             ELSE 'Observer'
         END as participant_role,
