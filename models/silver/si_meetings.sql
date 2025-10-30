@@ -8,7 +8,7 @@
             source_tables_processed, target_tables_updated, load_date, update_date
         ) 
         SELECT 
-            '{{ invocation_id }}_meetings' as execution_id,
+            LEFT('{{ invocation_id }}_meetings', 500) as execution_id,
             'si_meetings_pipeline' as pipeline_name,
             CURRENT_TIMESTAMP() as start_time,
             'RUNNING' as status,
@@ -27,7 +27,7 @@
             status = 'SUCCESS',
             records_processed = (SELECT COUNT(*) FROM {{ this }}),
             execution_duration_seconds = DATEDIFF('second', start_time, CURRENT_TIMESTAMP())
-        WHERE execution_id = '{{ invocation_id }}_meetings'
+        WHERE execution_id = LEFT('{{ invocation_id }}_meetings', 500)
     "
 ) }}
 
@@ -97,14 +97,14 @@ cleansed_meetings AS (
         bm.LOAD_TIMESTAMP as load_timestamp,
         bm.UPDATE_TIMESTAMP as update_timestamp,
         bm.SOURCE_SYSTEM as source_system,
-        -- Calculate data quality score
-        (
+        -- Calculate data quality score with proper decimal precision
+        CAST((
             CASE WHEN bm.MEETING_ID IS NOT NULL AND TRIM(bm.MEETING_ID) != '' THEN 0.2 ELSE 0 END +
             CASE WHEN bm.HOST_ID IS NOT NULL AND TRIM(bm.HOST_ID) != '' THEN 0.2 ELSE 0 END +
             CASE WHEN bm.START_TIME IS NOT NULL THEN 0.2 ELSE 0 END +
             CASE WHEN bm.END_TIME IS NOT NULL AND bm.END_TIME >= bm.START_TIME THEN 0.2 ELSE 0 END +
             CASE WHEN DATEDIFF('minute', bm.START_TIME, bm.END_TIME) BETWEEN 0 AND 1440 THEN 0.2 ELSE 0 END
-        ) as data_quality_score,
+        ) AS NUMBER(3,2)) as data_quality_score,
         CURRENT_DATE() as load_date,
         CURRENT_DATE() as update_date
     FROM bronze_meetings bm
