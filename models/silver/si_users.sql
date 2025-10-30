@@ -36,7 +36,14 @@ cleaned_users AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        {{ calculate_data_quality_score() }} AS data_quality_score,
+        ROUND(
+            (
+                CASE WHEN USER_ID IS NOT NULL THEN 0.2 ELSE 0 END +
+                CASE WHEN USER_NAME IS NOT NULL THEN 0.2 ELSE 0 END +
+                CASE WHEN EMAIL IS NOT NULL THEN 0.2 ELSE 0 END +
+                CASE WHEN EMAIL LIKE '%@%' OR EMAIL IS NULL THEN 0.4 ELSE 0 END
+            ), 2
+        ) AS data_quality_score,
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date
     FROM bronze_users
