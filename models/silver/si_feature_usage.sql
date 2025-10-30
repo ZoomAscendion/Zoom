@@ -1,34 +1,7 @@
 {{ config(
-    materialized='incremental',
-    unique_key='usage_id',
+    materialized='table',
     on_schema_change='sync_all_columns',
-    pre_hook="
-        INSERT INTO {{ this.database }}.{{ this.schema }}.si_pipeline_audit (
-            execution_id, pipeline_name, start_time, status, executed_by, execution_environment, source_system,
-            source_tables_processed, target_tables_updated, load_date, update_date
-        ) 
-        SELECT 
-            LEFT('{{ invocation_id }}_feature', 500) as execution_id,
-            'si_feature_usage_pipeline' as pipeline_name,
-            CURRENT_TIMESTAMP() as start_time,
-            'RUNNING' as status,
-            CURRENT_USER() as executed_by,
-            'PROD' as execution_environment,
-            'DBT_SILVER_PIPELINE' as source_system,
-            'BZ_FEATURE_USAGE' as source_tables_processed,
-            'SI_FEATURE_USAGE' as target_tables_updated,
-            CURRENT_DATE() as load_date,
-            CURRENT_DATE() as update_date
-    ",
-    post_hook="
-        UPDATE {{ this.database }}.{{ this.schema }}.si_pipeline_audit 
-        SET 
-            end_time = CURRENT_TIMESTAMP(),
-            status = 'SUCCESS',
-            records_processed = (SELECT COUNT(*) FROM {{ this }}),
-            execution_duration_seconds = DATEDIFF('second', start_time, CURRENT_TIMESTAMP())
-        WHERE execution_id = LEFT('{{ invocation_id }}_feature', 500)
-    "
+    pre_hook="DROP TABLE IF EXISTS {{ this }}"
 ) }}
 
 -- Silver layer transformation for feature usage with comprehensive data quality checks
@@ -52,10 +25,6 @@ WITH bronze_feature_usage AS (
     AND TRIM(USAGE_ID) != ''
     AND MEETING_ID IS NOT NULL
     AND FEATURE_NAME IS NOT NULL
-    
-    {% if is_incremental() %}
-        AND UPDATE_TIMESTAMP > (SELECT MAX(update_timestamp) FROM {{ this }})
-    {% endif %}
 ),
 
 -- Data quality validation and cleansing
