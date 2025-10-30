@@ -1,0 +1,461 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20233.23.1017.0948                               -->
+<workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
+  <datasources>
+    <datasource caption='Support Data (DB_POC_ZOOM)' inline='true' name='federated.2b3c4d5e6f1a' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='a8977680256071-ascendion_partner' name='snowflake.2bcd3def4'>
+            <connection authentication='Username Password' class='snowflake' dbname='DB_POC_ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' service='FR__POC__ADMIN__ZOOM' username='SATHYANARAYANAP' warehouse='WH_POC_ZOOM_DEV_XSMALL' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation type='collection' connection='snowflake.2bcd3def4'>
+          <relation name='GO_SUPPORT_FACTS' table='[DB_POC_ZOOM].[GOLD].[GO_SUPPORT_FACTS]' type='table' />
+          <relation name='GO_USER_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+          <relation name='GO_MEETING_FACTS' table='[DB_POC_ZOOM].[GOLD].[GO_MEETING_FACTS]' type='table' />
+          <relation name='GO_TIME_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_TIME_DIMENSION]' type='table' />
+        </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='collection' connection='snowflake.2bcd3def4'>
+          <relation name='GO_SUPPORT_FACTS' table='[DB_POC_ZOOM].[GOLD].[GO_SUPPORT_FACTS]' type='table'>
+            <columns>
+              <column datatype='integer' name='[SUPPORT_FACT_ID]' role='dimension' type='ordinal' />
+              <column datatype='date' name='[TICKET_DATE]' role='dimension' type='ordinal' />
+              <column datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+              <column datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
+              <column datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
+              <column datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+              <column datatype='real' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+              <column datatype='real' name='[FIRST_RESPONSE_TIME_HOURS]' role='measure' type='quantitative' />
+              <column datatype='string' name='[ESCALATION_FLAG]' role='dimension' type='nominal' />
+              <column datatype='string' name='[SLA_BREACH_FLAG]' role='dimension' type='nominal' />
+              <column datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
+              <column datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+              <column datatype='string' name='[ASSIGNED_AGENT]' role='dimension' type='nominal' />
+              <column datatype='string' name='[SUPPORT_TICKET_ID]' role='dimension' type='nominal' />
+              <column datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
+              <column datatype='string' name='[ISSUE_DESCRIPTION]' role='dimension' type='nominal' />
+              <column datatype='datetime' name='[OPEN_DATE]' role='dimension' type='ordinal' />
+              <column datatype='datetime' name='[CLOSE_DATE]' role='dimension' type='ordinal' />
+            </columns>
+          </relation>
+          <relation name='GO_USER_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table'>
+            <columns>
+              <column datatype='integer' name='[USER_DIMENSION_ID]' role='dimension' type='ordinal' />
+              <column datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+              <column datatype='string' name='[EMAIL_ADDRESS]' role='dimension' type='nominal' />
+              <column datatype='string' name='[EMAIL_DOMAIN]' role='dimension' type='nominal' />
+              <column datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
+              <column datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+              <column datatype='date' name='[REGISTRATION_DATE]' role='dimension' type='ordinal' />
+              <column datatype='integer' name='[ACCOUNT_AGE_DAYS]' role='measure' type='quantitative' />
+              <column datatype='string' name='[USER_SEGMENT]' role='dimension' type='nominal' />
+              <column datatype='string' name='[GEOGRAPHIC_REGION]' role='dimension' type='nominal' />
+              <column datatype='string' name='[USER_STATUS]' role='dimension' type='nominal' />
+              <column datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
+              <column datatype='string' name='[EMAIL]' role='dimension' type='nominal' />
+            </columns>
+          </relation>
+          <relation name='GO_MEETING_FACTS' table='[DB_POC_ZOOM].[GOLD].[GO_MEETING_FACTS]' type='table'>
+            <columns>
+              <column datatype='integer' name='[MEETING_FACT_ID]' role='dimension' type='ordinal' />
+              <column datatype='date' name='[MEETING_DATE]' role='dimension' type='ordinal' />
+              <column datatype='string' name='[HOST_NAME]' role='dimension' type='nominal' />
+              <column datatype='string' name='[MEETING_TOPIC]' role='dimension' type='nominal' />
+              <column datatype='integer' name='[DURATION_MINUTES]' role='measure' type='quantitative' />
+              <column datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
+              <column datatype='integer' name='[PARTICIPANT_COUNT]' role='measure' type='quantitative' />
+              <column datatype='string' name='[MEETING_ID]' role='dimension' type='nominal' />
+              <column datatype='string' name='[HOST_ID]' role='dimension' type='nominal' />
+            </columns>
+          </relation>
+          <relation name='GO_TIME_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_TIME_DIMENSION]' type='table'>
+            <columns>
+              <column datatype='integer' name='[TIME_DIMENSION_ID]' role='dimension' type='ordinal' />
+              <column datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+              <column datatype='integer' name='[YEAR]' role='dimension' type='ordinal' />
+              <column datatype='integer' name='[QUARTER]' role='dimension' type='ordinal' />
+              <column datatype='integer' name='[MONTH]' role='dimension' type='ordinal' />
+              <column datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+              <column datatype='integer' name='[WEEK_OF_YEAR]' role='dimension' type='ordinal' />
+              <column datatype='integer' name='[DAY_OF_MONTH]' role='dimension' type='ordinal' />
+              <column datatype='integer' name='[DAY_OF_WEEK]' role='dimension' type='ordinal' />
+              <column datatype='string' name='[DAY_NAME]' role='dimension' type='nominal' />
+            </columns>
+          </relation>
+        </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <cols>
+          <map key='[ASSIGNED_AGENT]' value='[GO_SUPPORT_FACTS].[ASSIGNED_AGENT]' />
+          <map key='[CLOSE_DATE]' value='[GO_SUPPORT_FACTS].[CLOSE_DATE]' />
+          <map key='[COMPANY (GO_SUPPORT_FACTS)]' value='[GO_SUPPORT_FACTS].[COMPANY]' />
+          <map key='[COMPANY (GO_USER_DIMENSION)]' value='[GO_USER_DIMENSION].[COMPANY]' />
+          <map key='[DATE_KEY]' value='[GO_TIME_DIMENSION].[DATE_KEY]' />
+          <map key='[DAY_NAME]' value='[GO_TIME_DIMENSION].[DAY_NAME]' />
+          <map key='[DAY_OF_MONTH]' value='[GO_TIME_DIMENSION].[DAY_OF_MONTH]' />
+          <map key='[DAY_OF_WEEK]' value='[GO_TIME_DIMENSION].[DAY_OF_WEEK]' />
+          <map key='[EMAIL_ADDRESS]' value='[GO_USER_DIMENSION].[EMAIL_ADDRESS]' />
+          <map key='[ESCALATION_FLAG]' value='[GO_SUPPORT_FACTS].[ESCALATION_FLAG]' />
+          <map key='[FIRST_RESPONSE_TIME_HOURS]' value='[GO_SUPPORT_FACTS].[FIRST_RESPONSE_TIME_HOURS]' />
+          <map key='[HOST_ID]' value='[GO_MEETING_FACTS].[HOST_ID]' />
+          <map key='[ISSUE_DESCRIPTION]' value='[GO_SUPPORT_FACTS].[ISSUE_DESCRIPTION]' />
+          <map key='[MEETING_DATE]' value='[GO_MEETING_FACTS].[MEETING_DATE]' />
+          <map key='[MEETING_TYPE]' value='[GO_MEETING_FACTS].[MEETING_TYPE]' />
+          <map key='[MONTH]' value='[GO_TIME_DIMENSION].[MONTH]' />
+          <map key='[MONTH_NAME]' value='[GO_TIME_DIMENSION].[MONTH_NAME]' />
+          <map key='[OPEN_DATE]' value='[GO_SUPPORT_FACTS].[OPEN_DATE]' />
+          <map key='[PLAN_TYPE (GO_SUPPORT_FACTS)]' value='[GO_SUPPORT_FACTS].[PLAN_TYPE]' />
+          <map key='[PLAN_TYPE (GO_USER_DIMENSION)]' value='[GO_USER_DIMENSION].[PLAN_TYPE]' />
+          <map key='[PRIORITY_LEVEL]' value='[GO_SUPPORT_FACTS].[PRIORITY_LEVEL]' />
+          <map key='[QUARTER]' value='[GO_TIME_DIMENSION].[QUARTER]' />
+          <map key='[RESOLUTION_STATUS]' value='[GO_SUPPORT_FACTS].[RESOLUTION_STATUS]' />
+          <map key='[RESOLUTION_TIME_HOURS]' value='[GO_SUPPORT_FACTS].[RESOLUTION_TIME_HOURS]' />
+          <map key='[SLA_BREACH_FLAG]' value='[GO_SUPPORT_FACTS].[SLA_BREACH_FLAG]' />
+          <map key='[SUPPORT_TICKET_ID]' value='[GO_SUPPORT_FACTS].[SUPPORT_TICKET_ID]' />
+          <map key='[TICKET_DATE]' value='[GO_SUPPORT_FACTS].[TICKET_DATE]' />
+          <map key='[TICKET_TYPE]' value='[GO_SUPPORT_FACTS].[TICKET_TYPE]' />
+          <map key='[USER_ID (GO_SUPPORT_FACTS)]' value='[GO_SUPPORT_FACTS].[USER_ID]' />
+          <map key='[USER_ID (GO_USER_DIMENSION)]' value='[GO_USER_DIMENSION].[USER_ID]' />
+          <map key='[USER_NAME (GO_SUPPORT_FACTS)]' value='[GO_SUPPORT_FACTS].[USER_NAME]' />
+          <map key='[USER_NAME (GO_USER_DIMENSION)]' value='[GO_USER_DIMENSION].[USER_NAME]' />
+          <map key='[WEEK_OF_YEAR]' value='[GO_TIME_DIMENSION].[WEEK_OF_YEAR]' />
+          <map key='[YEAR]' value='[GO_TIME_DIMENSION].[YEAR]' />
+        </cols>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[GO_SUPPORT_FACTS]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='context'>0</attribute>
+              <attribute datatype='string' name='gridOrigin'>&quot;A1:R1048577:no:A1:R1048577:0&quot;</attribute>
+              <attribute datatype='boolean' name='header'>true</attribute>
+              <attribute datatype='integer' name='outcome'>2</attribute>
+            </attributes>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Email Masked' datatype='string' name='[Calculation_2b3c4d5e6f1a]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],1)+&quot;*******&quot;+RIGHT([EMAIL_ADDRESS],9)' />
+      </column>
+      <column caption='Tickets Opened Per Day' datatype='integer' name='[Calculation_3b3c4d5e6f1a]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([SUPPORT_TICKET_ID])' />
+      </column>
+      <column caption='Average Resolution Time' datatype='real' name='[Calculation_4b3c4d5e6f1a]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
+      </column>
+      <column caption='First Contact Resolution Rate' datatype='real' name='[Calculation_5b3c4d5e6f1a]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [FIRST_RESPONSE_TIME_HOURS]&amp;lt;=24 AND [RESOLUTION_STATUS]=&quot;Closed&quot; THEN 1 ELSE 0 END)/COUNTD([SUPPORT_TICKET_ID])' />
+      </column>
+      <column caption='Tickets Per 1000 Active Users' datatype='real' name='[Calculation_6b3c4d5e6f1a]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='(COUNTD([SUPPORT_TICKET_ID])/COUNTD([USER_ID (GO_USER_DIMENSION)]))*1000' />
+      </column>
+      <column caption='Ticket Volume By Type' datatype='integer' name='[Calculation_7b3c4d5e6f1a]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD(IF [TICKET_TYPE]&amp;lt;&amp;gt;&quot;&quot; THEN [SUPPORT_TICKET_ID] END)' />
+      </column>
+      <column caption='Average Resolution Time Days' datatype='real' name='[Calculation_8b3c4d5e6f1a]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS]/24)' />
+      </column>
+      <column caption='Ticket Date' datatype='date' name='[TICKET_DATE]' role='dimension' type='ordinal' />
+      <column caption='Ticket Type' datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
+      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+      <column caption='Resolution Time Hours' datatype='real' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
+      <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
+      <column caption='Company' datatype='string' name='[COMPANY (GO_SUPPORT_FACTS)]' role='dimension' type='nominal' />
+      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+        <objects>
+          <object caption='GO_SUPPORT_FACTS' id='GO_SUPPORT_FACTS_2B3C4D5E6F1A'>
+            <properties context=''>
+              <relation connection='snowflake.2bcd3def4' name='GO_SUPPORT_FACTS' table='[DB_POC_ZOOM].[GOLD].[GO_SUPPORT_FACTS]' type='table' />
+            </properties>
+          </object>
+          <object caption='GO_USER_DIMENSION' id='GO_USER_DIMENSION_2B3C4D5E6F1A'>
+            <properties context=''>
+              <relation connection='snowflake.2bcd3def4' name='GO_USER_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_USER_DIMENSION]' type='table' />
+            </properties>
+          </object>
+          <object caption='GO_MEETING_FACTS' id='GO_MEETING_FACTS_2B3C4D5E6F1A'>
+            <properties context=''>
+              <relation connection='snowflake.2bcd3def4' name='GO_MEETING_FACTS' table='[DB_POC_ZOOM].[GOLD].[GO_MEETING_FACTS]' type='table' />
+            </properties>
+          </object>
+          <object caption='GO_TIME_DIMENSION' id='GO_TIME_DIMENSION_2B3C4D5E6F1A'>
+            <properties context=''>
+              <relation connection='snowflake.2bcd3def4' name='GO_TIME_DIMENSION' table='[DB_POC_ZOOM].[GOLD].[GO_TIME_DIMENSION]' type='table' />
+            </properties>
+          </object>
+        </objects>
+      </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Ticket Volume by Meeting Type'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Ticket Volume by Meeting Type</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Support Data (DB_POC_ZOOM)' name='federated.2b3c4d5e6f1a' />
+          </datasources>
+          <datasource-dependencies datasource='federated.2b3c4d5e6f1a'>
+            <column caption='Ticket Volume By Type' datatype='integer' name='[Calculation_7b3c4d5e6f1a]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD(IF [TICKET_TYPE]&amp;lt;&amp;gt;&quot;&quot; THEN [SUPPORT_TICKET_ID] END)' />
+            </column>
+            <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
+            <column caption='Ticket Type' datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
+            <column datatype='string' name='[SUPPORT_TICKET_ID]' role='dimension' type='nominal' />
+            <column-instance column='[Calculation_7b3c4d5e6f1a]' derivation='Sum' name='[sum:Calculation_7b3c4d5e6f1a:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[MEETING_TYPE]' derivation='None' name='[none:MEETING_TYPE:nk]' pivot='key' type='nominal' />
+            <column-instance column='[TICKET_TYPE]' derivation='None' name='[none:TICKET_TYPE:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.2b3c4d5e6f1a].[none:TICKET_TYPE:nk]' palette='tableau_10_0' type='palette' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.2b3c4d5e6f1a].[none:TICKET_TYPE:nk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.2b3c4d5e6f1a].[sum:Calculation_7b3c4d5e6f1a:qk]</rows>
+        <cols>[federated.2b3c4d5e6f1a].[none:MEETING_TYPE:nk]</cols>
+      </table>
+      <simple-id uuid='{7A2B3C4D-5E6F-1A2B-3C4D-5E6F1A2B3C4D}' />
+    </worksheet>
+    <worksheet name='Average Resolution Time Trend'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Average Resolution Time Over Time</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Support Data (DB_POC_ZOOM)' name='federated.2b3c4d5e6f1a' />
+          </datasources>
+          <datasource-dependencies datasource='federated.2b3c4d5e6f1a'>
+            <column caption='Average Resolution Time Days' datatype='real' name='[Calculation_8b3c4d5e6f1a]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS]/24)' />
+            </column>
+            <column caption='Resolution Time Hours' datatype='real' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+            <column caption='Ticket Date' datatype='date' name='[TICKET_DATE]' role='dimension' type='ordinal' />
+            <column-instance column='[Calculation_8b3c4d5e6f1a]' derivation='Sum' name='[sum:Calculation_8b3c4d5e6f1a:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[TICKET_DATE]' derivation='Month-Trunc' name='[tmn:TICKET_DATE:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.2b3c4d5e6f1a].[sum:Calculation_8b3c4d5e6f1a:qk]' palette='blue_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.2b3c4d5e6f1a].[sum:Calculation_8b3c4d5e6f1a:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.2b3c4d5e6f1a].[sum:Calculation_8b3c4d5e6f1a:qk]</rows>
+        <cols>[federated.2b3c4d5e6f1a].[tmn:TICKET_DATE:qk]</cols>
+      </table>
+      <simple-id uuid='{8B3C4D5E-6F1A-2B3C-4D5E-6F1A2B3C4D5E}' />
+    </worksheet>
+    <worksheet name='Support KPIs Dashboard'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Support KPIs Dashboard</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Support Data (DB_POC_ZOOM)' name='federated.2b3c4d5e6f1a' />
+          </datasources>
+          <datasource-dependencies datasource='federated.2b3c4d5e6f1a'>
+            <column caption='Tickets Opened Per Day' datatype='integer' name='[Calculation_3b3c4d5e6f1a]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD([SUPPORT_TICKET_ID])' />
+            </column>
+            <column caption='Average Resolution Time' datatype='real' name='[Calculation_4b3c4d5e6f1a]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
+            </column>
+            <column caption='First Contact Resolution Rate' datatype='real' name='[Calculation_5b3c4d5e6f1a]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM(IF [FIRST_RESPONSE_TIME_HOURS]&amp;lt;=24 AND [RESOLUTION_STATUS]=&quot;Closed&quot; THEN 1 ELSE 0 END)/COUNTD([SUPPORT_TICKET_ID])' />
+            </column>
+            <column caption='Tickets Per 1000 Active Users' datatype='real' name='[Calculation_6b3c4d5e6f1a]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='(COUNTD([SUPPORT_TICKET_ID])/COUNTD([USER_ID (GO_USER_DIMENSION)]))*1000' />
+            </column>
+            <column datatype='string' name='[SUPPORT_TICKET_ID]' role='dimension' type='nominal' />
+            <column datatype='real' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+            <column datatype='real' name='[FIRST_RESPONSE_TIME_HOURS]' role='measure' type='quantitative' />
+            <column datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+            <column datatype='string' name='[USER_ID (GO_USER_DIMENSION)]' role='dimension' type='nominal' />
+            <column-instance column='[Calculation_3b3c4d5e6f1a]' derivation='Sum' name='[sum:Calculation_3b3c4d5e6f1a:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_4b3c4d5e6f1a]' derivation='Sum' name='[sum:Calculation_4b3c4d5e6f1a:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_5b3c4d5e6f1a]' derivation='Sum' name='[sum:Calculation_5b3c4d5e6f1a:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_6b3c4d5e6f1a]' derivation='Sum' name='[sum:Calculation_6b3c4d5e6f1a:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Text' />
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+                <format attr='font-size' value='14' />
+                <format attr='font-weight' value='bold' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>([federated.2b3c4d5e6f1a].[sum:Calculation_3b3c4d5e6f1a:qk] + ([federated.2b3c4d5e6f1a].[sum:Calculation_4b3c4d5e6f1a:qk] + ([federated.2b3c4d5e6f1a].[sum:Calculation_5b3c4d5e6f1a:qk] + [federated.2b3c4d5e6f1a].[sum:Calculation_6b3c4d5e6f1a:qk])))</rows>
+        <cols />
+      </table>
+      <simple-id uuid='{9C4D5E6F-1A2B-3C4D-5E6F-1A2B3C4D5E6F}' />
+    </worksheet>
+  </worksheets>
+  <windows saved-dpi-scale-factor='1.5' source-height='44'>
+    <window class='worksheet' maximized='true' name='Ticket Volume by Meeting Type'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.2b3c4d5e6f1a].[none:MEETING_TYPE:nk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{AD5E6F1A-2B3C-4D5E-6F1A-2B3C4D5E6F1A}' />
+    </window>
+    <window class='worksheet' name='Average Resolution Time Trend'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{BE6F1A2B-3C4D-5E6F-1A2B-3C4D5E6F1A2B}' />
+    </window>
+    <window class='worksheet' name='Support KPIs Dashboard'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{CF1A2B3C-4D5E-6F1A-2B3C-4D5E6F1A2B3C}' />
+    </window>
+  </windows>
+</workbook>
