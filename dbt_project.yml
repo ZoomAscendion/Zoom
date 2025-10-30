@@ -1,8 +1,8 @@
-name: 'zoom_analytics_silver'
+name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_analytics_silver'
+profile: 'zoom_silver_pipeline'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,14 +17,8 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_analytics_silver:
-    bronze:
-      +materialized: table
+  zoom_silver_pipeline:
     silver:
       +materialized: incremental
       +on_schema_change: sync_all_columns
       +unique_key: "{{ var('unique_key', 'id') }}"
-
-vars:
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
