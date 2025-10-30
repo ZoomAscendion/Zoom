@@ -187,3 +187,22 @@ models:
         description: "Overall data quality score for the record"
         tests:
           - not_null
+
+  - name: si_data_quality_errors
+    description: "Table to store data validation errors and quality issues"
+    columns:
+      - name: error_id
+        description: "Unique identifier for each data quality error"
+        tests:
+          - not_null
+          - unique
+      - name: source_table
+        description: "Name of the source table where error was detected"
+        tests:
+          - not_null
+      - name: error_type
+        description: "Type of error detected"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Missing Value', 'Invalid Format', 'Constraint Violation', 'Duplicate']
