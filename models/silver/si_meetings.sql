@@ -96,14 +96,14 @@ final_meetings AS (
         load_timestamp,
         update_timestamp,
         source_system,
-        -- Calculate data quality score
-        ROUND(
+        -- Calculate data quality score with proper precision
+        CAST(ROUND(
             (CASE WHEN meeting_id IS NOT NULL THEN 0.2 ELSE 0 END +
              CASE WHEN host_id IS NOT NULL THEN 0.2 ELSE 0 END +
              CASE WHEN meeting_topic != 'Untitled Meeting' THEN 0.2 ELSE 0 END +
              CASE WHEN start_time IS NOT NULL AND end_time IS NOT NULL THEN 0.2 ELSE 0 END +
              CASE WHEN duration_minutes > 0 THEN 0.2 ELSE 0 END), 2
-        ) AS data_quality_score,
+        ) AS NUMBER(3,2)) AS data_quality_score,
         DATE(load_timestamp) AS load_date,
         DATE(update_timestamp) AS update_date
     FROM validated_meetings
