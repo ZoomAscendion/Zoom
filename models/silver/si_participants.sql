@@ -8,7 +8,7 @@
             source_tables_processed, target_tables_updated, load_date, update_date
         ) 
         SELECT 
-            '{{ invocation_id }}_participants' as execution_id,
+            LEFT('{{ invocation_id }}_participants', 500) as execution_id,
             'si_participants_pipeline' as pipeline_name,
             CURRENT_TIMESTAMP() as start_time,
             'RUNNING' as status,
@@ -27,7 +27,7 @@
             status = 'SUCCESS',
             records_processed = (SELECT COUNT(*) FROM {{ this }}),
             execution_duration_seconds = DATEDIFF('second', start_time, CURRENT_TIMESTAMP())
-        WHERE execution_id = '{{ invocation_id }}_participants'
+        WHERE execution_id = LEFT('{{ invocation_id }}_participants', 500)
     "
 ) }}
 
@@ -80,13 +80,13 @@ cleansed_participants AS (
         bp.LOAD_TIMESTAMP as load_timestamp,
         bp.UPDATE_TIMESTAMP as update_timestamp,
         bp.SOURCE_SYSTEM as source_system,
-        -- Calculate data quality score
-        (
+        -- Calculate data quality score with proper decimal precision
+        CAST((
             CASE WHEN bp.PARTICIPANT_ID IS NOT NULL AND TRIM(bp.PARTICIPANT_ID) != '' THEN 0.25 ELSE 0 END +
             CASE WHEN bp.MEETING_ID IS NOT NULL AND TRIM(bp.MEETING_ID) != '' THEN 0.25 ELSE 0 END +
             CASE WHEN bp.USER_ID IS NOT NULL AND TRIM(bp.USER_ID) != '' THEN 0.25 ELSE 0 END +
             CASE WHEN bp.JOIN_TIME IS NOT NULL THEN 0.25 ELSE 0 END
-        ) as data_quality_score,
+        ) AS NUMBER(3,2)) as data_quality_score,
         CURRENT_DATE() as load_date,
         CURRENT_DATE() as update_date
     FROM bronze_participants bp
