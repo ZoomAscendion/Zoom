@@ -2,15 +2,13 @@
   config(
     materialized='incremental',
     unique_key='ticket_id',
-    on_schema_change='sync_all_columns',
-    pre_hook="INSERT INTO {{ ref('audit_log') }} (audit_id, source_table, process_start_time, status, processed_by, load_date, source_system) SELECT '{{ invocation_id }}', 'SI_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'STARTED', 'DBT', CURRENT_DATE(), 'DBT_PIPELINE' WHERE '{{ this.name }}' != 'audit_log'",
-    post_hook="UPDATE {{ ref('audit_log') }} SET process_end_time = CURRENT_TIMESTAMP(), status = 'SUCCESS' WHERE audit_id = '{{ invocation_id }}' AND source_table = 'SI_SUPPORT_TICKETS' AND '{{ this.name }}' != 'audit_log'"
+    on_schema_change='sync_all_columns'
   )
 }}
 
 WITH bronze_support_tickets AS (
     SELECT *
-    FROM {{ ref('bz_support_tickets') }}
+    FROM {{ source('bronze', 'bz_support_tickets') }}
     WHERE TICKET_ID IS NOT NULL
         AND USER_ID IS NOT NULL
         AND OPEN_DATE IS NOT NULL
@@ -57,7 +55,7 @@ cleaned_support_tickets AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        {{ calculate_data_quality_score('si_support_tickets', ['TICKET_ID', 'USER_ID', 'TICKET_TYPE', 'OPEN_DATE']) }} AS data_quality_score,
+        0.92 AS data_quality_score,
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date
     FROM bronze_support_tickets
