@@ -38,7 +38,7 @@ cleaned_participants AS (
         bp.LOAD_TIMESTAMP,
         bp.UPDATE_TIMESTAMP,
         bp.SOURCE_SYSTEM,
-        0.90 AS data_quality_score,
+        CAST(0.90 AS NUMBER(3,2)) AS data_quality_score,
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date
     FROM bronze_participants bp
