@@ -64,7 +64,7 @@ transformed_support_tickets AS (
         END AS priority_level,
         OPEN_DATE AS open_date,
         CASE 
-            WHEN RESOLUTION_STATUS IN ('Resolved', 'Closed') THEN DATEADD('day', FLOOR(RANDOM() * 7) + 1, OPEN_DATE)
+            WHEN RESOLUTION_STATUS IN ('Resolved', 'Closed') THEN DATEADD('day', (ABS(HASH(TICKET_ID)) % 7) + 1, OPEN_DATE)
             ELSE NULL
         END AS close_date,
         CASE 
@@ -78,7 +78,7 @@ transformed_support_tickets AS (
         END AS resolution_notes,
         CASE 
             WHEN RESOLUTION_STATUS IN ('Resolved', 'Closed') 
-            THEN DATEDIFF('hour', OPEN_DATE, DATEADD('day', FLOOR(RANDOM() * 7) + 1, OPEN_DATE))
+            THEN DATEDIFF('hour', OPEN_DATE, DATEADD('day', (ABS(HASH(TICKET_ID)) % 7) + 1, OPEN_DATE))
             ELSE NULL
         END AS resolution_time_hours,
         LOAD_TIMESTAMP AS load_timestamp,
