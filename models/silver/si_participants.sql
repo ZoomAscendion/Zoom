@@ -1,34 +1,7 @@
 {{ config(
-    materialized='incremental',
-    unique_key='participant_id',
+    materialized='table',
     on_schema_change='sync_all_columns',
-    pre_hook="
-        INSERT INTO {{ this.database }}.{{ this.schema }}.si_pipeline_audit (
-            execution_id, pipeline_name, start_time, status, executed_by, execution_environment, source_system,
-            source_tables_processed, target_tables_updated, load_date, update_date
-        ) 
-        SELECT 
-            LEFT('{{ invocation_id }}_participants', 500) as execution_id,
-            'si_participants_pipeline' as pipeline_name,
-            CURRENT_TIMESTAMP() as start_time,
-            'RUNNING' as status,
-            CURRENT_USER() as executed_by,
-            'PROD' as execution_environment,
-            'DBT_SILVER_PIPELINE' as source_system,
-            'BZ_PARTICIPANTS' as source_tables_processed,
-            'SI_PARTICIPANTS' as target_tables_updated,
-            CURRENT_DATE() as load_date,
-            CURRENT_DATE() as update_date
-    ",
-    post_hook="
-        UPDATE {{ this.database }}.{{ this.schema }}.si_pipeline_audit 
-        SET 
-            end_time = CURRENT_TIMESTAMP(),
-            status = 'SUCCESS',
-            records_processed = (SELECT COUNT(*) FROM {{ this }}),
-            execution_duration_seconds = DATEDIFF('second', start_time, CURRENT_TIMESTAMP())
-        WHERE execution_id = LEFT('{{ invocation_id }}_participants', 500)
-    "
+    pre_hook="DROP TABLE IF EXISTS {{ this }}"
 ) }}
 
 -- Silver layer transformation for participants with comprehensive data quality checks
@@ -53,10 +26,6 @@ WITH bronze_participants AS (
     AND bp.MEETING_ID IS NOT NULL
     AND bp.USER_ID IS NOT NULL
     AND bp.JOIN_TIME IS NOT NULL
-    
-    {% if is_incremental() %}
-        AND bp.UPDATE_TIMESTAMP > (SELECT MAX(update_timestamp) FROM {{ this }})
-    {% endif %}
 ),
 
 -- Data quality validation and cleansing
