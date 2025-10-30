@@ -1,13 +1,13 @@
 {{ config(
-    materialized='incremental',
-    unique_key='error_id',
-    on_schema_change='sync_all_columns'
+    materialized='table',
+    on_schema_change='sync_all_columns',
+    pre_hook="DROP TABLE IF EXISTS {{ this }}"
 ) }}
 
 -- Data Quality Errors tracking table
 WITH error_records AS (
     SELECT 
-        {{ dbt_utils.generate_surrogate_key(['source_table', 'source_record_id', 'error_type']) }} as error_id,
+        'SAMPLE_ERROR_001' as error_id,
         'SAMPLE_TABLE' as source_table,
         'SAMPLE_RECORD' as source_record_id,
         'Missing Value' as error_type,
@@ -42,7 +42,3 @@ SELECT
     update_date,
     source_system
 FROM error_records
-
-{% if is_incremental() %}
-    WHERE detected_timestamp > (SELECT MAX(detected_timestamp) FROM {{ this }})
-{% endif %}
