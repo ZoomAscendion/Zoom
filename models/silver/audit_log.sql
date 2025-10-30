@@ -44,7 +44,7 @@ WITH audit_records AS (
     FROM {{ source('bronze', 'bz_audit_records') }}
     WHERE 1=1
     {% if is_incremental() %}
-        AND load_timestamp > (SELECT COALESCE(MAX(start_time), '1900-01-01') FROM {{ this }})
+        AND load_timestamp > (SELECT COALESCE(MAX(load_timestamp), '1900-01-01') FROM {{ this }})
     {% endif %}
 )
 
