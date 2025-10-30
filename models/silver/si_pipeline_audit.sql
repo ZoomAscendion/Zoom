@@ -1,6 +1,7 @@
 {{ config(
     materialized='table',
-    on_schema_change='sync_all_columns'
+    on_schema_change='sync_all_columns',
+    pre_hook="DROP TABLE IF EXISTS {{ this }}"
 ) }}
 
 -- Create the audit log table structure first
