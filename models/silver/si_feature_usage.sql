@@ -1,15 +1,37 @@
-{{
-    config(
-        materialized='incremental',
-        unique_key='usage_id',
-        on_schema_change='sync_all_columns'
-    )
-}}
+{{ config(
+    materialized='incremental',
+    unique_key='usage_id',
+    on_schema_change='sync_all_columns',
+    pre_hook="
+        INSERT INTO {{ this.database }}.{{ this.schema }}.si_pipeline_audit (
+            execution_id, pipeline_name, start_time, status, executed_by, execution_environment, source_system,
+            source_tables_processed, target_tables_updated, load_date, update_date
+        ) 
+        SELECT 
+            '{{ invocation_id }}_feature_usage' as execution_id,
+            'si_feature_usage_pipeline' as pipeline_name,
+            CURRENT_TIMESTAMP() as start_time,
+            'RUNNING' as status,
+            CURRENT_USER() as executed_by,
+            'PROD' as execution_environment,
+            'DBT_SILVER_PIPELINE' as source_system,
+            'BZ_FEATURE_USAGE' as source_tables_processed,
+            'SI_FEATURE_USAGE' as target_tables_updated,
+            CURRENT_DATE() as load_date,
+            CURRENT_DATE() as update_date
+    ",
+    post_hook="
+        UPDATE {{ this.database }}.{{ this.schema }}.si_pipeline_audit 
+        SET 
+            end_time = CURRENT_TIMESTAMP(),
+            status = 'SUCCESS',
+            records_processed = (SELECT COUNT(*) FROM {{ this }}),
+            execution_duration_seconds = DATEDIFF('second', start_time, CURRENT_TIMESTAMP())
+        WHERE execution_id = '{{ invocation_id }}_feature_usage'
+    "
+) }}
 
--- Silver Layer Feature Usage Transformation
--- Source: Bronze.BZ_FEATURE_USAGE
--- Target: Silver.SI_FEATURE_USAGE
-
+-- Silver layer transformation for feature usage with comprehensive data quality checks
 WITH bronze_feature_usage AS (
     SELECT 
         USAGE_ID,
@@ -19,59 +41,55 @@ WITH bronze_feature_usage AS (
         USAGE_DATE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
+        SOURCE_SYSTEM,
+        -- Add row number for deduplication
+        ROW_NUMBER() OVER (
+            PARTITION BY USAGE_ID 
+            ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC
+        ) as rn
     FROM {{ source('bronze', 'bz_feature_usage') }}
-    WHERE USAGE_ID IS NOT NULL
+    WHERE USAGE_ID IS NOT NULL 
+    AND TRIM(USAGE_ID) != ''
+    AND MEETING_ID IS NOT NULL
+    AND FEATURE_NAME IS NOT NULL
     
     {% if is_incremental() %}
         AND UPDATE_TIMESTAMP > (SELECT MAX(update_timestamp) FROM {{ this }})
     {% endif %}
 ),
 
--- Data Quality and Transformation Layer
-data_quality_checks AS (
+-- Data quality validation and cleansing
+cleansed_feature_usage AS (
     SELECT 
-        *,
-        -- Data Quality Score Calculation
+        TRIM(USAGE_ID) as usage_id,
+        TRIM(MEETING_ID) as meeting_id,
+        TRIM(FEATURE_NAME) as feature_name,
+        GREATEST(USAGE_COUNT, 0) as usage_count,
+        GREATEST(USAGE_COUNT * 5, 0) as usage_duration,  -- Estimated duration
         CASE 
-            WHEN USAGE_ID IS NULL THEN 0.0
-            WHEN MEETING_ID IS NULL OR FEATURE_NAME IS NULL THEN 0.3
-            WHEN USAGE_COUNT < 0 THEN 0.4
-            WHEN USAGE_DATE IS NULL OR USAGE_DATE > CURRENT_DATE() THEN 0.5
-            ELSE 1.0
-        END AS data_quality_score,
-        
-        -- Row Number for Deduplication
-        ROW_NUMBER() OVER (PARTITION BY USAGE_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+            WHEN UPPER(FEATURE_NAME) LIKE '%AUDIO%' OR UPPER(FEATURE_NAME) LIKE '%MIC%' THEN 'Audio'
+            WHEN UPPER(FEATURE_NAME) LIKE '%VIDEO%' OR UPPER(FEATURE_NAME) LIKE '%CAMERA%' THEN 'Video'
+            WHEN UPPER(FEATURE_NAME) LIKE '%SHARE%' OR UPPER(FEATURE_NAME) LIKE '%CHAT%' THEN 'Collaboration'
+            WHEN UPPER(FEATURE_NAME) LIKE '%SECURITY%' OR UPPER(FEATURE_NAME) LIKE '%PASSWORD%' THEN 'Security'
+            ELSE 'Collaboration'
+        END as feature_category,
+        USAGE_DATE as usage_date,
+        LOAD_TIMESTAMP as load_timestamp,
+        UPDATE_TIMESTAMP as update_timestamp,
+        SOURCE_SYSTEM as source_system,
+        -- Calculate data quality score
+        (
+            CASE WHEN USAGE_ID IS NOT NULL AND TRIM(USAGE_ID) != '' THEN 0.25 ELSE 0 END +
+            CASE WHEN MEETING_ID IS NOT NULL AND TRIM(MEETING_ID) != '' THEN 0.25 ELSE 0 END +
+            CASE WHEN FEATURE_NAME IS NOT NULL AND TRIM(FEATURE_NAME) != '' THEN 0.25 ELSE 0 END +
+            CASE WHEN USAGE_COUNT >= 0 THEN 0.25 ELSE 0 END
+        ) as data_quality_score,
+        CURRENT_DATE() as load_date,
+        CURRENT_DATE() as update_date
     FROM bronze_feature_usage
-),
-
--- Final Transformation
-transformed_feature_usage AS (
-    SELECT 
-        TRIM(USAGE_ID) AS usage_id,
-        TRIM(MEETING_ID) AS meeting_id,
-        TRIM(UPPER(FEATURE_NAME)) AS feature_name,
-        GREATEST(0, COALESCE(USAGE_COUNT, 0)) AS usage_count,
-        COALESCE(USAGE_COUNT * 5, 0) AS usage_duration,  -- Estimated 5 minutes per usage
-        CASE 
-            WHEN UPPER(FEATURE_NAME) LIKE '%AUDIO%' OR UPPER(FEATURE_NAME) LIKE '%MIC%' OR UPPER(FEATURE_NAME) LIKE '%SOUND%' THEN 'Audio'
-            WHEN UPPER(FEATURE_NAME) LIKE '%VIDEO%' OR UPPER(FEATURE_NAME) LIKE '%CAMERA%' OR UPPER(FEATURE_NAME) LIKE '%SCREEN%' THEN 'Video'
-            WHEN UPPER(FEATURE_NAME) LIKE '%CHAT%' OR UPPER(FEATURE_NAME) LIKE '%SHARE%' OR UPPER(FEATURE_NAME) LIKE '%WHITEBOARD%' THEN 'Collaboration'
-            WHEN UPPER(FEATURE_NAME) LIKE '%SECURITY%' OR UPPER(FEATURE_NAME) LIKE '%PASSWORD%' OR UPPER(FEATURE_NAME) LIKE '%LOCK%' THEN 'Security'
-            ELSE 'Other'
-        END AS feature_category,
-        USAGE_DATE AS usage_date,
-        LOAD_TIMESTAMP AS load_timestamp,
-        UPDATE_TIMESTAMP AS update_timestamp,
-        SOURCE_SYSTEM AS source_system,
-        data_quality_score,
-        DATE(LOAD_TIMESTAMP) AS load_date,
-        DATE(UPDATE_TIMESTAMP) AS update_date
-    FROM data_quality_checks
-    WHERE rn = 1  -- Remove duplicates
-        AND data_quality_score > 0.0  -- Remove records with critical quality issues
-        AND USAGE_COUNT >= 0
+    WHERE rn = 1
+    AND USAGE_COUNT >= 0
+    AND USAGE_DATE <= CURRENT_DATE()
 )
 
 SELECT 
@@ -88,4 +106,5 @@ SELECT
     data_quality_score,
     load_date,
     update_date
-FROM transformed_feature_usage
+FROM cleansed_feature_usage
+WHERE data_quality_score >= 0.75  -- Only accept high quality records
