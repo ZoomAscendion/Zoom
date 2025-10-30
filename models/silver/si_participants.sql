@@ -49,7 +49,10 @@ validated_participants AS (
         p.meeting_id,
         p.user_id,
         p.join_time,
-        COALESCE(p.leave_time, CURRENT_TIMESTAMP()) AS leave_time,
+        CASE 
+            WHEN p.leave_time IS NOT NULL THEN p.leave_time::TIMESTAMP_NTZ
+            ELSE CURRENT_TIMESTAMP()::TIMESTAMP_NTZ
+        END AS leave_time,
         CASE 
             WHEN p.leave_time IS NOT NULL 
             THEN DATEDIFF('minute', p.join_time, p.leave_time)
