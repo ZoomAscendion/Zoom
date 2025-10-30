@@ -8,7 +8,7 @@
     pre_hook="
         CREATE TABLE IF NOT EXISTS {{ this }} (
             RECORD_ID NUMBER AUTOINCREMENT,
-            SOURCE_TABLE VARCHAR(255),
+            SOURCE_TABLE VARCHAR(100),
             LOAD_TIMESTAMP TIMESTAMP_NTZ(9),
             PROCESSED_BY VARCHAR(50),
             PROCESSING_TIME NUMBER(10,3),
@@ -24,7 +24,7 @@
 -- The actual table is created via pre-hook to ensure it exists before other models run
 SELECT 
     1 as RECORD_ID,
-    'AUDIT_LOG_INIT' as SOURCE_TABLE,
+    'AUDIT_INIT' as SOURCE_TABLE,
     CURRENT_TIMESTAMP() as LOAD_TIMESTAMP,
     'DBT_SYS' as PROCESSED_BY,
     0.001 as PROCESSING_TIME,
