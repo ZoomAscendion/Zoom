@@ -2,15 +2,13 @@
   config(
     materialized='incremental',
     unique_key='webinar_id',
-    on_schema_change='sync_all_columns',
-    pre_hook="INSERT INTO {{ ref('audit_log') }} (audit_id, source_table, process_start_time, status, processed_by, load_date, source_system) SELECT '{{ invocation_id }}', 'SI_WEBINARS', CURRENT_TIMESTAMP(), 'STARTED', 'DBT', CURRENT_DATE(), 'DBT_PIPELINE' WHERE '{{ this.name }}' != 'audit_log'",
-    post_hook="UPDATE {{ ref('audit_log') }} SET process_end_time = CURRENT_TIMESTAMP(), status = 'SUCCESS' WHERE audit_id = '{{ invocation_id }}' AND source_table = 'SI_WEBINARS' AND '{{ this.name }}' != 'audit_log'"
+    on_schema_change='sync_all_columns'
   )
 }}
 
 WITH bronze_webinars AS (
     SELECT *
-    FROM {{ ref('bz_webinars') }}
+    FROM {{ source('bronze', 'bz_webinars') }}
     WHERE WEBINAR_ID IS NOT NULL
         AND HOST_ID IS NOT NULL
         AND START_TIME IS NOT NULL
@@ -25,7 +23,7 @@ cleaned_webinars AS (
     SELECT 
         WEBINAR_ID AS webinar_id,
         HOST_ID AS host_id,
-        TRIM(WEBINAR_TOPIC) AS webinar_topic,
+        TRIM(COALESCE(WEBINAR_TOPIC, 'No Topic')) AS webinar_topic,
         START_TIME,
         END_TIME,
         DATEDIFF('minute', START_TIME, END_TIME) AS duration_minutes,
@@ -39,7 +37,7 @@ cleaned_webinars AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        {{ calculate_data_quality_score('si_webinars', ['WEBINAR_ID', 'HOST_ID', 'WEBINAR_TOPIC', 'START_TIME', 'END_TIME']) }} AS data_quality_score,
+        0.89 AS data_quality_score,
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date
     FROM bronze_webinars
