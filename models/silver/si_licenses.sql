@@ -34,14 +34,16 @@ cleaned_licenses AS (
             ELSE 'SUSPENDED'
         END AS license_status,
         COALESCE(u.user_name, 'Unassigned') AS assigned_user_name,
-        CASE 
-            WHEN UPPER(bl.LICENSE_TYPE) = 'BASIC' THEN 10.00
-            WHEN UPPER(bl.LICENSE_TYPE) = 'PRO' THEN 20.00
-            WHEN UPPER(bl.LICENSE_TYPE) = 'ENTERPRISE' THEN 50.00
-            ELSE 5.00
-        END AS license_cost,
+        CAST(
+            CASE 
+                WHEN UPPER(bl.LICENSE_TYPE) = 'BASIC' THEN 10.00
+                WHEN UPPER(bl.LICENSE_TYPE) = 'PRO' THEN 20.00
+                WHEN UPPER(bl.LICENSE_TYPE) = 'ENTERPRISE' THEN 50.00
+                ELSE 5.00
+            END AS NUMBER(10,2)
+        ) AS license_cost,
         'YES' AS renewal_status,
-        75.50 AS utilization_percentage,
+        CAST(75.50 AS NUMBER(5,2)) AS utilization_percentage,
         bl.LOAD_TIMESTAMP,
         bl.UPDATE_TIMESTAMP,
         bl.SOURCE_SYSTEM,
