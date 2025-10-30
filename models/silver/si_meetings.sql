@@ -51,7 +51,7 @@ cleaned_meetings AS (
         bm.LOAD_TIMESTAMP,
         bm.UPDATE_TIMESTAMP,
         bm.SOURCE_SYSTEM,
-        0.85 AS data_quality_score,
+        CAST(0.85 AS NUMBER(3,2)) AS data_quality_score,
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date
     FROM bronze_meetings bm
