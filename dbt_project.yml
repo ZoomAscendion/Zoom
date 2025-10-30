@@ -1,8 +1,8 @@
-name: 'zoom_bronze_pipeline'
+name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_bronze_pipeline'
+profile: 'zoom_silver_pipeline'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -11,12 +11,20 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
 models:
-  zoom_bronze_pipeline:
-    bronze:
-      +materialized: table
-      +on_schema_change: "fail"
+  zoom_silver_pipeline:
+    +materialized: incremental
+    +on_schema_change: sync_all_columns
+    silver:
+      +materialized: incremental
+      +unique_key: "{{ var('unique_key', 'id') }}"
+      +on_schema_change: sync_all_columns
+
+vars:
+  start_date: '2020-01-01'
+  end_date: '2099-12-31'
