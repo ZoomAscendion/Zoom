@@ -3,8 +3,9 @@
     unique_key='meeting_id',
     on_schema_change='sync_all_columns',
     pre_hook="
-        INSERT INTO {{ ref('audit_log') }} (
-            execution_id, pipeline_name, start_time, status, executed_by, execution_environment, source_system
+        INSERT INTO {{ this.database }}.{{ this.schema }}.si_pipeline_audit (
+            execution_id, pipeline_name, start_time, status, executed_by, execution_environment, source_system,
+            source_tables_processed, target_tables_updated, load_date, update_date
         ) 
         SELECT 
             '{{ invocation_id }}_meetings' as execution_id,
@@ -13,10 +14,14 @@
             'RUNNING' as status,
             CURRENT_USER() as executed_by,
             'PROD' as execution_environment,
-            'DBT_SILVER_PIPELINE' as source_system
+            'DBT_SILVER_PIPELINE' as source_system,
+            'BZ_MEETINGS,BZ_PARTICIPANTS' as source_tables_processed,
+            'SI_MEETINGS' as target_tables_updated,
+            CURRENT_DATE() as load_date,
+            CURRENT_DATE() as update_date
     ",
     post_hook="
-        UPDATE {{ ref('audit_log') }}
+        UPDATE {{ this.database }}.{{ this.schema }}.si_pipeline_audit 
         SET 
             end_time = CURRENT_TIMESTAMP(),
             status = 'SUCCESS',
@@ -80,7 +85,7 @@ cleansed_meetings AS (
         bm.START_TIME as start_time,
         bm.END_TIME as end_time,
         GREATEST(DATEDIFF('minute', bm.START_TIME, bm.END_TIME), 0) as duration_minutes,
-        u.user_name as host_name,
+        COALESCE(u.user_name, 'Unknown Host') as host_name,
         CASE 
             WHEN bm.END_TIME < CURRENT_TIMESTAMP() THEN 'Completed'
             WHEN bm.START_TIME <= CURRENT_TIMESTAMP() AND bm.END_TIME >= CURRENT_TIMESTAMP() THEN 'In Progress'
