@@ -4,24 +4,10 @@
 -- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table',
-    pre_hook="
-        CREATE TABLE IF NOT EXISTS {{ this }} (
-            RECORD_ID NUMBER AUTOINCREMENT,
-            SOURCE_TABLE VARCHAR(100),
-            LOAD_TIMESTAMP TIMESTAMP_NTZ(9),
-            PROCESSED_BY VARCHAR(50),
-            PROCESSING_TIME NUMBER(10,3),
-            STATUS VARCHAR(50),
-            RECORD_COUNT NUMBER(38,0),
-            ERROR_MESSAGE VARCHAR(16777216),
-            CREATED_TIMESTAMP TIMESTAMP_NTZ(9) DEFAULT CURRENT_TIMESTAMP()
-        )
-    "
+    materialized='table'
 ) }}
 
--- This model creates the audit log structure
--- The actual table is created via pre-hook to ensure it exists before other models run
+-- Create audit log for tracking bronze layer data processing
 SELECT 
     1 as RECORD_ID,
     'AUDIT_INIT' as SOURCE_TABLE,
@@ -32,4 +18,4 @@ SELECT
     0 as RECORD_COUNT,
     NULL as ERROR_MESSAGE,
     CURRENT_TIMESTAMP() as CREATED_TIMESTAMP
-WHERE FALSE -- This ensures no actual data is inserted, just structure creation
+WHERE 1=0 -- Empty table for structure
