@@ -79,8 +79,8 @@ final_webinars AS (
         attendees,
         CASE 
             WHEN registrants > 0 
-            THEN ROUND((attendees::FLOAT / registrants * 100), 2)
-            ELSE 0.00
+            THEN CAST(ROUND((attendees::FLOAT / registrants * 100), 2) AS NUMBER(5,2))
+            ELSE CAST(0.00 AS NUMBER(5,2))
         END AS attendance_rate,
         load_timestamp,
         update_timestamp,
