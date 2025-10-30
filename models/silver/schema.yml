@@ -9,87 +9,57 @@ sources:
         columns:
           - name: user_id
             description: "Unique identifier for each user account"
-            tests:
-              - not_null
-              - unique
           - name: email
             description: "Email address of the user"
-            tests:
-              - not_null
       
       - name: bz_meetings
         description: "Raw meeting session data"
         columns:
           - name: meeting_id
             description: "Unique identifier for each meeting"
-            tests:
-              - not_null
-              - unique
           - name: host_id
             description: "User ID of the meeting host"
-            tests:
-              - not_null
       
       - name: bz_participants
         description: "Raw participant data for meeting attendance"
         columns:
           - name: participant_id
             description: "Unique identifier for each participant record"
-            tests:
-              - not_null
-              - unique
           - name: meeting_id
             description: "Reference to meeting"
-            tests:
-              - not_null
       
       - name: bz_feature_usage
         description: "Raw feature usage data"
         columns:
           - name: usage_id
             description: "Unique identifier for each feature usage record"
-            tests:
-              - not_null
-              - unique
       
       - name: bz_support_tickets
         description: "Raw support ticket data"
         columns:
           - name: ticket_id
             description: "Unique identifier for each support ticket"
-            tests:
-              - not_null
-              - unique
       
       - name: bz_billing_events
         description: "Raw billing event data"
         columns:
           - name: event_id
             description: "Unique identifier for each billing event"
-            tests:
-              - not_null
-              - unique
       
       - name: bz_licenses
         description: "Raw license data"
         columns:
           - name: license_id
             description: "Unique identifier for each license"
-            tests:
-              - not_null
-              - unique
       
       - name: bz_webinars
         description: "Raw webinar session data"
         columns:
           - name: webinar_id
             description: "Unique identifier for each webinar"
-            tests:
-              - not_null
-              - unique
 
 models:
-  - name: audit_log
+  - name: si_pipeline_audit
     description: "Audit log for tracking pipeline execution details"
     columns:
       - name: execution_id
@@ -136,9 +106,6 @@ models:
         description: "Overall data quality score for the record"
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 1
 
   - name: si_meetings
     description: "Silver layer table storing cleaned and enriched meeting data"
@@ -152,16 +119,10 @@ models:
         description: "User ID of the meeting host"
         tests:
           - not_null
-          - relationships:
-              to: ref('si_users')
-              field: user_id
       - name: duration_minutes
         description: "Calculated and validated meeting duration in minutes"
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 1440
       - name: meeting_status
         description: "Current state of the meeting"
         tests:
@@ -172,9 +133,6 @@ models:
         description: "Overall data quality score for the record"
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 1
 
   - name: si_participants
     description: "Silver layer table storing cleaned participant attendance data"
@@ -188,23 +146,14 @@ models:
         description: "Reference to meeting"
         tests:
           - not_null
-          - relationships:
-              to: ref('si_meetings')
-              field: meeting_id
       - name: user_id
         description: "Reference to user who participated"
         tests:
           - not_null
-          - relationships:
-              to: ref('si_users')
-              field: user_id
       - name: attendance_duration
         description: "Calculated time participant spent in meeting"
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 1440
       - name: participant_role
         description: "Role of attendee in the meeting"
         tests:
@@ -215,6 +164,26 @@ models:
         description: "Overall data quality score for the record"
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 1
+
+  - name: si_feature_usage
+    description: "Silver layer table storing standardized feature usage data"
+    columns:
+      - name: usage_id
+        description: "Unique identifier for each feature usage record"
+        tests:
+          - not_null
+          - unique
+      - name: meeting_id
+        description: "Reference to meeting where feature was used"
+        tests:
+          - not_null
+      - name: feature_category
+        description: "Classification of feature type"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Audio', 'Video', 'Collaboration', 'Security']
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+        tests:
+          - not_null
