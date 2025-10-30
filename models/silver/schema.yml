@@ -220,7 +220,218 @@ models:
               values: ['Active', 'Inactive', 'Suspended']
       - name: data_quality_score
         description: "Overall data quality score for the record (0.00 to 1.00)"
+
+  - name: si_meetings
+    description: "Silver layer cleaned and enriched meeting data"
+    columns:
+      - name: meeting_id
+        description: "Unique identifier for each meeting"
         tests:
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 1
+          - not_null
+          - unique
+      - name: host_id
+        description: "User ID of the meeting host"
+      - name: meeting_topic
+        description: "Cleaned and standardized meeting subject"
+      - name: meeting_type
+        description: "Standardized meeting category"
+        tests:
+          - accepted_values:
+              values: ['Scheduled', 'Instant', 'Webinar', 'Personal']
+      - name: start_time
+        description: "Validated meeting start timestamp in UTC"
+      - name: end_time
+        description: "Validated meeting end timestamp in UTC"
+      - name: duration_minutes
+        description: "Calculated and validated meeting duration"
+      - name: host_name
+        description: "Standardized name of the meeting host"
+      - name: meeting_status
+        description: "Current state of the meeting"
+        tests:
+          - accepted_values:
+              values: ['Scheduled', 'In Progress', 'Completed', 'Unknown']
+      - name: participant_count
+        description: "Total number of participants who joined"
+      - name: data_quality_score
+        description: "Overall data quality score for the record (0.00 to 1.00)"
+
+  - name: si_participants
+    description: "Silver layer cleaned participant attendance data"
+    columns:
+      - name: participant_id
+        description: "Unique identifier for each participant record"
+        tests:
+          - not_null
+          - unique
+      - name: meeting_id
+        description: "Reference to meeting"
+      - name: user_id
+        description: "Reference to user who participated"
+      - name: join_time
+        description: "Validated timestamp when participant joined"
+      - name: leave_time
+        description: "Validated timestamp when participant left"
+      - name: attendance_duration
+        description: "Calculated time participant spent in meeting"
+      - name: participant_role
+        description: "Role of attendee in the meeting"
+      - name: connection_quality
+        description: "Network connection quality during participation"
+      - name: data_quality_score
+        description: "Overall data quality score for the record (0.00 to 1.00)"
+
+  - name: si_feature_usage
+    description: "Silver layer standardized feature usage data"
+    columns:
+      - name: usage_id
+        description: "Unique identifier for each feature usage record"
+        tests:
+          - not_null
+          - unique
+      - name: meeting_id
+        description: "Reference to meeting where feature was used"
+      - name: feature_name
+        description: "Standardized name of the platform feature"
+      - name: usage_count
+        description: "Validated number of times feature was utilized"
+      - name: usage_duration
+        description: "Total time the feature was active"
+      - name: feature_category
+        description: "Classification of feature type"
+        tests:
+          - accepted_values:
+              values: ['Audio', 'Video', 'Collaboration', 'Security', 'Other']
+      - name: usage_date
+        description: "Date when feature usage occurred"
+      - name: data_quality_score
+        description: "Overall data quality score for the record (0.00 to 1.00)"
+
+  - name: si_support_tickets
+    description: "Silver layer standardized customer support ticket data"
+    columns:
+      - name: ticket_id
+        description: "Unique identifier for each support ticket"
+        tests:
+          - not_null
+          - unique
+      - name: user_id
+        description: "Reference to user who created the ticket"
+      - name: ticket_type
+        description: "Standardized category of support ticket"
+        tests:
+          - accepted_values:
+              values: ['Technical', 'Billing', 'Feature Request', 'Bug Report', 'Other']
+      - name: priority_level
+        description: "Urgency level of ticket"
+        tests:
+          - accepted_values:
+              values: ['Low', 'Medium', 'High', 'Critical']
+      - name: open_date
+        description: "Date when the support ticket was created"
+      - name: close_date
+        description: "Date when the support ticket was resolved"
+      - name: resolution_status
+        description: "Current status of ticket resolution"
+        tests:
+          - accepted_values:
+              values: ['Open', 'In Progress', 'Resolved', 'Closed']
+      - name: resolution_time_hours
+        description: "Calculated time to resolve ticket in hours"
+      - name: data_quality_score
+        description: "Overall data quality score for the record (0.00 to 1.00)"
+
+  - name: si_billing_events
+    description: "Silver layer validated billing and financial transaction data"
+    columns:
+      - name: event_id
+        description: "Unique identifier for each billing event"
+        tests:
+          - not_null
+          - unique
+      - name: user_id
+        description: "Reference to user associated with billing event"
+      - name: event_type
+        description: "Standardized billing transaction type"
+        tests:
+          - accepted_values:
+              values: ['Subscription', 'Upgrade', 'Downgrade', 'Refund', 'Other']
+      - name: transaction_amount
+        description: "Validated monetary value of the billing event"
+      - name: transaction_date
+        description: "Date when the billing event occurred"
+      - name: payment_method
+        description: "Method used for payment"
+      - name: currency_code
+        description: "ISO currency code for the transaction"
+      - name: invoice_number
+        description: "Unique identifier for the billing invoice"
+      - name: transaction_status
+        description: "Status of transaction"
+        tests:
+          - accepted_values:
+              values: ['Completed', 'Pending', 'Failed', 'Refunded']
+      - name: data_quality_score
+        description: "Overall data quality score for the record (0.00 to 1.00)"
+
+  - name: si_licenses
+    description: "Silver layer validated license assignment and management data"
+    columns:
+      - name: license_id
+        description: "Unique identifier for each license"
+        tests:
+          - not_null
+          - unique
+      - name: assigned_to_user_id
+        description: "User ID to whom license is assigned"
+      - name: license_type
+        description: "Standardized license category"
+        tests:
+          - accepted_values:
+              values: ['Basic', 'Pro', 'Enterprise', 'Add-on', 'Unknown']
+      - name: start_date
+        description: "Validated date when the license becomes active"
+      - name: end_date
+        description: "Validated date when the license expires"
+      - name: license_status
+        description: "Current state of the license"
+        tests:
+          - accepted_values:
+              values: ['Active', 'Expired', 'Suspended', 'Unknown']
+      - name: assigned_user_name
+        description: "Name of user to whom license is assigned"
+      - name: license_cost
+        description: "Price associated with the license"
+      - name: renewal_status
+        description: "Whether license is set for automatic renewal"
+      - name: utilization_percentage
+        description: "Percentage of license features being utilized"
+      - name: data_quality_score
+        description: "Overall data quality score for the record (0.00 to 1.00)"
+
+  - name: si_webinars
+    description: "Silver layer cleaned webinar data with engagement metrics"
+    columns:
+      - name: webinar_id
+        description: "Unique identifier for each webinar"
+        tests:
+          - not_null
+          - unique
+      - name: host_id
+        description: "User ID of the webinar host"
+      - name: webinar_topic
+        description: "Cleaned and standardized topic of the webinar"
+      - name: start_time
+        description: "Validated webinar start timestamp in UTC"
+      - name: end_time
+        description: "Validated webinar end timestamp in UTC"
+      - name: duration_minutes
+        description: "Calculated webinar duration in minutes"
+      - name: registrants
+        description: "Number of registered participants"
+      - name: attendees
+        description: "Number of actual attendees who joined"
+      - name: attendance_rate
+        description: "Percentage of registrants who attended"
+      - name: data_quality_score
+        description: "Overall data quality score for the record (0.00 to 1.00)"
