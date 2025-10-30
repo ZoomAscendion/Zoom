@@ -31,8 +31,8 @@ cleaned_webinars AS (
         GREATEST(0, REGISTRANTS - FLOOR(REGISTRANTS * 0.2)) AS attendees,
         CASE 
             WHEN REGISTRANTS > 0 
-            THEN ROUND((GREATEST(0, REGISTRANTS - FLOOR(REGISTRANTS * 0.2)) / REGISTRANTS::FLOAT) * 100, 2)
-            ELSE 0
+            THEN ROUND((GREATEST(0, REGISTRANTS - FLOOR(REGISTRANTS * 0.2)) * 100.0 / REGISTRANTS), 2)
+            ELSE 0.0
         END AS attendance_rate,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
