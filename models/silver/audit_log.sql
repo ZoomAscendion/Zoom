@@ -1,11 +1,15 @@
 {{ config(
-    materialized='incremental',
-    unique_key='execution_id',
+    materialized='table',
     on_schema_change='sync_all_columns'
 ) }}
 
 -- Audit log table for tracking pipeline execution
-WITH audit_records AS (
+WITH max_timestamp AS (
+    SELECT COALESCE(MAX(load_timestamp), '1900-01-01'::timestamp) as max_ts
+    FROM {{ source('bronze', 'bz_audit_records') }}
+),
+
+audit_records AS (
     SELECT
         {{ dbt_utils.generate_surrogate_key(['record_id', 'source_table', 'load_timestamp']) }} AS execution_id,
         COALESCE(source_table, 'Unknown') AS pipeline_name,
@@ -43,9 +47,6 @@ WITH audit_records AS (
         'Pipeline Audit System' AS source_system
     FROM {{ source('bronze', 'bz_audit_records') }}
     WHERE 1=1
-    {% if is_incremental() %}
-        AND load_timestamp > (SELECT COALESCE(MAX(load_timestamp), '1900-01-01') FROM {{ this }})
-    {% endif %}
 )
 
 SELECT * FROM audit_records
