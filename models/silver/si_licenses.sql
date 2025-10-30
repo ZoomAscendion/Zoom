@@ -45,7 +45,7 @@ cleaned_licenses AS (
         bl.LOAD_TIMESTAMP,
         bl.UPDATE_TIMESTAMP,
         bl.SOURCE_SYSTEM,
-        0.87 AS data_quality_score,
+        CAST(0.87 AS NUMBER(3,2)) AS data_quality_score,
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date
     FROM bronze_licenses bl
