@@ -1,0 +1,142 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: Bronze layer tables containing raw data from Zoom platform
+    tables:
+      - name: bz_users
+        description: Raw user account information
+        columns:
+          - name: user_id
+            description: Unique identifier for each user account
+            tests:
+              - not_null
+              - unique
+          - name: user_name
+            description: Display name of the user
+          - name: email
+            description: Email address of the user
+          - name: company
+            description: Company or organization name
+          - name: plan_type
+            description: Type of subscription plan
+
+      - name: bz_meetings
+        description: Raw meeting session information
+        columns:
+          - name: meeting_id
+            description: Unique identifier for each meeting
+            tests:
+              - not_null
+              - unique
+          - name: host_id
+            description: User ID of the meeting host
+          - name: meeting_topic
+            description: Topic or title of the meeting
+          - name: start_time
+            description: Meeting start timestamp
+          - name: end_time
+            description: Meeting end timestamp
+          - name: duration_minutes
+            description: Meeting duration in minutes
+
+      - name: bz_participants
+        description: Raw meeting participant information
+      - name: bz_feature_usage
+        description: Raw platform feature usage tracking
+      - name: bz_support_tickets
+        description: Raw customer support ticket information
+      - name: bz_billing_events
+        description: Raw billing and financial transaction information
+      - name: bz_licenses
+        description: Raw license management information
+      - name: bz_webinars
+        description: Raw webinar session information
+      - name: bz_audit_records
+        description: Raw audit tracking information
+
+models:
+  - name: audit_log
+    description: Audit log for tracking pipeline execution
+    columns:
+      - name: execution_id
+        description: Unique identifier for each pipeline execution
+        tests:
+          - not_null
+          - unique
+      - name: pipeline_name
+        description: Name of the data pipeline or process
+      - name: start_time
+        description: When the pipeline execution started
+      - name: end_time
+        description: When the pipeline execution completed
+      - name: status
+        description: Status (Success, Failed, Partial Success, Cancelled)
+
+  - name: si_users
+    description: Silver layer cleaned and standardized user data
+    columns:
+      - name: user_id
+        description: Unique identifier for each user account
+        tests:
+          - not_null
+          - unique
+      - name: user_name
+        description: Standardized full name of the registered user
+      - name: email
+        description: Validated and standardized email address
+      - name: company
+        description: Standardized organization or company affiliation
+      - name: plan_type
+        description: Standardized subscription tier
+        tests:
+          - accepted_values:
+              values: ['Free', 'Basic', 'Pro', 'Enterprise', 'Unknown']
+      - name: account_status
+        description: Current status of user account
+        tests:
+          - accepted_values:
+              values: ['Active', 'Inactive', 'Suspended']
+      - name: data_quality_score
+        description: Overall data quality score for the record
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1
+
+  - name: si_meetings
+    description: Silver layer cleaned and enriched meeting data
+    columns:
+      - name: meeting_id
+        description: Unique identifier for each meeting
+        tests:
+          - not_null
+          - unique
+      - name: host_id
+        description: User ID of the meeting host
+        tests:
+          - relationships:
+              to: ref('si_users')
+              field: user_id
+      - name: meeting_type
+        description: Standardized meeting category
+        tests:
+          - accepted_values:
+              values: ['Scheduled', 'Instant', 'Webinar', 'Personal']
+      - name: meeting_status
+        description: Current state of the meeting
+        tests:
+          - accepted_values:
+              values: ['Scheduled', 'In Progress', 'Completed', 'Cancelled', 'Unknown']
+      - name: duration_minutes
+        description: Meeting duration in minutes
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1440
+      - name: data_quality_score
+        description: Overall data quality score for the record
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1
