@@ -7,7 +7,7 @@
 -- Audit log table for tracking all Silver layer processing
 WITH audit_records AS (
     SELECT 
-        {{ dbt_utils.generate_surrogate_key(['"INITIAL_LOAD"', 'CURRENT_TIMESTAMP()']) }} as audit_id,
+        MD5(CONCAT('INITIAL_LOAD', CURRENT_TIMESTAMP()::STRING)) as audit_id,
         CAST('INITIAL_LOAD' AS VARCHAR(255)) as table_name,
         CURRENT_TIMESTAMP() as process_start_time,
         CURRENT_TIMESTAMP() as process_end_time,
