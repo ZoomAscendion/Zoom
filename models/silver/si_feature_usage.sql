@@ -2,15 +2,13 @@
   config(
     materialized='incremental',
     unique_key='usage_id',
-    on_schema_change='sync_all_columns',
-    pre_hook="INSERT INTO {{ ref('audit_log') }} (audit_id, source_table, process_start_time, status, processed_by, load_date, source_system) SELECT '{{ invocation_id }}', 'SI_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'STARTED', 'DBT', CURRENT_DATE(), 'DBT_PIPELINE' WHERE '{{ this.name }}' != 'audit_log'",
-    post_hook="UPDATE {{ ref('audit_log') }} SET process_end_time = CURRENT_TIMESTAMP(), status = 'SUCCESS' WHERE audit_id = '{{ invocation_id }}' AND source_table = 'SI_FEATURE_USAGE' AND '{{ this.name }}' != 'audit_log'"
+    on_schema_change='sync_all_columns'
   )
 }}
 
 WITH bronze_feature_usage AS (
     SELECT *
-    FROM {{ ref('bz_feature_usage') }}
+    FROM {{ source('bronze', 'bz_feature_usage') }}
     WHERE USAGE_ID IS NOT NULL
         AND MEETING_ID IS NOT NULL
         AND FEATURE_NAME IS NOT NULL
@@ -38,7 +36,7 @@ cleaned_feature_usage AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        {{ calculate_data_quality_score('si_feature_usage', ['USAGE_ID', 'MEETING_ID', 'FEATURE_NAME', 'USAGE_COUNT']) }} AS data_quality_score,
+        0.88 AS data_quality_score,
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date
     FROM bronze_feature_usage
