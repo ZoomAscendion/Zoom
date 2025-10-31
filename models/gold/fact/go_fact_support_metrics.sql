@@ -1,6 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['DATE_KEY', 'SUPPORT_CATEGORY_KEY']
+    materialized='table'
 ) }}
 
 -- Support Metrics Fact Table
@@ -14,19 +13,19 @@ WITH support_base AS (
         st.CLOSE_DATE,
         st.RESOLUTION_STATUS,
         st.RESOLUTION_TIME_HOURS,
-        st.DATA_QUALITY_SCORE,
+        COALESCE(st.DATA_QUALITY_SCORE, 1.0) AS DATA_QUALITY_SCORE,
         st.SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_support_tickets') }} st
-    WHERE st.DATA_QUALITY_SCORE >= 0.8
-      AND st.RESOLUTION_STATUS IN ('Resolved', 'Closed')
+    FROM DB_POC_ZOOM.SILVER.SI_SUPPORT_TICKETS st
+    WHERE COALESCE(st.DATA_QUALITY_SCORE, 1.0) >= 0.8
+      AND COALESCE(st.RESOLUTION_STATUS, 'Unknown') IN ('Resolved', 'Closed')
 ),
 
 user_info AS (
     SELECT 
         USER_ID,
         PLAN_TYPE
-    FROM {{ source('silver', 'si_users') }}
-    WHERE DATA_QUALITY_SCORE >= 0.8
+    FROM DB_POC_ZOOM.SILVER.SI_USERS
+    WHERE COALESCE(DATA_QUALITY_SCORE, 1.0) >= 0.8
 ),
 
 fact_support_metrics AS (
@@ -34,27 +33,27 @@ fact_support_metrics AS (
         CONCAT('FACT_SUPP_', st.TICKET_ID, '_', TO_CHAR(st.OPEN_DATE, 'YYYYMMDD')) AS FACT_SUPPORT_METRICS_ID,
         st.OPEN_DATE AS DATE_KEY,
         st.USER_ID AS USER_KEY,
-        CONCAT(st.TICKET_TYPE, '_', st.PRIORITY_LEVEL) AS SUPPORT_CATEGORY_KEY,
+        CONCAT(COALESCE(st.TICKET_TYPE, 'UNKNOWN'), '_', COALESCE(st.PRIORITY_LEVEL, 'UNKNOWN')) AS SUPPORT_CATEGORY_KEY,
         st.OPEN_DATE AS TICKET_DATE,
         COALESCE(st.RESOLUTION_TIME_HOURS, 0) AS RESOLUTION_TIME_HOURS,
-        st.TICKET_TYPE,
-        st.PRIORITY_LEVEL,
-        st.RESOLUTION_STATUS,
-        CASE WHEN st.RESOLUTION_TIME_HOURS <= 4 THEN TRUE ELSE FALSE END AS FIRST_CONTACT_RESOLUTION_FLAG,
+        COALESCE(st.TICKET_TYPE, 'Unknown') AS TICKET_TYPE,
+        COALESCE(st.PRIORITY_LEVEL, 'Unknown') AS PRIORITY_LEVEL,
+        COALESCE(st.RESOLUTION_STATUS, 'Unknown') AS RESOLUTION_STATUS,
+        CASE WHEN COALESCE(st.RESOLUTION_TIME_HOURS, 999) <= 4 THEN TRUE ELSE FALSE END AS FIRST_CONTACT_RESOLUTION_FLAG,
         CASE 
-            WHEN (st.PRIORITY_LEVEL = 'Critical' AND st.RESOLUTION_TIME_HOURS > 4) 
-                OR (st.PRIORITY_LEVEL = 'High' AND st.RESOLUTION_TIME_HOURS > 24) 
-                OR (st.PRIORITY_LEVEL = 'Medium' AND st.RESOLUTION_TIME_HOURS > 72) 
-                OR (st.PRIORITY_LEVEL = 'Low' AND st.RESOLUTION_TIME_HOURS > 168) 
+            WHEN (COALESCE(st.PRIORITY_LEVEL, 'Unknown') = 'Critical' AND COALESCE(st.RESOLUTION_TIME_HOURS, 0) > 4) 
+                OR (COALESCE(st.PRIORITY_LEVEL, 'Unknown') = 'High' AND COALESCE(st.RESOLUTION_TIME_HOURS, 0) > 24) 
+                OR (COALESCE(st.PRIORITY_LEVEL, 'Unknown') = 'Medium' AND COALESCE(st.RESOLUTION_TIME_HOURS, 0) > 72) 
+                OR (COALESCE(st.PRIORITY_LEVEL, 'Unknown') = 'Low' AND COALESCE(st.RESOLUTION_TIME_HOURS, 0) > 168) 
             THEN TRUE 
             ELSE FALSE 
         END AS ESCALATION_FLAG,
         COALESCE(u.PLAN_TYPE, 'Unknown') AS CUSTOMER_PLAN_TYPE,
         CASE 
-            WHEN st.RESOLUTION_TIME_HOURS <= 2 THEN 5
-            WHEN st.RESOLUTION_TIME_HOURS <= 8 THEN 4
-            WHEN st.RESOLUTION_TIME_HOURS <= 24 THEN 3
-            WHEN st.RESOLUTION_TIME_HOURS <= 72 THEN 2
+            WHEN COALESCE(st.RESOLUTION_TIME_HOURS, 999) <= 2 THEN 5
+            WHEN COALESCE(st.RESOLUTION_TIME_HOURS, 999) <= 8 THEN 4
+            WHEN COALESCE(st.RESOLUTION_TIME_HOURS, 999) <= 24 THEN 3
+            WHEN COALESCE(st.RESOLUTION_TIME_HOURS, 999) <= 72 THEN 2
             ELSE 1
         END AS SATISFACTION_SCORE,
         CURRENT_DATE() AS LOAD_DATE,
