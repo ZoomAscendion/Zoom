@@ -1,6 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['CATEGORY_KEY', 'PRIORITY_LEVEL']
+    materialized='table'
 ) }}
 
 -- Support Category Dimension Table
@@ -9,8 +8,8 @@ WITH support_source AS (
         TICKET_TYPE,
         PRIORITY_LEVEL,
         SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_support_tickets') }}
-    WHERE DATA_QUALITY_SCORE >= 0.8
+    FROM DB_POC_ZOOM.SILVER.SI_SUPPORT_TICKETS
+    WHERE COALESCE(DATA_QUALITY_SCORE, 1.0) >= 0.8
       AND TICKET_TYPE IS NOT NULL
       AND PRIORITY_LEVEL IS NOT NULL
 ),
@@ -47,7 +46,7 @@ support_transformed AS (
         END AS REQUIRES_TECHNICAL_EXPERTISE,
         CURRENT_DATE() AS LOAD_DATE,
         CURRENT_DATE() AS UPDATE_DATE,
-        SOURCE_SYSTEM
+        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
     FROM support_source
 )
 
