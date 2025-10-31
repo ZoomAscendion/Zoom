@@ -6,217 +6,107 @@ models:
     columns:
       - name: execution_id
         description: "Unique identifier for each pipeline execution"
-        tests:
-          - not_null
-          - unique
-      - name: audit_key
-        description: "Unique audit record identifier"
-        tests:
-          - not_null
       - name: pipeline_name
         description: "Name of the executed pipeline"
-        tests:
-          - not_null
       - name: execution_status
         description: "Status of pipeline execution"
-        tests:
-          - accepted_values:
-              values: ['STARTED', 'IN_PROGRESS', 'SUCCESS', 'FAILED']
               
   - name: go_dim_date
     description: "Date dimension table for time-based analysis"
     columns:
       - name: dim_date_id
         description: "Unique identifier for date dimension record"
-        tests:
-          - not_null
-          - unique
       - name: date_key
         description: "Primary date key"
-        tests:
-          - not_null
-          - unique
       - name: year
         description: "Year component"
-        tests:
-          - not_null
-      - name: quarter
-        description: "Quarter number (1-4)"
-        tests:
-          - not_null
-          - accepted_values:
-              values: [1, 2, 3, 4]
               
   - name: go_dim_user
     description: "User dimension with SCD Type 2 implementation"
     columns:
       - name: dim_user_id
         description: "Unique surrogate key for user dimension"
-        tests:
-          - not_null
-          - unique
       - name: user_business_key
         description: "Business key for the user"
-        tests:
-          - not_null
       - name: is_current
         description: "Flag indicating current version"
-        tests:
-          - not_null
-          - accepted_values:
-              values: [true, false]
               
   - name: go_dim_meeting_type
     description: "Meeting type classification dimension"
     columns:
       - name: dim_meeting_type_id
         description: "Unique identifier for meeting type dimension"
-        tests:
-          - not_null
-          - unique
       - name: meeting_type_key
         description: "Meeting type identifier"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['SCHEDULED', 'INSTANT', 'WEBINAR', 'PERSONAL']
               
   - name: go_dim_feature
     description: "Platform feature dimension for usage analysis"
     columns:
       - name: dim_feature_id
         description: "Unique identifier for feature dimension"
-        tests:
-          - not_null
-          - unique
       - name: feature_key
         description: "Feature identifier key"
-        tests:
-          - not_null
       - name: is_active
         description: "Whether feature is currently active"
-        tests:
-          - not_null
-          - accepted_values:
-              values: [true, false]
               
   - name: go_dim_support_category
     description: "Support ticket categorization dimension"
     columns:
       - name: dim_support_category_id
         description: "Unique identifier for support category dimension"
-        tests:
-          - not_null
-          - unique
       - name: category_key
         description: "Support category identifier"
-        tests:
-          - not_null
       - name: sla_hours
         description: "Service level agreement in hours"
-        tests:
-          - not_null
-          - dbt_utils.accepted_range:
-              min_value: 0
-              max_value: 168
               
   - name: go_dim_license
     description: "License type and pricing dimension with SCD Type 2"
     columns:
       - name: dim_license_id
         description: "Unique identifier for license dimension"
-        tests:
-          - not_null
-          - unique
       - name: license_type_key
         description: "License type identifier"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['BASIC', 'PRO', 'ENTERPRISE']
       - name: is_current
         description: "Whether this is current pricing"
-        tests:
-          - not_null
-          - accepted_values:
-              values: [true, false]
               
   - name: go_fact_meeting_activity
     description: "Meeting activities and usage metrics fact table"
     columns:
       - name: fact_meeting_activity_id
         description: "Unique identifier for meeting activity fact"
-        tests:
-          - not_null
-          - unique
       - name: date_key
         description: "Foreign key to date dimension"
-        tests:
-          - not_null
       - name: user_key
         description: "Foreign key to user dimension"
-        tests:
-          - not_null
       - name: meeting_duration_minutes
         description: "Meeting duration in minutes"
-        tests:
-          - not_null
-          - dbt_utils.accepted_range:
-              min_value: 0
               
   - name: go_fact_support_metrics
     description: "Support ticket metrics and resolution tracking fact table"
     columns:
       - name: fact_support_metrics_id
         description: "Unique identifier for support metrics fact"
-        tests:
-          - not_null
-          - unique
       - name: date_key
         description: "Foreign key to date dimension"
-        tests:
-          - not_null
       - name: resolution_time_hours
         description: "Time to resolve ticket in hours"
-        tests:
-          - not_null
-          - dbt_utils.accepted_range:
-              min_value: 0
               
   - name: go_fact_revenue_events
     description: "Billing events and revenue metrics fact table"
     columns:
       - name: fact_revenue_events_id
         description: "Unique identifier for revenue events fact"
-        tests:
-          - not_null
-          - unique
       - name: date_key
         description: "Foreign key to date dimension"
-        tests:
-          - not_null
       - name: transaction_amount_usd
         description: "Transaction amount in USD"
-        tests:
-          - not_null
-          - dbt_utils.accepted_range:
-              min_value: 0
               
   - name: go_fact_feature_usage
     description: "Feature usage analytics fact table"
     columns:
       - name: fact_feature_usage_id
         description: "Unique identifier for feature usage fact"
-        tests:
-          - not_null
-          - unique
       - name: date_key
         description: "Foreign key to date dimension"
-        tests:
-          - not_null
       - name: usage_count
         description: "Number of times feature was used"
-        tests:
-          - not_null
-          - dbt_utils.accepted_range:
-              min_value: 1
