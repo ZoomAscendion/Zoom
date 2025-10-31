@@ -1,6 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['DATE_KEY']
+    materialized='table'
 ) }}
 
 -- Date Dimension Table
@@ -23,7 +22,7 @@ date_attributes AS (
         DAYOFWEEK(date_value) AS DAY_OF_WEEK,
         DAYNAME(date_value) AS DAY_NAME,
         CASE WHEN DAYOFWEEK(date_value) IN (1, 7) THEN TRUE ELSE FALSE END AS IS_WEEKEND,
-        FALSE AS IS_HOLIDAY, -- Default to false, updated via holiday calendar
+        FALSE AS IS_HOLIDAY,
         CASE 
             WHEN MONTH(date_value) >= 4 THEN YEAR(date_value) 
             ELSE YEAR(date_value) - 1 
