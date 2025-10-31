@@ -1,6 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['DATE_KEY', 'FEATURE_KEY']
+    materialized='table'
 ) }}
 
 -- Feature Usage Fact Table
@@ -13,11 +12,11 @@ WITH feature_usage_base AS (
         fu.USAGE_DURATION,
         fu.FEATURE_CATEGORY,
         fu.USAGE_DATE,
-        fu.DATA_QUALITY_SCORE,
+        COALESCE(fu.DATA_QUALITY_SCORE, 1.0) AS DATA_QUALITY_SCORE,
         fu.SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_feature_usage') }} fu
-    WHERE fu.DATA_QUALITY_SCORE >= 0.8
-      AND fu.USAGE_COUNT > 0
+    FROM DB_POC_ZOOM.SILVER.SI_FEATURE_USAGE fu
+    WHERE COALESCE(fu.DATA_QUALITY_SCORE, 1.0) >= 0.8
+      AND COALESCE(fu.USAGE_COUNT, 0) > 0
 ),
 
 meeting_info AS (
@@ -26,16 +25,16 @@ meeting_info AS (
         HOST_ID,
         MEETING_TYPE,
         PARTICIPANT_COUNT
-    FROM {{ source('silver', 'si_meetings') }}
-    WHERE DATA_QUALITY_SCORE >= 0.8
+    FROM DB_POC_ZOOM.SILVER.SI_MEETINGS
+    WHERE COALESCE(DATA_QUALITY_SCORE, 1.0) >= 0.8
 ),
 
 user_info AS (
     SELECT 
         USER_ID,
         PLAN_TYPE
-    FROM {{ source('silver', 'si_users') }}
-    WHERE DATA_QUALITY_SCORE >= 0.8
+    FROM DB_POC_ZOOM.SILVER.SI_USERS
+    WHERE COALESCE(DATA_QUALITY_SCORE, 1.0) >= 0.8
 ),
 
 fact_feature_usage AS (
@@ -43,11 +42,11 @@ fact_feature_usage AS (
         CONCAT('FACT_FEAT_', fu.USAGE_ID, '_', TO_CHAR(fu.USAGE_DATE, 'YYYYMMDD')) AS FACT_FEATURE_USAGE_ID,
         fu.USAGE_DATE AS DATE_KEY,
         COALESCE(m.HOST_ID, 'UNKNOWN') AS USER_KEY,
-        UPPER(REPLACE(fu.FEATURE_NAME, ' ', '_')) AS FEATURE_KEY,
+        UPPER(REPLACE(COALESCE(fu.FEATURE_NAME, 'UNKNOWN'), ' ', '_')) AS FEATURE_KEY,
         fu.USAGE_DATE,
-        fu.FEATURE_NAME,
-        fu.FEATURE_CATEGORY,
-        fu.USAGE_COUNT,
+        COALESCE(fu.FEATURE_NAME, 'Unknown') AS FEATURE_NAME,
+        COALESCE(fu.FEATURE_CATEGORY, 'Unknown') AS FEATURE_CATEGORY,
+        COALESCE(fu.USAGE_COUNT, 0) AS USAGE_COUNT,
         COALESCE(fu.USAGE_DURATION, 0) AS USAGE_DURATION_MINUTES,
         COALESCE(m.MEETING_TYPE, 'Unknown') AS MEETING_TYPE,
         COALESCE(u.PLAN_TYPE, 'Unknown') AS USER_PLAN_TYPE,
