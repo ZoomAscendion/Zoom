@@ -1,6 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['DATE_KEY', 'LICENSE_KEY']
+    materialized='table'
 ) }}
 
 -- Revenue Events Fact Table
@@ -15,27 +14,27 @@ WITH billing_base AS (
         be.CURRENCY_CODE,
         be.INVOICE_NUMBER,
         be.TRANSACTION_STATUS,
-        be.DATA_QUALITY_SCORE,
+        COALESCE(be.DATA_QUALITY_SCORE, 1.0) AS DATA_QUALITY_SCORE,
         be.SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_billing_events') }} be
-    WHERE be.DATA_QUALITY_SCORE >= 0.8
-      AND be.TRANSACTION_STATUS = 'Completed'
+    FROM DB_POC_ZOOM.SILVER.SI_BILLING_EVENTS be
+    WHERE COALESCE(be.DATA_QUALITY_SCORE, 1.0) >= 0.8
+      AND COALESCE(be.TRANSACTION_STATUS, 'Unknown') = 'Completed'
 ),
 
 user_info AS (
     SELECT 
         USER_ID,
         PLAN_TYPE
-    FROM {{ source('silver', 'si_users') }}
-    WHERE DATA_QUALITY_SCORE >= 0.8
+    FROM DB_POC_ZOOM.SILVER.SI_USERS
+    WHERE COALESCE(DATA_QUALITY_SCORE, 1.0) >= 0.8
 ),
 
 license_info AS (
     SELECT 
         ASSIGNED_TO_USER_ID,
         LICENSE_TYPE
-    FROM {{ source('silver', 'si_licenses') }}
-    WHERE DATA_QUALITY_SCORE >= 0.8
+    FROM DB_POC_ZOOM.SILVER.SI_LICENSES
+    WHERE COALESCE(DATA_QUALITY_SCORE, 1.0) >= 0.8
 ),
 
 fact_revenue_events AS (
@@ -46,32 +45,32 @@ fact_revenue_events AS (
         COALESCE(l.LICENSE_TYPE, 'UNKNOWN') AS LICENSE_KEY,
         be.TRANSACTION_DATE,
         CASE 
-            WHEN be.CURRENCY_CODE = 'USD' THEN be.TRANSACTION_AMOUNT
-            WHEN be.CURRENCY_CODE = 'EUR' THEN be.TRANSACTION_AMOUNT * 1.1
-            WHEN be.CURRENCY_CODE = 'GBP' THEN be.TRANSACTION_AMOUNT * 1.25
-            ELSE be.TRANSACTION_AMOUNT
+            WHEN COALESCE(be.CURRENCY_CODE, 'USD') = 'USD' THEN COALESCE(be.TRANSACTION_AMOUNT, 0)
+            WHEN COALESCE(be.CURRENCY_CODE, 'USD') = 'EUR' THEN COALESCE(be.TRANSACTION_AMOUNT, 0) * 1.1
+            WHEN COALESCE(be.CURRENCY_CODE, 'USD') = 'GBP' THEN COALESCE(be.TRANSACTION_AMOUNT, 0) * 1.25
+            ELSE COALESCE(be.TRANSACTION_AMOUNT, 0)
         END AS TRANSACTION_AMOUNT_USD,
-        be.TRANSACTION_AMOUNT AS ORIGINAL_AMOUNT,
-        be.CURRENCY_CODE,
-        be.EVENT_TYPE,
-        be.PAYMENT_METHOD,
+        COALESCE(be.TRANSACTION_AMOUNT, 0) AS ORIGINAL_AMOUNT,
+        COALESCE(be.CURRENCY_CODE, 'USD') AS CURRENCY_CODE,
+        COALESCE(be.EVENT_TYPE, 'Unknown') AS EVENT_TYPE,
+        COALESCE(be.PAYMENT_METHOD, 'Unknown') AS PAYMENT_METHOD,
         COALESCE(l.LICENSE_TYPE, 'UNKNOWN') AS LICENSE_TYPE,
         COALESCE(u.PLAN_TYPE, 'Unknown') AS CUSTOMER_PLAN_TYPE,
-        be.TRANSACTION_STATUS,
+        COALESCE(be.TRANSACTION_STATUS, 'Unknown') AS TRANSACTION_STATUS,
         CASE 
-            WHEN be.EVENT_TYPE IN ('Subscription', 'Upgrade') THEN 
+            WHEN COALESCE(be.EVENT_TYPE, 'Unknown') IN ('Subscription', 'Upgrade') THEN 
                 CASE 
-                    WHEN be.CURRENCY_CODE = 'USD' THEN be.TRANSACTION_AMOUNT
-                    WHEN be.CURRENCY_CODE = 'EUR' THEN be.TRANSACTION_AMOUNT * 1.1
-                    WHEN be.CURRENCY_CODE = 'GBP' THEN be.TRANSACTION_AMOUNT * 1.25
-                    ELSE be.TRANSACTION_AMOUNT
+                    WHEN COALESCE(be.CURRENCY_CODE, 'USD') = 'USD' THEN COALESCE(be.TRANSACTION_AMOUNT, 0)
+                    WHEN COALESCE(be.CURRENCY_CODE, 'USD') = 'EUR' THEN COALESCE(be.TRANSACTION_AMOUNT, 0) * 1.1
+                    WHEN COALESCE(be.CURRENCY_CODE, 'USD') = 'GBP' THEN COALESCE(be.TRANSACTION_AMOUNT, 0) * 1.25
+                    ELSE COALESCE(be.TRANSACTION_AMOUNT, 0)
                 END
-            WHEN be.EVENT_TYPE IN ('Downgrade', 'Refund') THEN 
+            WHEN COALESCE(be.EVENT_TYPE, 'Unknown') IN ('Downgrade', 'Refund') THEN 
                 -1 * CASE 
-                    WHEN be.CURRENCY_CODE = 'USD' THEN be.TRANSACTION_AMOUNT
-                    WHEN be.CURRENCY_CODE = 'EUR' THEN be.TRANSACTION_AMOUNT * 1.1
-                    WHEN be.CURRENCY_CODE = 'GBP' THEN be.TRANSACTION_AMOUNT * 1.25
-                    ELSE be.TRANSACTION_AMOUNT
+                    WHEN COALESCE(be.CURRENCY_CODE, 'USD') = 'USD' THEN COALESCE(be.TRANSACTION_AMOUNT, 0)
+                    WHEN COALESCE(be.CURRENCY_CODE, 'USD') = 'EUR' THEN COALESCE(be.TRANSACTION_AMOUNT, 0) * 1.1
+                    WHEN COALESCE(be.CURRENCY_CODE, 'USD') = 'GBP' THEN COALESCE(be.TRANSACTION_AMOUNT, 0) * 1.25
+                    ELSE COALESCE(be.TRANSACTION_AMOUNT, 0)
                 END
             ELSE 0
         END AS MRR_IMPACT,
