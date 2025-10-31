@@ -1,6 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['LICENSE_TYPE_KEY', 'IS_CURRENT']
+    materialized='table'
 ) }}
 
 -- License Dimension Table with SCD Type 2
