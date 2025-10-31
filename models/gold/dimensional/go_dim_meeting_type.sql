@@ -1,6 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['MEETING_TYPE_KEY']
+    materialized='table'
 ) }}
 
 -- Meeting Type Dimension Table
