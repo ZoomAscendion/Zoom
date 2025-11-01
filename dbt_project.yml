@@ -1,8 +1,8 @@
-name: 'zoom_analytics_silver'
+name: 'zoom_analytics'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_analytics'
+profile: 'default'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,8 +17,7 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_analytics_silver:
-    +materialized: table
+  zoom_analytics:
     silver:
       +materialized: table
-      +on_schema_change: sync_all_columns
+      +tags: ["silver"]
