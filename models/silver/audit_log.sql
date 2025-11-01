@@ -1,34 +1,27 @@
 {{ config(
-    materialized='incremental',
-    unique_key='audit_id',
+    materialized='table',
     on_schema_change='sync_all_columns'
 ) }}
 
--- Audit log table for tracking all Silver layer processing
-WITH audit_records AS (
-    SELECT 
-        MD5(CONCAT('INITIAL_LOAD', CURRENT_TIMESTAMP()::STRING)) as audit_id,
-        CAST('INITIAL_LOAD' AS VARCHAR(255)) as table_name,
-        CURRENT_TIMESTAMP() as process_start_time,
-        CURRENT_TIMESTAMP() as process_end_time,
-        CAST('COMPLETED' AS VARCHAR(50)) as status,
-        0 as records_processed,
-        CURRENT_TIMESTAMP() as created_at,
-        CURRENT_TIMESTAMP() as updated_at
-    WHERE FALSE -- This ensures no records are selected initially
-)
-
+-- Audit log table for tracking Silver layer pipeline execution
 SELECT 
-    audit_id,
-    table_name,
-    process_start_time,
-    process_end_time,
-    status,
-    records_processed,
-    created_at,
-    updated_at
-FROM audit_records
-
-{% if is_incremental() %}
-    WHERE process_start_time > (SELECT COALESCE(MAX(process_start_time), '1900-01-01') FROM {{ this }})
-{% endif %}
+    {{ dbt_utils.generate_surrogate_key(['CURRENT_TIMESTAMP()', "'INITIAL_LOAD'", "'SILVER_PIPELINE'"]) }} AS EXECUTION_ID,
+    'SILVER_PIPELINE' AS PIPELINE_NAME,
+    CURRENT_TIMESTAMP() AS START_TIME,
+    NULL AS END_TIME,
+    'RUNNING' AS STATUS,
+    NULL AS ERROR_MESSAGE,
+    NULL AS EXECUTION_DURATION_SECONDS,
+    'BRONZE.BZ_USERS,BRONZE.BZ_MEETINGS,BRONZE.BZ_PARTICIPANTS,BRONZE.BZ_FEATURE_USAGE,BRONZE.BZ_SUPPORT_TICKETS,BRONZE.BZ_BILLING_EVENTS,BRONZE.BZ_LICENSES,BRONZE.BZ_WEBINARS' AS SOURCE_TABLES_PROCESSED,
+    'SILVER.SI_USERS,SILVER.SI_MEETINGS,SILVER.SI_PARTICIPANTS,SILVER.SI_FEATURE_USAGE,SILVER.SI_SUPPORT_TICKETS,SILVER.SI_BILLING_EVENTS,SILVER.SI_LICENSES,SILVER.SI_WEBINARS' AS TARGET_TABLES_UPDATED,
+    0 AS RECORDS_PROCESSED,
+    0 AS RECORDS_INSERTED,
+    0 AS RECORDS_UPDATED,
+    0 AS RECORDS_REJECTED,
+    'DBT_PIPELINE' AS EXECUTED_BY,
+    'PROD' AS EXECUTION_ENVIRONMENT,
+    'Bronze to Silver transformation with data quality checks' AS DATA_LINEAGE_INFO,
+    CURRENT_DATE() AS LOAD_DATE,
+    CURRENT_DATE() AS UPDATE_DATE,
+    'SILVER_LAYER_PIPELINE' AS SOURCE_SYSTEM
+WHERE FALSE -- This ensures the initial table is created but empty
