@@ -4,39 +4,7 @@
 -- Target: BRONZE.BZ_AUDIT_LOG
 
 {{ config(
-    materialized='table',
-    pre_hook="
-        {% if this.name != 'bz_audit_log' %}
-            INSERT INTO {{ ref('bz_audit_log') }} (
-                SOURCE_TABLE, 
-                PROCESS_START_TIME, 
-                STATUS, 
-                CREATED_BY
-            ) 
-            VALUES (
-                '{{ this.name }}', 
-                CURRENT_TIMESTAMP(), 
-                'STARTED', 
-                'DBT_PIPELINE'
-            )
-        {% endif %}
-    ",
-    post_hook="
-        {% if this.name != 'bz_audit_log' %}
-            INSERT INTO {{ ref('bz_audit_log') }} (
-                SOURCE_TABLE, 
-                PROCESS_END_TIME, 
-                STATUS, 
-                CREATED_BY
-            ) 
-            VALUES (
-                '{{ this.name }}', 
-                CURRENT_TIMESTAMP(), 
-                'COMPLETED', 
-                'DBT_PIPELINE'
-            )
-        {% endif %}
-    "
+    materialized='table'
 ) }}
 
 SELECT 
