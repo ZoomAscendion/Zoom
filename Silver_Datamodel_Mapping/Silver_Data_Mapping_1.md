@@ -1,7 +1,7 @@
 _____________________________________________
 ## *Author*: AAVA
 ## *Created on*:   
-## *Description*: Comprehensive data mapping for Silver Layer transformation from Bronze Layer in Zoom Platform Analytics System
+## *Description*: Comprehensive Silver Layer Data Mapping for Zoom Platform Analytics System
 ## *Version*: 1 
 ## *Updated on*: 
 _____________________________________________
@@ -11,312 +11,312 @@ _____________________________________________
 
 ## 1. Overview
 
-This document provides a comprehensive data mapping from the Bronze Layer to the Silver Layer for the Zoom Platform Analytics System following the Medallion architecture. The mapping incorporates necessary data cleansing, validations, and business rules to ensure high-quality, consistent data in the Silver layer.
+This document provides a comprehensive data mapping from the Bronze Layer to the Silver Layer for the Zoom Platform Analytics System following the Medallion architecture. The mapping incorporates necessary cleansing, validations, and business rules at the attribute level to ensure data quality, consistency, and usability across the organization.
 
-**Key Mapping Approach:**
-- **Data Cleansing**: Standardization of formats, removal of duplicates, and data type conversions
-- **Data Validation**: Implementation of business rules, referential integrity checks, and constraint validations
-- **Data Enhancement**: Addition of calculated fields, derived metrics, and data quality scores
-- **Error Handling**: Comprehensive error tracking and data quality monitoring
+The Silver Layer serves as the cleansed and conformed layer, transforming raw Bronze data into standardized, validated, and enriched datasets ready for analytical consumption. All transformations are designed to be compatible with Snowflake SQL and follow established data quality standards.
 
-**Assumptions:**
-- All Bronze layer tables contain metadata columns (LOAD_TIMESTAMP, UPDATE_TIMESTAMP, SOURCE_SYSTEM)
-- Data quality validations are applied during the transformation process
-- Failed validations are logged in the error tracking table
-- All transformations are compatible with Snowflake SQL
+**Key Mapping Principles:**
+- Data type standardization and validation
+- Business rule enforcement through validation checks
+- Data quality scoring and error tracking
+- Referential integrity validation
+- Comprehensive audit trail maintenance
 
 ## 2. Data Mapping for the Silver Layer
 
-### 2.1 SI_USERS - User Data Mapping
+### 2.1 SI_USERS Table Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Validation Rule | Transformation Rule |
 |--------------|--------------|--------------|--------------|--------------|--------------|-----------------|--------------------|
-| Silver | SI_USERS | USER_ID | Bronze | BZ_USERS | USER_ID | Not null, Unique | Direct mapping with trimming |
-| Silver | SI_USERS | USER_NAME | Bronze | BZ_USERS | USER_NAME | Not null, Length > 0 | Standardize case formatting (INITCAP) |
-| Silver | SI_USERS | EMAIL | Bronze | BZ_USERS | EMAIL | Not null, Valid email format | Lowercase and validate email pattern |
-| Silver | SI_USERS | COMPANY | Bronze | BZ_USERS | COMPANY | Length validation | Standardize company name formatting |
-| Silver | SI_USERS | PLAN_TYPE | Bronze | BZ_USERS | PLAN_TYPE | Must be in (Free, Basic, Pro, Enterprise) | Standardize enumerated values |
-| Silver | SI_USERS | REGISTRATION_DATE | Bronze | BZ_USERS | LOAD_TIMESTAMP | Not null, Not future date | Extract date from load timestamp |
-| Silver | SI_USERS | LAST_LOGIN_DATE | Bronze | BZ_USERS | UPDATE_TIMESTAMP | Not future date | Extract date from update timestamp |
-| Silver | SI_USERS | ACCOUNT_STATUS | Bronze | BZ_USERS | - | Must be in (Active, Inactive, Suspended) | Derive from user activity and plan status |
+| Silver | SI_USERS | USER_ID | Bronze | BZ_USERS | USER_ID | Not null, Unique | Direct mapping with validation |
+| Silver | SI_USERS | USER_NAME | Bronze | BZ_USERS | USER_NAME | Not null, Valid format | TRIM and PROPER case formatting |
+| Silver | SI_USERS | EMAIL | Bronze | BZ_USERS | EMAIL | Not null, Valid email format | LOWER case and email format validation |
+| Silver | SI_USERS | COMPANY | Bronze | BZ_USERS | COMPANY | Valid format | TRIM and standardize company names |
+| Silver | SI_USERS | PLAN_TYPE | Bronze | BZ_USERS | PLAN_TYPE | Not null, Valid enumeration (Free, Basic, Pro, Enterprise) | Standardize to predefined values |
+| Silver | SI_USERS | REGISTRATION_DATE | Bronze | BZ_USERS | LOAD_TIMESTAMP | Not null, Valid date, Not future date | Extract date from load timestamp |
+| Silver | SI_USERS | LAST_LOGIN_DATE | Bronze | BZ_USERS | UPDATE_TIMESTAMP | Valid date, Not future date | Extract date from update timestamp |
+| Silver | SI_USERS | ACCOUNT_STATUS | Bronze | BZ_USERS | - | Not null, Valid enumeration (Active, Inactive, Suspended) | Derived based on business logic |
 | Silver | SI_USERS | LOAD_TIMESTAMP | Bronze | BZ_USERS | LOAD_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_USERS | UPDATE_TIMESTAMP | Bronze | BZ_USERS | UPDATE_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_USERS | SOURCE_SYSTEM | Bronze | BZ_USERS | SOURCE_SYSTEM | Not null | Direct mapping |
-| Silver | SI_USERS | DATA_QUALITY_SCORE | Bronze | BZ_USERS | - | Range 0.00 to 1.00 | Calculate based on completeness and validity |
-| Silver | SI_USERS | LOAD_DATE | Bronze | BZ_USERS | LOAD_TIMESTAMP | Not null | Extract date component |
-| Silver | SI_USERS | UPDATE_DATE | Bronze | BZ_USERS | UPDATE_TIMESTAMP | Not null | Extract date component |
+| Silver | SI_USERS | DATA_QUALITY_SCORE | Bronze | BZ_USERS | - | Range 0.00-1.00 | Calculate based on validation results |
+| Silver | SI_USERS | LOAD_DATE | Bronze | BZ_USERS | LOAD_TIMESTAMP | Not null | Extract date from load timestamp |
+| Silver | SI_USERS | UPDATE_DATE | Bronze | BZ_USERS | UPDATE_TIMESTAMP | Not null | Extract date from update timestamp |
 
-### 2.2 SI_MEETINGS - Meeting Data Mapping
+### 2.2 SI_MEETINGS Table Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Validation Rule | Transformation Rule |
 |--------------|--------------|--------------|--------------|--------------|--------------|-----------------|--------------------|
-| Silver | SI_MEETINGS | MEETING_ID | Bronze | BZ_MEETINGS | MEETING_ID | Not null, Unique | Direct mapping with trimming |
-| Silver | SI_MEETINGS | HOST_ID | Bronze | BZ_MEETINGS | HOST_ID | Not null, Exists in SI_USERS | Direct mapping with referential integrity check |
-| Silver | SI_MEETINGS | MEETING_TOPIC | Bronze | BZ_MEETINGS | MEETING_TOPIC | Length validation | Clean and standardize meeting topic |
-| Silver | SI_MEETINGS | MEETING_TYPE | Bronze | BZ_MEETINGS | - | Must be in (Scheduled, Instant, Webinar, Personal) | Derive from meeting characteristics |
-| Silver | SI_MEETINGS | START_TIME | Bronze | BZ_MEETINGS | START_TIME | Not null, Valid timestamp | Convert to UTC and validate format |
-| Silver | SI_MEETINGS | END_TIME | Bronze | BZ_MEETINGS | END_TIME | Not null, >= START_TIME | Convert to UTC and validate logic |
-| Silver | SI_MEETINGS | DURATION_MINUTES | Bronze | BZ_MEETINGS | DURATION_MINUTES | >= 0, <= 1440 | Validate and recalculate if inconsistent |
-| Silver | SI_MEETINGS | HOST_NAME | Bronze | BZ_USERS | USER_NAME | Not null | Lookup from SI_USERS via HOST_ID |
-| Silver | SI_MEETINGS | MEETING_STATUS | Bronze | BZ_MEETINGS | - | Must be in (Scheduled, In Progress, Completed, Cancelled) | Derive from timestamps and current time |
-| Silver | SI_MEETINGS | RECORDING_STATUS | Bronze | BZ_MEETINGS | - | Must be in (Yes, No) | Derive from meeting metadata |
-| Silver | SI_MEETINGS | PARTICIPANT_COUNT | Bronze | BZ_PARTICIPANTS | - | >= 0 | Count distinct participants per meeting |
+| Silver | SI_MEETINGS | MEETING_ID | Bronze | BZ_MEETINGS | MEETING_ID | Not null, Unique | Direct mapping with validation |
+| Silver | SI_MEETINGS | HOST_ID | Bronze | BZ_MEETINGS | HOST_ID | Not null, Valid foreign key reference | Validate against SI_USERS.USER_ID |
+| Silver | SI_MEETINGS | MEETING_TOPIC | Bronze | BZ_MEETINGS | MEETING_TOPIC | Valid format | TRIM and standardize topic |
+| Silver | SI_MEETINGS | MEETING_TYPE | Bronze | BZ_MEETINGS | - | Not null, Valid enumeration (Scheduled, Instant, Webinar, Personal) | Derive based on meeting characteristics |
+| Silver | SI_MEETINGS | START_TIME | Bronze | BZ_MEETINGS | START_TIME | Not null, Valid timestamp | Convert to UTC and validate |
+| Silver | SI_MEETINGS | END_TIME | Bronze | BZ_MEETINGS | END_TIME | Not null, Valid timestamp, >= START_TIME | Convert to UTC and validate logic |
+| Silver | SI_MEETINGS | DURATION_MINUTES | Bronze | BZ_MEETINGS | DURATION_MINUTES | Not null, Range 1-1440 minutes | Validate and recalculate if needed |
+| Silver | SI_MEETINGS | HOST_NAME | Bronze | BZ_USERS | USER_NAME | Not null | Join with BZ_USERS on HOST_ID |
+| Silver | SI_MEETINGS | MEETING_STATUS | Bronze | BZ_MEETINGS | - | Not null, Valid enumeration (Scheduled, In Progress, Completed, Cancelled) | Derive based on timestamps |
+| Silver | SI_MEETINGS | RECORDING_STATUS | Bronze | BZ_MEETINGS | - | Valid enumeration (Yes, No) | Derive from meeting metadata |
+| Silver | SI_MEETINGS | PARTICIPANT_COUNT | Bronze | BZ_PARTICIPANTS | - | Non-negative integer | Count participants per meeting |
 | Silver | SI_MEETINGS | LOAD_TIMESTAMP | Bronze | BZ_MEETINGS | LOAD_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_MEETINGS | UPDATE_TIMESTAMP | Bronze | BZ_MEETINGS | UPDATE_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_MEETINGS | SOURCE_SYSTEM | Bronze | BZ_MEETINGS | SOURCE_SYSTEM | Not null | Direct mapping |
-| Silver | SI_MEETINGS | DATA_QUALITY_SCORE | Bronze | BZ_MEETINGS | - | Range 0.00 to 1.00 | Calculate based on completeness and validity |
-| Silver | SI_MEETINGS | LOAD_DATE | Bronze | BZ_MEETINGS | LOAD_TIMESTAMP | Not null | Extract date component |
-| Silver | SI_MEETINGS | UPDATE_DATE | Bronze | BZ_MEETINGS | UPDATE_TIMESTAMP | Not null | Extract date component |
+| Silver | SI_MEETINGS | DATA_QUALITY_SCORE | Bronze | BZ_MEETINGS | - | Range 0.00-1.00 | Calculate based on validation results |
+| Silver | SI_MEETINGS | LOAD_DATE | Bronze | BZ_MEETINGS | LOAD_TIMESTAMP | Not null | Extract date from load timestamp |
+| Silver | SI_MEETINGS | UPDATE_DATE | Bronze | BZ_MEETINGS | UPDATE_TIMESTAMP | Not null | Extract date from update timestamp |
 
-### 2.3 SI_PARTICIPANTS - Participant Data Mapping
+### 2.3 SI_PARTICIPANTS Table Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Validation Rule | Transformation Rule |
 |--------------|--------------|--------------|--------------|--------------|--------------|-----------------|--------------------|
-| Silver | SI_PARTICIPANTS | PARTICIPANT_ID | Bronze | BZ_PARTICIPANTS | PARTICIPANT_ID | Not null, Unique | Direct mapping with trimming |
-| Silver | SI_PARTICIPANTS | MEETING_ID | Bronze | BZ_PARTICIPANTS | MEETING_ID | Not null, Exists in SI_MEETINGS | Direct mapping with referential integrity check |
-| Silver | SI_PARTICIPANTS | USER_ID | Bronze | BZ_PARTICIPANTS | USER_ID | Not null, Exists in SI_USERS | Direct mapping with referential integrity check |
-| Silver | SI_PARTICIPANTS | JOIN_TIME | Bronze | BZ_PARTICIPANTS | JOIN_TIME | Not null, Valid timestamp | Convert to UTC and validate format |
-| Silver | SI_PARTICIPANTS | LEAVE_TIME | Bronze | BZ_PARTICIPANTS | LEAVE_TIME | >= JOIN_TIME when not null | Convert to UTC and validate logic |
-| Silver | SI_PARTICIPANTS | ATTENDANCE_DURATION | Bronze | BZ_PARTICIPANTS | - | >= 0 | Calculate DATEDIFF(minute, JOIN_TIME, LEAVE_TIME) |
-| Silver | SI_PARTICIPANTS | PARTICIPANT_ROLE | Bronze | BZ_PARTICIPANTS | - | Must be in (Host, Co-host, Participant, Observer) | Derive from user role and meeting context |
-| Silver | SI_PARTICIPANTS | CONNECTION_QUALITY | Bronze | BZ_PARTICIPANTS | - | Must be in (Excellent, Good, Fair, Poor) | Derive from connection metrics |
+| Silver | SI_PARTICIPANTS | PARTICIPANT_ID | Bronze | BZ_PARTICIPANTS | PARTICIPANT_ID | Not null, Unique | Direct mapping with validation |
+| Silver | SI_PARTICIPANTS | MEETING_ID | Bronze | BZ_PARTICIPANTS | MEETING_ID | Not null, Valid foreign key reference | Validate against SI_MEETINGS.MEETING_ID |
+| Silver | SI_PARTICIPANTS | USER_ID | Bronze | BZ_PARTICIPANTS | USER_ID | Not null, Valid foreign key reference | Validate against SI_USERS.USER_ID |
+| Silver | SI_PARTICIPANTS | JOIN_TIME | Bronze | BZ_PARTICIPANTS | JOIN_TIME | Not null, Valid timestamp | Convert to UTC and validate |
+| Silver | SI_PARTICIPANTS | LEAVE_TIME | Bronze | BZ_PARTICIPANTS | LEAVE_TIME | Valid timestamp, >= JOIN_TIME | Convert to UTC and validate logic |
+| Silver | SI_PARTICIPANTS | ATTENDANCE_DURATION | Bronze | BZ_PARTICIPANTS | - | Non-negative, <= meeting duration | Calculate DATEDIFF(minute, JOIN_TIME, LEAVE_TIME) |
+| Silver | SI_PARTICIPANTS | PARTICIPANT_ROLE | Bronze | BZ_PARTICIPANTS | - | Valid enumeration (Host, Co-host, Participant, Observer) | Derive based on participant metadata |
+| Silver | SI_PARTICIPANTS | CONNECTION_QUALITY | Bronze | BZ_PARTICIPANTS | - | Valid enumeration (Excellent, Good, Fair, Poor) | Derive from connection metrics |
 | Silver | SI_PARTICIPANTS | LOAD_TIMESTAMP | Bronze | BZ_PARTICIPANTS | LOAD_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_PARTICIPANTS | UPDATE_TIMESTAMP | Bronze | BZ_PARTICIPANTS | UPDATE_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_PARTICIPANTS | SOURCE_SYSTEM | Bronze | BZ_PARTICIPANTS | SOURCE_SYSTEM | Not null | Direct mapping |
-| Silver | SI_PARTICIPANTS | DATA_QUALITY_SCORE | Bronze | BZ_PARTICIPANTS | - | Range 0.00 to 1.00 | Calculate based on completeness and validity |
-| Silver | SI_PARTICIPANTS | LOAD_DATE | Bronze | BZ_PARTICIPANTS | LOAD_TIMESTAMP | Not null | Extract date component |
-| Silver | SI_PARTICIPANTS | UPDATE_DATE | Bronze | BZ_PARTICIPANTS | UPDATE_TIMESTAMP | Not null | Extract date component |
+| Silver | SI_PARTICIPANTS | DATA_QUALITY_SCORE | Bronze | BZ_PARTICIPANTS | - | Range 0.00-1.00 | Calculate based on validation results |
+| Silver | SI_PARTICIPANTS | LOAD_DATE | Bronze | BZ_PARTICIPANTS | LOAD_TIMESTAMP | Not null | Extract date from load timestamp |
+| Silver | SI_PARTICIPANTS | UPDATE_DATE | Bronze | BZ_PARTICIPANTS | UPDATE_TIMESTAMP | Not null | Extract date from update timestamp |
 
-### 2.4 SI_FEATURE_USAGE - Feature Usage Data Mapping
+### 2.4 SI_FEATURE_USAGE Table Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Validation Rule | Transformation Rule |
 |--------------|--------------|--------------|--------------|--------------|--------------|-----------------|--------------------|
-| Silver | SI_FEATURE_USAGE | USAGE_ID | Bronze | BZ_FEATURE_USAGE | USAGE_ID | Not null, Unique | Direct mapping with trimming |
-| Silver | SI_FEATURE_USAGE | MEETING_ID | Bronze | BZ_FEATURE_USAGE | MEETING_ID | Not null, Exists in SI_MEETINGS | Direct mapping with referential integrity check |
-| Silver | SI_FEATURE_USAGE | FEATURE_NAME | Bronze | BZ_FEATURE_USAGE | FEATURE_NAME | Not null, Length > 0 | Standardize feature name formatting |
-| Silver | SI_FEATURE_USAGE | USAGE_COUNT | Bronze | BZ_FEATURE_USAGE | USAGE_COUNT | >= 0 | Direct mapping with non-negative validation |
-| Silver | SI_FEATURE_USAGE | USAGE_DURATION | Bronze | BZ_FEATURE_USAGE | - | >= 0 | Calculate or derive from usage patterns |
-| Silver | SI_FEATURE_USAGE | FEATURE_CATEGORY | Bronze | BZ_FEATURE_USAGE | - | Must be in (Audio, Video, Collaboration, Security) | Categorize based on feature name mapping |
-| Silver | SI_FEATURE_USAGE | USAGE_DATE | Bronze | BZ_FEATURE_USAGE | USAGE_DATE | Not null, Not future date | Direct mapping with date validation |
+| Silver | SI_FEATURE_USAGE | USAGE_ID | Bronze | BZ_FEATURE_USAGE | USAGE_ID | Not null, Unique | Direct mapping with validation |
+| Silver | SI_FEATURE_USAGE | MEETING_ID | Bronze | BZ_FEATURE_USAGE | MEETING_ID | Not null, Valid foreign key reference | Validate against SI_MEETINGS.MEETING_ID |
+| Silver | SI_FEATURE_USAGE | FEATURE_NAME | Bronze | BZ_FEATURE_USAGE | FEATURE_NAME | Not null, Valid format | TRIM and standardize feature names |
+| Silver | SI_FEATURE_USAGE | USAGE_COUNT | Bronze | BZ_FEATURE_USAGE | USAGE_COUNT | Not null, Non-negative integer | Validate count >= 0 |
+| Silver | SI_FEATURE_USAGE | USAGE_DURATION | Bronze | BZ_FEATURE_USAGE | - | Non-negative, <= meeting duration | Calculate based on feature activation time |
+| Silver | SI_FEATURE_USAGE | FEATURE_CATEGORY | Bronze | BZ_FEATURE_USAGE | - | Not null, Valid enumeration (Audio, Video, Collaboration, Security) | Map feature names to categories |
+| Silver | SI_FEATURE_USAGE | USAGE_DATE | Bronze | BZ_FEATURE_USAGE | USAGE_DATE | Not null, Valid date | Direct mapping with validation |
 | Silver | SI_FEATURE_USAGE | LOAD_TIMESTAMP | Bronze | BZ_FEATURE_USAGE | LOAD_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_FEATURE_USAGE | UPDATE_TIMESTAMP | Bronze | BZ_FEATURE_USAGE | UPDATE_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_FEATURE_USAGE | SOURCE_SYSTEM | Bronze | BZ_FEATURE_USAGE | SOURCE_SYSTEM | Not null | Direct mapping |
-| Silver | SI_FEATURE_USAGE | DATA_QUALITY_SCORE | Bronze | BZ_FEATURE_USAGE | - | Range 0.00 to 1.00 | Calculate based on completeness and validity |
-| Silver | SI_FEATURE_USAGE | LOAD_DATE | Bronze | BZ_FEATURE_USAGE | LOAD_TIMESTAMP | Not null | Extract date component |
-| Silver | SI_FEATURE_USAGE | UPDATE_DATE | Bronze | BZ_FEATURE_USAGE | UPDATE_TIMESTAMP | Not null | Extract date component |
+| Silver | SI_FEATURE_USAGE | DATA_QUALITY_SCORE | Bronze | BZ_FEATURE_USAGE | - | Range 0.00-1.00 | Calculate based on validation results |
+| Silver | SI_FEATURE_USAGE | LOAD_DATE | Bronze | BZ_FEATURE_USAGE | LOAD_TIMESTAMP | Not null | Extract date from load timestamp |
+| Silver | SI_FEATURE_USAGE | UPDATE_DATE | Bronze | BZ_FEATURE_USAGE | UPDATE_TIMESTAMP | Not null | Extract date from update timestamp |
 
-### 2.5 SI_SUPPORT_TICKETS - Support Ticket Data Mapping
+### 2.5 SI_SUPPORT_TICKETS Table Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Validation Rule | Transformation Rule |
 |--------------|--------------|--------------|--------------|--------------|--------------|-----------------|--------------------|
-| Silver | SI_SUPPORT_TICKETS | TICKET_ID | Bronze | BZ_SUPPORT_TICKETS | TICKET_ID | Not null, Unique | Direct mapping with trimming |
-| Silver | SI_SUPPORT_TICKETS | USER_ID | Bronze | BZ_SUPPORT_TICKETS | USER_ID | Not null, Exists in SI_USERS | Direct mapping with referential integrity check |
-| Silver | SI_SUPPORT_TICKETS | TICKET_TYPE | Bronze | BZ_SUPPORT_TICKETS | TICKET_TYPE | Must be in (Technical, Billing, Feature Request, Bug Report) | Standardize enumerated values |
-| Silver | SI_SUPPORT_TICKETS | PRIORITY_LEVEL | Bronze | BZ_SUPPORT_TICKETS | - | Must be in (Low, Medium, High, Critical) | Derive from ticket type and content analysis |
-| Silver | SI_SUPPORT_TICKETS | OPEN_DATE | Bronze | BZ_SUPPORT_TICKETS | OPEN_DATE | Not null, Not future date | Direct mapping with date validation |
-| Silver | SI_SUPPORT_TICKETS | CLOSE_DATE | Bronze | BZ_SUPPORT_TICKETS | - | >= OPEN_DATE when not null | Derive from resolution status and timestamps |
-| Silver | SI_SUPPORT_TICKETS | RESOLUTION_STATUS | Bronze | BZ_SUPPORT_TICKETS | RESOLUTION_STATUS | Must be in (Open, In Progress, Resolved, Closed) | Standardize enumerated values |
-| Silver | SI_SUPPORT_TICKETS | ISSUE_DESCRIPTION | Bronze | BZ_SUPPORT_TICKETS | - | Length validation | Clean and standardize description text |
-| Silver | SI_SUPPORT_TICKETS | RESOLUTION_NOTES | Bronze | BZ_SUPPORT_TICKETS | - | Length validation | Clean and standardize resolution text |
-| Silver | SI_SUPPORT_TICKETS | RESOLUTION_TIME_HOURS | Bronze | BZ_SUPPORT_TICKETS | - | >= 0 | Calculate business hours between open and close |
+| Silver | SI_SUPPORT_TICKETS | TICKET_ID | Bronze | BZ_SUPPORT_TICKETS | TICKET_ID | Not null, Unique | Direct mapping with validation |
+| Silver | SI_SUPPORT_TICKETS | USER_ID | Bronze | BZ_SUPPORT_TICKETS | USER_ID | Not null, Valid foreign key reference | Validate against SI_USERS.USER_ID |
+| Silver | SI_SUPPORT_TICKETS | TICKET_TYPE | Bronze | BZ_SUPPORT_TICKETS | TICKET_TYPE | Not null, Valid enumeration (Technical, Billing, Feature Request, Bug Report) | Standardize to predefined values |
+| Silver | SI_SUPPORT_TICKETS | PRIORITY_LEVEL | Bronze | BZ_SUPPORT_TICKETS | - | Not null, Valid enumeration (Low, Medium, High, Critical) | Derive based on ticket characteristics |
+| Silver | SI_SUPPORT_TICKETS | OPEN_DATE | Bronze | BZ_SUPPORT_TICKETS | OPEN_DATE | Not null, Valid date, Not future date | Direct mapping with validation |
+| Silver | SI_SUPPORT_TICKETS | CLOSE_DATE | Bronze | BZ_SUPPORT_TICKETS | - | Valid date, >= OPEN_DATE | Derive from resolution status |
+| Silver | SI_SUPPORT_TICKETS | RESOLUTION_STATUS | Bronze | BZ_SUPPORT_TICKETS | RESOLUTION_STATUS | Not null, Valid enumeration (Open, In Progress, Resolved, Closed) | Standardize to predefined values |
+| Silver | SI_SUPPORT_TICKETS | ISSUE_DESCRIPTION | Bronze | BZ_SUPPORT_TICKETS | - | Valid format | Clean and standardize description text |
+| Silver | SI_SUPPORT_TICKETS | RESOLUTION_NOTES | Bronze | BZ_SUPPORT_TICKETS | - | Valid format | Clean and standardize resolution text |
+| Silver | SI_SUPPORT_TICKETS | RESOLUTION_TIME_HOURS | Bronze | BZ_SUPPORT_TICKETS | - | Non-negative | Calculate business hours between open and close |
 | Silver | SI_SUPPORT_TICKETS | LOAD_TIMESTAMP | Bronze | BZ_SUPPORT_TICKETS | LOAD_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_SUPPORT_TICKETS | UPDATE_TIMESTAMP | Bronze | BZ_SUPPORT_TICKETS | UPDATE_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_SUPPORT_TICKETS | SOURCE_SYSTEM | Bronze | BZ_SUPPORT_TICKETS | SOURCE_SYSTEM | Not null | Direct mapping |
-| Silver | SI_SUPPORT_TICKETS | DATA_QUALITY_SCORE | Bronze | BZ_SUPPORT_TICKETS | - | Range 0.00 to 1.00 | Calculate based on completeness and validity |
-| Silver | SI_SUPPORT_TICKETS | LOAD_DATE | Bronze | BZ_SUPPORT_TICKETS | LOAD_TIMESTAMP | Not null | Extract date component |
-| Silver | SI_SUPPORT_TICKETS | UPDATE_DATE | Bronze | BZ_SUPPORT_TICKETS | UPDATE_TIMESTAMP | Not null | Extract date component |
+| Silver | SI_SUPPORT_TICKETS | DATA_QUALITY_SCORE | Bronze | BZ_SUPPORT_TICKETS | - | Range 0.00-1.00 | Calculate based on validation results |
+| Silver | SI_SUPPORT_TICKETS | LOAD_DATE | Bronze | BZ_SUPPORT_TICKETS | LOAD_TIMESTAMP | Not null | Extract date from load timestamp |
+| Silver | SI_SUPPORT_TICKETS | UPDATE_DATE | Bronze | BZ_SUPPORT_TICKETS | UPDATE_TIMESTAMP | Not null | Extract date from update timestamp |
 
-### 2.6 SI_BILLING_EVENTS - Billing Events Data Mapping
+### 2.6 SI_BILLING_EVENTS Table Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Validation Rule | Transformation Rule |
 |--------------|--------------|--------------|--------------|--------------|--------------|-----------------|--------------------|
-| Silver | SI_BILLING_EVENTS | EVENT_ID | Bronze | BZ_BILLING_EVENTS | EVENT_ID | Not null, Unique | Direct mapping with trimming |
-| Silver | SI_BILLING_EVENTS | USER_ID | Bronze | BZ_BILLING_EVENTS | USER_ID | Not null, Exists in SI_USERS | Direct mapping with referential integrity check |
-| Silver | SI_BILLING_EVENTS | EVENT_TYPE | Bronze | BZ_BILLING_EVENTS | EVENT_TYPE | Must be in (Subscription, Upgrade, Downgrade, Refund) | Standardize enumerated values |
-| Silver | SI_BILLING_EVENTS | TRANSACTION_AMOUNT | Bronze | BZ_BILLING_EVENTS | AMOUNT | > 0, Valid decimal | Direct mapping with amount validation |
-| Silver | SI_BILLING_EVENTS | TRANSACTION_DATE | Bronze | BZ_BILLING_EVENTS | EVENT_DATE | Not null, Not future date | Direct mapping with date validation |
-| Silver | SI_BILLING_EVENTS | PAYMENT_METHOD | Bronze | BZ_BILLING_EVENTS | - | Must be in (Credit Card, Bank Transfer, PayPal) | Derive from transaction metadata |
-| Silver | SI_BILLING_EVENTS | CURRENCY_CODE | Bronze | BZ_BILLING_EVENTS | - | Valid 3-character ISO code | Derive from transaction metadata or default to USD |
+| Silver | SI_BILLING_EVENTS | EVENT_ID | Bronze | BZ_BILLING_EVENTS | EVENT_ID | Not null, Unique | Direct mapping with validation |
+| Silver | SI_BILLING_EVENTS | USER_ID | Bronze | BZ_BILLING_EVENTS | USER_ID | Not null, Valid foreign key reference | Validate against SI_USERS.USER_ID |
+| Silver | SI_BILLING_EVENTS | EVENT_TYPE | Bronze | BZ_BILLING_EVENTS | EVENT_TYPE | Not null, Valid enumeration (Subscription, Upgrade, Downgrade, Refund) | Standardize to predefined values |
+| Silver | SI_BILLING_EVENTS | TRANSACTION_AMOUNT | Bronze | BZ_BILLING_EVENTS | AMOUNT | Not null, Positive number | Validate amount > 0 |
+| Silver | SI_BILLING_EVENTS | TRANSACTION_DATE | Bronze | BZ_BILLING_EVENTS | EVENT_DATE | Not null, Valid date, Not future date | Direct mapping with validation |
+| Silver | SI_BILLING_EVENTS | PAYMENT_METHOD | Bronze | BZ_BILLING_EVENTS | - | Valid enumeration (Credit Card, Bank Transfer, PayPal) | Derive from transaction metadata |
+| Silver | SI_BILLING_EVENTS | CURRENCY_CODE | Bronze | BZ_BILLING_EVENTS | - | Not null, Valid 3-character ISO code | Default to 'USD' or derive from region |
 | Silver | SI_BILLING_EVENTS | INVOICE_NUMBER | Bronze | BZ_BILLING_EVENTS | - | Unique when not null | Generate or derive from event metadata |
-| Silver | SI_BILLING_EVENTS | TRANSACTION_STATUS | Bronze | BZ_BILLING_EVENTS | - | Must be in (Completed, Pending, Failed, Refunded) | Derive from event type and processing status |
+| Silver | SI_BILLING_EVENTS | TRANSACTION_STATUS | Bronze | BZ_BILLING_EVENTS | - | Not null, Valid enumeration (Completed, Pending, Failed, Refunded) | Derive from transaction metadata |
 | Silver | SI_BILLING_EVENTS | LOAD_TIMESTAMP | Bronze | BZ_BILLING_EVENTS | LOAD_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_BILLING_EVENTS | UPDATE_TIMESTAMP | Bronze | BZ_BILLING_EVENTS | UPDATE_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_BILLING_EVENTS | SOURCE_SYSTEM | Bronze | BZ_BILLING_EVENTS | SOURCE_SYSTEM | Not null | Direct mapping |
-| Silver | SI_BILLING_EVENTS | DATA_QUALITY_SCORE | Bronze | BZ_BILLING_EVENTS | - | Range 0.00 to 1.00 | Calculate based on completeness and validity |
-| Silver | SI_BILLING_EVENTS | LOAD_DATE | Bronze | BZ_BILLING_EVENTS | LOAD_TIMESTAMP | Not null | Extract date component |
-| Silver | SI_BILLING_EVENTS | UPDATE_DATE | Bronze | BZ_BILLING_EVENTS | UPDATE_TIMESTAMP | Not null | Extract date component |
+| Silver | SI_BILLING_EVENTS | DATA_QUALITY_SCORE | Bronze | BZ_BILLING_EVENTS | - | Range 0.00-1.00 | Calculate based on validation results |
+| Silver | SI_BILLING_EVENTS | LOAD_DATE | Bronze | BZ_BILLING_EVENTS | LOAD_TIMESTAMP | Not null | Extract date from load timestamp |
+| Silver | SI_BILLING_EVENTS | UPDATE_DATE | Bronze | BZ_BILLING_EVENTS | UPDATE_TIMESTAMP | Not null | Extract date from update timestamp |
 
-### 2.7 SI_LICENSES - License Data Mapping
+### 2.7 SI_LICENSES Table Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Validation Rule | Transformation Rule |
 |--------------|--------------|--------------|--------------|--------------|--------------|-----------------|--------------------|
-| Silver | SI_LICENSES | LICENSE_ID | Bronze | BZ_LICENSES | LICENSE_ID | Not null, Unique | Direct mapping with trimming |
-| Silver | SI_LICENSES | ASSIGNED_TO_USER_ID | Bronze | BZ_LICENSES | ASSIGNED_TO_USER_ID | Exists in SI_USERS when not null | Direct mapping with referential integrity check |
-| Silver | SI_LICENSES | LICENSE_TYPE | Bronze | BZ_LICENSES | LICENSE_TYPE | Must be in (Basic, Pro, Enterprise, Add-on) | Standardize enumerated values |
-| Silver | SI_LICENSES | START_DATE | Bronze | BZ_LICENSES | START_DATE | Not null, Not future date | Direct mapping with date validation |
-| Silver | SI_LICENSES | END_DATE | Bronze | BZ_LICENSES | END_DATE | >= START_DATE | Direct mapping with date logic validation |
-| Silver | SI_LICENSES | LICENSE_STATUS | Bronze | BZ_LICENSES | - | Must be in (Active, Expired, Suspended) | Derive from current date vs START_DATE/END_DATE |
-| Silver | SI_LICENSES | ASSIGNED_USER_NAME | Bronze | BZ_USERS | USER_NAME | Not null when assigned | Lookup from SI_USERS via ASSIGNED_TO_USER_ID |
-| Silver | SI_LICENSES | LICENSE_COST | Bronze | BZ_LICENSES | - | >= 0 | Derive from license type and pricing table |
-| Silver | SI_LICENSES | RENEWAL_STATUS | Bronze | BZ_LICENSES | - | Must be in (Yes, No) | Derive from license metadata |
-| Silver | SI_LICENSES | UTILIZATION_PERCENTAGE | Bronze | BZ_LICENSES | - | Range 0.00 to 100.00 | Calculate from usage patterns |
+| Silver | SI_LICENSES | LICENSE_ID | Bronze | BZ_LICENSES | LICENSE_ID | Not null, Unique | Direct mapping with validation |
+| Silver | SI_LICENSES | ASSIGNED_TO_USER_ID | Bronze | BZ_LICENSES | ASSIGNED_TO_USER_ID | Not null, Valid foreign key reference | Validate against SI_USERS.USER_ID |
+| Silver | SI_LICENSES | LICENSE_TYPE | Bronze | BZ_LICENSES | LICENSE_TYPE | Not null, Valid enumeration (Basic, Pro, Enterprise, Add-on) | Standardize to predefined values |
+| Silver | SI_LICENSES | START_DATE | Bronze | BZ_LICENSES | START_DATE | Not null, Valid date | Direct mapping with validation |
+| Silver | SI_LICENSES | END_DATE | Bronze | BZ_LICENSES | END_DATE | Not null, Valid date, >= START_DATE | Validate date logic |
+| Silver | SI_LICENSES | LICENSE_STATUS | Bronze | BZ_LICENSES | - | Not null, Valid enumeration (Active, Expired, Suspended) | Derive based on current date vs END_DATE |
+| Silver | SI_LICENSES | ASSIGNED_USER_NAME | Bronze | BZ_USERS | USER_NAME | Not null | Join with BZ_USERS on ASSIGNED_TO_USER_ID |
+| Silver | SI_LICENSES | LICENSE_COST | Bronze | BZ_LICENSES | - | Non-negative number | Derive from license type and billing data |
+| Silver | SI_LICENSES | RENEWAL_STATUS | Bronze | BZ_LICENSES | - | Valid enumeration (Yes, No) | Derive from license metadata |
+| Silver | SI_LICENSES | UTILIZATION_PERCENTAGE | Bronze | BZ_LICENSES | - | Range 0-100 | Calculate based on usage metrics |
 | Silver | SI_LICENSES | LOAD_TIMESTAMP | Bronze | BZ_LICENSES | LOAD_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_LICENSES | UPDATE_TIMESTAMP | Bronze | BZ_LICENSES | UPDATE_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_LICENSES | SOURCE_SYSTEM | Bronze | BZ_LICENSES | SOURCE_SYSTEM | Not null | Direct mapping |
-| Silver | SI_LICENSES | DATA_QUALITY_SCORE | Bronze | BZ_LICENSES | - | Range 0.00 to 1.00 | Calculate based on completeness and validity |
-| Silver | SI_LICENSES | LOAD_DATE | Bronze | BZ_LICENSES | LOAD_TIMESTAMP | Not null | Extract date component |
-| Silver | SI_LICENSES | UPDATE_DATE | Bronze | BZ_LICENSES | UPDATE_TIMESTAMP | Not null | Extract date component |
+| Silver | SI_LICENSES | DATA_QUALITY_SCORE | Bronze | BZ_LICENSES | - | Range 0.00-1.00 | Calculate based on validation results |
+| Silver | SI_LICENSES | LOAD_DATE | Bronze | BZ_LICENSES | LOAD_TIMESTAMP | Not null | Extract date from load timestamp |
+| Silver | SI_LICENSES | UPDATE_DATE | Bronze | BZ_LICENSES | UPDATE_TIMESTAMP | Not null | Extract date from update timestamp |
 
-### 2.8 SI_WEBINARS - Webinar Data Mapping
+### 2.8 SI_WEBINARS Table Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Validation Rule | Transformation Rule |
 |--------------|--------------|--------------|--------------|--------------|--------------|-----------------|--------------------|
-| Silver | SI_WEBINARS | WEBINAR_ID | Bronze | BZ_WEBINARS | WEBINAR_ID | Not null, Unique | Direct mapping with trimming |
-| Silver | SI_WEBINARS | HOST_ID | Bronze | BZ_WEBINARS | HOST_ID | Not null, Exists in SI_USERS | Direct mapping with referential integrity check |
-| Silver | SI_WEBINARS | WEBINAR_TOPIC | Bronze | BZ_WEBINARS | WEBINAR_TOPIC | Length validation | Clean and standardize webinar topic |
-| Silver | SI_WEBINARS | START_TIME | Bronze | BZ_WEBINARS | START_TIME | Not null, Valid timestamp | Convert to UTC and validate format |
-| Silver | SI_WEBINARS | END_TIME | Bronze | BZ_WEBINARS | END_TIME | Not null, >= START_TIME | Convert to UTC and validate logic |
-| Silver | SI_WEBINARS | DURATION_MINUTES | Bronze | BZ_WEBINARS | - | >= 0 | Calculate DATEDIFF(minute, START_TIME, END_TIME) |
-| Silver | SI_WEBINARS | REGISTRANTS | Bronze | BZ_WEBINARS | REGISTRANTS | >= 0 | Direct mapping with non-negative validation |
-| Silver | SI_WEBINARS | ATTENDEES | Bronze | BZ_WEBINARS | - | >= 0, <= REGISTRANTS | Derive from actual attendance data |
-| Silver | SI_WEBINARS | ATTENDANCE_RATE | Bronze | BZ_WEBINARS | - | Range 0.00 to 100.00 | Calculate (ATTENDEES / REGISTRANTS) * 100 |
+| Silver | SI_WEBINARS | WEBINAR_ID | Bronze | BZ_WEBINARS | WEBINAR_ID | Not null, Unique | Direct mapping with validation |
+| Silver | SI_WEBINARS | HOST_ID | Bronze | BZ_WEBINARS | HOST_ID | Not null, Valid foreign key reference | Validate against SI_USERS.USER_ID |
+| Silver | SI_WEBINARS | WEBINAR_TOPIC | Bronze | BZ_WEBINARS | WEBINAR_TOPIC | Valid format | TRIM and standardize topic |
+| Silver | SI_WEBINARS | START_TIME | Bronze | BZ_WEBINARS | START_TIME | Not null, Valid timestamp | Convert to UTC and validate |
+| Silver | SI_WEBINARS | END_TIME | Bronze | BZ_WEBINARS | END_TIME | Not null, Valid timestamp, >= START_TIME | Convert to UTC and validate logic |
+| Silver | SI_WEBINARS | DURATION_MINUTES | Bronze | BZ_WEBINARS | - | Not null, Non-negative | Calculate DATEDIFF(minute, START_TIME, END_TIME) |
+| Silver | SI_WEBINARS | REGISTRANTS | Bronze | BZ_WEBINARS | REGISTRANTS | Not null, Non-negative integer | Direct mapping with validation |
+| Silver | SI_WEBINARS | ATTENDEES | Bronze | BZ_WEBINARS | - | Non-negative integer, <= REGISTRANTS | Count actual attendees from participant data |
+| Silver | SI_WEBINARS | ATTENDANCE_RATE | Bronze | BZ_WEBINARS | - | Range 0-100 | Calculate (ATTENDEES / REGISTRANTS) * 100 |
 | Silver | SI_WEBINARS | LOAD_TIMESTAMP | Bronze | BZ_WEBINARS | LOAD_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_WEBINARS | UPDATE_TIMESTAMP | Bronze | BZ_WEBINARS | UPDATE_TIMESTAMP | Not null | Direct mapping |
 | Silver | SI_WEBINARS | SOURCE_SYSTEM | Bronze | BZ_WEBINARS | SOURCE_SYSTEM | Not null | Direct mapping |
-| Silver | SI_WEBINARS | DATA_QUALITY_SCORE | Bronze | BZ_WEBINARS | - | Range 0.00 to 1.00 | Calculate based on completeness and validity |
-| Silver | SI_WEBINARS | LOAD_DATE | Bronze | BZ_WEBINARS | LOAD_TIMESTAMP | Not null | Extract date component |
-| Silver | SI_WEBINARS | UPDATE_DATE | Bronze | BZ_WEBINARS | UPDATE_TIMESTAMP | Not null | Extract date component |
+| Silver | SI_WEBINARS | DATA_QUALITY_SCORE | Bronze | BZ_WEBINARS | - | Range 0.00-1.00 | Calculate based on validation results |
+| Silver | SI_WEBINARS | LOAD_DATE | Bronze | BZ_WEBINARS | LOAD_TIMESTAMP | Not null | Extract date from load timestamp |
+| Silver | SI_WEBINARS | UPDATE_DATE | Bronze | BZ_WEBINARS | UPDATE_TIMESTAMP | Not null | Extract date from update timestamp |
 
-### 2.9 SI_DATA_QUALITY_ERRORS - Error Data Mapping
+### 2.9 SI_DATA_QUALITY_ERRORS Table Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Validation Rule | Transformation Rule |
 |--------------|--------------|--------------|--------------|--------------|--------------|-----------------|--------------------|
 | Silver | SI_DATA_QUALITY_ERRORS | ERROR_ID | Bronze | - | - | Not null, Unique | Generate UUID for each error record |
 | Silver | SI_DATA_QUALITY_ERRORS | SOURCE_TABLE | Bronze | - | - | Not null | Populate with source table name during validation |
 | Silver | SI_DATA_QUALITY_ERRORS | SOURCE_RECORD_ID | Bronze | - | - | Not null | Populate with source record identifier |
-| Silver | SI_DATA_QUALITY_ERRORS | ERROR_TYPE | Bronze | - | - | Must be in (Missing Value, Invalid Format, Constraint Violation, Duplicate) | Categorize based on validation failure type |
+| Silver | SI_DATA_QUALITY_ERRORS | ERROR_TYPE | Bronze | - | - | Not null, Valid enumeration | Categorize error type during validation |
 | Silver | SI_DATA_QUALITY_ERRORS | ERROR_COLUMN | Bronze | - | - | Not null | Populate with column name where error occurred |
-| Silver | SI_DATA_QUALITY_ERRORS | ERROR_DESCRIPTION | Bronze | - | - | Not null | Generate descriptive error message |
-| Silver | SI_DATA_QUALITY_ERRORS | ERROR_SEVERITY | Bronze | - | - | Must be in (Critical, High, Medium, Low) | Assign based on business impact |
+| Silver | SI_DATA_QUALITY_ERRORS | ERROR_DESCRIPTION | Bronze | - | - | Not null | Generate detailed error description |
+| Silver | SI_DATA_QUALITY_ERRORS | ERROR_SEVERITY | Bronze | - | - | Not null, Valid enumeration (Critical, High, Medium, Low) | Assign severity based on error type |
 | Silver | SI_DATA_QUALITY_ERRORS | DETECTED_TIMESTAMP | Bronze | - | - | Not null | Set to current timestamp when error detected |
-| Silver | SI_DATA_QUALITY_ERRORS | RESOLUTION_STATUS | Bronze | - | - | Must be in (Open, In Progress, Resolved, Ignored) | Default to 'Open' for new errors |
-| Silver | SI_DATA_QUALITY_ERRORS | RESOLUTION_ACTION | Bronze | - | - | Length validation | Populate when resolution action is taken |
-| Silver | SI_DATA_QUALITY_ERRORS | RESOLVED_TIMESTAMP | Bronze | - | - | >= DETECTED_TIMESTAMP | Set when error is resolved |
-| Silver | SI_DATA_QUALITY_ERRORS | RESOLVED_BY | Bronze | - | - | Length validation | Populate with user/process that resolved error |
+| Silver | SI_DATA_QUALITY_ERRORS | RESOLUTION_STATUS | Bronze | - | - | Not null, Valid enumeration (Open, In Progress, Resolved, Ignored) | Default to 'Open' |
+| Silver | SI_DATA_QUALITY_ERRORS | RESOLUTION_ACTION | Bronze | - | - | Valid format | Populate when resolution action is taken |
+| Silver | SI_DATA_QUALITY_ERRORS | RESOLVED_TIMESTAMP | Bronze | - | - | Valid timestamp | Set when error is resolved |
+| Silver | SI_DATA_QUALITY_ERRORS | RESOLVED_BY | Bronze | - | - | Valid format | Populate with resolver identifier |
 | Silver | SI_DATA_QUALITY_ERRORS | LOAD_DATE | Bronze | - | - | Not null | Set to current date |
 | Silver | SI_DATA_QUALITY_ERRORS | UPDATE_DATE | Bronze | - | - | Not null | Set to current date |
-| Silver | SI_DATA_QUALITY_ERRORS | SOURCE_SYSTEM | Bronze | - | - | Not null | Set to 'Data Quality Engine' |
+| Silver | SI_DATA_QUALITY_ERRORS | SOURCE_SYSTEM | Bronze | - | - | Not null | Set to 'Silver Layer Validation' |
 
-### 2.10 SI_PIPELINE_AUDIT - Audit Data Mapping
+### 2.10 SI_PIPELINE_AUDIT Table Mapping
 
 | Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Validation Rule | Transformation Rule |
 |--------------|--------------|--------------|--------------|--------------|--------------|-----------------|--------------------|
-| Silver | SI_PIPELINE_AUDIT | EXECUTION_ID | Bronze | BZ_AUDIT_RECORDS | RECORD_ID | Not null, Unique | Generate UUID for each pipeline execution |
-| Silver | SI_PIPELINE_AUDIT | PIPELINE_NAME | Bronze | BZ_AUDIT_RECORDS | SOURCE_TABLE | Not null | Map to standardized pipeline names |
-| Silver | SI_PIPELINE_AUDIT | START_TIME | Bronze | BZ_AUDIT_RECORDS | LOAD_TIMESTAMP | Not null | Direct mapping |
-| Silver | SI_PIPELINE_AUDIT | END_TIME | Bronze | BZ_AUDIT_RECORDS | - | >= START_TIME | Calculate from processing time |
-| Silver | SI_PIPELINE_AUDIT | STATUS | Bronze | BZ_AUDIT_RECORDS | STATUS | Must be in (Success, Failed, Partial Success, Cancelled) | Standardize status values |
-| Silver | SI_PIPELINE_AUDIT | ERROR_MESSAGE | Bronze | BZ_AUDIT_RECORDS | ERROR_MESSAGE | Length validation | Direct mapping |
-| Silver | SI_PIPELINE_AUDIT | EXECUTION_DURATION_SECONDS | Bronze | BZ_AUDIT_RECORDS | PROCESSING_TIME | >= 0 | Direct mapping |
-| Silver | SI_PIPELINE_AUDIT | SOURCE_TABLES_PROCESSED | Bronze | BZ_AUDIT_RECORDS | SOURCE_TABLE | Not null | Aggregate source tables per execution |
-| Silver | SI_PIPELINE_AUDIT | TARGET_TABLES_UPDATED | Bronze | BZ_AUDIT_RECORDS | - | Not null | Map to target Silver tables |
-| Silver | SI_PIPELINE_AUDIT | RECORDS_PROCESSED | Bronze | BZ_AUDIT_RECORDS | RECORD_COUNT | >= 0 | Direct mapping |
-| Silver | SI_PIPELINE_AUDIT | RECORDS_INSERTED | Bronze | BZ_AUDIT_RECORDS | - | >= 0 | Calculate from processing results |
-| Silver | SI_PIPELINE_AUDIT | RECORDS_UPDATED | Bronze | BZ_AUDIT_RECORDS | - | >= 0 | Calculate from processing results |
-| Silver | SI_PIPELINE_AUDIT | RECORDS_REJECTED | Bronze | BZ_AUDIT_RECORDS | - | >= 0 | Calculate from data quality errors |
-| Silver | SI_PIPELINE_AUDIT | EXECUTED_BY | Bronze | BZ_AUDIT_RECORDS | PROCESSED_BY | Not null | Direct mapping |
-| Silver | SI_PIPELINE_AUDIT | EXECUTION_ENVIRONMENT | Bronze | BZ_AUDIT_RECORDS | - | Must be in (Dev, Test, Prod) | Derive from system environment |
-| Silver | SI_PIPELINE_AUDIT | DATA_LINEAGE_INFO | Bronze | BZ_AUDIT_RECORDS | - | Length validation | Generate lineage information |
-| Silver | SI_PIPELINE_AUDIT | LOAD_DATE | Bronze | BZ_AUDIT_RECORDS | LOAD_TIMESTAMP | Not null | Extract date component |
-| Silver | SI_PIPELINE_AUDIT | UPDATE_DATE | Bronze | BZ_AUDIT_RECORDS | LOAD_TIMESTAMP | Not null | Extract date component |
-| Silver | SI_PIPELINE_AUDIT | SOURCE_SYSTEM | Bronze | BZ_AUDIT_RECORDS | - | Not null | Set to 'Pipeline Audit System' |
+| Silver | SI_PIPELINE_AUDIT | EXECUTION_ID | Bronze | - | - | Not null, Unique | Generate UUID for each pipeline execution |
+| Silver | SI_PIPELINE_AUDIT | PIPELINE_NAME | Bronze | - | - | Not null | Set to specific pipeline name |
+| Silver | SI_PIPELINE_AUDIT | START_TIME | Bronze | - | - | Not null | Set to pipeline start timestamp |
+| Silver | SI_PIPELINE_AUDIT | END_TIME | Bronze | - | - | Valid timestamp, >= START_TIME | Set to pipeline completion timestamp |
+| Silver | SI_PIPELINE_AUDIT | STATUS | Bronze | - | - | Not null, Valid enumeration (Success, Failed, Partial Success, Cancelled) | Set based on pipeline execution result |
+| Silver | SI_PIPELINE_AUDIT | ERROR_MESSAGE | Bronze | - | - | Valid format | Populate if pipeline encounters errors |
+| Silver | SI_PIPELINE_AUDIT | EXECUTION_DURATION_SECONDS | Bronze | - | - | Non-negative | Calculate END_TIME - START_TIME in seconds |
+| Silver | SI_PIPELINE_AUDIT | SOURCE_TABLES_PROCESSED | Bronze | - | - | Valid format | List all Bronze tables processed |
+| Silver | SI_PIPELINE_AUDIT | TARGET_TABLES_UPDATED | Bronze | - | - | Valid format | List all Silver tables updated |
+| Silver | SI_PIPELINE_AUDIT | RECORDS_PROCESSED | Bronze | - | - | Non-negative integer | Count total records processed |
+| Silver | SI_PIPELINE_AUDIT | RECORDS_INSERTED | Bronze | - | - | Non-negative integer | Count new records inserted |
+| Silver | SI_PIPELINE_AUDIT | RECORDS_UPDATED | Bronze | - | - | Non-negative integer | Count existing records updated |
+| Silver | SI_PIPELINE_AUDIT | RECORDS_REJECTED | Bronze | - | - | Non-negative integer | Count records rejected due to quality issues |
+| Silver | SI_PIPELINE_AUDIT | EXECUTED_BY | Bronze | - | - | Not null | Set to user or system executing pipeline |
+| Silver | SI_PIPELINE_AUDIT | EXECUTION_ENVIRONMENT | Bronze | - | - | Not null, Valid enumeration (Dev, Test, Prod) | Set based on execution environment |
+| Silver | SI_PIPELINE_AUDIT | DATA_LINEAGE_INFO | Bronze | - | - | Valid format | Document data transformation lineage |
+| Silver | SI_PIPELINE_AUDIT | LOAD_DATE | Bronze | - | - | Not null | Set to current date |
+| Silver | SI_PIPELINE_AUDIT | UPDATE_DATE | Bronze | - | - | Not null | Set to current date |
+| Silver | SI_PIPELINE_AUDIT | SOURCE_SYSTEM | Bronze | - | - | Not null | Set to 'Silver Layer Pipeline' |
 
-## 3. Data Quality and Validation Rules Summary
+## 3. Data Quality and Validation Rules
 
-### 3.1 Critical Validation Rules
+### 3.1 Primary Validation Rules
 
-1. **Referential Integrity**
-   - All HOST_ID references must exist in SI_USERS
-   - All MEETING_ID references must exist in SI_MEETINGS
-   - All USER_ID references must exist in SI_USERS
-   - All ASSIGNED_TO_USER_ID references must exist in SI_USERS
+1. **Referential Integrity Checks**
+   - All foreign key references must exist in target tables
+   - HOST_ID in meetings must exist in users table
+   - USER_ID in all dependent tables must exist in users table
+   - MEETING_ID in participants and feature usage must exist in meetings table
 
-2. **Data Type and Format Validation**
+2. **Data Type and Format Validations**
    - Email addresses must follow valid email format pattern
-   - Timestamps must be in valid ISO 8601 format
-   - Numeric fields must be within specified ranges
-   - Enumerated values must be from predefined lists
+   - Dates must be valid and not in the future (where applicable)
+   - Numeric values must be within specified ranges
+   - Enumerated values must match predefined lists
 
-3. **Business Logic Validation**
-   - END_TIME must be >= START_TIME for meetings and webinars
-   - LEAVE_TIME must be >= JOIN_TIME for participants
-   - Duration calculations must be consistent with timestamps
-   - Date fields cannot be future dates where specified
+3. **Business Logic Validations**
+   - End times must be greater than or equal to start times
+   - Duration calculations must be consistent with start/end times
+   - Attendance duration cannot exceed meeting duration
+   - Attendees cannot exceed registrants for webinars
 
 4. **Data Quality Scoring**
-   - Completeness: Percentage of non-null required fields
-   - Validity: Percentage of fields passing format validation
-   - Consistency: Percentage of fields passing business rule validation
-   - Overall Score: Weighted average of completeness, validity, and consistency
+   - Calculate quality score based on validation results
+   - Score range: 0.00 (poor quality) to 1.00 (excellent quality)
+   - Consider completeness, accuracy, consistency, and validity
 
 ### 3.2 Error Handling and Logging
 
 1. **Error Classification**
-   - **Critical**: Data that prevents processing (missing primary keys, invalid references)
-   - **High**: Data that affects business calculations (invalid amounts, dates)
-   - **Medium**: Data that affects reporting quality (missing optional fields)
-   - **Low**: Data that affects presentation (formatting issues)
+   - Critical: Data that prevents processing (missing required fields)
+   - High: Data that affects business logic (invalid references)
+   - Medium: Data that affects quality (format issues)
+   - Low: Data that affects completeness (missing optional fields)
 
 2. **Error Resolution Process**
-   - Critical and High errors: Reject record and log for manual review
-   - Medium errors: Accept record with default values and log for review
-   - Low errors: Accept record with corrections and log for monitoring
+   - Log all validation errors in SI_DATA_QUALITY_ERRORS table
+   - Implement automated correction for common issues
+   - Flag records requiring manual review
+   - Track resolution status and actions taken
 
-3. **Monitoring and Alerting**
-   - Daily data quality reports generated automatically
-   - Alerts triggered when error rates exceed thresholds
-   - Trend analysis for proactive data quality management
+3. **Audit Trail Maintenance**
+   - Record all pipeline executions in SI_PIPELINE_AUDIT table
+   - Track processing statistics and performance metrics
+   - Maintain data lineage information
+   - Enable troubleshooting and performance optimization
 
-## 4. Implementation Recommendations
+## 4. Implementation Guidelines
 
-### 4.1 ETL Process Design
+### 4.1 ETL Process Flow
 
-1. **Staged Processing**
-   - Stage 1: Data extraction and basic cleansing
-   - Stage 2: Validation and business rule application
-   - Stage 3: Data quality scoring and error logging
-   - Stage 4: Final transformation and loading
+1. **Extract Phase**
+   - Read data from Bronze layer tables
+   - Apply initial data type conversions
+   - Handle null values and missing data
 
-2. **Performance Optimization**
-   - Use Snowflake clustering keys for frequently queried columns
-   - Implement incremental processing for large tables
-   - Optimize joins using appropriate join strategies
-   - Use materialized views for complex aggregations
+2. **Transform Phase**
+   - Apply validation rules and business logic
+   - Perform data cleansing and standardization
+   - Calculate derived fields and metrics
+   - Generate data quality scores
 
-3. **Error Recovery**
-   - Implement retry logic for transient errors
-   - Maintain processing checkpoints for restart capability
-   - Provide manual override capabilities for data quality issues
-   - Implement rollback procedures for failed processing
+3. **Load Phase**
+   - Insert/update records in Silver layer tables
+   - Log validation errors and processing statistics
+   - Update audit trail and metadata
 
-### 4.2 Data Governance
+### 4.2 Performance Optimization
 
-1. **Data Lineage Tracking**
-   - Document all transformation rules and business logic
-   - Maintain audit trail of all data changes
-   - Implement impact analysis for schema changes
-   - Provide data dictionary and documentation
+1. **Incremental Processing**
+   - Process only changed records based on update timestamps
+   - Implement change data capture (CDC) where possible
+   - Use clustering keys for frequently queried columns
 
-2. **Quality Monitoring**
-   - Establish data quality KPIs and thresholds
-   - Implement automated data profiling
-   - Provide data quality dashboards and reports
-   - Conduct regular data quality assessments
+2. **Parallel Processing**
+   - Process independent tables in parallel
+   - Use Snowflake's multi-cluster warehouses for scalability
+   - Implement proper error handling for concurrent operations
 
-3. **Change Management**
-   - Version control for all mapping rules and transformations
-   - Impact assessment for business rule changes
-   - Testing procedures for mapping updates
-   - Documentation of all changes and rationale
+### 4.3 Monitoring and Alerting
 
-This comprehensive data mapping provides the foundation for reliable, high-quality data transformation from the Bronze to Silver layer, ensuring that downstream analytics and reporting are built on clean, validated, and well-governed data.
+1. **Data Quality Monitoring**
+   - Set up alerts for data quality score thresholds
+   - Monitor error rates and resolution times
+   - Track data freshness and processing delays
+
+2. **Pipeline Monitoring**
+   - Monitor pipeline execution times and success rates
+   - Set up alerts for pipeline failures
+   - Track resource utilization and performance metrics
+
+This comprehensive data mapping provides the foundation for a robust Silver layer implementation that ensures data quality, consistency, and usability across the Zoom Platform Analytics System.
