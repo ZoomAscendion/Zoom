@@ -13,12 +13,12 @@
             STATUS, 
             CREATED_BY
         ) 
-        VALUES (
+        SELECT 
             'BZ_WEBINARS', 
             CURRENT_TIMESTAMP(), 
             'STARTED', 
             'DBT_PIPELINE'
-        )
+        WHERE NOT EXISTS (SELECT 1 FROM {{ ref('bz_audit_log') }} WHERE SOURCE_TABLE = 'BZ_WEBINARS' AND STATUS = 'STARTED')
     ",
     post_hook="
         INSERT INTO {{ ref('bz_audit_log') }} (
@@ -27,12 +27,12 @@
             STATUS, 
             CREATED_BY
         ) 
-        VALUES (
+        SELECT 
             'BZ_WEBINARS', 
             CURRENT_TIMESTAMP(), 
             'COMPLETED', 
             'DBT_PIPELINE'
-        )
+        WHERE NOT EXISTS (SELECT 1 FROM {{ ref('bz_audit_log') }} WHERE SOURCE_TABLE = 'BZ_WEBINARS' AND STATUS = 'COMPLETED')
     "
 ) }}
 
