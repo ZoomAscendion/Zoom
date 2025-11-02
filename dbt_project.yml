@@ -2,7 +2,7 @@ name: 'zoom_analytics'
 version: '1.0.0'
 config-version: 2
 
-profile: 'default'
+profile: 'zoom_analytics'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -20,4 +20,7 @@ models:
   zoom_analytics:
     silver:
       +materialized: table
-      +tags: ["silver"]
+
+vars:
+  current_timestamp: "CURRENT_TIMESTAMP()"
+  execution_id: "{{ invocation_id }}"
