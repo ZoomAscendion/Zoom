@@ -1,0 +1,46 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "Bronze layer tables containing raw data"
+    tables:
+      - name: BZ_USERS
+        description: "User information from bronze layer"
+      - name: BZ_MEETINGS
+        description: "Meeting information from bronze layer"
+      - name: BZ_PARTICIPANTS
+        description: "Meeting participants from bronze layer"
+      - name: BZ_FEATURE_USAGE
+        description: "Feature usage data from bronze layer"
+      - name: BZ_SUPPORT_TICKETS
+        description: "Support tickets from bronze layer"
+      - name: BZ_BILLING_EVENTS
+        description: "Billing events from bronze layer"
+      - name: BZ_LICENSES
+        description: "License information from bronze layer"
+      - name: BZ_WEBINARS
+        description: "Webinar information from bronze layer"
+
+models:
+  - name: audit_log
+    description: "Audit log for tracking pipeline execution"
+  - name: si_users
+    description: "Silver layer users table with enhanced data quality"
+  - name: si_meetings
+    description: "Silver layer meetings table with enhanced data quality"
+  - name: si_participants
+    description: "Silver layer participants table with enhanced data quality"
+  - name: si_feature_usage
+    description: "Silver layer feature usage table with enhanced data quality"
+  - name: si_support_tickets
+    description: "Silver layer support tickets table with enhanced data quality"
+  - name: si_billing_events
+    description: "Silver layer billing events table with enhanced data quality"
+  - name: si_licenses
+    description: "Silver layer licenses table with enhanced data quality"
+  - name: si_webinars
+    description: "Silver layer webinars table with enhanced data quality"
+  - name: si_data_quality_errors
+    description: "Silver layer data quality errors tracking table"
+  - name: si_pipeline_audit
+    description: "Silver layer pipeline audit table"
