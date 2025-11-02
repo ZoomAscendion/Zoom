@@ -1,14 +1,21 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('audit_log') }} (EXECUTION_ID, PIPELINE_NAME, START_TIME, STATUS, SOURCE_TABLES_PROCESSED, TARGET_TABLES_UPDATED, EXECUTED_BY, EXECUTION_ENVIRONMENT, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT 'EXEC_MEETINGS_' || TO_CHAR(CURRENT_TIMESTAMP(), 'YYYYMMDDHH24MISS'), 'SI_MEETINGS_PIPELINE', CURRENT_TIMESTAMP(), 'In Progress', 'BZ_MEETINGS', 'SI_MEETINGS', 'DBT_SILVER_PIPELINE', 'PROD', CURRENT_DATE(), CURRENT_DATE(), 'ZOOM_PLATFORM' WHERE NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'AUDIT_LOG')",
-    post_hook="INSERT INTO {{ ref('audit_log') }} (EXECUTION_ID, PIPELINE_NAME, START_TIME, END_TIME, STATUS, RECORDS_PROCESSED, RECORDS_INSERTED, SOURCE_TABLES_PROCESSED, TARGET_TABLES_UPDATED, EXECUTED_BY, EXECUTION_ENVIRONMENT, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT 'EXEC_MEETINGS_' || TO_CHAR(CURRENT_TIMESTAMP(), 'YYYYMMDDHH24MISS'), 'SI_MEETINGS_PIPELINE', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 'Success', COUNT(*), COUNT(*), 'BZ_MEETINGS', 'SI_MEETINGS', 'DBT_SILVER_PIPELINE', 'PROD', CURRENT_DATE(), CURRENT_DATE(), 'ZOOM_PLATFORM' FROM {{ this }} WHERE NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'AUDIT_LOG')"
+    materialized='table'
 ) }}
 
 -- Silver Layer Meetings Model
 -- Transforms bronze meetings data with enrichment and data quality validations
 
 WITH bronze_meetings AS (
-    SELECT *
+    SELECT 
+        MEETING_ID,
+        HOST_ID,
+        MEETING_TOPIC,
+        START_TIME,
+        END_TIME,
+        DURATION_MINUTES,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
     FROM {{ source('bronze', 'bz_meetings') }}
 ),
 
@@ -45,16 +52,6 @@ deduped_meetings AS (
            ROW_NUMBER() OVER (PARTITION BY MEETING_ID ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC) AS rn
     FROM data_quality_checks
     WHERE HOST_QUALITY_FLAG != 'MISSING_HOST'  -- Block records with missing host
-),
-
--- Enrichment with user data
-enriched_meetings AS (
-    SELECT 
-        m.*,
-        u.USER_NAME AS HOST_NAME
-    FROM deduped_meetings m
-    LEFT JOIN {{ ref('si_users') }} u ON m.HOST_ID = u.USER_ID
-    WHERE m.rn = 1
 ),
 
 -- Participant count calculation
@@ -99,8 +96,8 @@ transformed_meetings AS (
             ELSE m.DURATION_MINUTES
         END AS DURATION_MINUTES,
         
-        -- Enriched fields
-        COALESCE(m.HOST_NAME, 'Unknown Host') AS HOST_NAME,
+        -- Host name (simplified - using HOST_ID as placeholder)
+        COALESCE(m.HOST_ID, 'Unknown Host') AS HOST_NAME,
         
         -- Meeting status derivation
         CASE 
@@ -140,8 +137,9 @@ transformed_meetings AS (
         DATE(m.LOAD_TIMESTAMP) AS LOAD_DATE,
         DATE(m.UPDATE_TIMESTAMP) AS UPDATE_DATE
         
-    FROM enriched_meetings m
+    FROM deduped_meetings m
     LEFT JOIN participant_counts pc ON m.MEETING_ID = pc.MEETING_ID
+    WHERE m.rn = 1
 )
 
 SELECT 
