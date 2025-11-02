@@ -18,25 +18,14 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/example/
     silver:
       +materialized: table
-    bronze:
-      +materialized: view
+      +on_schema_change: sync_all_columns
 
 vars:
-  # The `start_date` variable will be accessible in all resources
-  start_date: '2024-01-01'
-  
-# Configure seeds
-seeds:
-  zoom_silver_pipeline:
-    +quote_columns: false
-
-# Configure snapshots
-snapshots:
-  zoom_silver_pipeline:
-    +target_schema: snapshots
+  # Set the timezone for timestamp operations
+  timezone: 'UTC'
+  # Set the default schema for sources
+  bronze_schema: 'BRONZE'
