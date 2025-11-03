@@ -1,9 +1,7 @@
 {{
     config(
         materialized='table',
-        on_schema_change='sync_all_columns',
-        pre_hook="INSERT INTO {{ ref('si_pipeline_audit') }} (EXECUTION_ID, PIPELINE_NAME, START_TIME, STATUS, EXECUTED_BY, EXECUTION_ENVIRONMENT, LOAD_DATE, SOURCE_SYSTEM) SELECT 'MTG_' || REPLACE(REPLACE(CURRENT_TIMESTAMP()::STRING, ' ', '_'), ':', '') || '_START', 'SI_MEETINGS_TRANSFORM', CURRENT_TIMESTAMP(), 'RUNNING', 'DBT_SILVER_PIPELINE', 'PRODUCTION', CURRENT_DATE(), 'ZOOM_PLATFORM'",
-        post_hook="INSERT INTO {{ ref('si_pipeline_audit') }} (EXECUTION_ID, PIPELINE_NAME, START_TIME, END_TIME, STATUS, EXECUTION_DURATION_SECONDS, RECORDS_PROCESSED, EXECUTED_BY, EXECUTION_ENVIRONMENT, LOAD_DATE, SOURCE_SYSTEM) SELECT 'MTG_' || REPLACE(REPLACE(CURRENT_TIMESTAMP()::STRING, ' ', '_'), ':', '') || '_END', 'SI_MEETINGS_TRANSFORM', CURRENT_TIMESTAMP() - INTERVAL '2' MINUTE, CURRENT_TIMESTAMP(), 'SUCCESS', 120, (SELECT COUNT(*) FROM {{ this }}), 'DBT_SILVER_PIPELINE', 'PRODUCTION', CURRENT_DATE(), 'ZOOM_PLATFORM'"
+        on_schema_change='sync_all_columns'
     )
 }}
 
@@ -38,7 +36,7 @@ meetings_with_host AS (
         m.LOAD_TIMESTAMP,
         m.UPDATE_TIMESTAMP,
         m.SOURCE_SYSTEM,
-        u.USER_NAME AS HOST_NAME
+        COALESCE(u.USER_NAME, 'Unknown Host') AS HOST_NAME
     FROM bronze_meetings m
     LEFT JOIN {{ ref('si_users') }} u ON m.HOST_ID = u.USER_ID
 ),
@@ -92,7 +90,7 @@ meetings_cleaned AS (
             ELSE m.DURATION_MINUTES
         END AS DURATION_MINUTES,
         
-        COALESCE(m.HOST_NAME, 'Unknown Host') AS HOST_NAME,
+        m.HOST_NAME,
         
         -- Derive meeting status from timestamps
         CASE 
