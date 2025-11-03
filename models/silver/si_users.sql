@@ -15,7 +15,7 @@ WITH source_data AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ ref('bz_users') }}
+    FROM DB_POC_ZOOM.BRONZE.BZ_USERS
     WHERE USER_ID IS NOT NULL
 ),
 
