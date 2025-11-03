@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('si_pipeline_audit') }} (EXECUTION_ID, PIPELINE_NAME, START_TIME, STATUS, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT CONCAT('EXEC_SI_USERS_', DATE_PART('epoch', CURRENT_TIMESTAMP())::STRING), 'SILVER_SI_USERS', CURRENT_TIMESTAMP(), 'In Progress', 'DBT_SILVER_PIPELINE', CURRENT_DATE(), CURRENT_DATE(), 'BRONZE_BZ_USERS' WHERE NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SI_PIPELINE_AUDIT')",
-    post_hook="UPDATE {{ ref('si_pipeline_audit') }} SET END_TIME = CURRENT_TIMESTAMP(), STATUS = 'Success', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}) WHERE PIPELINE_NAME = 'SILVER_SI_USERS' AND STATUS = 'In Progress'"
+    materialized='table'
 ) }}
 
 -- Silver Layer Users Table
@@ -9,7 +7,7 @@
 
 WITH bronze_users AS (
     SELECT *
-    FROM {{ ref('bz_users') }}
+    FROM {{ source('bronze', 'bz_users') }}
     WHERE USER_ID IS NOT NULL  -- Basic null check for primary identifier
 ),
 
