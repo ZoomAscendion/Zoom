@@ -2,7 +2,7 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_silver_pipeline'
+profile: 'zoom_analytics'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -22,6 +22,11 @@ models:
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
-      si_pipeline_audit:
-        +pre_hook: []
-        +post_hook: []
+
+vars:
+  # Data quality thresholds
+  min_data_quality_score: 0.5
+  
+  # Audit settings
+  enable_audit_logging: true
+  audit_retention_days: 90
