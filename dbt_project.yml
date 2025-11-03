@@ -2,8 +2,10 @@ name: 'zoom_analytics'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_analytics'
+# This setting configures which "profile" dbt uses for this project.
+profile: 'user'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -16,16 +18,19 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
   zoom_analytics:
+    # Config indicated by + and applies to all files under models/example/
     bronze:
       +materialized: table
     silver:
       +materialized: table
-      +on_schema_change: sync_all_columns
     gold:
       +materialized: table
 
 vars:
-  current_timestamp: "{{ run_started_at }}"
-  audit_user: "DBT_SILVER_PIPELINE"
+  # The `start_date` variable will be accessible in all resources
+  start_date: '2020-01-01'
+  # The `end_date` variable will be accessible in all resources  
+  end_date: '2030-12-31'
