@@ -1,0 +1,74 @@
+{{ config(materialized='table') }}
+
+WITH source_data AS (
+    SELECT 
+        USAGE_ID,
+        MEETING_ID,
+        FEATURE_NAME,
+        USAGE_COUNT,
+        USAGE_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ ref('bz_feature_usage') }}
+    WHERE USAGE_ID IS NOT NULL
+        AND MEETING_ID IS NOT NULL
+        AND FEATURE_NAME IS NOT NULL
+),
+
+cleaned_data AS (
+    SELECT 
+        USAGE_ID,
+        MEETING_ID,
+        TRIM(UPPER(FEATURE_NAME)) AS FEATURE_NAME,
+        CASE 
+            WHEN USAGE_COUNT < 0 THEN 0
+            ELSE USAGE_COUNT
+        END AS USAGE_COUNT,
+        CASE 
+            WHEN USAGE_COUNT > 0 THEN USAGE_COUNT * 5
+            ELSE 0
+        END AS USAGE_DURATION,
+        CASE 
+            WHEN UPPER(FEATURE_NAME) LIKE '%AUDIO%' OR UPPER(FEATURE_NAME) LIKE '%MIC%' THEN 'Audio'
+            WHEN UPPER(FEATURE_NAME) LIKE '%VIDEO%' OR UPPER(FEATURE_NAME) LIKE '%CAMERA%' THEN 'Video'
+            WHEN UPPER(FEATURE_NAME) LIKE '%SHARE%' OR UPPER(FEATURE_NAME) LIKE '%CHAT%' THEN 'Collaboration'
+            WHEN UPPER(FEATURE_NAME) LIKE '%SECURITY%' OR UPPER(FEATURE_NAME) LIKE '%PASSWORD%' THEN 'Security'
+            ELSE 'Other'
+        END AS FEATURE_CATEGORY,
+        USAGE_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        1.00 AS DATA_QUALITY_SCORE,
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE
+    FROM source_data
+    WHERE USAGE_DATE <= CURRENT_DATE()
+),
+
+deduplicated AS (
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY USAGE_ID 
+            ORDER BY UPDATE_TIMESTAMP DESC
+        ) AS row_num
+    FROM cleaned_data
+    QUALIFY row_num = 1
+)
+
+SELECT 
+    USAGE_ID,
+    MEETING_ID,
+    FEATURE_NAME,
+    USAGE_COUNT,
+    USAGE_DURATION,
+    FEATURE_CATEGORY,
+    USAGE_DATE,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    DATA_QUALITY_SCORE,
+    LOAD_DATE,
+    UPDATE_DATE
+FROM deduplicated
