@@ -2,14 +2,7 @@
     materialized='table'
 ) }}
 
--- Pre-hook: Log process start
-{% if this.name != 'audit_log' %}
-{{ config(
-    pre_hook="INSERT INTO {{ ref('audit_log') }} (source_table, process_start_time, status) VALUES ('{{ this.name }}', CURRENT_TIMESTAMP(), 'STARTED')"
-) }}
-{% endif %}
-
--- Main transformation
+-- Main transformation for SI_USERS
 WITH source_data AS (
     SELECT 
         USER_ID,
@@ -87,10 +80,3 @@ SELECT
     CURRENT_TIMESTAMP() AS created_at,
     CURRENT_TIMESTAMP() AS updated_at
 FROM deduplicated
-
--- Post-hook: Log process completion
-{% if this.name != 'audit_log' %}
-{{ config(
-    post_hook="UPDATE {{ ref('audit_log') }} SET process_end_time = CURRENT_TIMESTAMP(), status = 'COMPLETED', rows_processed = (SELECT COUNT(*) FROM {{ this }}) WHERE source_table = '{{ this.name }}' AND status = 'STARTED'"
-) }}
-{% endif %}
