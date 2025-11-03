@@ -1,4 +1,4 @@
-name: 'zoom_silver_pipeline'
+name: 'zoom_analytics'
 version: '1.0.0'
 config-version: 2
 
@@ -17,16 +17,15 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_silver_pipeline:
-    +materialized: table
+  zoom_analytics:
+    bronze:
+      +materialized: table
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
+    gold:
+      +materialized: table
 
 vars:
-  # Data quality thresholds
-  min_data_quality_score: 0.5
-  
-  # Audit settings
-  enable_audit_logging: true
-  audit_retention_days: 90
+  current_timestamp: "{{ run_started_at }}"
+  audit_user: "DBT_SILVER_PIPELINE"
