@@ -2,11 +2,6 @@
     materialized='table'
 ) }}
 
--- Pre-hook: Log process start
-{% if this.name != 'audit_log' %}
-{{ log("Starting transformation for " ~ this.name, info=true) }}
-{% endif %}
-
 -- Silver layer transformation for Users
 -- Source: BRONZE.BZ_USERS -> Target: SILVER.SI_USERS
 -- Includes data quality validations and standardization
@@ -21,7 +16,7 @@ WITH source_data AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'bz_users') }}
+    FROM {{ ref('bz_users') }}
     WHERE USER_ID IS NOT NULL
 ),
 
@@ -137,8 +132,3 @@ SELECT
     CURRENT_TIMESTAMP() AS updated_at
 FROM deduplicated_data
 WHERE DATA_QUALITY_SCORE >= 0.5  -- Only include records with acceptable quality
-
--- Post-hook: Log process completion
-{% if this.name != 'audit_log' %}
-{{ log("Completed transformation for " ~ this.name, info=true) }}
-{% endif %}
