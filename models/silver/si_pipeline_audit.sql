@@ -59,7 +59,7 @@ WITH audit_source AS (
         DATE(CREATED_TIMESTAMP) AS UPDATE_DATE,
         COALESCE(SOURCE_TABLE, 'UNKNOWN') AS SOURCE_SYSTEM
         
-    FROM {{ ref('bz_audit_records') }}
+    FROM {{ source('bronze', 'bz_audit_records') }}
     WHERE SOURCE_TABLE IS NOT NULL
 ),
 
