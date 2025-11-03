@@ -1,13 +1,13 @@
-name: 'zoom_analytics'
+name: 'silver_layer_project'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_analytics'
+profile: 'silver_layer_project'
 
 model-paths: ["models"]
-analysis-paths: ["analyses"]
+analysis-paths: ["analysis"]
 test-paths: ["tests"]
-seed-paths: ["seeds"]
+seed-paths: ["data"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
@@ -17,15 +17,6 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_analytics:
-    bronze:
-      +materialized: table
+  silver_layer_project:
     silver:
       +materialized: table
-      +on_schema_change: sync_all_columns
-    gold:
-      +materialized: table
-
-vars:
-  current_timestamp: "{{ run_started_at }}"
-  audit_user: "DBT_SILVER_PIPELINE"
