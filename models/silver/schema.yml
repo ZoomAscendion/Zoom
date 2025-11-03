@@ -164,3 +164,34 @@ models:
         description: "Overall data quality score for the record"
         tests:
           - not_null
+  
+  - name: si_participants
+    description: "Silver layer table storing cleaned participant attendance data"
+    columns:
+      - name: participant_id
+        description: "Unique identifier for each participant record"
+        tests:
+          - unique
+          - not_null
+      - name: meeting_id
+        description: "Reference to meeting"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('si_meetings')
+              field: meeting_id
+      - name: user_id
+        description: "Reference to user who participated"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('si_users')
+              field: user_id
+      - name: attendance_duration
+        description: "Calculated time participant spent in meeting"
+        tests:
+          - not_null
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+        tests:
+          - not_null
