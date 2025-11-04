@@ -253,3 +253,177 @@ models:
         description: Number of participants
       - name: data_quality_score
         description: Data quality score (0.00 to 1.00)
+        
+  - name: si_participants
+    description: Silver layer participants table with calculated metrics
+    columns:
+      - name: participant_id
+        description: Unique identifier for participants
+        tests:
+          - unique
+          - not_null
+      - name: meeting_id
+        description: Associated meeting ID
+        tests:
+          - not_null
+      - name: user_id
+        description: Participant user ID
+        tests:
+          - not_null
+      - name: join_time
+        description: Validated join timestamp
+      - name: leave_time
+        description: Validated leave timestamp
+      - name: attendance_duration
+        description: Calculated attendance duration
+      - name: participant_role
+        description: Role in the meeting
+      - name: connection_quality
+        description: Connection quality assessment
+      - name: data_quality_score
+        description: Data quality score (0.00 to 1.00)
+        
+  - name: si_feature_usage
+    description: Silver layer feature usage table with categorization
+    columns:
+      - name: usage_id
+        description: Unique identifier for usage records
+        tests:
+          - unique
+          - not_null
+      - name: meeting_id
+        description: Associated meeting ID
+        tests:
+          - not_null
+      - name: feature_name
+        description: Standardized feature name
+      - name: usage_count
+        description: Validated usage count
+      - name: usage_duration
+        description: Calculated usage duration
+      - name: feature_category
+        description: Feature category classification
+      - name: usage_date
+        description: Validated usage date
+      - name: data_quality_score
+        description: Data quality score (0.00 to 1.00)
+        
+  - name: si_support_tickets
+    description: Silver layer support tickets table with resolution metrics
+    columns:
+      - name: ticket_id
+        description: Unique identifier for tickets
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: User who created the ticket
+        tests:
+          - not_null
+      - name: ticket_type
+        description: Standardized ticket type
+      - name: priority_level
+        description: Derived priority level
+      - name: open_date
+        description: Validated open date
+      - name: close_date
+        description: Calculated close date
+      - name: resolution_status
+        description: Standardized resolution status
+      - name: issue_description
+        description: Generated issue description
+      - name: resolution_notes
+        description: Generated resolution notes
+      - name: resolution_time_hours
+        description: Calculated resolution time
+      - name: data_quality_score
+        description: Data quality score (0.00 to 1.00)
+        
+  - name: si_billing_events
+    description: Silver layer billing events table with financial standardization
+    columns:
+      - name: event_id
+        description: Unique identifier for billing events
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: Associated user ID
+        tests:
+          - not_null
+      - name: event_type
+        description: Standardized event type
+      - name: transaction_amount
+        description: Validated transaction amount
+      - name: transaction_date
+        description: Validated transaction date
+      - name: payment_method
+        description: Derived payment method
+      - name: currency_code
+        description: Currency code
+      - name: invoice_number
+        description: Generated invoice number
+      - name: transaction_status
+        description: Derived transaction status
+      - name: data_quality_score
+        description: Data quality score (0.00 to 1.00)
+        
+  - name: si_licenses
+    description: Silver layer licenses table with management metrics
+    columns:
+      - name: license_id
+        description: Unique identifier for licenses
+        tests:
+          - unique
+          - not_null
+      - name: assigned_to_user_id
+        description: User assigned to license
+        tests:
+          - not_null
+      - name: license_type
+        description: Standardized license type
+      - name: start_date
+        description: Validated start date
+      - name: end_date
+        description: Validated end date
+      - name: license_status
+        description: Derived license status
+      - name: assigned_user_name
+        description: Name of assigned user
+      - name: license_cost
+        description: Calculated license cost
+      - name: renewal_status
+        description: Derived renewal status
+      - name: utilization_percentage
+        description: Calculated utilization percentage
+      - name: data_quality_score
+        description: Data quality score (0.00 to 1.00)
+        
+  - name: si_webinars
+    description: Silver layer webinars table with engagement metrics
+    columns:
+      - name: webinar_id
+        description: Unique identifier for webinars
+        tests:
+          - unique
+          - not_null
+      - name: host_id
+        description: Webinar host user ID
+        tests:
+          - not_null
+      - name: webinar_topic
+        description: Standardized webinar topic
+      - name: start_time
+        description: Validated start time
+      - name: end_time
+        description: Validated end time
+      - name: duration_minutes
+        description: Calculated duration
+      - name: registrants
+        description: Validated registrant count
+      - name: attendees
+        description: Calculated attendee count
+      - name: attendance_rate
+        description: Calculated attendance rate
+      - name: data_quality_score
+        description: Data quality score (0.00 to 1.00)
