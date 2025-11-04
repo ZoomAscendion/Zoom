@@ -18,11 +18,6 @@ clean-targets:
 
 models:
   zoom_silver_pipeline:
+    +materialized: table
     silver:
       +materialized: table
-      +on_schema_change: "fail"
-
-vars:
-  # Data quality thresholds
-  dq_score_threshold: 0.80
-  max_processing_hours: 24
