@@ -21,8 +21,6 @@ models:
     +materialized: table
     silver:
       +materialized: table
-      +pre-hook: "INSERT INTO {{ this.database }}.{{ this.schema }}.SI_PIPELINE_AUDIT (EXECUTION_ID, PIPELINE_NAME, START_TIME, STATUS, EXECUTED_BY, EXECUTION_ENVIRONMENT, SOURCE_SYSTEM, LOAD_DATE, UPDATE_DATE) VALUES (CONCAT('{{ invocation_id }}', '_{{ this.name }}'), '{{ this.name }}', CURRENT_TIMESTAMP(), 'STARTED', 'DBT_SILVER_PIPELINE', 'PRODUCTION', 'ZOOM_PLATFORM', CURRENT_DATE(), CURRENT_DATE())"
-      +post-hook: "INSERT INTO {{ this.database }}.{{ this.schema }}.SI_PIPELINE_AUDIT (EXECUTION_ID, PIPELINE_NAME, END_TIME, STATUS, EXECUTED_BY, EXECUTION_ENVIRONMENT, SOURCE_SYSTEM, LOAD_DATE, UPDATE_DATE) VALUES (CONCAT('{{ invocation_id }}', '_{{ this.name }}'), '{{ this.name }}', CURRENT_TIMESTAMP(), 'COMPLETED', 'DBT_SILVER_PIPELINE', 'PRODUCTION', 'ZOOM_PLATFORM', CURRENT_DATE(), CURRENT_DATE())"
 
 vars:
   start_date: '2020-01-01'
