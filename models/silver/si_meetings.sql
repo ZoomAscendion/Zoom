@@ -16,7 +16,7 @@ WITH bronze_meetings AS (
         load_timestamp,
         update_timestamp,
         source_system
-    FROM {{ ref('bz_meetings') }}
+    FROM {{ source('bronze', 'bz_meetings') }}
     WHERE meeting_id IS NOT NULL
 ),
 
@@ -33,7 +33,7 @@ participant_counts AS (
     SELECT 
         meeting_id,
         COUNT(DISTINCT user_id) AS participant_count
-    FROM {{ ref('bz_participants') }}
+    FROM {{ source('bronze', 'bz_participants') }}
     WHERE meeting_id IS NOT NULL
     GROUP BY meeting_id
 ),
@@ -61,7 +61,7 @@ meetings_cleaned AS (
         
         -- Validate and correct start time
         CASE 
-            WHEN m.start_time > CURRENT_TIMESTAMP() + INTERVAL '1 YEAR'
+            WHEN m.start_time > DATEADD('year', 1, CURRENT_TIMESTAMP())
             THEN CURRENT_TIMESTAMP()
             ELSE m.start_time
         END AS start_time,
@@ -72,7 +72,7 @@ meetings_cleaned AS (
             THEN DATEADD('minute', COALESCE(m.duration_minutes, 60), m.start_time)
             WHEN m.end_time < m.start_time 
             THEN DATEADD('minute', COALESCE(m.duration_minutes, 60), m.start_time)
-            WHEN m.end_time > CURRENT_TIMESTAMP() + INTERVAL '1 YEAR'
+            WHEN m.end_time > DATEADD('year', 1, CURRENT_TIMESTAMP())
             THEN CURRENT_TIMESTAMP()
             ELSE m.end_time
         END AS end_time,
