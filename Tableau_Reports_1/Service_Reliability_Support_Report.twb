@@ -21,141 +21,158 @@
     </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
   </_.fcp.AnimationOnByDefault.false...style>
   <datasources>
-    <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' inline='true' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' version='18.1'>
+    <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' inline='true' name='federated.2B3C4D5E6F789012' version='18.1'>
       <connection class='federated'>
         <named-connections>
-          <named-connection caption='WDFMBAH-IA58548.snowflakecomputing.com' name='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7'>
-            <connection authentication='Username Password' class='snowflake' dbname='DB_POC_ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='WDFMBAH-IA58548.snowflakecomputing.com' service='ACCOUNTADMIN' username='KARTHIKVALLURI1985' password='Sathyanarayana@20' warehouse='COMPUTE_WH' />
+          <named-connection caption='WDFMBAH-IA58548.snowflakecomputing.com' name='snowflake.2B3C4D5E6F789012'>
+            <connection authentication='Username Password' class='snowflake' dbname='DB_POC_ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='WDFMBAH-IA58548.snowflakecomputing.com' service='ACCOUNTADMIN' username='KARTHIKVALLURI1985' password='Alwayslearnnew@2025' warehouse='COMPUTE_WH' />
           </named-connection>
         </named-connections>
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' name='GO_FACT_SUPPORT_METRICS' table='[DB_POC_ZOOM].[GOLD].[GO_FACT_SUPPORT_METRICS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' name='GO_FACT_SUPPORT_METRICS' table='[DB_POC_ZOOM].[GOLD].[GO_FACT_SUPPORT_METRICS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' name='GO_DIM_SUPPORT_CATEGORY' table='[DB_POC_ZOOM].[GOLD].[GO_DIM_SUPPORT_CATEGORY]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' name='GO_DIM_SUPPORT_CATEGORY' table='[DB_POC_ZOOM].[GOLD].[GO_DIM_SUPPORT_CATEGORY]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' name='GO_DIM_USER' table='[DB_POC_ZOOM].[GOLD].[GO_DIM_USER]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' name='GO_DIM_USER' table='[DB_POC_ZOOM].[GOLD].[GO_DIM_USER]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2B3C4D5E6F789012' name='SUPPORT_TICKETS' table='[DB_POC_ZOOM].[GOLD].[SUPPORT_TICKETS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2B3C4D5E6F789012' name='SUPPORT_TICKETS' table='[DB_POC_ZOOM].[GOLD].[SUPPORT_TICKETS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2B3C4D5E6F789012' name='USERS' table='[DB_POC_ZOOM].[GOLD].[USERS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2B3C4D5E6F789012' name='USERS' table='[DB_POC_ZOOM].[GOLD].[USERS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2B3C4D5E6F789012' name='MEETINGS' table='[DB_POC_ZOOM].[GOLD].[MEETINGS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2B3C4D5E6F789012' name='MEETINGS' table='[DB_POC_ZOOM].[GOLD].[MEETINGS]' type='table' />
         <metadata-records>
           <metadata-record class='column'>
-            <remote-name>TICKET_DATE</remote-name>
-            <remote-type>7</remote-type>
-            <local-name>[TICKET_DATE]</local-name>
-            <parent-name>[GO_FACT_SUPPORT_METRICS]</parent-name>
-            <remote-alias>TICKET_DATE</remote-alias>
-            <ordinal>1</ordinal>
-            <local-type>date</local-type>
-            <aggregation>Year</aggregation>
-            <contains-null>true</contains-null>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_FACT_SUPPORT_METRICS_E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>RESOLUTION_TIME_HOURS</remote-name>
-            <remote-type>131</remote-type>
-            <local-name>[RESOLUTION_TIME_HOURS]</local-name>
-            <parent-name>[GO_FACT_SUPPORT_METRICS]</parent-name>
-            <remote-alias>RESOLUTION_TIME_HOURS</remote-alias>
-            <ordinal>2</ordinal>
-            <local-type>integer</local-type>
-            <aggregation>Sum</aggregation>
-            <contains-null>true</contains-null>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_FACT_SUPPORT_METRICS_E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>TICKET_TYPE</remote-name>
+            <remote-name>TICKET_ID</remote-name>
             <remote-type>129</remote-type>
-            <local-name>[TICKET_TYPE]</local-name>
-            <parent-name>[GO_FACT_SUPPORT_METRICS]</parent-name>
-            <remote-alias>TICKET_TYPE</remote-alias>
+            <local-name>[TICKET_ID]</local-name>
+            <parent-name>[SUPPORT_TICKETS]</parent-name>
+            <remote-alias>TICKET_ID</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_ID]</local-name>
+            <parent-name>[SUPPORT_TICKETS]</parent-name>
+            <remote-alias>USER_ID</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[TYPE]</local-name>
+            <parent-name>[SUPPORT_TICKETS]</parent-name>
+            <remote-alias>TYPE</remote-alias>
             <ordinal>3</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_FACT_SUPPORT_METRICS_E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>PRIORITY_LEVEL</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[PRIORITY_LEVEL]</local-name>
-            <parent-name>[GO_FACT_SUPPORT_METRICS]</parent-name>
-            <remote-alias>PRIORITY_LEVEL</remote-alias>
-            <ordinal>4</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_FACT_SUPPORT_METRICS_E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>RESOLUTION_STATUS</remote-name>
             <remote-type>129</remote-type>
             <local-name>[RESOLUTION_STATUS]</local-name>
-            <parent-name>[GO_FACT_SUPPORT_METRICS]</parent-name>
+            <parent-name>[SUPPORT_TICKETS]</parent-name>
             <remote-alias>RESOLUTION_STATUS</remote-alias>
-            <ordinal>5</ordinal>
+            <ordinal>4</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
             <collation flag='0' name='binary' />
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_FACT_SUPPORT_METRICS_E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
-            <remote-name>FIRST_CONTACT_RESOLUTION_FLAG</remote-name>
-            <remote-type>16</remote-type>
-            <local-name>[FIRST_CONTACT_RESOLUTION_FLAG]</local-name>
-            <parent-name>[GO_FACT_SUPPORT_METRICS]</parent-name>
-            <remote-alias>FIRST_CONTACT_RESOLUTION_FLAG</remote-alias>
+            <remote-name>OPEN_DATE</remote-name>
+            <remote-type>93</remote-type>
+            <local-name>[OPEN_DATE]</local-name>
+            <parent-name>[SUPPORT_TICKETS]</parent-name>
+            <remote-alias>OPEN_DATE</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>CLOSE_DATE</remote-name>
+            <remote-type>93</remote-type>
+            <local-name>[CLOSE_DATE]</local-name>
+            <parent-name>[SUPPORT_TICKETS]</parent-name>
+            <remote-alias>CLOSE_DATE</remote-alias>
             <ordinal>6</ordinal>
-            <local-type>boolean</local-type>
-            <aggregation>Count</aggregation>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
             <contains-null>true</contains-null>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_FACT_SUPPORT_METRICS_E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
-            <remote-name>ESCALATION_FLAG</remote-name>
-            <remote-type>16</remote-type>
-            <local-name>[ESCALATION_FLAG]</local-name>
-            <parent-name>[GO_FACT_SUPPORT_METRICS]</parent-name>
-            <remote-alias>ESCALATION_FLAG</remote-alias>
+            <remote-name>COMPANY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[COMPANY]</local-name>
+            <parent-name>[USERS]</parent-name>
+            <remote-alias>COMPANY</remote-alias>
             <ordinal>7</ordinal>
-            <local-type>boolean</local-type>
+            <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_FACT_SUPPORT_METRICS_E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <collation flag='0' name='binary' />
           </metadata-record>
           <metadata-record class='column'>
-            <remote-name>SATISFACTION_SCORE</remote-name>
-            <remote-type>131</remote-type>
-            <local-name>[SATISFACTION_SCORE]</local-name>
-            <parent-name>[GO_FACT_SUPPORT_METRICS]</parent-name>
-            <remote-alias>SATISFACTION_SCORE</remote-alias>
+            <remote-name>EMAIL_ADDRESS</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[EMAIL_ADDRESS]</local-name>
+            <parent-name>[USERS]</parent-name>
+            <remote-alias>EMAIL_ADDRESS</remote-alias>
             <ordinal>8</ordinal>
-            <local-type>integer</local-type>
-            <aggregation>Sum</aggregation>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[GO_FACT_SUPPORT_METRICS_E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MEETING_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MEETING_TYPE]</local-name>
+            <parent-name>[MEETINGS]</parent-name>
+            <remote-alias>MEETING_TYPE</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
           </metadata-record>
         </metadata-records>
       </connection>
       <aliases enabled='yes' />
-      <column caption='Ticket Date' datatype='date' name='[TICKET_DATE]' role='dimension' type='ordinal' />
-      <column caption='Resolution Time Hours' datatype='integer' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
-      <column caption='Ticket Type' datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
-      <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
+      <column caption='Ticket ID' datatype='string' name='[TICKET_ID]' role='dimension' type='nominal' />
+      <column caption='User ID' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
+      <column caption='Type' datatype='string' name='[TYPE]' role='dimension' type='nominal' />
       <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
-      <column caption='First Contact Resolution Flag' datatype='boolean' name='[FIRST_CONTACT_RESOLUTION_FLAG]' role='dimension' type='nominal' />
-      <column caption='Escalation Flag' datatype='boolean' name='[ESCALATION_FLAG]' role='dimension' type='nominal' />
-      <column caption='Satisfaction Score' datatype='integer' name='[SATISFACTION_SCORE]' role='measure' type='quantitative' />
-      <column caption='Tickets Opened Per Day' datatype='integer' name='[Calculation_F7A8B9C0D1E2F3A4]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNT([TICKET_TYPE])' />
+      <column caption='Open Date' datatype='datetime' name='[OPEN_DATE]' role='dimension' type='ordinal' />
+      <column caption='Close Date' datatype='datetime' name='[CLOSE_DATE]' role='dimension' type='ordinal' />
+      <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
+      <column caption='Email Address' datatype='string' name='[EMAIL_ADDRESS]' role='dimension' type='nominal' />
+      <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
+      <column caption='Masked Email' datatype='string' name='[Calculation_A2B3C4D5E6F78901]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],1)+&quot;*******&quot;+RIGHT([EMAIL_ADDRESS],9)' />
       </column>
-      <column caption='Average Resolution Time' datatype='real' name='[Calculation_A8B9C0D1E2F3A4B5]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
+      <column caption='Tickets Opened Per Day' datatype='integer' name='[Calculation_B3C4D5E6F7890123]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([TICKET_ID])' />
       </column>
-      <column caption='First Contact Resolution Rate' datatype='real' name='[Calculation_B9C0D1E2F3A4B5C6]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='SUM(IF [FIRST_CONTACT_RESOLUTION_FLAG] = TRUE THEN 1 ELSE 0 END) / COUNT([TICKET_TYPE])' />
+      <column caption='Average Resolution Time' datatype='real' name='[Calculation_C4D5E6F789012345]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG(DATEDIFF(&quot;day&quot;,[OPEN_DATE],[CLOSE_DATE]))' />
       </column>
-      <column caption='Tickets Per 1000 Active Users' datatype='real' name='[Calculation_C0D1E2F3A4B5C6D7]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNT([TICKET_TYPE]) * 1000 / COUNTD([USER_KEY])' />
+      <column caption='First Contact Resolution Rate' datatype='real' name='[Calculation_D5E6F78901234567]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [RESOLUTION_STATUS] = &quot;Resolved&quot; AND DATEDIFF(&quot;day&quot;,[OPEN_DATE],[CLOSE_DATE]) &lt;= 1 THEN 1 ELSE 0 END) / COUNT([TICKET_ID])' />
+      </column>
+      <column caption='Tickets Per 1000 Active Users' datatype='real' name='[Calculation_E6F789012345678A]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='(COUNT([TICKET_ID]) / COUNTD([USER_ID])) * 1000' />
+      </column>
+      <column caption='Ticket Volume By Type' datatype='integer' name='[Calculation_F78901234567890B]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([TICKET_ID])' />
+      </column>
+      <column caption='User To Ticket Ratio' datatype='real' name='[Calculation_7890123456789ABC]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([TICKET_ID]) / COUNTD([USER_ID])' />
       </column>
       <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
       <semantic-values>
@@ -163,19 +180,19 @@
       </semantic-values>
       <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
         <objects>
-          <object caption='GO_FACT_SUPPORT_METRICS' id='GO_FACT_SUPPORT_METRICS_E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1'>
+          <object caption='SUPPORT_TICKETS' id='SUPPORT_TICKETS_2B3C4D5E6F789012'>
             <properties context=''>
-              <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' name='GO_FACT_SUPPORT_METRICS' table='[DB_POC_ZOOM].[GOLD].[GO_FACT_SUPPORT_METRICS]' type='table' />
+              <relation connection='snowflake.2B3C4D5E6F789012' name='SUPPORT_TICKETS' table='[DB_POC_ZOOM].[GOLD].[SUPPORT_TICKETS]' type='table' />
             </properties>
           </object>
-          <object caption='GO_DIM_SUPPORT_CATEGORY' id='GO_DIM_SUPPORT_CATEGORY_F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1C2'>
+          <object caption='USERS' id='USERS_3C4D5E6F78901234'>
             <properties context=''>
-              <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' name='GO_DIM_SUPPORT_CATEGORY' table='[DB_POC_ZOOM].[GOLD].[GO_DIM_SUPPORT_CATEGORY]' type='table' />
+              <relation connection='snowflake.2B3C4D5E6F789012' name='USERS' table='[DB_POC_ZOOM].[GOLD].[USERS]' type='table' />
             </properties>
           </object>
-          <object caption='GO_DIM_USER' id='GO_DIM_USER_A8B9C0D1E2F3A4B5C6D7E8F9A0B1C2D3'>
+          <object caption='MEETINGS' id='MEETINGS_4D5E6F7890123456'>
             <properties context=''>
-              <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' name='GO_DIM_USER' table='[DB_POC_ZOOM].[GOLD].[GO_DIM_USER]' type='table' />
+              <relation connection='snowflake.2B3C4D5E6F789012' name='MEETINGS' table='[DB_POC_ZOOM].[GOLD].[MEETINGS]' type='table' />
             </properties>
           </object>
         </objects>
@@ -183,26 +200,26 @@
     </datasource>
   </datasources>
   <worksheets>
-    <worksheet name='Ticket Volume by Type'>
+    <worksheet name='Ticket Volume by Meeting Type'>
       <layout-options>
         <title>
           <formatted-text>
-            <run>Ticket Volume by Type</run>
+            <run>Ticket Volume by Meeting Type</run>
           </formatted-text>
         </title>
       </layout-options>
       <table>
         <view>
           <datasources>
-            <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' />
+            <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' name='federated.2B3C4D5E6F789012' />
           </datasources>
-          <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7'>
-            <column caption='Ticket Type' datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
-            <column caption='Tickets Opened Per Day' datatype='integer' name='[Calculation_F7A8B9C0D1E2F3A4]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='COUNT([TICKET_TYPE])' />
+          <datasource-dependencies datasource='federated.2B3C4D5E6F789012'>
+            <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
+            <column caption='Ticket Volume By Type' datatype='integer' name='[Calculation_F78901234567890B]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNT([TICKET_ID])' />
             </column>
-            <column-instance column='[TICKET_TYPE]' derivation='None' name='[none:TICKET_TYPE:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calculation_F7A8B9C0D1E2F3A4]' derivation='User' name='[usr:Calculation_F7A8B9C0D1E2F3A4:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[MEETING_TYPE]' derivation='None' name='[none:MEETING_TYPE:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_F78901234567890B]' derivation='Sum' name='[sum:Calculation_F78901234567890B:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
@@ -214,7 +231,7 @@
             </view>
             <mark class='Bar' />
             <encodings>
-              <color column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:TICKET_TYPE:nk]' />
+              <color column='[federated.2B3C4D5E6F789012].[none:MEETING_TYPE:nk]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -224,12 +241,12 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[usr:Calculation_F7A8B9C0D1E2F3A4:qk]</rows>
-        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:TICKET_TYPE:nk]</cols>
+        <rows>[federated.2B3C4D5E6F789012].[sum:Calculation_F78901234567890B:qk]</rows>
+        <cols>[federated.2B3C4D5E6F789012].[none:MEETING_TYPE:nk]</cols>
       </table>
-      <simple-id uuid='{E6F7A8B9-C0D1-E2F3-A4B5-C6D7E8F9A0B1}' />
+      <simple-id uuid='{E5F67890-1234-5678-9ABC-DEF012345678}' />
     </worksheet>
-    <worksheet name='Average Resolution Time Trend'>
+    <worksheet name='Average Resolution Time Trends'>
       <layout-options>
         <title>
           <formatted-text>
@@ -240,21 +257,21 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' />
+            <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' name='federated.2B3C4D5E6F789012' />
           </datasources>
-          <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7'>
-            <column caption='Ticket Date' datatype='date' name='[TICKET_DATE]' role='dimension' type='ordinal' />
-            <column caption='Average Resolution Time' datatype='real' name='[Calculation_A8B9C0D1E2F3A4B5]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
+          <datasource-dependencies datasource='federated.2B3C4D5E6F789012'>
+            <column caption='Open Date' datatype='datetime' name='[OPEN_DATE]' role='dimension' type='ordinal' />
+            <column caption='Average Resolution Time' datatype='real' name='[Calculation_C4D5E6F789012345]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG(DATEDIFF(&quot;day&quot;,[OPEN_DATE],[CLOSE_DATE]))' />
             </column>
-            <column-instance column='[TICKET_DATE]' derivation='Month-Trunc' name='[tmn:TICKET_DATE:qk]' pivot='key' type='quantitative' />
-            <column-instance column='[Calculation_A8B9C0D1E2F3A4B5]' derivation='User' name='[usr:Calculation_A8B9C0D1E2F3A4B5:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[OPEN_DATE]' derivation='Month-Trunc' name='[tmn:OPEN_DATE:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_C4D5E6F789012345]' derivation='Sum' name='[sum:Calculation_C4D5E6F789012345:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
         <style>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[usr:Calculation_A8B9C0D1E2F3A4B5:qk]' palette='red_blue_diverging_10_0' type='interpolated' />
+            <encoding attr='color' field='[federated.2B3C4D5E6F789012].[sum:Calculation_C4D5E6F789012345:qk]' palette='orange_10_0' type='interpolated' />
           </style-rule>
         </style>
         <panes>
@@ -263,6 +280,9 @@
               <breakdown value='auto' />
             </view>
             <mark class='Line' />
+            <encodings>
+              <color column='[federated.2B3C4D5E6F789012].[sum:Calculation_C4D5E6F789012345:qk]' />
+            </encodings>
             <style>
               <style-rule element='mark'>
                 <format attr='mark-labels-show' value='true' />
@@ -271,14 +291,14 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[usr:Calculation_A8B9C0D1E2F3A4B5:qk]</rows>
-        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[tmn:TICKET_DATE:qk]</cols>
+        <rows>[federated.2B3C4D5E6F789012].[sum:Calculation_C4D5E6F789012345:qk]</rows>
+        <cols>[federated.2B3C4D5E6F789012].[tmn:OPEN_DATE:qk]</cols>
       </table>
-      <simple-id uuid='{F7A8B9C0-D1E2-F3A4-B5C6-D7E8F9A0B1C2}' />
+      <simple-id uuid='{F6789012-3456-789A-BCDE-F01234567890}' />
     </worksheet>
   </worksheets>
   <windows saved-dpi-scale-factor='1.5' source-height='44'>
-    <window class='worksheet' maximized='true' name='Ticket Volume by Type'>
+    <window class='worksheet' maximized='true' name='Ticket Volume by Meeting Type'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -299,11 +319,11 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{A8B9C0D1-E2F3-A4B5-C6D7-E8F9A0B1C2D3}' />
+      <simple-id uuid='{67890123-456A-BCDE-F012-3456789ABCDE}' />
     </window>
   </windows>
   <thumbnails>
-    <thumbnail height='192' name='Ticket Volume by Type' width='192'>
+    <thumbnail height='192' name='Ticket Volume by Meeting Type' width='192'>
       iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAABYlAAAWJQFJUiTw
     </thumbnail>
   </thumbnails>
