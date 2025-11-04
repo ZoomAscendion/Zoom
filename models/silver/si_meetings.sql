@@ -1,171 +1,150 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ target.schema }}.SI_PIPELINE_AUDIT (EXECUTION_ID, PIPELINE_NAME, START_TIME, STATUS, SOURCE_TABLES_PROCESSED, EXECUTED_BY, EXECUTION_ENVIRONMENT) VALUES (GENERATE_UUID(), 'SI_MEETINGS_TRANSFORM', CURRENT_TIMESTAMP(), 'RUNNING', 'BZ_MEETINGS,BZ_USERS,BZ_PARTICIPANTS', 'DBT_SYSTEM', 'PRODUCTION')",
+    post_hook="UPDATE {{ target.schema }}.SI_PIPELINE_AUDIT SET END_TIME = CURRENT_TIMESTAMP(), STATUS = 'SUCCESS', EXECUTION_DURATION_SECONDS = DATEDIFF('second', START_TIME, CURRENT_TIMESTAMP()), RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}) WHERE PIPELINE_NAME = 'SI_MEETINGS_TRANSFORM' AND STATUS = 'RUNNING'"
 ) }}
 
 -- Silver Layer Meetings Transformation
--- Source: Bronze.BZ_MEETINGS, Bronze.BZ_USERS, Bronze.BZ_PARTICIPANTS
+-- Source: Bronze.BZ_MEETINGS, BZ_USERS, BZ_PARTICIPANTS
 -- Target: Silver.SI_MEETINGS
--- Description: Transforms and enriches meeting data with host information and participant counts
+-- Description: Clean, validate and enrich meeting data with host information and participant counts
 
 WITH bronze_meetings AS (
     SELECT 
-        meeting_id,
-        host_id,
-        meeting_topic,
-        start_time,
-        end_time,
-        duration_minutes,
-        load_timestamp,
-        update_timestamp,
-        source_system
-    FROM {{ source('bronze', 'bz_meetings') }}
-    WHERE meeting_id IS NOT NULL
-      AND host_id IS NOT NULL
+        MEETING_ID,
+        HOST_ID,
+        MEETING_TOPIC,
+        START_TIME,
+        END_TIME,
+        DURATION_MINUTES,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ ref('bz_meetings') }}
+    WHERE MEETING_ID IS NOT NULL
+      AND HOST_ID IS NOT NULL
+      AND START_TIME IS NOT NULL
 ),
 
 host_info AS (
     SELECT 
-        user_id,
-        user_name
+        USER_ID,
+        USER_NAME
     FROM {{ ref('si_users') }}
 ),
 
 participant_counts AS (
     SELECT 
-        meeting_id,
-        COUNT(DISTINCT user_id) AS participant_count
-    FROM {{ source('bronze', 'bz_participants') }}
-    WHERE meeting_id IS NOT NULL
-    GROUP BY meeting_id
+        MEETING_ID,
+        COUNT(DISTINCT USER_ID) AS PARTICIPANT_COUNT
+    FROM {{ ref('bz_participants') }}
+    WHERE MEETING_ID IS NOT NULL
+      AND USER_ID IS NOT NULL
+    GROUP BY MEETING_ID
 ),
 
 -- Data Quality Validation and Cleansing
-data_quality_checks AS (
+validated_meetings AS (
     SELECT 
-        bm.meeting_id,
-        bm.host_id,
+        m.MEETING_ID,
+        m.HOST_ID,
         
-        -- Clean and standardize meeting topic
+        -- Clean meeting topic
         CASE 
-            WHEN bm.meeting_topic IS NULL OR TRIM(bm.meeting_topic) = '' THEN 'Untitled Meeting'
-            ELSE TRIM(bm.meeting_topic)
-        END AS meeting_topic_clean,
+            WHEN m.MEETING_TOPIC IS NULL OR TRIM(m.MEETING_TOPIC) = '' THEN 'Untitled Meeting'
+            ELSE TRIM(m.MEETING_TOPIC)
+        END AS MEETING_TOPIC,
         
-        -- Derive meeting type from duration and other attributes
+        -- Derive meeting type from duration
         CASE 
-            WHEN bm.duration_minutes <= 30 THEN 'Instant'
-            WHEN bm.duration_minutes <= 120 THEN 'Scheduled'
-            WHEN bm.duration_minutes > 120 THEN 'Webinar'
+            WHEN m.DURATION_MINUTES <= 30 THEN 'Instant'
+            WHEN m.DURATION_MINUTES <= 60 THEN 'Scheduled'
+            WHEN m.DURATION_MINUTES > 60 THEN 'Webinar'
             ELSE 'Personal'
-        END AS meeting_type,
+        END AS MEETING_TYPE,
         
-        -- Validate and correct timestamps
+        -- Validate timestamps
         CASE 
-            WHEN bm.start_time IS NULL THEN CURRENT_TIMESTAMP()
-            ELSE bm.start_time
-        END AS start_time_clean,
+            WHEN m.START_TIME > CURRENT_TIMESTAMP() THEN CURRENT_TIMESTAMP()
+            ELSE m.START_TIME
+        END AS START_TIME,
         
         CASE 
-            WHEN bm.end_time IS NULL OR bm.end_time < bm.start_time 
-                THEN DATEADD('minute', COALESCE(bm.duration_minutes, 60), bm.start_time)
-            ELSE bm.end_time
-        END AS end_time_clean,
+            WHEN m.END_TIME IS NULL THEN DATEADD('minute', COALESCE(m.DURATION_MINUTES, 60), m.START_TIME)
+            WHEN m.END_TIME < m.START_TIME THEN DATEADD('minute', COALESCE(m.DURATION_MINUTES, 60), m.START_TIME)
+            ELSE m.END_TIME
+        END AS END_TIME,
         
-        -- Recalculate and validate duration
+        -- Recalculate duration if needed
         CASE 
-            WHEN bm.duration_minutes IS NULL OR bm.duration_minutes <= 0
-                THEN GREATEST(1, DATEDIFF('minute', bm.start_time, 
-                    CASE WHEN bm.end_time < bm.start_time THEN DATEADD('hour', 1, bm.start_time) ELSE bm.end_time END))
-            WHEN bm.duration_minutes > 1440 THEN 1440  -- Cap at 24 hours
-            ELSE bm.duration_minutes
-        END AS duration_minutes_clean,
+            WHEN m.DURATION_MINUTES IS NULL OR m.DURATION_MINUTES <= 0 THEN 
+                DATEDIFF('minute', m.START_TIME, 
+                    CASE 
+                        WHEN m.END_TIME IS NULL OR m.END_TIME < m.START_TIME 
+                        THEN DATEADD('minute', 60, m.START_TIME)
+                        ELSE m.END_TIME
+                    END
+                )
+            ELSE m.DURATION_MINUTES
+        END AS DURATION_MINUTES,
         
-        -- Get host name from users table
-        COALESCE(hi.user_name, 'Unknown Host') AS host_name,
+        -- Get host name
+        COALESCE(h.USER_NAME, 'Unknown Host') AS HOST_NAME,
         
-        -- Derive meeting status from timestamps
+        -- Derive meeting status
         CASE 
-            WHEN bm.end_time IS NULL AND bm.start_time > CURRENT_TIMESTAMP() THEN 'Scheduled'
-            WHEN bm.end_time IS NULL AND bm.start_time <= CURRENT_TIMESTAMP() THEN 'In Progress'
-            WHEN bm.end_time IS NOT NULL AND bm.end_time <= CURRENT_TIMESTAMP() THEN 'Completed'
-            ELSE 'Cancelled'
-        END AS meeting_status,
+            WHEN m.END_TIME IS NULL OR m.END_TIME > CURRENT_TIMESTAMP() THEN 'In Progress'
+            WHEN m.END_TIME <= CURRENT_TIMESTAMP() THEN 'Completed'
+            ELSE 'Scheduled'
+        END AS MEETING_STATUS,
         
-        -- Derive recording status (simplified logic)
-        CASE 
-            WHEN bm.duration_minutes > 30 THEN 'Yes'
-            ELSE 'No'
-        END AS recording_status,
+        -- Default recording status
+        'No' AS RECORDING_STATUS,
         
         -- Get participant count
-        COALESCE(pc.participant_count, 0) AS participant_count,
+        COALESCE(pc.PARTICIPANT_COUNT, 0) AS PARTICIPANT_COUNT,
         
-        bm.load_timestamp,
-        bm.update_timestamp,
-        bm.source_system
-    FROM bronze_meetings bm
-    LEFT JOIN host_info hi ON bm.host_id = hi.user_id
-    LEFT JOIN participant_counts pc ON bm.meeting_id = pc.meeting_id
-),
-
--- Calculate data quality score
-quality_scored AS (
-    SELECT 
-        *,
+        m.LOAD_TIMESTAMP,
+        m.UPDATE_TIMESTAMP,
+        m.SOURCE_SYSTEM,
+        
         -- Calculate data quality score
         (
-            CASE WHEN meeting_topic_clean != 'Untitled Meeting' THEN 0.20 ELSE 0 END +
-            CASE WHEN host_name != 'Unknown Host' THEN 0.25 ELSE 0 END +
-            CASE WHEN start_time_clean IS NOT NULL THEN 0.20 ELSE 0 END +
-            CASE WHEN end_time_clean IS NOT NULL THEN 0.20 ELSE 0 END +
-            CASE WHEN duration_minutes_clean > 0 THEN 0.15 ELSE 0 END
-        ) AS data_quality_score
-    FROM data_quality_checks
-),
-
--- Remove duplicates keeping the most recent record
-deduped_meetings AS (
-    SELECT 
-        meeting_id,
-        host_id,
-        meeting_topic_clean AS meeting_topic,
-        meeting_type,
-        start_time_clean AS start_time,
-        end_time_clean AS end_time,
-        duration_minutes_clean AS duration_minutes,
-        host_name,
-        meeting_status,
-        recording_status,
-        participant_count,
-        load_timestamp,
-        update_timestamp,
-        source_system,
-        data_quality_score,
-        ROW_NUMBER() OVER (PARTITION BY meeting_id ORDER BY update_timestamp DESC) AS rn
-    FROM quality_scored
-    WHERE data_quality_score >= {{ var('dq_score_threshold') }}
+            CASE WHEN m.MEETING_ID IS NOT NULL THEN 0.20 ELSE 0 END +
+            CASE WHEN m.HOST_ID IS NOT NULL THEN 0.20 ELSE 0 END +
+            CASE WHEN m.START_TIME IS NOT NULL THEN 0.20 ELSE 0 END +
+            CASE WHEN m.DURATION_MINUTES > 0 THEN 0.20 ELSE 0 END +
+            CASE WHEN m.MEETING_TOPIC IS NOT NULL AND TRIM(m.MEETING_TOPIC) != '' THEN 0.20 ELSE 0 END
+        ) AS DATA_QUALITY_SCORE,
+        
+        DATE(m.LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(m.UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        
+        ROW_NUMBER() OVER (PARTITION BY m.MEETING_ID ORDER BY m.UPDATE_TIMESTAMP DESC) AS rn
+    FROM bronze_meetings m
+    LEFT JOIN host_info h ON m.HOST_ID = h.USER_ID
+    LEFT JOIN participant_counts pc ON m.MEETING_ID = pc.MEETING_ID
 )
 
+-- Final selection with deduplication
 SELECT 
-    meeting_id,
-    host_id,
-    meeting_topic,
-    meeting_type,
-    start_time,
-    end_time,
-    duration_minutes,
-    host_name,
-    meeting_status,
-    recording_status,
-    participant_count,
-    load_timestamp,
-    update_timestamp,
-    source_system,
-    data_quality_score,
-    DATE(load_timestamp) AS load_date,
-    DATE(update_timestamp) AS update_date
-FROM deduped_meetings
+    MEETING_ID,
+    HOST_ID,
+    MEETING_TOPIC,
+    MEETING_TYPE,
+    START_TIME,
+    END_TIME,
+    DURATION_MINUTES,
+    HOST_NAME,
+    MEETING_STATUS,
+    RECORDING_STATUS,
+    PARTICIPANT_COUNT,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    DATA_QUALITY_SCORE,
+    LOAD_DATE,
+    UPDATE_DATE
+FROM validated_meetings
 WHERE rn = 1
-  AND start_time IS NOT NULL
-  AND end_time IS NOT NULL
-  AND duration_minutes > 0
+  AND DATA_QUALITY_SCORE >= 0.60  -- Only include records with acceptable quality
