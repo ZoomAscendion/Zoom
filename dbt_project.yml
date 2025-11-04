@@ -1,8 +1,8 @@
-name: 'zoom_silver_pipeline'
+name: 'zoom_analytics_silver'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_silver_pipeline'
+profile: 'zoom_analytics'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -11,41 +11,19 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
 models:
-  zoom_silver_pipeline:
+  zoom_analytics_silver:
+    +materialized: table
     silver:
       +materialized: table
-      si_pipeline_audit:
-        +pre-hook: []
-        +post-hook: []
-      si_users:
-        +depends_on:
-          - ref('si_pipeline_audit')
-      si_meetings:
-        +depends_on:
-          - ref('si_pipeline_audit')
-          - ref('si_users')
-      si_participants:
-        +depends_on:
-          - ref('si_pipeline_audit')
-          - ref('si_meetings')
-      si_feature_usage:
-        +depends_on:
-          - ref('si_pipeline_audit')
-      si_support_tickets:
-        +depends_on:
-          - ref('si_pipeline_audit')
-      si_billing_events:
-        +depends_on:
-          - ref('si_pipeline_audit')
-      si_licenses:
-        +depends_on:
-          - ref('si_pipeline_audit')
-          - ref('si_users')
-      si_webinars:
-        +depends_on:
-          - ref('si_pipeline_audit')
+      +pre-hook: "INSERT INTO {{ this.database }}.{{ this.schema }}.SI_PIPELINE_AUDIT (EXECUTION_ID, PIPELINE_NAME, START_TIME, STATUS, EXECUTED_BY, EXECUTION_ENVIRONMENT, SOURCE_SYSTEM, LOAD_DATE, UPDATE_DATE) VALUES (CONCAT('{{ invocation_id }}', '_{{ this.name }}'), '{{ this.name }}', CURRENT_TIMESTAMP(), 'STARTED', 'DBT_SILVER_PIPELINE', 'PRODUCTION', 'ZOOM_PLATFORM', CURRENT_DATE(), CURRENT_DATE())"
+      +post-hook: "INSERT INTO {{ this.database }}.{{ this.schema }}.SI_PIPELINE_AUDIT (EXECUTION_ID, PIPELINE_NAME, END_TIME, STATUS, EXECUTED_BY, EXECUTION_ENVIRONMENT, SOURCE_SYSTEM, LOAD_DATE, UPDATE_DATE) VALUES (CONCAT('{{ invocation_id }}', '_{{ this.name }}'), '{{ this.name }}', CURRENT_TIMESTAMP(), 'COMPLETED', 'DBT_SILVER_PIPELINE', 'PRODUCTION', 'ZOOM_PLATFORM', CURRENT_DATE(), CURRENT_DATE())"
+
+vars:
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
