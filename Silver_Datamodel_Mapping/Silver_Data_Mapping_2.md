@@ -181,52 +181,6 @@ The Silver Layer serves as the cleansed and conformed layer, transforming raw Br
 | Silver | SI_WEBINARS | LOAD_DATE | Bronze | BZ_WEBINARS | LOAD_TIMESTAMP | Not null | Extract date from load timestamp |
 | Silver | SI_WEBINARS | UPDATE_DATE | Bronze | BZ_WEBINARS | UPDATE_TIMESTAMP | Not null | Extract date from update timestamp |
 
-### 2.9 SILVER.SI_DATA_QUALITY_ERRORS Mapping
-
-| Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Validation Rule | Transformation Rule |
-|--------------|--------------|--------------|--------------|--------------|--------------|-----------------|--------------------|
-| Silver | SI_DATA_QUALITY_ERRORS | ERROR_ID | Silver | SI_PIPELINE_AUDIT | EXECUTION_ID | Not null, Unique | Generate unique error identifier from pipeline execution |
-| Silver | SI_DATA_QUALITY_ERRORS | SOURCE_TABLE | Silver | SI_PIPELINE_AUDIT | SOURCE_TABLES_PROCESSED | Not null | Extract source table from pipeline audit |
-| Silver | SI_DATA_QUALITY_ERRORS | SOURCE_RECORD_ID | Silver | SI_PIPELINE_AUDIT | EXECUTION_ID | Not null | Generate from pipeline execution context |
-| Silver | SI_DATA_QUALITY_ERRORS | ERROR_TYPE | Silver | SI_PIPELINE_AUDIT | STATUS | Must be in (Missing Value, Invalid Format, Constraint Violation, Duplicate) | Derive from pipeline execution status |
-| Silver | SI_DATA_QUALITY_ERRORS | ERROR_COLUMN | Silver | SI_PIPELINE_AUDIT | ERROR_MESSAGE | Not null | Extract column name from error context |
-| Silver | SI_DATA_QUALITY_ERRORS | ERROR_DESCRIPTION | Silver | SI_PIPELINE_AUDIT | ERROR_MESSAGE | Length validation | Direct mapping with formatting |
-| Silver | SI_DATA_QUALITY_ERRORS | ERROR_SEVERITY | Silver | SI_PIPELINE_AUDIT | STATUS | Must be in (Critical, High, Medium, Low) | Derive severity from execution status |
-| Silver | SI_DATA_QUALITY_ERRORS | DETECTED_TIMESTAMP | Silver | SI_PIPELINE_AUDIT | START_TIME | Not null | Direct mapping |
-| Silver | SI_DATA_QUALITY_ERRORS | RESOLUTION_STATUS | Silver | SI_PIPELINE_AUDIT | STATUS | Must be in (Open, In Progress, Resolved, Ignored) | Derive from pipeline status |
-| Silver | SI_DATA_QUALITY_ERRORS | RESOLUTION_ACTION | Silver | SI_PIPELINE_AUDIT | EXECUTED_BY | Length validation | Generate action description |
-| Silver | SI_DATA_QUALITY_ERRORS | RESOLVED_TIMESTAMP | Silver | SI_PIPELINE_AUDIT | END_TIME | Valid timestamp | Set when resolution status changes |
-| Silver | SI_DATA_QUALITY_ERRORS | RESOLVED_BY | Silver | SI_PIPELINE_AUDIT | EXECUTED_BY | Length validation | Direct mapping |
-| Silver | SI_DATA_QUALITY_ERRORS | LOAD_DATE | Silver | SI_PIPELINE_AUDIT | LOAD_DATE | Not null | Extract date from pipeline audit |
-| Silver | SI_DATA_QUALITY_ERRORS | UPDATE_DATE | Silver | SI_PIPELINE_AUDIT | UPDATE_DATE | Not null | Extract date from pipeline audit |
-| Silver | SI_DATA_QUALITY_ERRORS | SOURCE_SYSTEM | Silver | SI_PIPELINE_AUDIT | SOURCE_SYSTEM | Not null | Direct mapping from pipeline audit |
-
-### 2.10 SILVER.SI_PIPELINE_AUDIT Mapping (Independent)
-
-**Note**: The Silver audit table is now independent and does not reference Bronze audit records. It captures Silver layer pipeline execution details independently.
-
-| Target Layer | Target Table | Target Field | Source Layer | Source Table | Source Field | Validation Rule | Transformation Rule |
-|--------------|--------------|--------------|--------------|--------------|--------------|-----------------|--------------------|
-| Silver | SI_PIPELINE_AUDIT | EXECUTION_ID | Silver | ETL_PROCESS | PROCESS_ID | Not null, Unique | Generate unique execution identifier for Silver pipeline |
-| Silver | SI_PIPELINE_AUDIT | PIPELINE_NAME | Silver | ETL_PROCESS | PIPELINE_NAME | Not null | Silver layer pipeline name (e.g., 'Silver_Users_ETL') |
-| Silver | SI_PIPELINE_AUDIT | START_TIME | Silver | ETL_PROCESS | START_TIME | Not null | Silver pipeline execution start time |
-| Silver | SI_PIPELINE_AUDIT | END_TIME | Silver | ETL_PROCESS | END_TIME | Not null | Silver pipeline execution end time |
-| Silver | SI_PIPELINE_AUDIT | STATUS | Silver | ETL_PROCESS | STATUS | Must be in (Success, Failed, Partial Success, Cancelled) | Silver pipeline execution status |
-| Silver | SI_PIPELINE_AUDIT | ERROR_MESSAGE | Silver | ETL_PROCESS | ERROR_MESSAGE | Length validation | Silver pipeline error messages |
-| Silver | SI_PIPELINE_AUDIT | EXECUTION_DURATION_SECONDS | Silver | ETL_PROCESS | DURATION | Must be >= 0 | Calculate Silver pipeline execution duration |
-| Silver | SI_PIPELINE_AUDIT | SOURCE_TABLES_PROCESSED | Silver | ETL_PROCESS | SOURCE_TABLES | Not null | Bronze tables processed by Silver pipeline |
-| Silver | SI_PIPELINE_AUDIT | TARGET_TABLES_UPDATED | Silver | ETL_PROCESS | TARGET_TABLES | Not null | Silver tables updated by pipeline |
-| Silver | SI_PIPELINE_AUDIT | RECORDS_PROCESSED | Silver | ETL_PROCESS | RECORD_COUNT | Must be >= 0 | Total records processed in Silver pipeline |
-| Silver | SI_PIPELINE_AUDIT | RECORDS_INSERTED | Silver | ETL_PROCESS | INSERT_COUNT | Must be >= 0 | New records inserted into Silver tables |
-| Silver | SI_PIPELINE_AUDIT | RECORDS_UPDATED | Silver | ETL_PROCESS | UPDATE_COUNT | Must be >= 0 | Existing records updated in Silver tables |
-| Silver | SI_PIPELINE_AUDIT | RECORDS_REJECTED | Silver | ETL_PROCESS | REJECT_COUNT | Must be >= 0 | Records rejected due to Silver quality rules |
-| Silver | SI_PIPELINE_AUDIT | EXECUTED_BY | Silver | ETL_PROCESS | EXECUTED_BY | Not null | User or system executing Silver pipeline |
-| Silver | SI_PIPELINE_AUDIT | EXECUTION_ENVIRONMENT | Silver | ETL_PROCESS | ENVIRONMENT | Not null | Environment where Silver pipeline executed |
-| Silver | SI_PIPELINE_AUDIT | DATA_LINEAGE_INFO | Silver | ETL_PROCESS | LINEAGE_INFO | Length validation | Silver layer data lineage information |
-| Silver | SI_PIPELINE_AUDIT | LOAD_DATE | Silver | ETL_PROCESS | EXECUTION_DATE | Not null | Date of Silver pipeline execution |
-| Silver | SI_PIPELINE_AUDIT | UPDATE_DATE | Silver | ETL_PROCESS | EXECUTION_DATE | Not null | Date of Silver pipeline execution |
-| Silver | SI_PIPELINE_AUDIT | SOURCE_SYSTEM | Silver | ETL_PROCESS | SOURCE_SYSTEM | Not null | Silver layer system identifier |
-
 ## 3. Data Quality and Validation Rules Summary
 
 ### 3.1 Critical Validation Rules
@@ -271,27 +225,10 @@ The DATA_QUALITY_SCORE is calculated based on:
    - Medium errors: Apply business rules and continue
    - Low errors: Apply formatting rules and continue
 
-## 4. Silver Layer Audit Independence
 
-### 4.1 Independent Audit Architecture
+## 4. Implementation Recommendations
 
-The Silver audit table (SI_PIPELINE_AUDIT) is now completely independent from Bronze audit records:
-
-1. **Separate Audit Trail**: Silver layer maintains its own audit trail independent of Bronze
-2. **Silver-Specific Metrics**: Captures metrics specific to Silver layer transformations
-3. **Independent Error Tracking**: Silver data quality errors are tracked separately
-4. **Layer Isolation**: Ensures proper separation of concerns between architectural layers
-
-### 4.2 Benefits of Independent Audit
-
-1. **Clear Separation**: Each layer maintains its own audit trail
-2. **Independent Monitoring**: Silver layer performance can be monitored separately
-3. **Scalability**: Audit tables can be optimized for their specific layer requirements
-4. **Maintainability**: Changes in Bronze audit structure don't affect Silver audit
-
-## 5. Implementation Recommendations
-
-### 5.1 ETL Pipeline Design
+### 4.1 ETL Pipeline Design
 
 1. **Incremental Processing**
    - Use UPDATE_TIMESTAMP for incremental loads
@@ -308,7 +245,7 @@ The Silver audit table (SI_PIPELINE_AUDIT) is now completely independent from Br
    - Set up alerts for critical data quality issues
    - Create dashboards for Silver layer data quality metrics
 
-### 5.2 Snowflake-Specific Considerations
+### 4.2 Snowflake-Specific Considerations
 
 1. **Data Types**
    - Use STRING instead of VARCHAR for flexibility
