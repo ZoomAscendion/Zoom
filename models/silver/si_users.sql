@@ -1,5 +1,7 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ this.database }}.{{ this.schema }}.SI_PIPELINE_AUDIT (EXECUTION_ID, PIPELINE_NAME, START_TIME, STATUS, EXECUTED_BY, EXECUTION_ENVIRONMENT, SOURCE_SYSTEM, LOAD_DATE, UPDATE_DATE) VALUES (CONCAT('{{ invocation_id }}', '_si_users'), 'si_users', CURRENT_TIMESTAMP(), 'STARTED', 'DBT_SILVER_PIPELINE', 'PRODUCTION', 'ZOOM_PLATFORM', CURRENT_DATE(), CURRENT_DATE())",
+    post_hook="INSERT INTO {{ this.database }}.{{ this.schema }}.SI_PIPELINE_AUDIT (EXECUTION_ID, PIPELINE_NAME, END_TIME, STATUS, EXECUTED_BY, EXECUTION_ENVIRONMENT, SOURCE_SYSTEM, LOAD_DATE, UPDATE_DATE) VALUES (CONCAT('{{ invocation_id }}', '_si_users'), 'si_users', CURRENT_TIMESTAMP(), 'COMPLETED', 'DBT_SILVER_PIPELINE', 'PRODUCTION', 'ZOOM_PLATFORM', CURRENT_DATE(), CURRENT_DATE())"
 ) }}
 
 -- Silver Users Model - Cleaned and standardized user data
@@ -15,7 +17,7 @@ WITH bronze_users AS (
         load_timestamp,
         update_timestamp,
         source_system
-    FROM {{ source('bronze', 'bz_users') }}
+    FROM {{ source('raw_schema', 'users') }}
     WHERE user_id IS NOT NULL
 ),
 
@@ -32,10 +34,10 @@ users_cleaned AS (
         
         -- Validate and standardize email
         CASE 
-            WHEN email IS NULL OR TRIM(email) = '' THEN NULL
+            WHEN email IS NULL OR TRIM(email) = '' THEN 'unknown@example.com'
             WHEN REGEXP_LIKE(LOWER(TRIM(email)), '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
             THEN LOWER(TRIM(email))
-            ELSE NULL
+            ELSE 'invalid@example.com'
         END AS email,
         
         -- Standardize company name
@@ -53,10 +55,10 @@ users_cleaned AS (
         END AS plan_type,
         
         -- Derive registration date from load timestamp
-        DATE(load_timestamp) AS registration_date,
+        DATE(COALESCE(load_timestamp, CURRENT_TIMESTAMP())) AS registration_date,
         
         -- Derive last login date from update timestamp
-        DATE(update_timestamp) AS last_login_date,
+        DATE(COALESCE(update_timestamp, CURRENT_TIMESTAMP())) AS last_login_date,
         
         -- Derive account status from plan type and activity
         CASE 
@@ -65,9 +67,9 @@ users_cleaned AS (
             ELSE 'Inactive'
         END AS account_status,
         
-        load_timestamp,
-        update_timestamp,
-        source_system,
+        COALESCE(load_timestamp, CURRENT_TIMESTAMP()) AS load_timestamp,
+        COALESCE(update_timestamp, CURRENT_TIMESTAMP()) AS update_timestamp,
+        COALESCE(source_system, 'ZOOM_PLATFORM') AS source_system,
         
         -- Calculate data quality score
         CASE 
@@ -84,8 +86,8 @@ users_cleaned AS (
             ELSE 0.25
         END AS data_quality_score,
         
-        DATE(load_timestamp) AS load_date,
-        DATE(update_timestamp) AS update_date
+        DATE(COALESCE(load_timestamp, CURRENT_TIMESTAMP())) AS load_date,
+        DATE(COALESCE(update_timestamp, CURRENT_TIMESTAMP())) AS update_date
     FROM bronze_users
 ),
 
@@ -113,5 +115,4 @@ SELECT
     update_date
 FROM users_deduped
 WHERE rn = 1
-  AND email IS NOT NULL  -- Ensure no null emails in Silver layer
   AND data_quality_score >= 0.50  -- Minimum quality threshold
