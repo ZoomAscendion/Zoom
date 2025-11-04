@@ -21,19 +21,19 @@
     </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
   </_.fcp.AnimationOnByDefault.false...style>
   <datasources>
-    <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' inline='true' name='federated.2B3C4D5E6F789012' version='18.1'>
+    <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' inline='true' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' version='18.1'>
       <connection class='federated'>
         <named-connections>
-          <named-connection caption='WDFMBAH-IA58548.snowflakecomputing.com' name='snowflake.2B3C4D5E6F789012'>
+          <named-connection caption='WDFMBAH-IA58548.snowflakecomputing.com' name='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e'>
             <connection authentication='Username Password' class='snowflake' dbname='DB_POC_ZOOM' odbc-connect-string-extras='' one-time-sql='' schema='GOLD' server='WDFMBAH-IA58548.snowflakecomputing.com' service='ACCOUNTADMIN' username='KARTHIKVALLURI1985' password='Alwayslearnnew@2025' warehouse='COMPUTE_WH' />
           </named-connection>
         </named-connections>
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2B3C4D5E6F789012' name='SUPPORT_TICKETS' table='[DB_POC_ZOOM].[GOLD].[SUPPORT_TICKETS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2B3C4D5E6F789012' name='SUPPORT_TICKETS' table='[DB_POC_ZOOM].[GOLD].[SUPPORT_TICKETS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2B3C4D5E6F789012' name='USERS' table='[DB_POC_ZOOM].[GOLD].[USERS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2B3C4D5E6F789012' name='USERS' table='[DB_POC_ZOOM].[GOLD].[USERS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2B3C4D5E6F789012' name='MEETINGS' table='[DB_POC_ZOOM].[GOLD].[MEETINGS]' type='table' />
-        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2B3C4D5E6F789012' name='MEETINGS' table='[DB_POC_ZOOM].[GOLD].[MEETINGS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='SUPPORT_TICKETS' table='[DB_POC_ZOOM].[GOLD].[SUPPORT_TICKETS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='SUPPORT_TICKETS' table='[DB_POC_ZOOM].[GOLD].[SUPPORT_TICKETS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='USERS' table='[DB_POC_ZOOM].[GOLD].[USERS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='USERS' table='[DB_POC_ZOOM].[GOLD].[USERS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='MEETINGS' table='[DB_POC_ZOOM].[GOLD].[MEETINGS]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='MEETINGS' table='[DB_POC_ZOOM].[GOLD].[MEETINGS]' type='table' />
         <metadata-records>
           <metadata-record class='column'>
             <remote-name>TICKET_ID</remote-name>
@@ -45,7 +45,7 @@
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[SUPPORT_TICKETS_E1F2A3B4C5D6E7F8A9B0C1D2E3F4A5B6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>USER_ID</remote-name>
@@ -57,31 +57,19 @@
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[SUPPORT_TICKETS_E1F2A3B4C5D6E7F8A9B0C1D2E3F4A5B6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
-            <remote-name>TYPE</remote-name>
+            <remote-name>TICKET_TYPE</remote-name>
             <remote-type>129</remote-type>
-            <local-name>[TYPE]</local-name>
+            <local-name>[TICKET_TYPE]</local-name>
             <parent-name>[SUPPORT_TICKETS]</parent-name>
-            <remote-alias>TYPE</remote-alias>
+            <remote-alias>TICKET_TYPE</remote-alias>
             <ordinal>3</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>RESOLUTION_STATUS</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[RESOLUTION_STATUS]</local-name>
-            <parent-name>[SUPPORT_TICKETS]</parent-name>
-            <remote-alias>RESOLUTION_STATUS</remote-alias>
-            <ordinal>4</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[SUPPORT_TICKETS_E1F2A3B4C5D6E7F8A9B0C1D2E3F4A5B6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>OPEN_DATE</remote-name>
@@ -89,10 +77,11 @@
             <local-name>[OPEN_DATE]</local-name>
             <parent-name>[SUPPORT_TICKETS]</parent-name>
             <remote-alias>OPEN_DATE</remote-alias>
-            <ordinal>5</ordinal>
+            <ordinal>4</ordinal>
             <local-type>datetime</local-type>
             <aggregation>Year</aggregation>
             <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[SUPPORT_TICKETS_E1F2A3B4C5D6E7F8A9B0C1D2E3F4A5B6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>CLOSE_DATE</remote-name>
@@ -100,10 +89,23 @@
             <local-name>[CLOSE_DATE]</local-name>
             <parent-name>[SUPPORT_TICKETS]</parent-name>
             <remote-alias>CLOSE_DATE</remote-alias>
-            <ordinal>6</ordinal>
+            <ordinal>5</ordinal>
             <local-type>datetime</local-type>
             <aggregation>Year</aggregation>
             <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[SUPPORT_TICKETS_E1F2A3B4C5D6E7F8A9B0C1D2E3F4A5B6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>RESOLUTION_STATUS</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[RESOLUTION_STATUS]</local-name>
+            <parent-name>[SUPPORT_TICKETS]</parent-name>
+            <remote-alias>RESOLUTION_STATUS</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[SUPPORT_TICKETS_E1F2A3B4C5D6E7F8A9B0C1D2E3F4A5B6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>COMPANY</remote-name>
@@ -115,19 +117,7 @@
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>EMAIL_ADDRESS</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[EMAIL_ADDRESS]</local-name>
-            <parent-name>[USERS]</parent-name>
-            <remote-alias>EMAIL_ADDRESS</remote-alias>
-            <ordinal>8</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[USERS_F2A3B4C5D6E7F8A9B0C1D2E3F4A5B6C7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>MEETING_TYPE</remote-name>
@@ -135,43 +125,39 @@
             <local-name>[MEETING_TYPE]</local-name>
             <parent-name>[MEETINGS]</parent-name>
             <remote-alias>MEETING_TYPE</remote-alias>
-            <ordinal>9</ordinal>
+            <ordinal>8</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[MEETINGS_A3B4C5D6E7F8A9B0C1D2E3F4A5B6C7D8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
         </metadata-records>
       </connection>
       <aliases enabled='yes' />
       <column caption='Ticket ID' datatype='string' name='[TICKET_ID]' role='dimension' type='nominal' />
       <column caption='User ID' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
-      <column caption='Type' datatype='string' name='[TYPE]' role='dimension' type='nominal' />
-      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+      <column caption='Ticket Type' datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
       <column caption='Open Date' datatype='datetime' name='[OPEN_DATE]' role='dimension' type='ordinal' />
       <column caption='Close Date' datatype='datetime' name='[CLOSE_DATE]' role='dimension' type='ordinal' />
+      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
       <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
-      <column caption='Email Address' datatype='string' name='[EMAIL_ADDRESS]' role='dimension' type='nominal' />
       <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
-      <column caption='Masked Email' datatype='string' name='[Calculation_A2B3C4D5E6F78901]' role='dimension' type='nominal'>
-        <calculation class='tableau' formula='LEFT([EMAIL_ADDRESS],1)+&quot;*******&quot;+RIGHT([EMAIL_ADDRESS],9)' />
+      <column caption='Tickets Opened Per Day' datatype='integer' name='[Calculation_E1F2A3B4C5D6E7F8]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD(IF DATEPART(&quot;day&quot;,[OPEN_DATE]) = DATEPART(&quot;day&quot;,TODAY()) THEN [TICKET_ID] END)' />
       </column>
-      <column caption='Tickets Opened Per Day' datatype='integer' name='[Calculation_B3C4D5E6F7890123]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNTD([TICKET_ID])' />
+      <column caption='Average Resolution Time' datatype='real' name='[Calculation_F2A3B4C5D6E7F8A9]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG(DATEDIFF(&quot;hour&quot;,[OPEN_DATE],[CLOSE_DATE]))' />
       </column>
-      <column caption='Average Resolution Time' datatype='real' name='[Calculation_C4D5E6F789012345]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='AVG(DATEDIFF(&quot;day&quot;,[OPEN_DATE],[CLOSE_DATE]))' />
+      <column caption='First Contact Resolution Rate' datatype='real' name='[Calculation_A3B4C5D6E7F8A9B0]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [RESOLUTION_STATUS] = &quot;Resolved&quot; AND DATEDIFF(&quot;day&quot;,[OPEN_DATE],[CLOSE_DATE]) = 0 THEN 1 ELSE 0 END) / COUNT([TICKET_ID])' />
       </column>
-      <column caption='First Contact Resolution Rate' datatype='real' name='[Calculation_D5E6F78901234567]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='SUM(IF [RESOLUTION_STATUS] = &quot;Resolved&quot; AND DATEDIFF(&quot;day&quot;,[OPEN_DATE],[CLOSE_DATE]) &lt;= 1 THEN 1 ELSE 0 END) / COUNT([TICKET_ID])' />
-      </column>
-      <column caption='Tickets Per 1000 Active Users' datatype='real' name='[Calculation_E6F789012345678A]' role='measure' type='quantitative'>
+      <column caption='Tickets Per 1000 Active Users' datatype='real' name='[Calculation_B4C5D6E7F8A9B0C1]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='(COUNT([TICKET_ID]) / COUNTD([USER_ID])) * 1000' />
       </column>
-      <column caption='Ticket Volume By Type' datatype='integer' name='[Calculation_F78901234567890B]' role='measure' type='quantitative'>
+      <column caption='Ticket Volume By Type' datatype='integer' name='[Calculation_C5D6E7F8A9B0C1D2]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='COUNT([TICKET_ID])' />
       </column>
-      <column caption='User To Ticket Ratio' datatype='real' name='[Calculation_7890123456789ABC]' role='measure' type='quantitative'>
+      <column caption='User To Ticket Ratio' datatype='real' name='[Calculation_D6E7F8A9B0C1D2E3]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='COUNT([TICKET_ID]) / COUNTD([USER_ID])' />
       </column>
       <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
@@ -180,19 +166,19 @@
       </semantic-values>
       <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
         <objects>
-          <object caption='SUPPORT_TICKETS' id='SUPPORT_TICKETS_2B3C4D5E6F789012'>
+          <object caption='SUPPORT_TICKETS' id='SUPPORT_TICKETS_E1F2A3B4C5D6E7F8A9B0C1D2E3F4A5B6'>
             <properties context=''>
-              <relation connection='snowflake.2B3C4D5E6F789012' name='SUPPORT_TICKETS' table='[DB_POC_ZOOM].[GOLD].[SUPPORT_TICKETS]' type='table' />
+              <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='SUPPORT_TICKETS' table='[DB_POC_ZOOM].[GOLD].[SUPPORT_TICKETS]' type='table' />
             </properties>
           </object>
-          <object caption='USERS' id='USERS_3C4D5E6F78901234'>
+          <object caption='USERS' id='USERS_F2A3B4C5D6E7F8A9B0C1D2E3F4A5B6C7'>
             <properties context=''>
-              <relation connection='snowflake.2B3C4D5E6F789012' name='USERS' table='[DB_POC_ZOOM].[GOLD].[USERS]' type='table' />
+              <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='USERS' table='[DB_POC_ZOOM].[GOLD].[USERS]' type='table' />
             </properties>
           </object>
-          <object caption='MEETINGS' id='MEETINGS_4D5E6F7890123456'>
+          <object caption='MEETINGS' id='MEETINGS_A3B4C5D6E7F8A9B0C1D2E3F4A5B6C7D8'>
             <properties context=''>
-              <relation connection='snowflake.2B3C4D5E6F789012' name='MEETINGS' table='[DB_POC_ZOOM].[GOLD].[MEETINGS]' type='table' />
+              <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='MEETINGS' table='[DB_POC_ZOOM].[GOLD].[MEETINGS]' type='table' />
             </properties>
           </object>
         </objects>
@@ -211,15 +197,15 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' name='federated.2B3C4D5E6F789012' />
+            <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' />
           </datasources>
-          <datasource-dependencies datasource='federated.2B3C4D5E6F789012'>
+          <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e'>
             <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
-            <column caption='Ticket Volume By Type' datatype='integer' name='[Calculation_F78901234567890B]' role='measure' type='quantitative'>
+            <column caption='Ticket Volume By Type' datatype='integer' name='[Calculation_C5D6E7F8A9B0C1D2]' role='measure' type='quantitative'>
               <calculation class='tableau' formula='COUNT([TICKET_ID])' />
             </column>
             <column-instance column='[MEETING_TYPE]' derivation='None' name='[none:MEETING_TYPE:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calculation_F78901234567890B]' derivation='Sum' name='[sum:Calculation_F78901234567890B:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_C5D6E7F8A9B0C1D2]' derivation='User' name='[usr:Calculation_C5D6E7F8A9B0C1D2:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
@@ -231,7 +217,7 @@
             </view>
             <mark class='Bar' />
             <encodings>
-              <color column='[federated.2B3C4D5E6F789012].[none:MEETING_TYPE:nk]' />
+              <color column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[none:MEETING_TYPE:nk]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -241,12 +227,12 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.2B3C4D5E6F789012].[sum:Calculation_F78901234567890B:qk]</rows>
-        <cols>[federated.2B3C4D5E6F789012].[none:MEETING_TYPE:nk]</cols>
+        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[usr:Calculation_C5D6E7F8A9B0C1D2:qk]</rows>
+        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[none:MEETING_TYPE:nk]</cols>
       </table>
-      <simple-id uuid='{E5F67890-1234-5678-9ABC-DEF012345678}' />
+      <simple-id uuid='{E1F2A3B4-C5D6-E7F8-A9B0-C1D2E3F4A5B6}' />
     </worksheet>
-    <worksheet name='Average Resolution Time Trends'>
+    <worksheet name='Average Resolution Time Trend'>
       <layout-options>
         <title>
           <formatted-text>
@@ -257,21 +243,21 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' name='federated.2B3C4D5E6F789012' />
+            <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' />
           </datasources>
-          <datasource-dependencies datasource='federated.2B3C4D5E6F789012'>
+          <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e'>
             <column caption='Open Date' datatype='datetime' name='[OPEN_DATE]' role='dimension' type='ordinal' />
-            <column caption='Average Resolution Time' datatype='real' name='[Calculation_C4D5E6F789012345]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='AVG(DATEDIFF(&quot;day&quot;,[OPEN_DATE],[CLOSE_DATE]))' />
+            <column caption='Average Resolution Time' datatype='real' name='[Calculation_F2A3B4C5D6E7F8A9]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG(DATEDIFF(&quot;hour&quot;,[OPEN_DATE],[CLOSE_DATE]))' />
             </column>
             <column-instance column='[OPEN_DATE]' derivation='Month-Trunc' name='[tmn:OPEN_DATE:qk]' pivot='key' type='quantitative' />
-            <column-instance column='[Calculation_C4D5E6F789012345]' derivation='Sum' name='[sum:Calculation_C4D5E6F789012345:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_F2A3B4C5D6E7F8A9]' derivation='User' name='[usr:Calculation_F2A3B4C5D6E7F8A9:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
         <style>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.2B3C4D5E6F789012].[sum:Calculation_C4D5E6F789012345:qk]' palette='orange_10_0' type='interpolated' />
+            <encoding attr='color' field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[usr:Calculation_F2A3B4C5D6E7F8A9:qk]' palette='orange_10_0' type='interpolated' />
           </style-rule>
         </style>
         <panes>
@@ -281,7 +267,7 @@
             </view>
             <mark class='Line' />
             <encodings>
-              <color column='[federated.2B3C4D5E6F789012].[sum:Calculation_C4D5E6F789012345:qk]' />
+              <color column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[usr:Calculation_F2A3B4C5D6E7F8A9:qk]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -291,10 +277,10 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.2B3C4D5E6F789012].[sum:Calculation_C4D5E6F789012345:qk]</rows>
-        <cols>[federated.2B3C4D5E6F789012].[tmn:OPEN_DATE:qk]</cols>
+        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[usr:Calculation_F2A3B4C5D6E7F8A9:qk]</rows>
+        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[tmn:OPEN_DATE:qk]</cols>
       </table>
-      <simple-id uuid='{F6789012-3456-789A-BCDE-F01234567890}' />
+      <simple-id uuid='{F2A3B4C5-D6E7-F8A9-B0C1-D2E3F4A5B6C7}' />
     </worksheet>
   </worksheets>
   <windows saved-dpi-scale-factor='1.5' source-height='44'>
@@ -319,12 +305,7 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{67890123-456A-BCDE-F012-3456789ABCDE}' />
+      <simple-id uuid='{A3B4C5D6-E7F8-A9B0-C1D2-E3F4A5B6C7D8}' />
     </window>
   </windows>
-  <thumbnails>
-    <thumbnail height='192' name='Ticket Volume by Meeting Type' width='192'>
-      iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAABYlAAAWJQFJUiTw
-    </thumbnail>
-  </thumbnails>
 </workbook>
