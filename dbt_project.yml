@@ -19,76 +19,24 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "dbt_packages"
 
 # Configuring models
-# Full documentation: https://docs.getdbt.com/docs/configuring-models
-
 models:
   zoom_silver_pipeline:
     # Config indicated by + and applies to all files under models/example/
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
-      +depends_on:
-        - model.zoom_silver_pipeline.si_pipeline_audit
-      +pre_hook: |
-        {% if this.name != 'si_pipeline_audit' %}
-          INSERT INTO {{ ref('si_pipeline_audit') }} (
-            execution_id, pipeline_name, start_time, status, 
-            source_tables_processed, target_tables_updated, 
-            executed_by, execution_environment, load_date, update_date, source_system
-          ) 
-          SELECT 
-            '{{ this.name }}_' || TO_CHAR(CURRENT_TIMESTAMP(), 'YYYYMMDDHH24MISS'), 
-            '{{ this.name }}_ETL', 
-            CURRENT_TIMESTAMP(), 
-            'Started', 
-            'BRONZE_TABLES', 
-            '{{ this.name }}', 
-            'DBT', 
-            'PRODUCTION', 
-            CURRENT_DATE(), 
-            CURRENT_DATE(), 
-            'SILVER_LAYER'
-          WHERE EXISTS (
-            SELECT 1 FROM INFORMATION_SCHEMA.TABLES 
-            WHERE TABLE_SCHEMA = CURRENT_SCHEMA() 
-            AND TABLE_NAME = 'SI_PIPELINE_AUDIT' 
-            AND TABLE_TYPE = 'BASE TABLE'
-          )
-        {% endif %}
-      +post_hook: |
-        {% if this.name != 'si_pipeline_audit' %}
-          INSERT INTO {{ ref('si_pipeline_audit') }} (
-            execution_id, pipeline_name, end_time, status, 
-            records_processed, executed_by, execution_environment, 
-            load_date, update_date, source_system
-          ) 
-          SELECT 
-            '{{ this.name }}_' || TO_CHAR(CURRENT_TIMESTAMP(), 'YYYYMMDDHH24MISS'), 
-            '{{ this.name }}_ETL', 
-            CURRENT_TIMESTAMP(), 
-            'Completed', 
-            (SELECT COUNT(*) FROM {{ this }}), 
-            'DBT', 
-            'PRODUCTION', 
-            CURRENT_DATE(), 
-            CURRENT_DATE(), 
-            'SILVER_LAYER'
-          WHERE EXISTS (
-            SELECT 1 FROM INFORMATION_SCHEMA.TABLES 
-            WHERE TABLE_SCHEMA = CURRENT_SCHEMA() 
-            AND TABLE_NAME = 'SI_PIPELINE_AUDIT' 
-            AND TABLE_TYPE = 'BASE TABLE'
-          )
-        {% endif %}
 
-# Set the timezone for timestamp functions
+# Global configurations
 vars:
-  timezone: 'UTC'
+  # The `start_date` variable will be accessible in all resources
+  start_date: '2020-01-01'
   
-# Specify the minimum version of dbt required to run this project
-require-dbt-version: ">=1.0.0"
-
-# Configure seeds
+# Seeds configuration
 seeds:
   zoom_silver_pipeline:
     +quote_columns: false
+
+# Snapshots configuration
+snapshots:
+  zoom_silver_pipeline:
+    +target_schema: snapshots
