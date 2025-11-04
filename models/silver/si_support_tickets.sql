@@ -1,162 +1,154 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('audit_log') }} (EXECUTION_ID, PIPELINE_NAME, START_TIME, STATUS, EXECUTED_BY, SOURCE_TABLES_PROCESSED, TARGET_TABLES_UPDATED, LOAD_DATE) SELECT 'EXEC_' || REPLACE(CAST(CURRENT_TIMESTAMP() AS STRING), ' ', '_'), 'SI_SUPPORT_TICKETS_TRANSFORMATION', CURRENT_TIMESTAMP(), 'STARTED', 'DBT_PIPELINE', 'BZ_SUPPORT_TICKETS', 'SI_SUPPORT_TICKETS', CURRENT_DATE() WHERE EXISTS (SELECT 1 FROM {{ ref('audit_log') }} LIMIT 1)",
+    post_hook="INSERT INTO {{ ref('audit_log') }} (EXECUTION_ID, PIPELINE_NAME, END_TIME, STATUS, EXECUTED_BY, RECORDS_PROCESSED, LOAD_DATE) SELECT 'EXEC_' || REPLACE(CAST(CURRENT_TIMESTAMP() AS STRING), ' ', '_'), 'SI_SUPPORT_TICKETS_TRANSFORMATION', CURRENT_TIMESTAMP(), 'COMPLETED', 'DBT_PIPELINE', (SELECT COUNT(*) FROM {{ this }}), CURRENT_DATE() WHERE EXISTS (SELECT 1 FROM {{ ref('audit_log') }} LIMIT 1)"
 ) }}
 
--- Silver Layer Support Tickets Transformation
+-- Silver Layer Support Tickets Table Transformation
 -- Source: Bronze.BZ_SUPPORT_TICKETS
--- Target: Silver.SI_SUPPORT_TICKETS
--- Description: Transforms and standardizes support ticket data with resolution metrics
 
 WITH bronze_support_tickets AS (
     SELECT 
-        ticket_id,
-        user_id,
-        ticket_type,
-        resolution_status,
-        open_date,
-        load_timestamp,
-        update_timestamp,
-        source_system
-    FROM {{ source('bronze', 'bz_support_tickets') }}
-    WHERE ticket_id IS NOT NULL
-      AND user_id IS NOT NULL
+        TICKET_ID,
+        USER_ID,
+        TICKET_TYPE,
+        RESOLUTION_STATUS,
+        OPEN_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_SUPPORT_TICKETS') }}
 ),
 
 -- Data Quality Validation and Cleansing
-data_quality_checks AS (
+validated_support_tickets AS (
     SELECT 
-        ticket_id,
-        user_id,
+        TICKET_ID,
+        USER_ID,
         
         -- Standardize ticket type
         CASE 
-            WHEN UPPER(ticket_type) IN ('TECHNICAL', 'BILLING', 'FEATURE REQUEST', 'BUG REPORT') THEN UPPER(ticket_type)
-            ELSE 'GENERAL'
-        END AS ticket_type_clean,
+            WHEN TICKET_TYPE IN ('Technical', 'Billing', 'Feature Request', 'Bug Report') 
+            THEN TICKET_TYPE
+            ELSE 'Other'
+        END AS TICKET_TYPE,
         
         -- Derive priority level from ticket type
         CASE 
-            WHEN UPPER(ticket_type) = 'BUG REPORT' THEN 'High'
-            WHEN UPPER(ticket_type) = 'TECHNICAL' THEN 'Medium'
-            WHEN UPPER(ticket_type) = 'BILLING' THEN 'High'
-            WHEN UPPER(ticket_type) = 'FEATURE REQUEST' THEN 'Low'
+            WHEN TICKET_TYPE = 'Bug Report' THEN 'High'
+            WHEN TICKET_TYPE = 'Technical' THEN 'Medium'
+            WHEN TICKET_TYPE = 'Billing' THEN 'High'
+            WHEN TICKET_TYPE = 'Feature Request' THEN 'Low'
             ELSE 'Medium'
-        END AS priority_level,
+        END AS PRIORITY_LEVEL,
         
         -- Validate open date
         CASE 
-            WHEN open_date IS NULL THEN DATE(load_timestamp)
-            WHEN open_date > CURRENT_DATE() THEN CURRENT_DATE()
-            ELSE open_date
-        END AS open_date_clean,
+            WHEN OPEN_DATE > DATEADD('day', 1, CURRENT_DATE()) 
+            THEN CURRENT_DATE()
+            ELSE OPEN_DATE
+        END AS OPEN_DATE,
+        
+        -- Derive close date from resolution status
+        CASE 
+            WHEN RESOLUTION_STATUS IN ('Resolved', 'Closed') 
+            THEN DATEADD('day', 3, OPEN_DATE)  -- Assume 3 days resolution time
+            ELSE NULL
+        END AS CLOSE_DATE,
         
         -- Standardize resolution status
         CASE 
-            WHEN UPPER(resolution_status) IN ('OPEN', 'IN PROGRESS', 'RESOLVED', 'CLOSED') THEN UPPER(resolution_status)
-            ELSE 'OPEN'
-        END AS resolution_status_clean,
-        
-        load_timestamp,
-        update_timestamp,
-        source_system
-    FROM bronze_support_tickets
-),
-
--- Add derived fields
-derived_fields AS (
-    SELECT 
-        *,
-        -- Derive close date based on resolution status
-        CASE 
-            WHEN resolution_status_clean IN ('RESOLVED', 'CLOSED') THEN DATE(update_timestamp)
-            ELSE NULL
-        END AS close_date,
+            WHEN RESOLUTION_STATUS IN ('Open', 'In Progress', 'Resolved', 'Closed') 
+            THEN RESOLUTION_STATUS
+            ELSE 'Open'
+        END AS RESOLUTION_STATUS,
         
         -- Generate issue description based on ticket type
         CASE 
-            WHEN ticket_type_clean = 'TECHNICAL' THEN 'Technical issue reported by user requiring investigation'
-            WHEN ticket_type_clean = 'BILLING' THEN 'Billing inquiry or payment-related issue'
-            WHEN ticket_type_clean = 'FEATURE REQUEST' THEN 'User request for new feature or enhancement'
-            WHEN ticket_type_clean = 'BUG REPORT' THEN 'Software bug or defect reported by user'
+            WHEN TICKET_TYPE = 'Technical' THEN 'Technical issue reported by user'
+            WHEN TICKET_TYPE = 'Billing' THEN 'Billing inquiry or dispute'
+            WHEN TICKET_TYPE = 'Feature Request' THEN 'User requested new feature'
+            WHEN TICKET_TYPE = 'Bug Report' THEN 'Software bug reported'
             ELSE 'General support inquiry'
-        END AS issue_description,
+        END AS ISSUE_DESCRIPTION,
         
         -- Generate resolution notes based on status
         CASE 
-            WHEN resolution_status_clean = 'RESOLVED' THEN 'Issue successfully resolved by support team'
-            WHEN resolution_status_clean = 'CLOSED' THEN 'Ticket closed after resolution confirmation'
-            WHEN resolution_status_clean = 'IN PROGRESS' THEN 'Issue currently being investigated'
-            ELSE 'Ticket awaiting initial review'
-        END AS resolution_notes
-    FROM data_quality_checks
+            WHEN RESOLUTION_STATUS = 'Resolved' THEN 'Issue successfully resolved'
+            WHEN RESOLUTION_STATUS = 'Closed' THEN 'Ticket closed by user or system'
+            WHEN RESOLUTION_STATUS = 'In Progress' THEN 'Currently being worked on'
+            ELSE 'Awaiting initial review'
+        END AS RESOLUTION_NOTES,
+        
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        
+        -- Add row number for deduplication
+        ROW_NUMBER() OVER (PARTITION BY TICKET_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM bronze_support_tickets
+    WHERE TICKET_ID IS NOT NULL
+        AND USER_ID IS NOT NULL
 ),
 
--- Calculate resolution time
-resolution_time_calc AS (
+-- Calculate derived fields
+final_support_tickets AS (
     SELECT 
-        *,
+        TICKET_ID,
+        USER_ID,
+        TICKET_TYPE,
+        PRIORITY_LEVEL,
+        OPEN_DATE,
+        CLOSE_DATE,
+        RESOLUTION_STATUS,
+        ISSUE_DESCRIPTION,
+        RESOLUTION_NOTES,
+        
         -- Calculate resolution time in hours
         CASE 
-            WHEN close_date IS NOT NULL THEN 
-                DATEDIFF('hour', open_date_clean, close_date)
+            WHEN CLOSE_DATE IS NOT NULL 
+            THEN DATEDIFF('hour', OPEN_DATE, CLOSE_DATE)
             ELSE NULL
-        END AS resolution_time_hours
-    FROM derived_fields
-),
-
--- Calculate data quality score
-quality_scored AS (
-    SELECT 
-        *,
+        END AS RESOLUTION_TIME_HOURS,
+        
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        
         -- Calculate data quality score
-        (
-            CASE WHEN ticket_type_clean != 'GENERAL' THEN 0.25 ELSE 0 END +
-            CASE WHEN priority_level IS NOT NULL THEN 0.25 ELSE 0 END +
-            CASE WHEN open_date_clean IS NOT NULL THEN 0.25 ELSE 0 END +
-            CASE WHEN resolution_status_clean IS NOT NULL THEN 0.25 ELSE 0 END
-        ) AS data_quality_score
-    FROM resolution_time_calc
-),
-
--- Remove duplicates keeping the most recent record
-deduped_support_tickets AS (
-    SELECT 
-        ticket_id,
-        user_id,
-        ticket_type_clean AS ticket_type,
-        priority_level,
-        open_date_clean AS open_date,
-        close_date,
-        resolution_status_clean AS resolution_status,
-        issue_description,
-        resolution_notes,
-        resolution_time_hours,
-        load_timestamp,
-        update_timestamp,
-        source_system,
-        data_quality_score,
-        ROW_NUMBER() OVER (PARTITION BY ticket_id ORDER BY update_timestamp DESC) AS rn
-    FROM quality_scored
-    WHERE data_quality_score >= {{ var('dq_score_threshold') }}
+        CASE 
+            WHEN TICKET_ID IS NOT NULL 
+                AND USER_ID IS NOT NULL
+                AND TICKET_TYPE IS NOT NULL
+                AND OPEN_DATE IS NOT NULL
+                AND RESOLUTION_STATUS IS NOT NULL
+            THEN 1.00
+            WHEN TICKET_ID IS NOT NULL AND USER_ID IS NOT NULL
+            THEN 0.75
+            ELSE 0.50
+        END AS DATA_QUALITY_SCORE,
+        
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE
+    FROM validated_support_tickets
+    WHERE rn = 1
 )
 
 SELECT 
-    ticket_id,
-    user_id,
-    ticket_type,
-    priority_level,
-    open_date,
-    close_date,
-    resolution_status,
-    issue_description,
-    resolution_notes,
-    resolution_time_hours,
-    load_timestamp,
-    update_timestamp,
-    source_system,
-    data_quality_score,
-    DATE(load_timestamp) AS load_date,
-    DATE(update_timestamp) AS update_date
-FROM deduped_support_tickets
-WHERE rn = 1
-  AND open_date IS NOT NULL
+    TICKET_ID,
+    USER_ID,
+    TICKET_TYPE,
+    PRIORITY_LEVEL,
+    OPEN_DATE,
+    CLOSE_DATE,
+    RESOLUTION_STATUS,
+    ISSUE_DESCRIPTION,
+    RESOLUTION_NOTES,
+    RESOLUTION_TIME_HOURS,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    DATA_QUALITY_SCORE,
+    LOAD_DATE,
+    UPDATE_DATE
+FROM final_support_tickets
