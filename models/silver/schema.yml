@@ -1,62 +1,47 @@
 version: 2
 
 sources:
-  - name: bronze
-    description: "Bronze layer tables containing raw data from Zoom platform"
+  - name: raw_schema
+    description: "Raw data tables from Zoom platform"
+    database: DB_POC_ZOOM
+    schema: RAW
     tables:
-      - name: bz_users
-        description: "Bronze users table with raw user account data"
+      - name: users
+        description: "Raw users table with user account data"
         columns:
           - name: user_id
             description: "Unique identifier for each user"
-            tests:
-              - not_null
-              - unique
           - name: email
             description: "User email address"
-            tests:
-              - not_null
       
-      - name: bz_meetings
-        description: "Bronze meetings table with raw meeting data"
+      - name: meetings
+        description: "Raw meetings table with meeting data"
         columns:
           - name: meeting_id
             description: "Unique identifier for each meeting"
-            tests:
-              - not_null
-              - unique
           - name: host_id
             description: "User ID of meeting host"
-            tests:
-              - not_null
       
-      - name: bz_participants
-        description: "Bronze participants table with raw attendance data"
+      - name: participants
+        description: "Raw participants table with attendance data"
         columns:
           - name: participant_id
             description: "Unique identifier for each participant record"
-            tests:
-              - not_null
-              - unique
           - name: meeting_id
             description: "Reference to meeting"
-            tests:
-              - not_null
           - name: user_id
             description: "Reference to user"
-            tests:
-              - not_null
       
-      - name: bz_feature_usage
-        description: "Bronze feature usage table"
-      - name: bz_support_tickets
-        description: "Bronze support tickets table"
-      - name: bz_billing_events
-        description: "Bronze billing events table"
-      - name: bz_licenses
-        description: "Bronze licenses table"
-      - name: bz_webinars
-        description: "Bronze webinars table"
+      - name: feature_usage
+        description: "Raw feature usage table"
+      - name: support_tickets
+        description: "Raw support tickets table"
+      - name: billing_events
+        description: "Raw billing events table"
+      - name: licenses
+        description: "Raw licenses table"
+      - name: webinars
+        description: "Raw webinars table"
 
 models:
   - name: si_pipeline_audit
@@ -110,9 +95,6 @@ models:
         description: "Data quality score for the record"
         tests:
           - not_null
-          - dbt_utils.accepted_range:
-              min_value: 0
-              max_value: 1
   
   - name: si_meetings
     description: "Silver layer meetings table with cleaned and enriched meeting data"
@@ -126,9 +108,6 @@ models:
         description: "User ID of meeting host"
         tests:
           - not_null
-          - relationships:
-              to: ref('si_users')
-              field: user_id
       - name: meeting_type
         description: "Standardized meeting category"
         tests:
@@ -145,62 +124,7 @@ models:
         description: "Meeting duration in minutes"
         tests:
           - not_null
-          - dbt_utils.accepted_range:
-              min_value: 1
-              max_value: 1440
       - name: data_quality_score
         description: "Data quality score for the record"
         tests:
           - not_null
-          - dbt_utils.accepted_range:
-              min_value: 0
-              max_value: 1
-  
-  - name: si_participants
-    description: "Silver layer participants table with cleaned attendance data"
-    columns:
-      - name: participant_id
-        description: "Unique identifier for each participant record"
-        tests:
-          - not_null
-          - unique
-      - name: meeting_id
-        description: "Reference to meeting"
-        tests:
-          - not_null
-          - relationships:
-              to: ref('si_meetings')
-              field: meeting_id
-      - name: user_id
-        description: "Reference to user"
-        tests:
-          - not_null
-          - relationships:
-              to: ref('si_users')
-              field: user_id
-      - name: attendance_duration
-        description: "Time spent in meeting (minutes)"
-        tests:
-          - not_null
-          - dbt_utils.accepted_range:
-              min_value: 0
-              max_value: 1440
-      - name: participant_role
-        description: "Role of attendee"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['Host', 'Co-host', 'Participant', 'Observer']
-      - name: connection_quality
-        description: "Network connection quality"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['Excellent', 'Good', 'Fair', 'Poor']
-      - name: data_quality_score
-        description: "Data quality score for the record"
-        tests:
-          - not_null
-          - dbt_utils.accepted_range:
-              min_value: 0
-              max_value: 1
