@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ this.database }}.{{ this.schema }}.si_pipeline_audit (execution_id, pipeline_name, start_time, status, executed_by) VALUES (REPLACE(UUID_STRING(), '-', ''), 'si_meetings_transform', CURRENT_TIMESTAMP(), 'STARTED', CURRENT_USER())",
-    post_hook="UPDATE {{ this.database }}.{{ this.schema }}.si_pipeline_audit SET end_time = CURRENT_TIMESTAMP(), status = 'COMPLETED', records_processed = (SELECT COUNT(*) FROM {{ this }}) WHERE pipeline_name = 'si_meetings_transform' AND status = 'STARTED'"
+    materialized='table'
 ) }}
 
 -- Silver Layer Meetings Transformation
@@ -20,7 +18,7 @@ WITH bronze_meetings AS (
         load_timestamp,
         update_timestamp,
         source_system
-    FROM {{ ref('bronze_meetings') }}
+    FROM {{ source('bronze', 'bz_meetings') }}
     WHERE meeting_id IS NOT NULL
       AND host_id IS NOT NULL
 ),
@@ -36,7 +34,7 @@ participant_counts AS (
     SELECT 
         meeting_id,
         COUNT(DISTINCT user_id) AS participant_count
-    FROM {{ ref('bronze_participants') }}
+    FROM {{ source('bronze', 'bz_participants') }}
     WHERE meeting_id IS NOT NULL
     GROUP BY meeting_id
 ),
