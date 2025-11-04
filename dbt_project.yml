@@ -2,10 +2,8 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_silver_pipeline'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -13,76 +11,41 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
-      +on_schema_change: sync_all_columns
-      +pre_hook: |
-        {% if this.name != 'si_pipeline_audit' %}
-          INSERT INTO {{ ref('si_pipeline_audit') }} (
-            EXECUTION_ID, PIPELINE_NAME, START_TIME, STATUS, 
-            SOURCE_TABLES_PROCESSED, TARGET_TABLES_UPDATED, 
-            EXECUTED_BY, EXECUTION_ENVIRONMENT, DATA_LINEAGE_INFO, 
-            LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM
-          ) 
-          SELECT 
-            CONCAT('SILVER_{{ this.name | upper }}_', DATE_PART('epoch', CURRENT_TIMESTAMP())::STRING),
-            'SI_{{ this.name | upper }}_ETL',
-            CURRENT_TIMESTAMP(),
-            'In Progress',
-            'BRONZE_TABLES',
-            'SI_{{ this.name | upper }}',
-            'DBT_SILVER_PIPELINE',
-            'PRODUCTION',
-            'Bronze to Silver {{ this.name }} transformation',
-            CURRENT_DATE(),
-            CURRENT_DATE(),
-            'SILVER_LAYER'
-        {% endif %}
-      +post_hook: |
-        {% if this.name != 'si_pipeline_audit' %}
-          UPDATE {{ ref('si_pipeline_audit') }} 
-          SET 
-            END_TIME = CURRENT_TIMESTAMP(),
-            STATUS = 'Success',
-            EXECUTION_DURATION_SECONDS = DATEDIFF('second', START_TIME, CURRENT_TIMESTAMP()),
-            RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
-            RECORDS_INSERTED = (SELECT COUNT(*) FROM {{ this }})
-          WHERE PIPELINE_NAME = 'SI_{{ this.name | upper }}_ETL' 
-            AND STATUS = 'In Progress'
-        {% endif %}
-
-# Configure seeds
-seeds:
-  zoom_silver_pipeline:
-    +materialized: table
-
-# Configure snapshots
-snapshots:
-  zoom_silver_pipeline:
-    +target_schema: snapshots
-
-vars:
-  # dbt-utils variables
-  'dbt_utils:surrogate_key_treat_nulls_as_empty_strings': true
-  
-  # Custom variables for the project
-  bronze_schema: 'bronze'
-  silver_schema: 'silver'
-  gold_schema: 'gold'
-  
-  # Data quality thresholds
-  min_data_quality_score: 0.50
-  max_duration_minutes: 1440
-  
-  # Business rules
-  default_meeting_duration: 30
-  max_participant_count: 1000
+      si_pipeline_audit:
+        +pre-hook: []
+        +post-hook: []
+      si_users:
+        +depends_on:
+          - ref('si_pipeline_audit')
+      si_meetings:
+        +depends_on:
+          - ref('si_pipeline_audit')
+          - ref('si_users')
+      si_participants:
+        +depends_on:
+          - ref('si_pipeline_audit')
+          - ref('si_meetings')
+      si_feature_usage:
+        +depends_on:
+          - ref('si_pipeline_audit')
+      si_support_tickets:
+        +depends_on:
+          - ref('si_pipeline_audit')
+      si_billing_events:
+        +depends_on:
+          - ref('si_pipeline_audit')
+      si_licenses:
+        +depends_on:
+          - ref('si_pipeline_audit')
+          - ref('si_users')
+      si_webinars:
+        +depends_on:
+          - ref('si_pipeline_audit')
