@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ this.database }}.{{ this.schema }}.si_pipeline_audit (execution_id, pipeline_name, start_time, status, executed_by) VALUES (REPLACE(UUID_STRING(), '-', ''), 'si_users_transform', CURRENT_TIMESTAMP(), 'STARTED', CURRENT_USER())",
-    post_hook="UPDATE {{ this.database }}.{{ this.schema }}.si_pipeline_audit SET end_time = CURRENT_TIMESTAMP(), status = 'COMPLETED', records_processed = (SELECT COUNT(*) FROM {{ this }}) WHERE pipeline_name = 'si_users_transform' AND status = 'STARTED'"
+    materialized='table'
 ) }}
 
 -- Silver Layer Users Transformation
@@ -19,7 +17,7 @@ WITH bronze_users AS (
         load_timestamp,
         update_timestamp,
         source_system
-    FROM {{ ref('bronze_users') }}
+    FROM {{ source('bronze', 'bz_users') }}
     WHERE user_id IS NOT NULL
 ),
 
