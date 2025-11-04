@@ -15,7 +15,7 @@ WITH bronze_users AS (
         load_timestamp,
         update_timestamp,
         source_system
-    FROM {{ ref('bz_users') }}
+    FROM {{ source('bronze', 'bz_users') }}
     WHERE user_id IS NOT NULL
 ),
 
