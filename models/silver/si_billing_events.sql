@@ -1,136 +1,110 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('audit_log') }} (EXECUTION_ID, PIPELINE_NAME, START_TIME, STATUS, EXECUTED_BY, SOURCE_TABLES_PROCESSED, TARGET_TABLES_UPDATED, LOAD_DATE) SELECT 'EXEC_' || REPLACE(CAST(CURRENT_TIMESTAMP() AS STRING), ' ', '_'), 'SI_BILLING_EVENTS_TRANSFORMATION', CURRENT_TIMESTAMP(), 'STARTED', 'DBT_PIPELINE', 'BZ_BILLING_EVENTS', 'SI_BILLING_EVENTS', CURRENT_DATE() WHERE EXISTS (SELECT 1 FROM {{ ref('audit_log') }} LIMIT 1)",
+    post_hook="INSERT INTO {{ ref('audit_log') }} (EXECUTION_ID, PIPELINE_NAME, END_TIME, STATUS, EXECUTED_BY, RECORDS_PROCESSED, LOAD_DATE) SELECT 'EXEC_' || REPLACE(CAST(CURRENT_TIMESTAMP() AS STRING), ' ', '_'), 'SI_BILLING_EVENTS_TRANSFORMATION', CURRENT_TIMESTAMP(), 'COMPLETED', 'DBT_PIPELINE', (SELECT COUNT(*) FROM {{ this }}), CURRENT_DATE() WHERE EXISTS (SELECT 1 FROM {{ ref('audit_log') }} LIMIT 1)"
 ) }}
 
--- Silver Layer Billing Events Transformation
+-- Silver Layer Billing Events Table Transformation
 -- Source: Bronze.BZ_BILLING_EVENTS
--- Target: Silver.SI_BILLING_EVENTS
--- Description: Transforms and validates billing and financial transaction data
 
 WITH bronze_billing_events AS (
     SELECT 
-        event_id,
-        user_id,
-        event_type,
-        amount,
-        event_date,
-        load_timestamp,
-        update_timestamp,
-        source_system
-    FROM {{ source('bronze', 'bz_billing_events') }}
-    WHERE event_id IS NOT NULL
-      AND user_id IS NOT NULL
+        EVENT_ID,
+        USER_ID,
+        EVENT_TYPE,
+        AMOUNT,
+        EVENT_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_BILLING_EVENTS') }}
 ),
 
 -- Data Quality Validation and Cleansing
-data_quality_checks AS (
+validated_billing_events AS (
     SELECT 
-        event_id,
-        user_id,
+        EVENT_ID,
+        USER_ID,
         
-        -- Standardize event type
+        -- Standardize event type and handle negative amounts
         CASE 
-            WHEN UPPER(event_type) IN ('SUBSCRIPTION', 'UPGRADE', 'DOWNGRADE', 'REFUND') THEN UPPER(event_type)
-            ELSE 'OTHER'
-        END AS event_type_clean,
+            WHEN AMOUNT < 0 AND EVENT_TYPE != 'Refund' THEN 'Refund'
+            WHEN EVENT_TYPE IN ('Subscription', 'Upgrade', 'Downgrade', 'Refund') THEN EVENT_TYPE
+            ELSE 'Other'
+        END AS EVENT_TYPE,
         
         -- Validate transaction amount
-        CASE 
-            WHEN amount IS NULL THEN 0.00
-            WHEN amount < 0 AND UPPER(event_type) != 'REFUND' THEN ABS(amount)
-            ELSE amount
-        END AS transaction_amount,
+        ABS(COALESCE(AMOUNT, 0)) AS TRANSACTION_AMOUNT,
         
         -- Validate transaction date
         CASE 
-            WHEN event_date IS NULL THEN DATE(load_timestamp)
-            WHEN event_date > CURRENT_DATE() THEN CURRENT_DATE()
-            ELSE event_date
-        END AS transaction_date,
+            WHEN EVENT_DATE > DATEADD('day', 1, CURRENT_DATE()) 
+            THEN CURRENT_DATE()
+            ELSE EVENT_DATE
+        END AS TRANSACTION_DATE,
         
-        load_timestamp,
-        update_timestamp,
-        source_system
-    FROM bronze_billing_events
-),
-
--- Add derived fields
-derived_fields AS (
-    SELECT 
-        *,
-        -- Derive payment method from amount patterns
+        -- Derive payment method from event type and amount patterns
         CASE 
-            WHEN transaction_amount >= 100 THEN 'Bank Transfer'
-            WHEN transaction_amount >= 20 THEN 'Credit Card'
+            WHEN AMOUNT >= 1000 THEN 'Bank Transfer'
+            WHEN AMOUNT >= 100 THEN 'Credit Card'
             ELSE 'PayPal'
-        END AS payment_method,
+        END AS PAYMENT_METHOD,
         
         -- Default currency code
-        'USD' AS currency_code,
+        'USD' AS CURRENCY_CODE,
         
-        -- Generate invoice number
-        'INV-' || event_id AS invoice_number,
+        -- Generate invoice number from event ID
+        'INV-' || EVENT_ID AS INVOICE_NUMBER,
         
         -- Derive transaction status
         CASE 
-            WHEN event_type_clean = 'REFUND' THEN 'Refunded'
-            WHEN transaction_amount > 0 THEN 'Completed'
-            ELSE 'Pending'
-        END AS transaction_status
-    FROM data_quality_checks
-),
-
--- Calculate data quality score
-quality_scored AS (
-    SELECT 
-        *,
+            WHEN EVENT_TYPE = 'Refund' THEN 'Refunded'
+            WHEN AMOUNT > 0 THEN 'Completed'
+            ELSE 'Failed'
+        END AS TRANSACTION_STATUS,
+        
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        
         -- Calculate data quality score
-        (
-            CASE WHEN event_type_clean != 'OTHER' THEN 0.30 ELSE 0 END +
-            CASE WHEN transaction_amount >= 0 THEN 0.25 ELSE 0 END +
-            CASE WHEN transaction_date IS NOT NULL THEN 0.25 ELSE 0 END +
-            CASE WHEN transaction_status != 'Pending' THEN 0.20 ELSE 0 END
-        ) AS data_quality_score
-    FROM derived_fields
-),
-
--- Remove duplicates keeping the most recent record
-deduped_billing_events AS (
-    SELECT 
-        event_id,
-        user_id,
-        event_type_clean AS event_type,
-        transaction_amount,
-        transaction_date,
-        payment_method,
-        currency_code,
-        invoice_number,
-        transaction_status,
-        load_timestamp,
-        update_timestamp,
-        source_system,
-        data_quality_score,
-        ROW_NUMBER() OVER (PARTITION BY event_id ORDER BY update_timestamp DESC) AS rn
-    FROM quality_scored
-    WHERE data_quality_score >= {{ var('dq_score_threshold') }}
+        CASE 
+            WHEN EVENT_ID IS NOT NULL 
+                AND USER_ID IS NOT NULL
+                AND EVENT_TYPE IS NOT NULL
+                AND AMOUNT IS NOT NULL
+                AND EVENT_DATE IS NOT NULL
+            THEN 1.00
+            WHEN EVENT_ID IS NOT NULL AND USER_ID IS NOT NULL
+            THEN 0.75
+            ELSE 0.50
+        END AS DATA_QUALITY_SCORE,
+        
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        
+        -- Add row number for deduplication
+        ROW_NUMBER() OVER (PARTITION BY EVENT_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM bronze_billing_events
+    WHERE EVENT_ID IS NOT NULL
+        AND USER_ID IS NOT NULL
 )
 
 SELECT 
-    event_id,
-    user_id,
-    event_type,
-    transaction_amount,
-    transaction_date,
-    payment_method,
-    currency_code,
-    invoice_number,
-    transaction_status,
-    load_timestamp,
-    update_timestamp,
-    source_system,
-    data_quality_score,
-    DATE(load_timestamp) AS load_date,
-    DATE(update_timestamp) AS update_date
-FROM deduped_billing_events
+    EVENT_ID,
+    USER_ID,
+    EVENT_TYPE,
+    TRANSACTION_AMOUNT,
+    TRANSACTION_DATE,
+    PAYMENT_METHOD,
+    CURRENCY_CODE,
+    INVOICE_NUMBER,
+    TRANSACTION_STATUS,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    DATA_QUALITY_SCORE,
+    LOAD_DATE,
+    UPDATE_DATE
+FROM validated_billing_events
 WHERE rn = 1
-  AND transaction_amount >= 0
