@@ -1,124 +1,106 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ target.schema }}.SI_PIPELINE_AUDIT (EXECUTION_ID, PIPELINE_NAME, START_TIME, STATUS, SOURCE_TABLES_PROCESSED, EXECUTED_BY, EXECUTION_ENVIRONMENT) VALUES (GENERATE_UUID(), 'SI_USERS_TRANSFORM', CURRENT_TIMESTAMP(), 'RUNNING', 'BZ_USERS', 'DBT_SYSTEM', 'PRODUCTION')",
+    post_hook="UPDATE {{ target.schema }}.SI_PIPELINE_AUDIT SET END_TIME = CURRENT_TIMESTAMP(), STATUS = 'SUCCESS', EXECUTION_DURATION_SECONDS = DATEDIFF('second', START_TIME, CURRENT_TIMESTAMP()), RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}) WHERE PIPELINE_NAME = 'SI_USERS_TRANSFORM' AND STATUS = 'RUNNING'"
 ) }}
 
 -- Silver Layer Users Transformation
 -- Source: Bronze.BZ_USERS
 -- Target: Silver.SI_USERS
--- Description: Transforms and cleanses user data with comprehensive data quality checks
+-- Description: Clean, validate and standardize user data with data quality checks
 
 WITH bronze_users AS (
     SELECT 
-        user_id,
-        user_name,
-        email,
-        company,
-        plan_type,
-        load_timestamp,
-        update_timestamp,
-        source_system
-    FROM {{ source('bronze', 'bz_users') }}
-    WHERE user_id IS NOT NULL
+        USER_ID,
+        USER_NAME,
+        EMAIL,
+        COMPANY,
+        PLAN_TYPE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ ref('bz_users') }}
+    WHERE USER_ID IS NOT NULL
 ),
 
 -- Data Quality Validation and Cleansing
-data_quality_checks AS (
+validated_users AS (
     SELECT 
-        user_id,
-        -- Standardize user name with proper case formatting
+        USER_ID,
+        -- Clean and standardize user name
         CASE 
-            WHEN user_name IS NULL OR TRIM(user_name) = '' THEN 'Unknown User'
-            ELSE TRIM(UPPER(SUBSTRING(user_name, 1, 1)) || LOWER(SUBSTRING(user_name, 2)))
-        END AS user_name_clean,
+            WHEN USER_NAME IS NULL OR TRIM(USER_NAME) = '' THEN 'Unknown User'
+            ELSE TRIM(UPPER(USER_NAME))
+        END AS USER_NAME,
         
-        -- Email validation and standardization
+        -- Validate and standardize email
         CASE 
-            WHEN email IS NULL OR TRIM(email) = '' THEN NULL
-            WHEN REGEXP_LIKE(LOWER(TRIM(email)), '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$') 
-                THEN LOWER(TRIM(email))
+            WHEN EMAIL IS NULL OR TRIM(EMAIL) = '' THEN NULL
+            WHEN REGEXP_LIKE(LOWER(TRIM(EMAIL)), '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$') 
+                THEN LOWER(TRIM(EMAIL))
             ELSE NULL
-        END AS email_clean,
+        END AS EMAIL,
         
-        -- Company standardization
+        -- Clean company name
         CASE 
-            WHEN company IS NULL OR TRIM(company) = '' THEN 'Unknown Company'
-            ELSE TRIM(company)
-        END AS company_clean,
+            WHEN COMPANY IS NULL OR TRIM(COMPANY) = '' THEN 'Unknown Company'
+            ELSE TRIM(COMPANY)
+        END AS COMPANY,
         
-        -- Plan type standardization
+        -- Standardize plan type
         CASE 
-            WHEN UPPER(plan_type) IN ('FREE', 'BASIC', 'PRO', 'ENTERPRISE') THEN UPPER(plan_type)
-            ELSE 'UNKNOWN_PLAN'
-        END AS plan_type_clean,
+            WHEN PLAN_TYPE IN ('Free', 'Basic', 'Pro', 'Enterprise') THEN PLAN_TYPE
+            ELSE 'Unknown'
+        END AS PLAN_TYPE,
         
         -- Derive registration date from load timestamp
-        DATE(load_timestamp) AS registration_date,
+        DATE(LOAD_TIMESTAMP) AS REGISTRATION_DATE,
         
         -- Derive last login date from update timestamp
-        DATE(update_timestamp) AS last_login_date,
+        DATE(UPDATE_TIMESTAMP) AS LAST_LOGIN_DATE,
         
-        -- Derive account status from plan type and activity
+        -- Derive account status from plan type
         CASE 
-            WHEN plan_type IS NOT NULL AND update_timestamp >= DATEADD('day', -30, CURRENT_TIMESTAMP()) THEN 'Active'
-            WHEN plan_type IS NOT NULL AND update_timestamp < DATEADD('day', -30, CURRENT_TIMESTAMP()) THEN 'Inactive'
-            ELSE 'Suspended'
-        END AS account_status,
+            WHEN PLAN_TYPE IN ('Free', 'Basic', 'Pro', 'Enterprise') THEN 'Active'
+            ELSE 'Inactive'
+        END AS ACCOUNT_STATUS,
         
-        load_timestamp,
-        update_timestamp,
-        source_system
-    FROM bronze_users
-),
-
--- Calculate data quality score
-quality_scored AS (
-    SELECT 
-        *,
-        -- Calculate data quality score based on completeness and validity
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        
+        -- Calculate data quality score
         (
-            CASE WHEN user_name_clean != 'Unknown User' THEN 0.25 ELSE 0 END +
-            CASE WHEN email_clean IS NOT NULL THEN 0.30 ELSE 0 END +
-            CASE WHEN company_clean != 'Unknown Company' THEN 0.20 ELSE 0 END +
-            CASE WHEN plan_type_clean != 'UNKNOWN_PLAN' THEN 0.25 ELSE 0 END
-        ) AS data_quality_score
-    FROM data_quality_checks
-),
-
--- Remove duplicates keeping the most recent record
-deduped_users AS (
-    SELECT 
-        user_id,
-        user_name_clean AS user_name,
-        email_clean AS email,
-        company_clean AS company,
-        plan_type_clean AS plan_type,
-        registration_date,
-        last_login_date,
-        account_status,
-        load_timestamp,
-        update_timestamp,
-        source_system,
-        data_quality_score,
-        ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY update_timestamp DESC) AS rn
-    FROM quality_scored
-    WHERE data_quality_score >= {{ var('dq_score_threshold') }}
+            CASE WHEN USER_ID IS NOT NULL THEN 0.25 ELSE 0 END +
+            CASE WHEN EMAIL IS NOT NULL AND REGEXP_LIKE(LOWER(TRIM(EMAIL)), '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$') THEN 0.25 ELSE 0 END +
+            CASE WHEN USER_NAME IS NOT NULL AND TRIM(USER_NAME) != '' THEN 0.25 ELSE 0 END +
+            CASE WHEN PLAN_TYPE IN ('Free', 'Basic', 'Pro', 'Enterprise') THEN 0.25 ELSE 0 END
+        ) AS DATA_QUALITY_SCORE,
+        
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        
+        ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM bronze_users
+    WHERE EMAIL IS NULL OR REGEXP_LIKE(LOWER(TRIM(EMAIL)), '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
 )
 
+-- Final selection with deduplication
 SELECT 
-    user_id,
-    user_name,
-    email,
-    company,
-    plan_type,
-    registration_date,
-    last_login_date,
-    account_status,
-    load_timestamp,
-    update_timestamp,
-    source_system,
-    data_quality_score,
-    DATE(load_timestamp) AS load_date,
-    DATE(update_timestamp) AS update_date
-FROM deduped_users
+    USER_ID,
+    USER_NAME,
+    EMAIL,
+    COMPANY,
+    PLAN_TYPE,
+    REGISTRATION_DATE,
+    LAST_LOGIN_DATE,
+    ACCOUNT_STATUS,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    DATA_QUALITY_SCORE,
+    LOAD_DATE,
+    UPDATE_DATE
+FROM validated_users
 WHERE rn = 1
-  AND email IS NOT NULL  -- Ensure no null emails in silver layer
+  AND DATA_QUALITY_SCORE >= 0.50  -- Only include records with acceptable quality
