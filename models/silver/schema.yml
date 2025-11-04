@@ -1,0 +1,206 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "Bronze layer tables containing raw data from Zoom platform"
+    tables:
+      - name: bz_users
+        description: "Bronze users table with raw user account data"
+        columns:
+          - name: user_id
+            description: "Unique identifier for each user"
+            tests:
+              - not_null
+              - unique
+          - name: email
+            description: "User email address"
+            tests:
+              - not_null
+      
+      - name: bz_meetings
+        description: "Bronze meetings table with raw meeting data"
+        columns:
+          - name: meeting_id
+            description: "Unique identifier for each meeting"
+            tests:
+              - not_null
+              - unique
+          - name: host_id
+            description: "User ID of meeting host"
+            tests:
+              - not_null
+      
+      - name: bz_participants
+        description: "Bronze participants table with raw attendance data"
+        columns:
+          - name: participant_id
+            description: "Unique identifier for each participant record"
+            tests:
+              - not_null
+              - unique
+          - name: meeting_id
+            description: "Reference to meeting"
+            tests:
+              - not_null
+          - name: user_id
+            description: "Reference to user"
+            tests:
+              - not_null
+      
+      - name: bz_feature_usage
+        description: "Bronze feature usage table"
+      - name: bz_support_tickets
+        description: "Bronze support tickets table"
+      - name: bz_billing_events
+        description: "Bronze billing events table"
+      - name: bz_licenses
+        description: "Bronze licenses table"
+      - name: bz_webinars
+        description: "Bronze webinars table"
+
+models:
+  - name: si_pipeline_audit
+    description: "Silver layer pipeline audit table for tracking execution details"
+    columns:
+      - name: execution_id
+        description: "Unique identifier for each pipeline execution"
+        tests:
+          - not_null
+          - unique
+      - name: pipeline_name
+        description: "Name of the executed pipeline"
+        tests:
+          - not_null
+      - name: status
+        description: "Execution status"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['SUCCESS', 'FAILED', 'PARTIAL_SUCCESS', 'CANCELLED', 'STARTED', 'COMPLETED']
+  
+  - name: si_users
+    description: "Silver layer users table with cleaned and standardized user data"
+    columns:
+      - name: user_id
+        description: "Unique identifier for each user"
+        tests:
+          - not_null
+          - unique
+      - name: user_name
+        description: "Standardized user name"
+        tests:
+          - not_null
+      - name: email
+        description: "Validated and standardized email address"
+        tests:
+          - not_null
+      - name: plan_type
+        description: "Standardized subscription plan type"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['FREE', 'BASIC', 'PRO', 'ENTERPRISE', 'UNKNOWN_PLAN']
+      - name: account_status
+        description: "Current account status"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Active', 'Inactive', 'Suspended']
+      - name: data_quality_score
+        description: "Data quality score for the record"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
+  
+  - name: si_meetings
+    description: "Silver layer meetings table with cleaned and enriched meeting data"
+    columns:
+      - name: meeting_id
+        description: "Unique identifier for each meeting"
+        tests:
+          - not_null
+          - unique
+      - name: host_id
+        description: "User ID of meeting host"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('si_users')
+              field: user_id
+      - name: meeting_type
+        description: "Standardized meeting category"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Scheduled', 'Instant', 'Webinar', 'Personal']
+      - name: meeting_status
+        description: "Current meeting state"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Scheduled', 'In Progress', 'Completed', 'Cancelled']
+      - name: duration_minutes
+        description: "Meeting duration in minutes"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+              max_value: 1440
+      - name: data_quality_score
+        description: "Data quality score for the record"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
+  
+  - name: si_participants
+    description: "Silver layer participants table with cleaned attendance data"
+    columns:
+      - name: participant_id
+        description: "Unique identifier for each participant record"
+        tests:
+          - not_null
+          - unique
+      - name: meeting_id
+        description: "Reference to meeting"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('si_meetings')
+              field: meeting_id
+      - name: user_id
+        description: "Reference to user"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('si_users')
+              field: user_id
+      - name: attendance_duration
+        description: "Time spent in meeting (minutes)"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1440
+      - name: participant_role
+        description: "Role of attendee"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Host', 'Co-host', 'Participant', 'Observer']
+      - name: connection_quality
+        description: "Network connection quality"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Excellent', 'Good', 'Fair', 'Poor']
+      - name: data_quality_score
+        description: "Data quality score for the record"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
