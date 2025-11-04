@@ -1,8 +1,8 @@
-name: 'zoom_analytics_silver'
+name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_analytics'
+profile: 'zoom_silver_pipeline'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,11 +17,12 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_analytics_silver:
-    +materialized: table
+  zoom_silver_pipeline:
     silver:
       +materialized: table
+      +on_schema_change: "fail"
 
 vars:
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
+  # Data quality thresholds
+  dq_score_threshold: 0.80
+  max_processing_hours: 24
