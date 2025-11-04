@@ -285,3 +285,140 @@ models:
         tests:
           - accepted_values:
               values: ['Excellent', 'Good', 'Fair', 'Poor']
+              
+  - name: si_feature_usage
+    description: "Silver layer feature usage table with standardized feature data"
+    columns:
+      - name: usage_id
+        description: "Unique identifier for each feature usage record"
+        tests:
+          - unique
+          - not_null
+      - name: meeting_id
+        description: "Reference to meeting where feature was used"
+        tests:
+          - not_null
+      - name: feature_name
+        description: "Standardized name of the platform feature"
+        tests:
+          - not_null
+      - name: feature_category
+        description: "Classification of feature type"
+        tests:
+          - accepted_values:
+              values: ['Audio', 'Video', 'Collaboration', 'Security', 'General']
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+        tests:
+          - not_null
+          
+  - name: si_support_tickets
+    description: "Silver layer support tickets table with standardized ticket data"
+    columns:
+      - name: ticket_id
+        description: "Unique identifier for each support ticket"
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: "Reference to user who created the ticket"
+        tests:
+          - not_null
+      - name: ticket_type
+        description: "Standardized category of support ticket"
+        tests:
+          - accepted_values:
+              values: ['Technical', 'Billing', 'Feature Request', 'Bug Report', 'General']
+      - name: priority_level
+        description: "Urgency level of ticket"
+        tests:
+          - accepted_values:
+              values: ['Low', 'Medium', 'High', 'Critical']
+      - name: resolution_status
+        description: "Current status of ticket resolution"
+        tests:
+          - accepted_values:
+              values: ['Open', 'In Progress', 'Resolved', 'Closed']
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+        tests:
+          - not_null
+          
+  - name: si_billing_events
+    description: "Silver layer billing events table with validated transaction data"
+    columns:
+      - name: event_id
+        description: "Unique identifier for each billing event"
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: "Reference to user associated with billing event"
+        tests:
+          - not_null
+      - name: event_type
+        description: "Standardized billing transaction type"
+        tests:
+          - accepted_values:
+              values: ['Subscription', 'Upgrade', 'Downgrade', 'Refund', 'Other']
+      - name: transaction_status
+        description: "Status of transaction"
+        tests:
+          - accepted_values:
+              values: ['Completed', 'Pending', 'Refunded']
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+        tests:
+          - not_null
+          
+  - name: si_licenses
+    description: "Silver layer licenses table with validated license data"
+    columns:
+      - name: license_id
+        description: "Unique identifier for each license"
+        tests:
+          - unique
+          - not_null
+      - name: assigned_to_user_id
+        description: "User ID to whom license is assigned"
+        tests:
+          - not_null
+      - name: license_type
+        description: "Standardized category of license"
+        tests:
+          - accepted_values:
+              values: ['Basic', 'Pro', 'Enterprise', 'Add-on']
+      - name: license_status
+        description: "Current state of license"
+        tests:
+          - accepted_values:
+              values: ['Active', 'Expired', 'Pending']
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+        tests:
+          - not_null
+          
+  - name: si_webinars
+    description: "Silver layer webinars table with cleaned webinar data and engagement metrics"
+    columns:
+      - name: webinar_id
+        description: "Unique identifier for each webinar"
+        tests:
+          - unique
+          - not_null
+      - name: host_id
+        description: "User ID of the webinar host"
+        tests:
+          - not_null
+      - name: webinar_topic
+        description: "Cleaned and standardized topic or title of the webinar"
+        tests:
+          - not_null
+      - name: duration_minutes
+        description: "Calculated webinar duration in minutes"
+        tests:
+          - not_null
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+        tests:
+          - not_null
