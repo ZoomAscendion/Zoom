@@ -1,126 +1,101 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('audit_log') }} (EXECUTION_ID, PIPELINE_NAME, START_TIME, STATUS, EXECUTED_BY, SOURCE_TABLES_PROCESSED, TARGET_TABLES_UPDATED, LOAD_DATE) SELECT 'EXEC_' || REPLACE(CAST(CURRENT_TIMESTAMP() AS STRING), ' ', '_'), 'SI_FEATURE_USAGE_TRANSFORMATION', CURRENT_TIMESTAMP(), 'STARTED', 'DBT_PIPELINE', 'BZ_FEATURE_USAGE', 'SI_FEATURE_USAGE', CURRENT_DATE() WHERE EXISTS (SELECT 1 FROM {{ ref('audit_log') }} LIMIT 1)",
+    post_hook="INSERT INTO {{ ref('audit_log') }} (EXECUTION_ID, PIPELINE_NAME, END_TIME, STATUS, EXECUTED_BY, RECORDS_PROCESSED, LOAD_DATE) SELECT 'EXEC_' || REPLACE(CAST(CURRENT_TIMESTAMP() AS STRING), ' ', '_'), 'SI_FEATURE_USAGE_TRANSFORMATION', CURRENT_TIMESTAMP(), 'COMPLETED', 'DBT_PIPELINE', (SELECT COUNT(*) FROM {{ this }}), CURRENT_DATE() WHERE EXISTS (SELECT 1 FROM {{ ref('audit_log') }} LIMIT 1)"
 ) }}
 
--- Silver Layer Feature Usage Transformation
+-- Silver Layer Feature Usage Table Transformation
 -- Source: Bronze.BZ_FEATURE_USAGE
--- Target: Silver.SI_FEATURE_USAGE
--- Description: Transforms and standardizes feature usage data with categorization
 
 WITH bronze_feature_usage AS (
     SELECT 
-        usage_id,
-        meeting_id,
-        feature_name,
-        usage_count,
-        usage_date,
-        load_timestamp,
-        update_timestamp,
-        source_system
-    FROM {{ source('bronze', 'bz_feature_usage') }}
-    WHERE usage_id IS NOT NULL
-      AND meeting_id IS NOT NULL
+        USAGE_ID,
+        MEETING_ID,
+        FEATURE_NAME,
+        USAGE_COUNT,
+        USAGE_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_FEATURE_USAGE') }}
 ),
 
 -- Data Quality Validation and Cleansing
-data_quality_checks AS (
+validated_feature_usage AS (
     SELECT 
-        usage_id,
-        meeting_id,
+        USAGE_ID,
+        MEETING_ID,
         
         -- Standardize feature name
         CASE 
-            WHEN feature_name IS NULL OR TRIM(feature_name) = '' THEN 'Unknown Feature'
-            ELSE TRIM(UPPER(feature_name))
-        END AS feature_name_clean,
+            WHEN FEATURE_NAME IS NULL OR TRIM(FEATURE_NAME) = '' 
+            THEN 'Unknown Feature'
+            ELSE TRIM(FEATURE_NAME)
+        END AS FEATURE_NAME,
         
         -- Validate usage count
         CASE 
-            WHEN usage_count IS NULL OR usage_count < 0 THEN 0
-            ELSE usage_count
-        END AS usage_count_clean,
+            WHEN USAGE_COUNT < 0 THEN NULL
+            ELSE COALESCE(USAGE_COUNT, 0)
+        END AS USAGE_COUNT,
         
-        -- Validate usage date
+        -- Derive usage duration from usage count
         CASE 
-            WHEN usage_date IS NULL THEN DATE(load_timestamp)
-            WHEN usage_date > CURRENT_DATE() THEN CURRENT_DATE()
-            ELSE usage_date
-        END AS usage_date_clean,
-        
-        load_timestamp,
-        update_timestamp,
-        source_system
-    FROM bronze_feature_usage
-),
-
--- Add derived fields
-derived_fields AS (
-    SELECT 
-        *,
-        -- Derive usage duration from usage count (simplified logic)
-        CASE 
-            WHEN usage_count_clean > 0 THEN usage_count_clean * 2
+            WHEN USAGE_COUNT IS NOT NULL AND USAGE_COUNT > 0 
+            THEN USAGE_COUNT * 2  -- Assume 2 minutes per usage
             ELSE 0
-        END AS usage_duration,
+        END AS USAGE_DURATION,
         
         -- Categorize features
         CASE 
-            WHEN feature_name_clean ILIKE '%AUDIO%' OR feature_name_clean ILIKE '%MICROPHONE%' OR feature_name_clean ILIKE '%SOUND%' THEN 'Audio'
-            WHEN feature_name_clean ILIKE '%VIDEO%' OR feature_name_clean ILIKE '%CAMERA%' OR feature_name_clean ILIKE '%SCREEN%' THEN 'Video'
-            WHEN feature_name_clean ILIKE '%CHAT%' OR feature_name_clean ILIKE '%SHARE%' OR feature_name_clean ILIKE '%WHITEBOARD%' THEN 'Collaboration'
-            WHEN feature_name_clean ILIKE '%SECURITY%' OR feature_name_clean ILIKE '%PASSWORD%' OR feature_name_clean ILIKE '%LOCK%' THEN 'Security'
-            ELSE 'General'
-        END AS feature_category
-    FROM data_quality_checks
-),
-
--- Calculate data quality score
-quality_scored AS (
-    SELECT 
-        *,
+            WHEN UPPER(FEATURE_NAME) LIKE '%AUDIO%' OR UPPER(FEATURE_NAME) LIKE '%MICROPHONE%' OR UPPER(FEATURE_NAME) LIKE '%SOUND%' THEN 'Audio'
+            WHEN UPPER(FEATURE_NAME) LIKE '%VIDEO%' OR UPPER(FEATURE_NAME) LIKE '%CAMERA%' OR UPPER(FEATURE_NAME) LIKE '%SCREEN%' THEN 'Video'
+            WHEN UPPER(FEATURE_NAME) LIKE '%CHAT%' OR UPPER(FEATURE_NAME) LIKE '%SHARE%' OR UPPER(FEATURE_NAME) LIKE '%WHITEBOARD%' THEN 'Collaboration'
+            WHEN UPPER(FEATURE_NAME) LIKE '%SECURITY%' OR UPPER(FEATURE_NAME) LIKE '%PASSWORD%' OR UPPER(FEATURE_NAME) LIKE '%LOCK%' THEN 'Security'
+            ELSE 'Other'
+        END AS FEATURE_CATEGORY,
+        
+        USAGE_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        
         -- Calculate data quality score
-        (
-            CASE WHEN feature_name_clean != 'Unknown Feature' THEN 0.30 ELSE 0 END +
-            CASE WHEN usage_count_clean > 0 THEN 0.25 ELSE 0 END +
-            CASE WHEN usage_date_clean IS NOT NULL THEN 0.25 ELSE 0 END +
-            CASE WHEN feature_category != 'General' THEN 0.20 ELSE 0 END
-        ) AS data_quality_score
-    FROM derived_fields
-),
-
--- Remove duplicates keeping the most recent record
-deduped_feature_usage AS (
-    SELECT 
-        usage_id,
-        meeting_id,
-        feature_name_clean AS feature_name,
-        usage_count_clean AS usage_count,
-        usage_duration,
-        feature_category,
-        usage_date_clean AS usage_date,
-        load_timestamp,
-        update_timestamp,
-        source_system,
-        data_quality_score,
-        ROW_NUMBER() OVER (PARTITION BY usage_id ORDER BY update_timestamp DESC) AS rn
-    FROM quality_scored
-    WHERE data_quality_score >= {{ var('dq_score_threshold') }}
+        CASE 
+            WHEN USAGE_ID IS NOT NULL 
+                AND MEETING_ID IS NOT NULL
+                AND FEATURE_NAME IS NOT NULL AND TRIM(FEATURE_NAME) != ''
+                AND USAGE_COUNT >= 0
+                AND USAGE_DATE IS NOT NULL
+            THEN 1.00
+            WHEN USAGE_ID IS NOT NULL AND MEETING_ID IS NOT NULL
+            THEN 0.75
+            ELSE 0.50
+        END AS DATA_QUALITY_SCORE,
+        
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        
+        -- Add row number for deduplication
+        ROW_NUMBER() OVER (PARTITION BY USAGE_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM bronze_feature_usage
+    WHERE USAGE_ID IS NOT NULL
+        AND MEETING_ID IS NOT NULL
 )
 
 SELECT 
-    usage_id,
-    meeting_id,
-    feature_name,
-    usage_count,
-    usage_duration,
-    feature_category,
-    usage_date,
-    load_timestamp,
-    update_timestamp,
-    source_system,
-    data_quality_score,
-    DATE(load_timestamp) AS load_date,
-    DATE(update_timestamp) AS update_date
-FROM deduped_feature_usage
+    USAGE_ID,
+    MEETING_ID,
+    FEATURE_NAME,
+    USAGE_COUNT,
+    USAGE_DURATION,
+    FEATURE_CATEGORY,
+    USAGE_DATE,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    DATA_QUALITY_SCORE,
+    LOAD_DATE,
+    UPDATE_DATE
+FROM validated_feature_usage
 WHERE rn = 1
-  AND usage_count >= 0
