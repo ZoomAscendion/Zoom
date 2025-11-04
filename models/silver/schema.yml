@@ -3,6 +3,8 @@ version: 2
 sources:
   - name: bronze
     description: "Bronze layer tables containing raw data from Zoom platform"
+    database: DB_POC_ZOOM
+    schema: BRONZE
     tables:
       - name: bz_users
         description: "Raw user account information"
@@ -55,6 +57,22 @@ sources:
             description: "Timestamp when participant left"
 
 models:
+  - name: si_pipeline_audit
+    description: "Silver layer pipeline audit table for tracking execution details"
+    columns:
+      - name: execution_id
+        description: "Unique identifier for each pipeline execution"
+        tests:
+          - unique
+          - not_null
+      - name: pipeline_name
+        description: "Name of the data pipeline or process"
+      - name: status
+        description: "Status of pipeline execution"
+        tests:
+          - accepted_values:
+              values: ['STARTED', 'COMPLETED', 'FAILED', 'TEMPLATE']
+
   - name: si_users
     description: "Silver layer table storing cleaned and standardized user data"
     columns:
