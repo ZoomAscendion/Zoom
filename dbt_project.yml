@@ -2,8 +2,10 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
+# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_silver_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -11,14 +13,15 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"
-clean-targets:
+target-path: "target"  # directory which will store compiled SQL files
+clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
   zoom_silver_pipeline:
-    +materialized: table
+    # Config indicated by + and applies to all files under models/example/
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
