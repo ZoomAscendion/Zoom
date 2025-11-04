@@ -1,139 +1,135 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('audit_log') }} (EXECUTION_ID, PIPELINE_NAME, START_TIME, STATUS, EXECUTED_BY, SOURCE_TABLES_PROCESSED, TARGET_TABLES_UPDATED, LOAD_DATE) SELECT 'EXEC_' || REPLACE(CAST(CURRENT_TIMESTAMP() AS STRING), ' ', '_'), 'SI_WEBINARS_TRANSFORMATION', CURRENT_TIMESTAMP(), 'STARTED', 'DBT_PIPELINE', 'BZ_WEBINARS', 'SI_WEBINARS', CURRENT_DATE() WHERE EXISTS (SELECT 1 FROM {{ ref('audit_log') }} LIMIT 1)",
+    post_hook="INSERT INTO {{ ref('audit_log') }} (EXECUTION_ID, PIPELINE_NAME, END_TIME, STATUS, EXECUTED_BY, RECORDS_PROCESSED, LOAD_DATE) SELECT 'EXEC_' || REPLACE(CAST(CURRENT_TIMESTAMP() AS STRING), ' ', '_'), 'SI_WEBINARS_TRANSFORMATION', CURRENT_TIMESTAMP(), 'COMPLETED', 'DBT_PIPELINE', (SELECT COUNT(*) FROM {{ this }}), CURRENT_DATE() WHERE EXISTS (SELECT 1 FROM {{ ref('audit_log') }} LIMIT 1)"
 ) }}
 
--- Silver Layer Webinars Transformation
+-- Silver Layer Webinars Table Transformation
 -- Source: Bronze.BZ_WEBINARS
--- Target: Silver.SI_WEBINARS
--- Description: Transforms and cleanses webinar data with engagement metrics
 
 WITH bronze_webinars AS (
     SELECT 
-        webinar_id,
-        host_id,
-        webinar_topic,
-        start_time,
-        end_time,
-        registrants,
-        load_timestamp,
-        update_timestamp,
-        source_system
-    FROM {{ source('bronze', 'bz_webinars') }}
-    WHERE webinar_id IS NOT NULL
-      AND host_id IS NOT NULL
+        WEBINAR_ID,
+        HOST_ID,
+        WEBINAR_TOPIC,
+        START_TIME,
+        END_TIME,
+        REGISTRANTS,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_WEBINARS') }}
 ),
 
 -- Data Quality Validation and Cleansing
-data_quality_checks AS (
+validated_webinars AS (
     SELECT 
-        webinar_id,
-        host_id,
+        WEBINAR_ID,
+        HOST_ID,
         
-        -- Clean and standardize webinar topic
+        -- Webinar topic standardization
         CASE 
-            WHEN webinar_topic IS NULL OR TRIM(webinar_topic) = '' THEN 'Untitled Webinar'
-            ELSE TRIM(webinar_topic)
-        END AS webinar_topic_clean,
+            WHEN WEBINAR_TOPIC IS NULL OR TRIM(WEBINAR_TOPIC) = '' 
+            THEN 'Unknown Topic - needs enrichment'
+            ELSE TRIM(WEBINAR_TOPIC)
+        END AS WEBINAR_TOPIC,
         
         -- Validate and correct timestamps
-        CASE 
-            WHEN start_time IS NULL THEN CURRENT_TIMESTAMP()
-            ELSE start_time
-        END AS start_time_clean,
+        START_TIME,
         
         CASE 
-            WHEN end_time IS NULL OR end_time < start_time 
-                THEN DATEADD('hour', 1, COALESCE(start_time, CURRENT_TIMESTAMP()))
-            ELSE end_time
-        END AS end_time_clean,
+            WHEN END_TIME IS NULL 
+            THEN DATEADD('hour', 1, START_TIME)
+            WHEN END_TIME < START_TIME 
+            THEN DATEADD('hour', 1, START_TIME)
+            ELSE END_TIME
+        END AS END_TIME,
         
-        -- Validate registrants count
+        -- Validate registrants
         CASE 
-            WHEN registrants IS NULL OR registrants < 0 THEN 0
-            ELSE registrants
-        END AS registrants_clean,
+            WHEN REGISTRANTS < 0 THEN 0
+            ELSE COALESCE(REGISTRANTS, 0)
+        END AS REGISTRANTS,
         
-        load_timestamp,
-        update_timestamp,
-        source_system
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        
+        -- Add row number for deduplication
+        ROW_NUMBER() OVER (PARTITION BY WEBINAR_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
     FROM bronze_webinars
+    WHERE WEBINAR_ID IS NOT NULL
+        AND HOST_ID IS NOT NULL
 ),
 
--- Add derived fields
-derived_fields AS (
+-- Calculate derived fields
+final_webinars AS (
+    SELECT 
+        WEBINAR_ID,
+        HOST_ID,
+        WEBINAR_TOPIC,
+        START_TIME,
+        END_TIME,
+        
+        -- Calculate duration in minutes
+        DATEDIFF('minute', START_TIME, END_TIME) AS DURATION_MINUTES,
+        
+        REGISTRANTS,
+        
+        -- Derive attendees from registrants with attendance rate
+        CAST(REGISTRANTS * 0.75 AS INTEGER) AS ATTENDEES,
+        
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        
+        -- Calculate data quality score
+        CASE 
+            WHEN WEBINAR_ID IS NOT NULL 
+                AND HOST_ID IS NOT NULL
+                AND START_TIME IS NOT NULL
+                AND END_TIME IS NOT NULL
+                AND END_TIME >= START_TIME
+                AND REGISTRANTS >= 0
+            THEN 1.00
+            WHEN WEBINAR_ID IS NOT NULL AND HOST_ID IS NOT NULL
+            THEN 0.75
+            ELSE 0.50
+        END AS DATA_QUALITY_SCORE,
+        
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE
+    FROM validated_webinars
+    WHERE rn = 1
+),
+
+-- Calculate attendance rate
+final_with_rate AS (
     SELECT 
         *,
-        -- Calculate duration in minutes
-        DATEDIFF('minute', start_time_clean, end_time_clean) AS duration_minutes,
-        
-        -- Derive attendees from registrants (simplified logic)
-        CASE 
-            WHEN registrants_clean > 0 THEN ROUND(registrants_clean * 0.75, 0)
-            ELSE 0
-        END AS attendees,
-        
         -- Calculate attendance rate
         CASE 
-            WHEN registrants_clean > 0 THEN 
-                ROUND((ROUND(registrants_clean * 0.75, 0) / registrants_clean) * 100, 2)
-            ELSE 0
-        END AS attendance_rate
-    FROM data_quality_checks
-),
-
--- Calculate data quality score
-quality_scored AS (
-    SELECT 
-        *,
-        -- Calculate data quality score
-        (
-            CASE WHEN webinar_topic_clean != 'Untitled Webinar' THEN 0.25 ELSE 0 END +
-            CASE WHEN start_time_clean IS NOT NULL THEN 0.25 ELSE 0 END +
-            CASE WHEN end_time_clean IS NOT NULL THEN 0.25 ELSE 0 END +
-            CASE WHEN registrants_clean >= 0 THEN 0.25 ELSE 0 END
-        ) AS data_quality_score
-    FROM derived_fields
-),
-
--- Remove duplicates keeping the most recent record
-deduped_webinars AS (
-    SELECT 
-        webinar_id,
-        host_id,
-        webinar_topic_clean AS webinar_topic,
-        start_time_clean AS start_time,
-        end_time_clean AS end_time,
-        duration_minutes,
-        registrants_clean AS registrants,
-        attendees,
-        attendance_rate,
-        load_timestamp,
-        update_timestamp,
-        source_system,
-        data_quality_score,
-        ROW_NUMBER() OVER (PARTITION BY webinar_id ORDER BY update_timestamp DESC) AS rn
-    FROM quality_scored
-    WHERE data_quality_score >= {{ var('dq_score_threshold') }}
+            WHEN REGISTRANTS > 0 
+            THEN ROUND((ATTENDEES::FLOAT / REGISTRANTS::FLOAT) * 100, 2)
+            ELSE 0.00
+        END AS ATTENDANCE_RATE
+    FROM final_webinars
 )
 
 SELECT 
-    webinar_id,
-    host_id,
-    webinar_topic,
-    start_time,
-    end_time,
-    duration_minutes,
-    registrants,
-    attendees,
-    attendance_rate,
-    load_timestamp,
-    update_timestamp,
-    source_system,
-    data_quality_score,
-    DATE(load_timestamp) AS load_date,
-    DATE(update_timestamp) AS update_date
-FROM deduped_webinars
-WHERE rn = 1
-  AND start_time IS NOT NULL
-  AND end_time IS NOT NULL
-  AND duration_minutes > 0
+    WEBINAR_ID,
+    HOST_ID,
+    WEBINAR_TOPIC,
+    START_TIME,
+    END_TIME,
+    DURATION_MINUTES,
+    REGISTRANTS,
+    ATTENDEES,
+    ATTENDANCE_RATE,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    DATA_QUALITY_SCORE,
+    LOAD_DATE,
+    UPDATE_DATE
+FROM final_with_rate
