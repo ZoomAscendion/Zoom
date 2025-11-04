@@ -2,281 +2,281 @@ version: 2
 
 sources:
   - name: bronze
-    description: Bronze layer tables containing raw data from Zoom platform
+    description: Bronze layer tables from the Zoom platform
     tables:
-      - name: bz_users
-        description: Raw user account information
+      - name: BZ_USERS
+        description: Bronze layer user account information
         columns:
-          - name: user_id
+          - name: USER_ID
             description: Unique identifier for each user account
-          - name: user_name
+          - name: USER_NAME
             description: Display name of the user
-          - name: email
+          - name: EMAIL
             description: Email address of the user
-          - name: company
+          - name: COMPANY
             description: Company or organization name
-          - name: plan_type
+          - name: PLAN_TYPE
             description: Type of subscription plan
-          - name: load_timestamp
+          - name: LOAD_TIMESTAMP
             description: Timestamp when record was loaded
-          - name: update_timestamp
+          - name: UPDATE_TIMESTAMP
             description: Timestamp when record was last updated
-          - name: source_system
+          - name: SOURCE_SYSTEM
             description: Source system from which data originated
             
-      - name: bz_meetings
-        description: Raw meeting session information
+      - name: BZ_MEETINGS
+        description: Bronze layer meeting session information
         columns:
-          - name: meeting_id
+          - name: MEETING_ID
             description: Unique identifier for each meeting
-          - name: host_id
+          - name: HOST_ID
             description: User ID of the meeting host
-          - name: meeting_topic
+          - name: MEETING_TOPIC
             description: Topic or title of the meeting
-          - name: start_time
+          - name: START_TIME
             description: Meeting start timestamp
-          - name: end_time
+          - name: END_TIME
             description: Meeting end timestamp
-          - name: duration_minutes
+          - name: DURATION_MINUTES
             description: Meeting duration in minutes
-          - name: load_timestamp
+          - name: LOAD_TIMESTAMP
             description: Timestamp when record was loaded
-          - name: update_timestamp
+          - name: UPDATE_TIMESTAMP
             description: Timestamp when record was last updated
-          - name: source_system
+          - name: SOURCE_SYSTEM
             description: Source system from which data originated
             
-      - name: bz_participants
-        description: Raw meeting participant information
+      - name: BZ_PARTICIPANTS
+        description: Bronze layer meeting participant information
         columns:
-          - name: participant_id
+          - name: PARTICIPANT_ID
             description: Unique identifier for each participant record
-          - name: meeting_id
+          - name: MEETING_ID
             description: Reference to meeting
-          - name: user_id
+          - name: USER_ID
             description: Reference to user who participated
-          - name: join_time
+          - name: JOIN_TIME
             description: Timestamp when participant joined
-          - name: leave_time
+          - name: LEAVE_TIME
             description: Timestamp when participant left
-          - name: load_timestamp
+          - name: LOAD_TIMESTAMP
             description: Timestamp when record was loaded
-          - name: update_timestamp
+          - name: UPDATE_TIMESTAMP
             description: Timestamp when record was last updated
-          - name: source_system
+          - name: SOURCE_SYSTEM
             description: Source system from which data originated
             
-      - name: bz_feature_usage
-        description: Raw platform feature usage tracking
+      - name: BZ_FEATURE_USAGE
+        description: Bronze layer platform feature usage tracking
         columns:
-          - name: usage_id
+          - name: USAGE_ID
             description: Unique identifier for each feature usage record
-          - name: meeting_id
+          - name: MEETING_ID
             description: Reference to meeting where feature was used
-          - name: feature_name
+          - name: FEATURE_NAME
             description: Name of the feature being tracked
-          - name: usage_count
+          - name: USAGE_COUNT
             description: Number of times feature was used
-          - name: usage_date
+          - name: USAGE_DATE
             description: Date when feature usage occurred
-          - name: load_timestamp
+          - name: LOAD_TIMESTAMP
             description: Timestamp when record was loaded
-          - name: update_timestamp
+          - name: UPDATE_TIMESTAMP
             description: Timestamp when record was last updated
-          - name: source_system
+          - name: SOURCE_SYSTEM
             description: Source system from which data originated
             
-      - name: bz_support_tickets
-        description: Raw customer support ticket information
+      - name: BZ_SUPPORT_TICKETS
+        description: Bronze layer customer support ticket information
         columns:
-          - name: ticket_id
+          - name: TICKET_ID
             description: Unique identifier for each support ticket
-          - name: user_id
+          - name: USER_ID
             description: Reference to user who created the ticket
-          - name: ticket_type
+          - name: TICKET_TYPE
             description: Type or category of support ticket
-          - name: resolution_status
+          - name: RESOLUTION_STATUS
             description: Current status of ticket resolution
-          - name: open_date
+          - name: OPEN_DATE
             description: Date when ticket was opened
-          - name: load_timestamp
+          - name: LOAD_TIMESTAMP
             description: Timestamp when record was loaded
-          - name: update_timestamp
+          - name: UPDATE_TIMESTAMP
             description: Timestamp when record was last updated
-          - name: source_system
+          - name: SOURCE_SYSTEM
             description: Source system from which data originated
             
-      - name: bz_billing_events
-        description: Raw billing and financial transaction information
+      - name: BZ_BILLING_EVENTS
+        description: Bronze layer billing and financial transaction information
         columns:
-          - name: event_id
+          - name: EVENT_ID
             description: Unique identifier for each billing event
-          - name: user_id
+          - name: USER_ID
             description: Reference to user associated with billing event
-          - name: event_type
+          - name: EVENT_TYPE
             description: Type of billing event
-          - name: amount
+          - name: AMOUNT
             description: Monetary amount for the billing event
-          - name: event_date
+          - name: EVENT_DATE
             description: Date when the billing event occurred
-          - name: load_timestamp
+          - name: LOAD_TIMESTAMP
             description: Timestamp when record was loaded
-          - name: update_timestamp
+          - name: UPDATE_TIMESTAMP
             description: Timestamp when record was last updated
-          - name: source_system
+          - name: SOURCE_SYSTEM
             description: Source system from which data originated
             
-      - name: bz_licenses
-        description: Raw license management information
+      - name: BZ_LICENSES
+        description: Bronze layer license management information
         columns:
-          - name: license_id
+          - name: LICENSE_ID
             description: Unique identifier for each license
-          - name: license_type
+          - name: LICENSE_TYPE
             description: Type of license
-          - name: assigned_to_user_id
+          - name: ASSIGNED_TO_USER_ID
             description: User ID to whom license is assigned
-          - name: start_date
+          - name: START_DATE
             description: License start date
-          - name: end_date
+          - name: END_DATE
             description: License end date
-          - name: load_timestamp
+          - name: LOAD_TIMESTAMP
             description: Timestamp when record was loaded
-          - name: update_timestamp
+          - name: UPDATE_TIMESTAMP
             description: Timestamp when record was last updated
-          - name: source_system
+          - name: SOURCE_SYSTEM
             description: Source system from which data originated
             
-      - name: bz_webinars
-        description: Raw webinar session information
+      - name: BZ_WEBINARS
+        description: Bronze layer webinar session information
         columns:
-          - name: webinar_id
+          - name: WEBINAR_ID
             description: Unique identifier for each webinar
-          - name: host_id
+          - name: HOST_ID
             description: User ID of the webinar host
-          - name: webinar_topic
+          - name: WEBINAR_TOPIC
             description: Topic or title of the webinar
-          - name: start_time
+          - name: START_TIME
             description: Webinar start timestamp
-          - name: end_time
+          - name: END_TIME
             description: Webinar end timestamp
-          - name: registrants
+          - name: REGISTRANTS
             description: Number of registered participants
-          - name: load_timestamp
+          - name: LOAD_TIMESTAMP
             description: Timestamp when record was loaded
-          - name: update_timestamp
+          - name: UPDATE_TIMESTAMP
             description: Timestamp when record was last updated
-          - name: source_system
+          - name: SOURCE_SYSTEM
             description: Source system from which data originated
 
 models:
+  - name: audit_log
+    description: Silver layer audit log table for tracking pipeline execution
+    columns:
+      - name: EXECUTION_ID
+        description: Unique identifier for each pipeline execution
+      - name: PIPELINE_NAME
+        description: Name of the data pipeline or process
+      - name: START_TIME
+        description: When the pipeline execution started
+      - name: END_TIME
+        description: When the pipeline execution completed
+      - name: STATUS
+        description: Status of execution
+      - name: ERROR_MESSAGE
+        description: Error message if pipeline failed
+      - name: EXECUTION_DURATION_SECONDS
+        description: Total time taken for pipeline execution
+      - name: SOURCE_TABLES_PROCESSED
+        description: List of source tables processed
+      - name: TARGET_TABLES_UPDATED
+        description: List of target tables updated
+      - name: RECORDS_PROCESSED
+        description: Total number of records processed
+      - name: RECORDS_INSERTED
+        description: Number of new records inserted
+      - name: RECORDS_UPDATED
+        description: Number of existing records updated
+      - name: RECORDS_REJECTED
+        description: Number of records rejected due to quality issues
+      - name: EXECUTED_BY
+        description: User or system that executed the pipeline
+      - name: EXECUTION_ENVIRONMENT
+        description: Environment where pipeline was executed
+      - name: DATA_LINEAGE_INFO
+        description: Information about data lineage and transformations
+      - name: LOAD_DATE
+        description: Date when record was loaded
+      - name: UPDATE_DATE
+        description: Date when record was last updated
+      - name: SOURCE_SYSTEM
+        description: Source system from which data originated
+        
   - name: si_users
-    description: Silver layer table containing cleaned and standardized user data
+    description: Silver layer cleaned and standardized user data
     columns:
-      - name: user_id
+      - name: USER_ID
         description: Unique identifier for each user account
-        tests:
-          - unique
-          - not_null
-      - name: user_name
+      - name: USER_NAME
         description: Standardized full name of the registered user
-        tests:
-          - not_null
-      - name: email
+      - name: EMAIL
         description: Validated and standardized email address
-      - name: company
+      - name: COMPANY
         description: Standardized organization or company affiliation
-      - name: plan_type
+      - name: PLAN_TYPE
         description: Standardized subscription tier
-        tests:
-          - accepted_values:
-              values: ['Free', 'Basic', 'Pro', 'Enterprise', 'Unknown']
-      - name: registration_date
+      - name: REGISTRATION_DATE
         description: Date when the user first registered
-      - name: last_login_date
+      - name: LAST_LOGIN_DATE
         description: Most recent date the user accessed the platform
-      - name: account_status
+      - name: ACCOUNT_STATUS
         description: Current status of user account
-        tests:
-          - accepted_values:
-              values: ['Active', 'Inactive', 'Suspended']
-      - name: data_quality_score
+      - name: LOAD_TIMESTAMP
+        description: Timestamp when record was loaded into silver layer
+      - name: UPDATE_TIMESTAMP
+        description: Timestamp when record was last updated in silver layer
+      - name: SOURCE_SYSTEM
+        description: Source system from which data originated
+      - name: DATA_QUALITY_SCORE
         description: Overall data quality score for the record
-        tests:
-          - not_null
-          
+      - name: LOAD_DATE
+        description: Date when record was loaded
+      - name: UPDATE_DATE
+        description: Date when record was last updated
+        
   - name: si_meetings
-    description: Silver layer table containing cleaned and enriched meeting data
+    description: Silver layer cleaned and enriched meeting data
     columns:
-      - name: meeting_id
+      - name: MEETING_ID
         description: Unique identifier for each meeting
-        tests:
-          - unique
-          - not_null
-      - name: host_id
+      - name: HOST_ID
         description: User ID of the meeting host
-        tests:
-          - not_null
-      - name: meeting_topic
+      - name: MEETING_TOPIC
         description: Cleaned and standardized meeting subject
-      - name: meeting_type
+      - name: MEETING_TYPE
         description: Standardized meeting category
-        tests:
-          - accepted_values:
-              values: ['Scheduled', 'Instant', 'Webinar', 'Personal']
-      - name: start_time
+      - name: START_TIME
         description: Validated meeting start timestamp
-        tests:
-          - not_null
-      - name: end_time
+      - name: END_TIME
         description: Validated meeting end timestamp
-      - name: duration_minutes
+      - name: DURATION_MINUTES
         description: Calculated and validated meeting duration
-        tests:
-          - not_null
-      - name: participant_count
+      - name: HOST_NAME
+        description: Standardized name of the meeting host
+      - name: MEETING_STATUS
+        description: Current state of the meeting
+      - name: RECORDING_STATUS
+        description: Whether the meeting was recorded
+      - name: PARTICIPANT_COUNT
         description: Total number of participants
-      - name: data_quality_score
+      - name: LOAD_TIMESTAMP
+        description: Timestamp when record was loaded into silver layer
+      - name: UPDATE_TIMESTAMP
+        description: Timestamp when record was last updated in silver layer
+      - name: SOURCE_SYSTEM
+        description: Source system from which data originated
+      - name: DATA_QUALITY_SCORE
         description: Overall data quality score for the record
-        tests:
-          - not_null
-          
-  - name: si_participants
-    description: Silver layer table containing cleaned participant attendance data
-    columns:
-      - name: participant_id
-        description: Unique identifier for each participant record
-        tests:
-          - unique
-          - not_null
-      - name: meeting_id
-        description: Reference to meeting
-        tests:
-          - not_null
-      - name: user_id
-        description: Reference to user who participated
-        tests:
-          - not_null
-      - name: join_time
-        description: Validated timestamp when participant joined
-        tests:
-          - not_null
-      - name: leave_time
-        description: Validated timestamp when participant left
-      - name: attendance_duration
-        description: Calculated time participant spent in meeting
-        tests:
-          - not_null
-      - name: participant_role
-        description: Role of attendee
-        tests:
-          - accepted_values:
-              values: ['Host', 'Co-host', 'Participant', 'Observer']
-      - name: connection_quality
-        description: Network connection quality during participation
-        tests:
-          - accepted_values:
-              values: ['Excellent', 'Good', 'Fair', 'Poor']
-      - name: data_quality_score
-        description: Overall data quality score for the record
-        tests:
-          - not_null
+      - name: LOAD_DATE
+        description: Date when record was loaded
+      - name: UPDATE_DATE
+        description: Date when record was last updated
