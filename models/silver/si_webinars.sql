@@ -1,0 +1,115 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('si_pipeline_audit') }} (EXECUTION_ID, PIPELINE_NAME, START_TIME, STATUS, SOURCE_TABLES_PROCESSED, TARGET_TABLES_UPDATED, EXECUTED_BY, EXECUTION_ENVIRONMENT, DATA_LINEAGE_INFO, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT CONCAT('EXEC_', TO_CHAR(CURRENT_TIMESTAMP(), 'YYYYMMDDHH24MISS'), '_WEB'), 'Silver_Webinars_ETL', CURRENT_TIMESTAMP(), 'Started', 'BRONZE.BZ_WEBINARS', 'SILVER.SI_WEBINARS', 'DBT_SILVER_PIPELINE', 'PRODUCTION', 'Processing webinars data from Bronze to Silver', CURRENT_DATE(), CURRENT_DATE(), 'ZOOM_PLATFORM' WHERE '{{ this.name }}' != 'si_pipeline_audit'",
+    post_hook="INSERT INTO {{ ref('si_pipeline_audit') }} (EXECUTION_ID, PIPELINE_NAME, END_TIME, STATUS, RECORDS_PROCESSED, RECORDS_INSERTED, EXECUTED_BY, EXECUTION_ENVIRONMENT, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT CONCAT('EXEC_', TO_CHAR(CURRENT_TIMESTAMP(), 'YYYYMMDDHH24MISS'), '_WEB_END'), 'Silver_Webinars_ETL', CURRENT_TIMESTAMP(), 'Completed', (SELECT COUNT(*) FROM {{ this }}), (SELECT COUNT(*) FROM {{ this }}), 'DBT_SILVER_PIPELINE', 'PRODUCTION', CURRENT_DATE(), CURRENT_DATE(), 'ZOOM_PLATFORM' WHERE '{{ this.name }}' != 'si_pipeline_audit'"
+) }}
+
+-- Silver Webinars Table Transformation
+WITH bronze_webinars AS (
+    SELECT 
+        WEBINAR_ID,
+        HOST_ID,
+        WEBINAR_TOPIC,
+        START_TIME,
+        END_TIME,
+        REGISTRANTS,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'bz_webinars') }}
+    WHERE WEBINAR_ID IS NOT NULL
+      AND HOST_ID IS NOT NULL
+),
+
+validated_webinars AS (
+    SELECT 
+        WEBINAR_ID,
+        HOST_ID,
+        
+        CASE 
+            WHEN WEBINAR_TOPIC IS NULL OR TRIM(WEBINAR_TOPIC) = '' THEN 'Untitled Webinar'
+            ELSE TRIM(WEBINAR_TOPIC)
+        END AS WEBINAR_TOPIC,
+        
+        CASE 
+            WHEN START_TIME > CURRENT_TIMESTAMP() THEN CURRENT_TIMESTAMP()
+            ELSE START_TIME
+        END AS START_TIME,
+        
+        CASE 
+            WHEN END_TIME IS NULL THEN DATEADD('hour', 1, START_TIME)
+            WHEN END_TIME < START_TIME THEN DATEADD('hour', 1, START_TIME)
+            WHEN END_TIME > CURRENT_TIMESTAMP() THEN CURRENT_TIMESTAMP()
+            ELSE END_TIME
+        END AS END_TIME,
+        
+        DATEDIFF('minute', 
+            START_TIME, 
+            CASE 
+                WHEN END_TIME IS NULL THEN DATEADD('hour', 1, START_TIME)
+                WHEN END_TIME < START_TIME THEN DATEADD('hour', 1, START_TIME)
+                ELSE END_TIME
+            END
+        ) AS DURATION_MINUTES,
+        
+        CASE 
+            WHEN REGISTRANTS < 0 THEN 0
+            WHEN REGISTRANTS IS NULL THEN 0
+            ELSE REGISTRANTS
+        END AS REGISTRANTS,
+        
+        CASE 
+            WHEN REGISTRANTS IS NULL OR REGISTRANTS <= 0 THEN 0
+            ELSE ROUND(REGISTRANTS * 0.75)
+        END AS ATTENDEES,
+        
+        CASE 
+            WHEN REGISTRANTS IS NULL OR REGISTRANTS <= 0 THEN 0.00
+            ELSE ROUND((REGISTRANTS * 0.75 / REGISTRANTS) * 100, 2)
+        END AS ATTENDANCE_RATE,
+        
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        
+        (
+            CASE WHEN WEBINAR_ID IS NOT NULL THEN 0.25 ELSE 0 END +
+            CASE WHEN HOST_ID IS NOT NULL THEN 0.25 ELSE 0 END +
+            CASE WHEN START_TIME IS NOT NULL THEN 0.25 ELSE 0 END +
+            CASE WHEN REGISTRANTS >= 0 THEN 0.25 ELSE 0 END
+        ) AS DATA_QUALITY_SCORE,
+        
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE
+        
+    FROM bronze_webinars
+),
+
+deduped_webinars AS (
+    SELECT *,
+           ROW_NUMBER() OVER (PARTITION BY WEBINAR_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM validated_webinars
+)
+
+SELECT 
+    WEBINAR_ID,
+    HOST_ID,
+    WEBINAR_TOPIC,
+    START_TIME,
+    END_TIME,
+    DURATION_MINUTES,
+    REGISTRANTS,
+    ATTENDEES,
+    ATTENDANCE_RATE,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    DATA_QUALITY_SCORE,
+    LOAD_DATE,
+    UPDATE_DATE
+FROM deduped_webinars
+WHERE rn = 1
+  AND START_TIME IS NOT NULL
+  AND END_TIME >= START_TIME
+  AND REGISTRANTS >= 0
+  AND DATA_QUALITY_SCORE >= 0.75
