@@ -27,6 +27,8 @@ models:
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
+      +depends_on:
+        - model.zoom_silver_pipeline.si_pipeline_audit
       +pre_hook: |
         {% if this.name != 'si_pipeline_audit' %}
           INSERT INTO {{ ref('si_pipeline_audit') }} (
