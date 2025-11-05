@@ -1,0 +1,484 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "Bronze layer tables containing raw data from Zoom platform"
+    tables:
+      - name: bz_users
+        description: "Raw user account information"
+        columns:
+          - name: user_id
+            description: "Unique identifier for each user account"
+          - name: user_name
+            description: "Display name of the user"
+          - name: email
+            description: "Email address of the user - PII Data"
+          - name: company
+            description: "Company or organization name"
+          - name: plan_type
+            description: "Type of subscription plan"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+      
+      - name: bz_meetings
+        description: "Raw meeting session information"
+        columns:
+          - name: meeting_id
+            description: "Unique identifier for each meeting"
+          - name: host_id
+            description: "User ID of the meeting host"
+          - name: meeting_topic
+            description: "Topic or title of the meeting"
+          - name: start_time
+            description: "Meeting start timestamp"
+          - name: end_time
+            description: "Meeting end timestamp"
+          - name: duration_minutes
+            description: "Meeting duration in minutes"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+      
+      - name: bz_participants
+        description: "Raw meeting participant information"
+        columns:
+          - name: participant_id
+            description: "Unique identifier for each participant record"
+          - name: meeting_id
+            description: "Reference to meeting"
+          - name: user_id
+            description: "Reference to user who participated"
+          - name: join_time
+            description: "Timestamp when participant joined"
+          - name: leave_time
+            description: "Timestamp when participant left"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+      
+      - name: bz_feature_usage
+        description: "Raw platform feature usage tracking"
+        columns:
+          - name: usage_id
+            description: "Unique identifier for each feature usage record"
+          - name: meeting_id
+            description: "Reference to meeting where feature was used"
+          - name: feature_name
+            description: "Name of the feature being tracked"
+          - name: usage_count
+            description: "Number of times feature was used"
+          - name: usage_date
+            description: "Date when feature usage occurred"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+      
+      - name: bz_support_tickets
+        description: "Raw customer support ticket information"
+        columns:
+          - name: ticket_id
+            description: "Unique identifier for each support ticket"
+          - name: user_id
+            description: "Reference to user who created the ticket"
+          - name: ticket_type
+            description: "Type or category of support ticket"
+          - name: resolution_status
+            description: "Current status of ticket resolution"
+          - name: open_date
+            description: "Date when ticket was opened"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+      
+      - name: bz_billing_events
+        description: "Raw billing and financial transaction information"
+        columns:
+          - name: event_id
+            description: "Unique identifier for each billing event"
+          - name: user_id
+            description: "Reference to user associated with billing event"
+          - name: event_type
+            description: "Type of billing event"
+          - name: amount
+            description: "Monetary amount for the billing event"
+          - name: event_date
+            description: "Date when the billing event occurred"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+      
+      - name: bz_licenses
+        description: "Raw license management information"
+        columns:
+          - name: license_id
+            description: "Unique identifier for each license"
+          - name: license_type
+            description: "Type of license"
+          - name: assigned_to_user_id
+            description: "User ID to whom license is assigned"
+          - name: start_date
+            description: "License start date"
+          - name: end_date
+            description: "License end date"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+      
+      - name: bz_webinars
+        description: "Raw webinar session information"
+        columns:
+          - name: webinar_id
+            description: "Unique identifier for each webinar"
+          - name: host_id
+            description: "User ID of the webinar host"
+          - name: webinar_topic
+            description: "Topic or title of the webinar"
+          - name: start_time
+            description: "Webinar start timestamp"
+          - name: end_time
+            description: "Webinar end timestamp"
+          - name: registrants
+            description: "Number of registered participants"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+
+models:
+  - name: audit_log
+    description: "Audit table for tracking Silver layer pipeline execution"
+    columns:
+      - name: execution_id
+        description: "Unique identifier for each pipeline execution"
+      - name: pipeline_name
+        description: "Name of the data pipeline or process"
+      - name: start_time
+        description: "When the pipeline execution started"
+      - name: end_time
+        description: "When the pipeline execution completed"
+      - name: status
+        description: "Status (Success, Failed, Partial Success, Cancelled)"
+      - name: error_message
+        description: "Error message if pipeline failed"
+      - name: execution_duration_seconds
+        description: "Total time taken for pipeline execution"
+      - name: source_tables_processed
+        description: "List of source tables processed in this execution"
+      - name: target_tables_updated
+        description: "List of target tables updated in this execution"
+      - name: records_processed
+        description: "Total number of records processed"
+      - name: records_inserted
+        description: "Number of new records inserted"
+      - name: records_updated
+        description: "Number of existing records updated"
+      - name: records_rejected
+        description: "Number of records rejected due to quality issues"
+      - name: executed_by
+        description: "User or system that executed the pipeline"
+      - name: execution_environment
+        description: "Environment where pipeline was executed"
+      - name: data_lineage_info
+        description: "Information about data lineage and transformations"
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: source_system
+        description: "Source system from which data originated"
+  
+  - name: si_users
+    description: "Silver layer table storing cleaned and standardized user data"
+    columns:
+      - name: user_id
+        description: "Unique identifier for each user account"
+      - name: user_name
+        description: "Standardized full name of the registered user"
+      - name: email
+        description: "Validated and standardized email address"
+      - name: company
+        description: "Standardized organization or company affiliation"
+      - name: plan_type
+        description: "Standardized subscription tier"
+      - name: registration_date
+        description: "Date when the user first registered"
+      - name: last_login_date
+        description: "Most recent date the user accessed the platform"
+      - name: account_status
+        description: "Current status of user account"
+      - name: load_timestamp
+        description: "Timestamp when record was loaded into silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated in silver layer"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+  
+  - name: si_meetings
+    description: "Silver layer table storing cleaned and enriched meeting data"
+    columns:
+      - name: meeting_id
+        description: "Unique identifier for each meeting"
+      - name: host_id
+        description: "User ID of the meeting host"
+      - name: meeting_topic
+        description: "Cleaned and standardized meeting subject"
+      - name: meeting_type
+        description: "Standardized meeting category"
+      - name: start_time
+        description: "Validated meeting start timestamp in UTC"
+      - name: end_time
+        description: "Validated meeting end timestamp in UTC"
+      - name: duration_minutes
+        description: "Calculated and validated meeting duration"
+      - name: host_name
+        description: "Standardized name of the meeting host"
+      - name: meeting_status
+        description: "Current state of the meeting"
+      - name: recording_status
+        description: "Whether the meeting was recorded"
+      - name: participant_count
+        description: "Total number of participants"
+      - name: load_timestamp
+        description: "Timestamp when record was loaded into silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated in silver layer"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+  
+  - name: si_participants
+    description: "Silver layer table storing cleaned participant attendance data"
+    columns:
+      - name: participant_id
+        description: "Unique identifier for each participant record"
+      - name: meeting_id
+        description: "Reference to meeting"
+      - name: user_id
+        description: "Reference to user who participated"
+      - name: join_time
+        description: "Validated timestamp when participant joined"
+      - name: leave_time
+        description: "Validated timestamp when participant left"
+      - name: attendance_duration
+        description: "Calculated time participant spent in meeting"
+      - name: participant_role
+        description: "Role of attendee in the meeting"
+      - name: connection_quality
+        description: "Network connection quality during participation"
+      - name: load_timestamp
+        description: "Timestamp when record was loaded into silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated in silver layer"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+  
+  - name: si_feature_usage
+    description: "Silver layer table storing standardized feature usage data"
+    columns:
+      - name: usage_id
+        description: "Unique identifier for each feature usage record"
+      - name: meeting_id
+        description: "Reference to meeting where feature was used"
+      - name: feature_name
+        description: "Standardized name of the platform feature"
+      - name: usage_count
+        description: "Validated number of times feature was utilized"
+      - name: usage_duration
+        description: "Total time the feature was active"
+      - name: feature_category
+        description: "Classification of feature type"
+      - name: usage_date
+        description: "Date when feature usage occurred"
+      - name: load_timestamp
+        description: "Timestamp when record was loaded into silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated in silver layer"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+  
+  - name: si_support_tickets
+    description: "Silver layer table storing standardized customer support ticket data"
+    columns:
+      - name: ticket_id
+        description: "Unique identifier for each support ticket"
+      - name: user_id
+        description: "Reference to user who created the ticket"
+      - name: ticket_type
+        description: "Standardized category of support ticket"
+      - name: priority_level
+        description: "Urgency level of ticket"
+      - name: open_date
+        description: "Date when the support ticket was created"
+      - name: close_date
+        description: "Date when the support ticket was resolved"
+      - name: resolution_status
+        description: "Current status of ticket resolution"
+      - name: issue_description
+        description: "Cleaned and standardized description of the problem"
+      - name: resolution_notes
+        description: "Summary of actions taken to resolve the issue"
+      - name: resolution_time_hours
+        description: "Calculated time to resolve ticket in business hours"
+      - name: load_timestamp
+        description: "Timestamp when record was loaded into silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated in silver layer"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+  
+  - name: si_billing_events
+    description: "Silver layer table storing validated billing and financial transaction data"
+    columns:
+      - name: event_id
+        description: "Unique identifier for each billing event"
+      - name: user_id
+        description: "Reference to user associated with billing event"
+      - name: event_type
+        description: "Standardized billing transaction type"
+      - name: transaction_amount
+        description: "Validated monetary value of the billing event"
+      - name: transaction_date
+        description: "Date when the billing event occurred"
+      - name: payment_method
+        description: "Method used for payment"
+      - name: currency_code
+        description: "ISO currency code for the transaction"
+      - name: invoice_number
+        description: "Unique identifier for the billing invoice"
+      - name: transaction_status
+        description: "Status of transaction"
+      - name: load_timestamp
+        description: "Timestamp when record was loaded into silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated in silver layer"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+  
+  - name: si_licenses
+    description: "Silver layer table storing validated license assignment and management data"
+    columns:
+      - name: license_id
+        description: "Unique identifier for each license"
+      - name: assigned_to_user_id
+        description: "User ID to whom license is assigned"
+      - name: license_type
+        description: "Standardized category of license"
+      - name: start_date
+        description: "Validated date when the license becomes active"
+      - name: end_date
+        description: "Validated date when the license expires"
+      - name: license_status
+        description: "Current state of the license"
+      - name: assigned_user_name
+        description: "Name of user to whom license is assigned"
+      - name: license_cost
+        description: "Price associated with the license"
+      - name: renewal_status
+        description: "Whether license is set for automatic renewal"
+      - name: utilization_percentage
+        description: "Percentage of license features being utilized"
+      - name: load_timestamp
+        description: "Timestamp when record was loaded into silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated in silver layer"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+  
+  - name: si_webinars
+    description: "Silver layer table storing cleaned webinar data with engagement metrics"
+    columns:
+      - name: webinar_id
+        description: "Unique identifier for each webinar"
+      - name: host_id
+        description: "User ID of the webinar host"
+      - name: webinar_topic
+        description: "Cleaned and standardized topic or title of the webinar"
+      - name: start_time
+        description: "Validated webinar start timestamp in UTC"
+      - name: end_time
+        description: "Validated webinar end timestamp in UTC"
+      - name: duration_minutes
+        description: "Calculated webinar duration in minutes"
+      - name: registrants
+        description: "Number of registered participants"
+      - name: attendees
+        description: "Number of actual attendees who joined"
+      - name: attendance_rate
+        description: "Percentage of registrants who attended"
+      - name: load_timestamp
+        description: "Timestamp when record was loaded into silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated in silver layer"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: data_quality_score
+        description: "Overall data quality score for the record"
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
