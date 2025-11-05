@@ -20,57 +20,27 @@ models:
   zoom_silver_pipeline:
     silver:
       +materialized: table
-      si_pipeline_audit:
-        +pre-hook: []
-        +post-hook: []
-      si_users:
-        +depends_on:
-          - ref('si_pipeline_audit')
-      si_meetings:
-        +depends_on:
-          - ref('si_pipeline_audit')
-          - ref('si_users')
-      si_participants:
-        +depends_on:
-          - ref('si_pipeline_audit')
-          - ref('si_meetings')
-          - ref('si_users')
-      si_feature_usage:
-        +depends_on:
-          - ref('si_pipeline_audit')
-          - ref('si_meetings')
-      si_support_tickets:
-        +depends_on:
-          - ref('si_pipeline_audit')
-          - ref('si_users')
-      si_billing_events:
-        +depends_on:
-          - ref('si_pipeline_audit')
-          - ref('si_users')
-      si_licenses:
-        +depends_on:
-          - ref('si_pipeline_audit')
-          - ref('si_users')
-
-vars:
-  # Data quality thresholds
-  max_meeting_duration_minutes: 1440
-  min_meeting_duration_minutes: 1
-  valid_plan_types: ['FREE', 'BASIC', 'PRO', 'BUSINESS', 'ENTERPRISE', 'EDUCATION']
-  valid_feature_names: ['SCREEN_SHARE', 'CHAT', 'RECORDING', 'BREAKOUT_ROOMS', 'WHITEBOARD']
-  valid_ticket_types: ['TECHNICAL', 'BILLING', 'FEATURE_REQUEST', 'ACCOUNT', 'GENERAL']
-  valid_resolution_statuses: ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED']
-  valid_event_types: ['SUBSCRIPTION', 'UPGRADE', 'DOWNGRADE', 'REFUND', 'CHARGEBACK', 'PAYMENT']
-  valid_license_statuses: ['EXPIRED', 'EXPIRING_SOON', 'FUTURE', 'ACTIVE']
-  
-  # Date range validations
-  min_valid_date: '2020-01-01'
-  max_future_billing_days: 30
-  
-  # Default values
-  default_currency: 'USD'
-  default_plan_type: 'UNKNOWN'
-  default_feature_name: 'OTHER'
-  default_ticket_type: 'GENERAL'
-  default_resolution_status: 'OPEN'
-  default_event_type: 'PAYMENT'
+      +on_schema_change: sync_all_columns
+      +pre-hook: |
+        {% if this.name != 'si_pipeline_audit' %}
+          INSERT INTO {{ ref('si_pipeline_audit') }} (
+            AUDIT_ID, PIPELINE_NAME, PIPELINE_RUN_ID, SOURCE_TABLE, TARGET_TABLE,
+            EXECUTION_START_TIME, EXECUTION_STATUS, PROCESSED_BY, PROCESSING_MODE,
+            LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM
+          ) VALUES (
+            '{{ invocation_id }}', 'SILVER_ETL', '{{ run_started_at }}', 'BRONZE.BZ_{{ this.name[3:] | upper }}', '{{ this }}',
+            '{{ run_started_at }}', 'RUNNING', 'DBT_CLOUD', 'INCREMENTAL',
+            CURRENT_DATE, CURRENT_DATE, 'SILVER_ETL_PROCESS'
+          )
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'si_pipeline_audit' %}
+          UPDATE {{ ref('si_pipeline_audit') }}
+          SET EXECUTION_END_TIME = CURRENT_TIMESTAMP,
+              EXECUTION_DURATION_SECONDS = DATEDIFF('second', EXECUTION_START_TIME, CURRENT_TIMESTAMP),
+              EXECUTION_STATUS = 'SUCCESS',
+              RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
+              RECORDS_INSERTED = (SELECT COUNT(*) FROM {{ this }})
+          WHERE PIPELINE_RUN_ID = '{{ run_started_at }}'
+            AND TARGET_TABLE = '{{ this }}'
+        {% endif %}
