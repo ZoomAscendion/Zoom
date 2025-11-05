@@ -6,7 +6,7 @@
 -- Silver Users transformation with data quality checks
 WITH bronze_users AS (
     SELECT *
-    FROM {{ ref('bz_users') }}
+    FROM {{ source('bronze', 'bz_users') }}
     WHERE USER_ID IS NOT NULL
       AND TRIM(USER_ID) != ''
       AND EMAIL IS NOT NULL
