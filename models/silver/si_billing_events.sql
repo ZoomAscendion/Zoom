@@ -6,7 +6,7 @@
 -- Silver Billing Events transformation with data quality checks
 WITH bronze_billing_events AS (
     SELECT *
-    FROM {{ ref('bz_billing_events') }}
+    FROM {{ source('bronze', 'bz_billing_events') }}
     WHERE EVENT_ID IS NOT NULL
       AND TRIM(EVENT_ID) != ''
       AND USER_ID IS NOT NULL
