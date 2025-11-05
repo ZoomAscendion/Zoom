@@ -6,7 +6,7 @@
 -- Silver Licenses transformation with data quality checks
 WITH bronze_licenses AS (
     SELECT *
-    FROM {{ ref('bz_licenses') }}
+    FROM {{ source('bronze', 'bz_licenses') }}
     WHERE LICENSE_ID IS NOT NULL
       AND TRIM(LICENSE_ID) != ''
       AND LICENSE_TYPE IS NOT NULL
