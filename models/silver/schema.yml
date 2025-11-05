@@ -1,0 +1,447 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "Bronze layer tables containing raw data from Zoom platform"
+    tables:
+      - name: bz_users
+        description: "Raw user data from Zoom platform"
+        columns:
+          - name: user_id
+            description: "Unique identifier for users"
+          - name: user_name
+            description: "User display name"
+          - name: email
+            description: "User email address"
+          - name: company
+            description: "User company name"
+          - name: plan_type
+            description: "User subscription plan type"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system identifier"
+      
+      - name: bz_meetings
+        description: "Raw meeting data from Zoom platform"
+        columns:
+          - name: meeting_id
+            description: "Unique identifier for meetings"
+          - name: host_id
+            description: "User ID of meeting host"
+          - name: meeting_topic
+            description: "Meeting topic/title"
+          - name: start_time
+            description: "Meeting start timestamp"
+          - name: end_time
+            description: "Meeting end timestamp"
+          - name: duration_minutes
+            description: "Meeting duration in minutes"
+      
+      - name: bz_participants
+        description: "Raw participant data from Zoom meetings"
+        columns:
+          - name: participant_id
+            description: "Unique identifier for participants"
+          - name: meeting_id
+            description: "Meeting identifier"
+          - name: user_id
+            description: "User identifier for participant"
+          - name: join_time
+            description: "Participant join timestamp"
+          - name: leave_time
+            description: "Participant leave timestamp"
+      
+      - name: bz_feature_usage
+        description: "Raw feature usage data from Zoom meetings"
+        columns:
+          - name: usage_id
+            description: "Unique identifier for usage records"
+          - name: meeting_id
+            description: "Meeting identifier"
+          - name: feature_name
+            description: "Name of feature used"
+          - name: usage_count
+            description: "Number of times feature was used"
+          - name: usage_date
+            description: "Date of feature usage"
+      
+      - name: bz_support_tickets
+        description: "Raw support ticket data"
+        columns:
+          - name: ticket_id
+            description: "Unique identifier for support tickets"
+          - name: user_id
+            description: "User who created the ticket"
+          - name: ticket_type
+            description: "Type/category of support ticket"
+          - name: resolution_status
+            description: "Current status of ticket resolution"
+          - name: open_date
+            description: "Date when ticket was opened"
+      
+      - name: bz_billing_events
+        description: "Raw billing and payment event data"
+        columns:
+          - name: event_id
+            description: "Unique identifier for billing events"
+          - name: user_id
+            description: "User associated with billing event"
+          - name: event_type
+            description: "Type of billing event"
+          - name: amount
+            description: "Monetary amount of the event"
+          - name: event_date
+            description: "Date of the billing event"
+      
+      - name: bz_licenses
+        description: "Raw license assignment and management data"
+        columns:
+          - name: license_id
+            description: "Unique identifier for licenses"
+          - name: license_type
+            description: "Type/category of license"
+          - name: assigned_to_user_id
+            description: "User ID to whom license is assigned"
+          - name: start_date
+            description: "License validity start date"
+          - name: end_date
+            description: "License validity end date"
+
+models:
+  - name: si_pipeline_audit
+    description: "Audit table for tracking Silver layer ETL pipeline executions"
+    columns:
+      - name: audit_id
+        description: "Unique identifier for audit records"
+      - name: pipeline_name
+        description: "Name of the ETL pipeline"
+      - name: pipeline_run_id
+        description: "Unique identifier for pipeline execution"
+      - name: source_table
+        description: "Source table name in Bronze layer"
+      - name: target_table
+        description: "Target table name in Silver layer"
+      - name: execution_start_time
+        description: "Pipeline execution start timestamp"
+      - name: execution_end_time
+        description: "Pipeline execution end timestamp"
+      - name: execution_duration_seconds
+        description: "Total execution time in seconds"
+      - name: records_read
+        description: "Number of records read from source"
+      - name: records_processed
+        description: "Number of records successfully processed"
+      - name: records_inserted
+        description: "Number of new records inserted"
+      - name: records_updated
+        description: "Number of existing records updated"
+      - name: records_rejected
+        description: "Number of records rejected due to errors"
+      - name: error_count
+        description: "Total number of errors encountered"
+      - name: warning_count
+        description: "Total number of warnings generated"
+      - name: execution_status
+        description: "Final execution status (SUCCESS/FAILED/PARTIAL_SUCCESS/CANCELLED)"
+      - name: error_message
+        description: "Detailed error message if execution failed"
+      - name: processed_by
+        description: "User or system that executed the pipeline"
+      - name: processing_mode
+        description: "Type of processing (FULL_LOAD/INCREMENTAL/DELTA)"
+      - name: data_freshness_timestamp
+        description: "Latest timestamp of processed data"
+      - name: resource_utilization
+        description: "JSON string with resource usage metrics"
+      - name: load_date
+        description: "Date when audit record was created"
+      - name: update_date
+        description: "Date when audit record was last updated"
+      - name: source_system
+        description: "Processing system identifier"
+  
+  - name: si_users
+    description: "Cleansed and standardized user data from Bronze layer"
+    columns:
+      - name: user_id
+        description: "Unique identifier for users"
+        tests:
+          - not_null
+          - unique
+      - name: user_name
+        description: "Standardized user display name (trimmed and uppercase)"
+        tests:
+          - not_null
+      - name: email
+        description: "Standardized email address (trimmed and lowercase)"
+        tests:
+          - not_null
+      - name: company
+        description: "Trimmed company name"
+      - name: plan_type
+        description: "Standardized subscription plan type"
+        tests:
+          - accepted_values:
+              values: ['FREE', 'BASIC', 'PRO', 'BUSINESS', 'ENTERPRISE', 'EDUCATION', 'UNKNOWN']
+      - name: load_date
+        description: "Date component of original load timestamp"
+      - name: update_date
+        description: "Date component of original update timestamp"
+      - name: source_system
+        description: "Source system identifier"
+      - name: load_timestamp
+        description: "Original load timestamp from Bronze layer"
+      - name: update_timestamp
+        description: "Original update timestamp from Bronze layer"
+  
+  - name: si_meetings
+    description: "Cleansed and validated meeting data with referential integrity"
+    columns:
+      - name: meeting_id
+        description: "Unique identifier for meetings"
+        tests:
+          - not_null
+          - unique
+      - name: host_id
+        description: "User ID of meeting host (validated against si_users)"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('si_users')
+              field: user_id
+      - name: meeting_topic
+        description: "Trimmed meeting topic/title"
+      - name: start_time
+        description: "Meeting start timestamp"
+        tests:
+          - not_null
+      - name: end_time
+        description: "Meeting end timestamp"
+        tests:
+          - not_null
+      - name: duration_minutes
+        description: "Calculated or validated meeting duration in minutes"
+        tests:
+          - not_null
+      - name: load_date
+        description: "Date component of original load timestamp"
+      - name: update_date
+        description: "Date component of original update timestamp"
+      - name: source_system
+        description: "Source system identifier"
+      - name: load_timestamp
+        description: "Original load timestamp from Bronze layer"
+      - name: update_timestamp
+        description: "Original update timestamp from Bronze layer"
+  
+  - name: si_participants
+    description: "Cleansed participant data with calculated attendance duration"
+    columns:
+      - name: participant_id
+        description: "Unique identifier for participants"
+        tests:
+          - not_null
+          - unique
+      - name: meeting_id
+        description: "Meeting identifier (validated against si_meetings)"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('si_meetings')
+              field: meeting_id
+      - name: user_id
+        description: "User identifier for participant (optional, validated if present)"
+      - name: join_time
+        description: "Participant join timestamp (validated within meeting bounds)"
+        tests:
+          - not_null
+      - name: leave_time
+        description: "Participant leave timestamp (validated within meeting bounds)"
+        tests:
+          - not_null
+      - name: attendance_duration
+        description: "Calculated attendance duration in minutes"
+      - name: load_date
+        description: "Date component of original load timestamp"
+      - name: update_date
+        description: "Date component of original update timestamp"
+      - name: source_system
+        description: "Source system identifier"
+      - name: load_timestamp
+        description: "Original load timestamp from Bronze layer"
+      - name: update_timestamp
+        description: "Original update timestamp from Bronze layer"
+  
+  - name: si_feature_usage
+    description: "Standardized feature usage data with validated feature names"
+    columns:
+      - name: usage_id
+        description: "Unique identifier for usage records"
+        tests:
+          - not_null
+          - unique
+      - name: meeting_id
+        description: "Meeting identifier (validated against si_meetings)"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('si_meetings')
+              field: meeting_id
+      - name: feature_name
+        description: "Standardized feature name (uppercase)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['SCREEN_SHARE', 'CHAT', 'RECORDING', 'BREAKOUT_ROOMS', 'WHITEBOARD']
+      - name: usage_count
+        description: "Number of times feature was used (non-negative)"
+        tests:
+          - not_null
+      - name: usage_date
+        description: "Date of feature usage (validated range)"
+        tests:
+          - not_null
+      - name: load_date
+        description: "Date component of original load timestamp"
+      - name: update_date
+        description: "Date component of original update timestamp"
+      - name: source_system
+        description: "Source system identifier"
+      - name: load_timestamp
+        description: "Original load timestamp from Bronze layer"
+      - name: update_timestamp
+        description: "Original update timestamp from Bronze layer"
+  
+  - name: si_support_tickets
+    description: "Cleansed support ticket data with calculated resolution times"
+    columns:
+      - name: ticket_id
+        description: "Unique identifier for support tickets"
+        tests:
+          - not_null
+          - unique
+      - name: user_id
+        description: "User who created the ticket (validated against si_users)"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('si_users')
+              field: user_id
+      - name: ticket_type
+        description: "Standardized ticket type/category"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['TECHNICAL', 'BILLING', 'FEATURE_REQUEST', 'ACCOUNT', 'GENERAL']
+      - name: resolution_status
+        description: "Standardized ticket resolution status"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED']
+      - name: open_date
+        description: "Date when ticket was opened (validated range)"
+        tests:
+          - not_null
+      - name: resolution_time_hours
+        description: "Calculated resolution time in hours (for resolved/closed tickets)"
+      - name: load_date
+        description: "Date component of original load timestamp"
+      - name: update_date
+        description: "Date component of original update timestamp"
+      - name: source_system
+        description: "Source system identifier"
+      - name: load_timestamp
+        description: "Original load timestamp from Bronze layer"
+      - name: update_timestamp
+        description: "Original update timestamp from Bronze layer"
+  
+  - name: si_billing_events
+    description: "Validated billing event data with standardized event types"
+    columns:
+      - name: event_id
+        description: "Unique identifier for billing events"
+        tests:
+          - not_null
+          - unique
+      - name: user_id
+        description: "User associated with billing event (validated against si_users)"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('si_users')
+              field: user_id
+      - name: event_type
+        description: "Standardized billing event type"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['SUBSCRIPTION', 'UPGRADE', 'DOWNGRADE', 'REFUND', 'CHARGEBACK', 'PAYMENT']
+      - name: amount
+        description: "Monetary amount of the event (positive values only)"
+        tests:
+          - not_null
+      - name: event_date
+        description: "Date of the billing event (validated range)"
+        tests:
+          - not_null
+      - name: currency_code
+        description: "Currency code (defaulted to USD)"
+        tests:
+          - not_null
+      - name: load_date
+        description: "Date component of original load timestamp"
+      - name: update_date
+        description: "Date component of original update timestamp"
+      - name: source_system
+        description: "Source system identifier"
+      - name: load_timestamp
+        description: "Original load timestamp from Bronze layer"
+      - name: update_timestamp
+        description: "Original update timestamp from Bronze layer"
+  
+  - name: si_licenses
+    description: "License data with calculated status and expiry information"
+    columns:
+      - name: license_id
+        description: "Unique identifier for licenses"
+        tests:
+          - not_null
+          - unique
+      - name: license_type
+        description: "Standardized license type/category"
+        tests:
+          - not_null
+      - name: assigned_to_user_id
+        description: "User ID to whom license is assigned (optional, validated if present)"
+      - name: start_date
+        description: "License validity start date"
+        tests:
+          - not_null
+      - name: end_date
+        description: "License validity end date"
+        tests:
+          - not_null
+      - name: license_status
+        description: "Calculated license status based on dates"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['EXPIRED', 'EXPIRING_SOON', 'FUTURE', 'ACTIVE']
+      - name: days_to_expiry
+        description: "Calculated days until license expires (0 for expired)"
+        tests:
+          - not_null
+      - name: load_date
+        description: "Date component of original load timestamp"
+      - name: update_date
+        description: "Date component of original update timestamp"
+      - name: source_system
+        description: "Source system identifier"
+      - name: load_timestamp
+        description: "Original load timestamp from Bronze layer"
+      - name: update_timestamp
+        description: "Original update timestamp from Bronze layer"
