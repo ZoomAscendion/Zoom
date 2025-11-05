@@ -1,7 +1,7 @@
 _____________________________________________
 ## *Author*: AAVA
 ## *Created on*:   
-## *Description*: Silver layer physical data model for Zoom Platform Analytics System supporting cleaned and validated data with error handling and audit tracking
+## *Description*: Silver layer physical data model for Zoom Platform Analytics System with data quality, validation, and audit tracking
 ## *Version*: 1 
 ## *Updated on*: 
 _____________________________________________
@@ -11,15 +11,16 @@ _____________________________________________
 -- =====================================================
 
 -- 1. Silver Layer DDL Scripts for Cleaned and Validated Data
--- All tables store cleansed data with enhanced metadata fields
+-- All tables store cleaned, validated, and enriched data from Bronze layer
 -- Compatible with Snowflake SQL standards
--- No primary keys, foreign keys, or constraints as per Snowflake best practices
--- All Bronze layer columns preserved with additional Silver layer enhancements
+-- No primary keys, foreign keys, or constraints for Silver layer
+-- Includes data quality, validation, and audit tracking capabilities
 
 -- =====================================================
 -- 1.1 SI_USERS Table
 -- =====================================================
 CREATE TABLE IF NOT EXISTS SILVER.SI_USERS (
+    -- Bronze layer columns preserved
     USER_ID STRING,
     USER_NAME STRING,
     EMAIL STRING,
@@ -28,14 +29,22 @@ CREATE TABLE IF NOT EXISTS SILVER.SI_USERS (
     LOAD_TIMESTAMP TIMESTAMP_NTZ,
     UPDATE_TIMESTAMP TIMESTAMP_NTZ,
     SOURCE_SYSTEM STRING,
-    DATA_QUALITY_SCORE DECIMAL(3,2),
-    IS_ACTIVE BOOLEAN
+    
+    -- Silver layer enhancements
+    DATA_QUALITY_SCORE NUMBER(5,2),
+    IS_VALID_RECORD BOOLEAN,
+    VALIDATION_STATUS STRING,
+    CLEANSED_TIMESTAMP TIMESTAMP_NTZ,
+    PROCESSED_BY STRING,
+    SILVER_LOAD_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    SILVER_UPDATE_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 -- =====================================================
 -- 1.2 SI_MEETINGS Table
 -- =====================================================
 CREATE TABLE IF NOT EXISTS SILVER.SI_MEETINGS (
+    -- Bronze layer columns preserved
     MEETING_ID STRING,
     HOST_ID STRING,
     MEETING_TOPIC STRING,
@@ -45,14 +54,22 @@ CREATE TABLE IF NOT EXISTS SILVER.SI_MEETINGS (
     LOAD_TIMESTAMP TIMESTAMP_NTZ,
     UPDATE_TIMESTAMP TIMESTAMP_NTZ,
     SOURCE_SYSTEM STRING,
-    MEETING_STATUS STRING,
-    IS_VALID_DURATION BOOLEAN
+    
+    -- Silver layer enhancements
+    DATA_QUALITY_SCORE NUMBER(5,2),
+    IS_VALID_RECORD BOOLEAN,
+    VALIDATION_STATUS STRING,
+    CLEANSED_TIMESTAMP TIMESTAMP_NTZ,
+    PROCESSED_BY STRING,
+    SILVER_LOAD_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    SILVER_UPDATE_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 -- =====================================================
 -- 1.3 SI_PARTICIPANTS Table
 -- =====================================================
 CREATE TABLE IF NOT EXISTS SILVER.SI_PARTICIPANTS (
+    -- Bronze layer columns preserved
     PARTICIPANT_ID STRING,
     MEETING_ID STRING,
     USER_ID STRING,
@@ -61,15 +78,22 @@ CREATE TABLE IF NOT EXISTS SILVER.SI_PARTICIPANTS (
     LOAD_TIMESTAMP TIMESTAMP_NTZ,
     UPDATE_TIMESTAMP TIMESTAMP_NTZ,
     SOURCE_SYSTEM STRING,
-    ATTENDANCE_DURATION_MINUTES NUMBER,
-    ATTENDANCE_PERCENTAGE DECIMAL(5,2),
-    IS_HOST BOOLEAN
+    
+    -- Silver layer enhancements
+    DATA_QUALITY_SCORE NUMBER(5,2),
+    IS_VALID_RECORD BOOLEAN,
+    VALIDATION_STATUS STRING,
+    CLEANSED_TIMESTAMP TIMESTAMP_NTZ,
+    PROCESSED_BY STRING,
+    SILVER_LOAD_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    SILVER_UPDATE_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 -- =====================================================
 -- 1.4 SI_FEATURE_USAGE Table
 -- =====================================================
 CREATE TABLE IF NOT EXISTS SILVER.SI_FEATURE_USAGE (
+    -- Bronze layer columns preserved
     USAGE_ID STRING,
     MEETING_ID STRING,
     FEATURE_NAME STRING,
@@ -78,14 +102,22 @@ CREATE TABLE IF NOT EXISTS SILVER.SI_FEATURE_USAGE (
     LOAD_TIMESTAMP TIMESTAMP_NTZ,
     UPDATE_TIMESTAMP TIMESTAMP_NTZ,
     SOURCE_SYSTEM STRING,
-    FEATURE_CATEGORY STRING,
-    USAGE_INTENSITY STRING
+    
+    -- Silver layer enhancements
+    DATA_QUALITY_SCORE NUMBER(5,2),
+    IS_VALID_RECORD BOOLEAN,
+    VALIDATION_STATUS STRING,
+    CLEANSED_TIMESTAMP TIMESTAMP_NTZ,
+    PROCESSED_BY STRING,
+    SILVER_LOAD_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    SILVER_UPDATE_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 -- =====================================================
 -- 1.5 SI_SUPPORT_TICKETS Table
 -- =====================================================
 CREATE TABLE IF NOT EXISTS SILVER.SI_SUPPORT_TICKETS (
+    -- Bronze layer columns preserved
     TICKET_ID STRING,
     USER_ID STRING,
     TICKET_TYPE STRING,
@@ -94,31 +126,46 @@ CREATE TABLE IF NOT EXISTS SILVER.SI_SUPPORT_TICKETS (
     LOAD_TIMESTAMP TIMESTAMP_NTZ,
     UPDATE_TIMESTAMP TIMESTAMP_NTZ,
     SOURCE_SYSTEM STRING,
-    PRIORITY_LEVEL STRING,
-    IS_FIRST_CONTACT_RESOLUTION BOOLEAN
+    
+    -- Silver layer enhancements
+    DATA_QUALITY_SCORE NUMBER(5,2),
+    IS_VALID_RECORD BOOLEAN,
+    VALIDATION_STATUS STRING,
+    CLEANSED_TIMESTAMP TIMESTAMP_NTZ,
+    PROCESSED_BY STRING,
+    SILVER_LOAD_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    SILVER_UPDATE_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 -- =====================================================
 -- 1.6 SI_BILLING_EVENTS Table
 -- =====================================================
 CREATE TABLE IF NOT EXISTS SILVER.SI_BILLING_EVENTS (
+    -- Bronze layer columns preserved
     EVENT_ID STRING,
     USER_ID STRING,
     EVENT_TYPE STRING,
-    AMOUNT NUMBER(12,2),
+    AMOUNT NUMBER(10,2),
     EVENT_DATE DATE,
     LOAD_TIMESTAMP TIMESTAMP_NTZ,
     UPDATE_TIMESTAMP TIMESTAMP_NTZ,
     SOURCE_SYSTEM STRING,
-    CURRENCY_CODE STRING,
-    IS_RECURRING BOOLEAN,
-    REVENUE_CATEGORY STRING
+    
+    -- Silver layer enhancements
+    DATA_QUALITY_SCORE NUMBER(5,2),
+    IS_VALID_RECORD BOOLEAN,
+    VALIDATION_STATUS STRING,
+    CLEANSED_TIMESTAMP TIMESTAMP_NTZ,
+    PROCESSED_BY STRING,
+    SILVER_LOAD_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    SILVER_UPDATE_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 -- =====================================================
 -- 1.7 SI_LICENSES Table
 -- =====================================================
 CREATE TABLE IF NOT EXISTS SILVER.SI_LICENSES (
+    -- Bronze layer columns preserved
     LICENSE_ID STRING,
     LICENSE_TYPE STRING,
     ASSIGNED_TO_USER_ID STRING,
@@ -127,13 +174,19 @@ CREATE TABLE IF NOT EXISTS SILVER.SI_LICENSES (
     LOAD_TIMESTAMP TIMESTAMP_NTZ,
     UPDATE_TIMESTAMP TIMESTAMP_NTZ,
     SOURCE_SYSTEM STRING,
-    LICENSE_STATUS STRING,
-    DAYS_TO_EXPIRY NUMBER,
-    IS_UTILIZED BOOLEAN
+    
+    -- Silver layer enhancements
+    DATA_QUALITY_SCORE NUMBER(5,2),
+    IS_VALID_RECORD BOOLEAN,
+    VALIDATION_STATUS STRING,
+    CLEANSED_TIMESTAMP TIMESTAMP_NTZ,
+    PROCESSED_BY STRING,
+    SILVER_LOAD_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    SILVER_UPDATE_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 -- =====================================================
--- 2. Error Data Table
+-- 2. Data Quality and Error Handling Tables
 -- =====================================================
 
 -- =====================================================
@@ -145,15 +198,16 @@ CREATE TABLE IF NOT EXISTS SILVER.SI_DATA_QUALITY_ERRORS (
     SOURCE_RECORD_ID STRING,
     ERROR_TYPE STRING,
     ERROR_DESCRIPTION STRING,
-    FIELD_NAME STRING,
-    FIELD_VALUE STRING,
-    EXPECTED_FORMAT STRING,
-    ERROR_SEVERITY STRING,
-    ERROR_TIMESTAMP TIMESTAMP_NTZ,
-    PROCESSING_BATCH_ID STRING,
-    IS_RESOLVED BOOLEAN,
-    RESOLUTION_ACTION STRING,
-    RESOLUTION_TIMESTAMP TIMESTAMP_NTZ
+    ERROR_COLUMN STRING,
+    ERROR_VALUE STRING,
+    SEVERITY_LEVEL STRING,
+    ERROR_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    RESOLUTION_STATUS STRING,
+    RESOLVED_BY STRING,
+    RESOLVED_TIMESTAMP TIMESTAMP_NTZ,
+    RESOLUTION_NOTES STRING,
+    CREATED_BY STRING,
+    CREATED_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 -- =====================================================
@@ -162,18 +216,23 @@ CREATE TABLE IF NOT EXISTS SILVER.SI_DATA_QUALITY_ERRORS (
 CREATE TABLE IF NOT EXISTS SILVER.SI_VALIDATION_RULES (
     RULE_ID STRING,
     RULE_NAME STRING,
+    RULE_DESCRIPTION STRING,
     TARGET_TABLE STRING,
-    TARGET_FIELD STRING,
+    TARGET_COLUMN STRING,
     RULE_TYPE STRING,
     RULE_EXPRESSION STRING,
-    ERROR_MESSAGE STRING,
+    SEVERITY_LEVEL STRING,
     IS_ACTIVE BOOLEAN,
-    CREATED_DATE DATE,
-    LAST_MODIFIED_DATE DATE
+    CREATED_BY STRING,
+    CREATED_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    UPDATED_BY STRING,
+    UPDATED_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    EFFECTIVE_START_DATE DATE,
+    EFFECTIVE_END_DATE DATE
 );
 
 -- =====================================================
--- 3. Audit Table
+-- 3. Audit and Lineage Tables
 -- =====================================================
 
 -- =====================================================
@@ -182,25 +241,23 @@ CREATE TABLE IF NOT EXISTS SILVER.SI_VALIDATION_RULES (
 CREATE TABLE IF NOT EXISTS SILVER.SI_PIPELINE_AUDIT (
     AUDIT_ID STRING,
     PIPELINE_NAME STRING,
-    EXECUTION_ID STRING,
-    START_TIMESTAMP TIMESTAMP_NTZ,
-    END_TIMESTAMP TIMESTAMP_NTZ,
-    EXECUTION_STATUS STRING,
+    PIPELINE_RUN_ID STRING,
     SOURCE_TABLE STRING,
     TARGET_TABLE STRING,
+    OPERATION_TYPE STRING,
+    START_TIMESTAMP TIMESTAMP_NTZ,
+    END_TIMESTAMP TIMESTAMP_NTZ,
+    DURATION_SECONDS NUMBER,
     RECORDS_PROCESSED NUMBER,
-    RECORDS_INSERTED NUMBER,
-    RECORDS_UPDATED NUMBER,
-    RECORDS_REJECTED NUMBER,
-    ERROR_COUNT NUMBER,
-    WARNING_COUNT NUMBER,
-    PROCESSING_TIME_SECONDS DECIMAL(10,2),
-    THROUGHPUT_RECORDS_PER_SECOND DECIMAL(10,2),
-    DATA_VOLUME_MB DECIMAL(10,2),
+    RECORDS_SUCCESS NUMBER,
+    RECORDS_FAILED NUMBER,
+    RECORDS_SKIPPED NUMBER,
+    STATUS STRING,
+    ERROR_MESSAGE STRING,
     EXECUTED_BY STRING,
-    EXECUTION_MODE STRING,
-    ERROR_DETAILS STRING,
-    PERFORMANCE_METRICS STRING
+    EXECUTION_ENVIRONMENT STRING,
+    PIPELINE_VERSION STRING,
+    CREATED_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 -- =====================================================
@@ -210,163 +267,121 @@ CREATE TABLE IF NOT EXISTS SILVER.SI_DATA_LINEAGE (
     LINEAGE_ID STRING,
     SOURCE_SYSTEM STRING,
     SOURCE_TABLE STRING,
-    SOURCE_RECORD_ID STRING,
+    SOURCE_COLUMN STRING,
+    TARGET_SYSTEM STRING,
     TARGET_TABLE STRING,
-    TARGET_RECORD_ID STRING,
+    TARGET_COLUMN STRING,
+    TRANSFORMATION_LOGIC STRING,
     TRANSFORMATION_TYPE STRING,
-    TRANSFORMATION_RULES STRING,
-    PROCESSING_TIMESTAMP TIMESTAMP_NTZ,
-    DATA_QUALITY_SCORE DECIMAL(3,2),
-    IS_CURRENT BOOLEAN,
-    VERSION_NUMBER NUMBER
+    DEPENDENCY_LEVEL NUMBER,
+    IS_DIRECT_MAPPING BOOLEAN,
+    DATA_FLOW_DIRECTION STRING,
+    CREATED_BY STRING,
+    CREATED_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    UPDATED_BY STRING,
+    UPDATED_TIMESTAMP TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    IS_ACTIVE BOOLEAN DEFAULT TRUE
 );
 
 -- =====================================================
--- 4. Update DDL Scripts for Schema Evolution
--- =====================================================
-
--- =====================================================
--- 4.1 Add New Columns to Existing Tables
--- =====================================================
--- Example: Add new column to SI_USERS table
--- ALTER TABLE SILVER.SI_USERS ADD COLUMN NEW_FIELD STRING;
-
--- =====================================================
--- 4.2 Modify Existing Column Data Types
--- =====================================================
--- Example: Modify column data type
--- ALTER TABLE SILVER.SI_USERS ALTER COLUMN USER_NAME SET DATA TYPE VARCHAR(500);
-
--- =====================================================
--- 4.3 Add Clustering Keys for Performance
--- =====================================================
--- Cluster large tables on frequently filtered columns
-ALTER TABLE SILVER.SI_MEETINGS CLUSTER BY (START_TIME, HOST_ID);
-ALTER TABLE SILVER.SI_PARTICIPANTS CLUSTER BY (JOIN_TIME, MEETING_ID);
-ALTER TABLE SILVER.SI_FEATURE_USAGE CLUSTER BY (USAGE_DATE, FEATURE_NAME);
-ALTER TABLE SILVER.SI_SUPPORT_TICKETS CLUSTER BY (OPEN_DATE, TICKET_TYPE);
-ALTER TABLE SILVER.SI_BILLING_EVENTS CLUSTER BY (EVENT_DATE, USER_ID);
-ALTER TABLE SILVER.SI_LICENSES CLUSTER BY (START_DATE, LICENSE_TYPE);
-
--- =====================================================
--- 4.4 Create Views for Common Access Patterns
--- =====================================================
--- Active users view
-CREATE OR REPLACE VIEW SILVER.VW_ACTIVE_USERS AS
-SELECT 
-    USER_ID,
-    USER_NAME,
-    EMAIL,
-    COMPANY,
-    PLAN_TYPE,
-    DATA_QUALITY_SCORE
-FROM SILVER.SI_USERS
-WHERE IS_ACTIVE = TRUE;
-
--- Meeting summary view
-CREATE OR REPLACE VIEW SILVER.VW_MEETING_SUMMARY AS
-SELECT 
-    m.MEETING_ID,
-    m.MEETING_TOPIC,
-    m.START_TIME,
-    m.DURATION_MINUTES,
-    m.MEETING_STATUS,
-    COUNT(p.PARTICIPANT_ID) as PARTICIPANT_COUNT
-FROM SILVER.SI_MEETINGS m
-LEFT JOIN SILVER.SI_PARTICIPANTS p ON m.MEETING_ID = p.MEETING_ID
-GROUP BY m.MEETING_ID, m.MEETING_TOPIC, m.START_TIME, m.DURATION_MINUTES, m.MEETING_STATUS;
-
--- =====================================================
--- 5. Data Type Mapping and Design Decisions
+-- 4. Data Type Mapping and Justification
 -- =====================================================
 /*
-5.1 Snowflake Data Types Used:
-   - STRING: Used for all text fields for maximum flexibility
-   - NUMBER: Used for numeric values with precision specified where needed
+4.1 Snowflake Data Types Used:
+   - STRING: Used for all text fields, provides maximum flexibility
+   - NUMBER: Used for numeric values with appropriate precision
    - TIMESTAMP_NTZ: Used for all timestamp fields (without timezone)
    - DATE: Used for date-only fields
-   - BOOLEAN: Used for flag fields
-   - DECIMAL: Used for precise numeric calculations
+   - BOOLEAN: Used for true/false flags
+   - DECIMAL/NUMBER(10,2): Used for monetary amounts
 
-5.2 Silver Layer Design Principles:
-   - All Bronze layer columns preserved
-   - Additional Silver layer enhancement columns added
-   - No primary keys, foreign keys, or constraints as per Snowflake best practices
-   - Cleansed and validated data with quality scores
-   - Comprehensive error tracking and audit capabilities
+4.2 Silver Layer Design Principles:
+   - All Bronze layer columns preserved for data lineage
+   - Additional Silver layer columns for data quality tracking
+   - No primary keys, foreign keys, or constraints
+   - Snowflake-compatible data types
    - Table names prefixed with 'SI_' for Silver layer identification
 
-5.3 Enhanced Metadata Columns:
-   - All Bronze columns maintained
-   - DATA_QUALITY_SCORE: Quality assessment of cleansed data
-   - IS_ACTIVE, IS_VALID_DURATION, IS_HOST: Business logic flags
-   - MEETING_STATUS, FEATURE_CATEGORY, PRIORITY_LEVEL: Derived classifications
-   - ATTENDANCE_DURATION_MINUTES, ATTENDANCE_PERCENTAGE: Calculated metrics
+4.3 Data Quality Enhancements:
+   - DATA_QUALITY_SCORE: Numeric score (0-100) indicating data quality
+   - IS_VALID_RECORD: Boolean flag for record validity
+   - VALIDATION_STATUS: Text description of validation results
+   - CLEANSED_TIMESTAMP: When data cleansing was performed
+   - PROCESSED_BY: System/user that processed the record
 
-5.4 Error Handling Features:
-   - Comprehensive error tracking with SI_DATA_QUALITY_ERRORS
-   - Configurable validation rules with SI_VALIDATION_RULES
-   - Full audit trail with SI_PIPELINE_AUDIT
-   - Data lineage tracking with SI_DATA_LINEAGE
+4.4 Error Handling Features:
+   - Comprehensive error logging with detailed descriptions
+   - Error categorization and severity levels
+   - Resolution tracking and audit trail
+   - Support for data quality rule management
 
-5.5 Performance Optimizations:
-   - Clustering keys on frequently filtered columns
-   - Views for common access patterns
-   - Snowflake's automatic micro-partitioning utilized
-   - Optimized data types for storage efficiency
+4.5 Audit and Lineage Features:
+   - Pipeline execution tracking with performance metrics
+   - Complete data lineage from source to target
+   - Transformation logic documentation
+   - Version control and change tracking
 */
 
 -- =====================================================
--- 6. Implementation Guidelines
+-- 5. Implementation Notes
 -- =====================================================
 /*
-6.1 Data Loading Strategy:
-   - Transform and validate data from Bronze to Silver
-   - Implement data quality checks and scoring
-   - Log all errors and processing metrics
-   - Maintain data lineage for traceability
+5.1 Schema Structure:
+   - All tables created in SILVER schema
+   - Compatible with Snowflake SQL standards
+   - Follows Medallion architecture principles
 
-6.2 Quality Assurance:
-   - Validate all data transformations
-   - Monitor data quality scores
-   - Track and resolve data quality errors
-   - Implement automated data validation rules
+5.2 Data Processing Strategy:
+   - Incremental processing using timestamp fields
+   - Data quality validation before Silver layer insertion
+   - Error handling with detailed logging
+   - Audit trail for all operations
 
-6.3 Performance Monitoring:
-   - Monitor clustering effectiveness
-   - Track query performance metrics
-   - Optimize warehouse sizing based on workload
-   - Use result caching for repeated queries
+5.3 Performance Considerations:
+   - Snowflake's automatic micro-partitioning
+   - Consider clustering keys for large tables
+   - Optimize for analytical workloads
 
-6.4 Security Considerations:
-   - Implement role-based access control
-   - Apply data masking policies for sensitive data
-   - Monitor access patterns and usage
-   - Maintain audit logs for compliance
+5.4 Data Quality Framework:
+   - Configurable validation rules
+   - Automated data quality scoring
+   - Exception handling and resolution workflow
+   - Comprehensive error reporting
 
-6.5 Maintenance Tasks:
-   - Regular clustering maintenance
-   - Monitor and clean up error tables
-   - Archive old audit records
-   - Update validation rules as business requirements change
+5.5 Governance and Compliance:
+   - Complete audit trail for regulatory compliance
+   - Data lineage for impact analysis
+   - Change tracking and version control
+   - Access control at role level
 */
 
 -- =====================================================
--- 7. API Cost Calculation
+-- 6. Sample Usage Examples
 -- =====================================================
 /*
-7.1 API Cost Breakdown:
-   - GitHub File Reader API calls: $0.000150
-   - GitHub File Writer API calls: $0.000200
-   - Snowflake Connection API calls: $0.000100
-   - Vector Database Query API calls: $0.000050
-   - Total API Cost: $0.000500
+6.1 Data Quality Check Example:
+INSERT INTO SILVER.SI_DATA_QUALITY_ERRORS 
+(ERROR_ID, SOURCE_TABLE, SOURCE_RECORD_ID, ERROR_TYPE, ERROR_DESCRIPTION, ERROR_COLUMN, SEVERITY_LEVEL, CREATED_BY)
+VALUES 
+('ERR_001', 'SI_USERS', 'USER_123', 'NULL_VALUE', 'Email field is null', 'EMAIL', 'HIGH', 'DQ_PROCESS');
 
-7.2 Cost Optimization:
-   - Batch API calls where possible
-   - Cache frequently accessed data
-   - Use efficient query patterns
-   - Monitor and optimize API usage
+6.2 Pipeline Audit Example:
+INSERT INTO SILVER.SI_PIPELINE_AUDIT 
+(AUDIT_ID, PIPELINE_NAME, SOURCE_TABLE, TARGET_TABLE, OPERATION_TYPE, START_TIMESTAMP, END_TIMESTAMP, RECORDS_PROCESSED, STATUS, EXECUTED_BY)
+VALUES 
+('AUDIT_001', 'BRONZE_TO_SILVER_USERS', 'BZ_USERS', 'SI_USERS', 'TRANSFORM', '2024-01-01 10:00:00', '2024-01-01 10:05:00', 1000, 'SUCCESS', 'ETL_PROCESS');
+
+6.3 Data Lineage Example:
+INSERT INTO SILVER.SI_DATA_LINEAGE 
+(LINEAGE_ID, SOURCE_SYSTEM, SOURCE_TABLE, SOURCE_COLUMN, TARGET_SYSTEM, TARGET_TABLE, TARGET_COLUMN, TRANSFORMATION_TYPE, IS_DIRECT_MAPPING, CREATED_BY)
+VALUES 
+('LIN_001', 'BRONZE', 'BZ_USERS', 'USER_NAME', 'SILVER', 'SI_USERS', 'USER_NAME', 'DIRECT_COPY', TRUE, 'LINEAGE_PROCESS');
+
+6.4 Validation Rule Example:
+INSERT INTO SILVER.SI_VALIDATION_RULES 
+(RULE_ID, RULE_NAME, RULE_DESCRIPTION, TARGET_TABLE, TARGET_COLUMN, RULE_TYPE, RULE_EXPRESSION, SEVERITY_LEVEL, IS_ACTIVE, CREATED_BY)
+VALUES 
+('RULE_001', 'Email Format Check', 'Validates email format using regex', 'SI_USERS', 'EMAIL', 'REGEX', '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$', 'HIGH', TRUE, 'DQ_ADMIN');
 */
 
 -- =====================================================
