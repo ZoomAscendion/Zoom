@@ -23,24 +23,34 @@ models:
       +on_schema_change: sync_all_columns
       +pre-hook: |
         {% if this.name != 'si_pipeline_audit' %}
-          INSERT INTO {{ ref('si_pipeline_audit') }} (
-            AUDIT_ID, PIPELINE_NAME, PIPELINE_RUN_ID, SOURCE_TABLE, TARGET_TABLE,
-            EXECUTION_START_TIME, EXECUTION_STATUS, PROCESSED_BY, PROCESSING_MODE,
-            LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM
-          ) VALUES (
-            '{{ invocation_id }}', 'SILVER_ETL', '{{ run_started_at }}', 'BRONZE.BZ_{{ this.name[3:] | upper }}', '{{ this }}',
-            '{{ run_started_at }}', 'RUNNING', 'DBT_CLOUD', 'INCREMENTAL',
-            CURRENT_DATE, CURRENT_DATE, 'SILVER_ETL_PROCESS'
-          )
+        INSERT INTO {{ ref('si_pipeline_audit') }} (
+          AUDIT_ID, PIPELINE_NAME, PIPELINE_RUN_ID, SOURCE_TABLE, TARGET_TABLE,
+          EXECUTION_START_TIME, EXECUTION_STATUS, PROCESSED_BY, PROCESSING_MODE,
+          LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM
+        ) VALUES (
+          '{{ invocation_id }}' || '_' || '{{ this.name }}' || '_START',
+          'BRONZE_TO_SILVER_{{ this.name | upper }}',
+          '{{ invocation_id }}',
+          'BZ_{{ this.name | replace("si_", "") | upper }}',
+          '{{ this.name | upper }}',
+          CURRENT_TIMESTAMP(),
+          'RUNNING',
+          'DBT_CLOUD',
+          'INCREMENTAL',
+          CURRENT_DATE(),
+          CURRENT_DATE(),
+          'SILVER_LAYER_PROCESSING'
+        )
         {% endif %}
       +post-hook: |
         {% if this.name != 'si_pipeline_audit' %}
-          UPDATE {{ ref('si_pipeline_audit') }}
-          SET EXECUTION_END_TIME = CURRENT_TIMESTAMP,
-              EXECUTION_DURATION_SECONDS = DATEDIFF('second', EXECUTION_START_TIME, CURRENT_TIMESTAMP),
-              EXECUTION_STATUS = 'SUCCESS',
-              RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
-              RECORDS_INSERTED = (SELECT COUNT(*) FROM {{ this }})
-          WHERE PIPELINE_RUN_ID = '{{ run_started_at }}'
-            AND TARGET_TABLE = '{{ this }}'
+        UPDATE {{ ref('si_pipeline_audit') }}
+        SET 
+          EXECUTION_END_TIME = CURRENT_TIMESTAMP(),
+          EXECUTION_DURATION_SECONDS = DATEDIFF('second', EXECUTION_START_TIME, CURRENT_TIMESTAMP()),
+          RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
+          RECORDS_INSERTED = (SELECT COUNT(*) FROM {{ this }}),
+          EXECUTION_STATUS = 'SUCCESS',
+          UPDATE_DATE = CURRENT_DATE()
+        WHERE AUDIT_ID = '{{ invocation_id }}' || '_' || '{{ this.name }}' || '_START'
         {% endif %}
