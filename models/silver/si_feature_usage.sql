@@ -6,7 +6,7 @@
 -- Silver Feature Usage transformation with data quality checks
 WITH bronze_feature_usage AS (
     SELECT *
-    FROM {{ ref('bz_feature_usage') }}
+    FROM {{ source('bronze', 'bz_feature_usage') }}
     WHERE USAGE_ID IS NOT NULL
       AND TRIM(USAGE_ID) != ''
       AND MEETING_ID IS NOT NULL
