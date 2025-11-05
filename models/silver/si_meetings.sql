@@ -6,7 +6,7 @@
 -- Silver Meetings transformation with data quality checks
 WITH bronze_meetings AS (
     SELECT *
-    FROM {{ ref('bz_meetings') }}
+    FROM {{ source('bronze', 'bz_meetings') }}
     WHERE MEETING_ID IS NOT NULL
       AND TRIM(MEETING_ID) != ''
       AND HOST_ID IS NOT NULL
