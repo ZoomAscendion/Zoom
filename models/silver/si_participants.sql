@@ -6,7 +6,7 @@
 -- Silver Participants transformation with data quality checks
 WITH bronze_participants AS (
     SELECT *
-    FROM {{ ref('bz_participants') }}
+    FROM {{ source('bronze', 'bz_participants') }}
     WHERE PARTICIPANT_ID IS NOT NULL
       AND TRIM(PARTICIPANT_ID) != ''
       AND MEETING_ID IS NOT NULL
