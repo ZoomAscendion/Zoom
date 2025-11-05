@@ -10,7 +10,8 @@
     materialized='table',
     pre_hook="
       INSERT INTO {{ ref('bz_audit_log') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
-      VALUES ('BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_PROCESS', 0, 'STARTED')
+      SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_PROCESS', 0, 'STARTED'
+      WHERE EXISTS (SELECT 1 FROM {{ ref('bz_audit_log') }} LIMIT 1)
     ",
     post_hook="
       UPDATE {{ ref('bz_audit_log') }} 
@@ -44,7 +45,10 @@ WITH source_data AS (
             WHEN HOST_ID IS NULL THEN 'MISSING_HOST_ID'
             WHEN START_TIME IS NULL THEN 'MISSING_START_TIME'
             ELSE 'VALID'
-        END AS data_quality_flag
+        END AS data_quality_flag,
+        
+        -- Add row number to handle duplicates
+        ROW_NUMBER() OVER (PARTITION BY MEETING_ID ORDER BY LOAD_TIMESTAMP DESC) AS rn
         
     FROM {{ source('raw_zoom', 'meetings') }}
 ),
@@ -67,6 +71,7 @@ validated_data AS (
         
     FROM source_data
     WHERE data_quality_flag = 'VALID'  -- Only process valid records
+    AND rn = 1  -- Take only the most recent record for each MEETING_ID
 )
 
 -- Final selection for Bronze layer
