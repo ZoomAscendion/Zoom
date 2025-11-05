@@ -6,7 +6,7 @@
 -- Silver Support Tickets transformation with data quality checks
 WITH bronze_support_tickets AS (
     SELECT *
-    FROM {{ ref('bz_support_tickets') }}
+    FROM {{ source('bronze', 'bz_support_tickets') }}
     WHERE TICKET_ID IS NOT NULL
       AND TRIM(TICKET_ID) != ''
       AND USER_ID IS NOT NULL
