@@ -29,7 +29,7 @@ trends and areas for improvement.
 
 **Data Relationships Used**
 
--   Meetings \-- \>Users (via Host_ID)
+-   Meetings \--\>Users (via Host_ID)
 
 -   Attendees \--\>Meetings (via Meeting_ID)
 
