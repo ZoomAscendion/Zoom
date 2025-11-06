@@ -9,16 +9,24 @@
 {{ config(
     materialized='table',
     pre_hook="""
-        {% if target.name != 'bz_audit_log' %}
-            INSERT INTO {{ ref('bz_audit_log') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
-            VALUES ('BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_PROCESS', 0, 'STARTED')
-        {% endif %}
+        INSERT INTO {{ ref('bz_audit_log') }} (RECORD_ID, SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
+        SELECT 
+            COALESCE((SELECT MAX(RECORD_ID) FROM {{ ref('bz_audit_log') }}), 0) + 1,
+            'BZ_LICENSES', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_PROCESS', 
+            0, 
+            'STARTED'
     """,
     post_hook="""
-        {% if target.name != 'bz_audit_log' %}
-            INSERT INTO {{ ref('bz_audit_log') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
-            VALUES ('BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_PROCESS', 30, 'COMPLETED')
-        {% endif %}
+        INSERT INTO {{ ref('bz_audit_log') }} (RECORD_ID, SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
+        SELECT 
+            COALESCE((SELECT MAX(RECORD_ID) FROM {{ ref('bz_audit_log') }}), 0) + 1,
+            'BZ_LICENSES', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_PROCESS', 
+            30, 
+            'COMPLETED'
     """
 ) }}
 
