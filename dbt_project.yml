@@ -2,8 +2,10 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
+# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_silver_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -16,41 +18,49 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
   zoom_silver_pipeline:
+    # Config indicated by + and applies to all files under models/example/
     silver:
       +materialized: table
-      +on_schema_change: sync_all_columns
-      +pre-hook: |
-        {% if this.name != 'si_pipeline_audit' %}
-        INSERT INTO {{ ref('si_pipeline_audit') }} (
-          AUDIT_ID, PIPELINE_NAME, PIPELINE_RUN_ID, SOURCE_TABLE, TARGET_TABLE,
-          EXECUTION_START_TIME, EXECUTION_STATUS, PROCESSED_BY, PROCESSING_MODE,
-          LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM
-        ) VALUES (
-          '{{ invocation_id }}' || '_' || '{{ this.name }}' || '_START',
-          'BRONZE_TO_SILVER_{{ this.name | upper }}',
-          '{{ invocation_id }}',
-          'BZ_{{ this.name | replace("si_", "") | upper }}',
-          '{{ this.name | upper }}',
-          CURRENT_TIMESTAMP(),
-          'RUNNING',
-          'DBT_CLOUD',
-          'INCREMENTAL',
-          CURRENT_DATE(),
-          CURRENT_DATE(),
-          'SILVER_LAYER_PROCESSING'
-        )
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'si_pipeline_audit' %}
-        UPDATE {{ ref('si_pipeline_audit') }}
-        SET 
-          EXECUTION_END_TIME = CURRENT_TIMESTAMP(),
-          EXECUTION_DURATION_SECONDS = DATEDIFF('second', EXECUTION_START_TIME, CURRENT_TIMESTAMP()),
-          RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
-          RECORDS_INSERTED = (SELECT COUNT(*) FROM {{ this }}),
-          EXECUTION_STATUS = 'SUCCESS',
-          UPDATE_DATE = CURRENT_DATE()
-        WHERE AUDIT_ID = '{{ invocation_id }}' || '_' || '{{ this.name }}' || '_START'
-        {% endif %}
+      +pre-hook: 
+        - "{{ log('Starting transformation for ' ~ this.name, info=true) }}"
+      +post-hook:
+        - "{{ log('Completed transformation for ' ~ this.name ~ ' with ' ~ (this.rows | default(0)) ~ ' rows', info=true) }}"
+
+# Model execution order - audit table must run first
+model-ordering:
+  - "si_pipeline_audit"
+  - "si_users"
+  - "si_meetings"
+  - "si_participants"
+  - "si_feature_usage"
+  - "si_support_tickets"
+  - "si_billing_events"
+  - "si_licenses"
+
+# Global configurations
+vars:
+  # Default values for pipeline execution
+  pipeline_run_id: "{{ run_started_at.strftime('%Y%m%d_%H%M%S') }}"
+  processed_by: "DBT_PIPELINE"
+  processing_mode: "INCREMENTAL"
+  
+# Snapshot configurations
+snapshots:
+  zoom_silver_pipeline:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: update_timestamp
+
+# Test configurations
+tests:
+  zoom_silver_pipeline:
+    +severity: error
+    +store_failures: true
+
+# Documentation
+docs:
+  zoom_silver_pipeline:
+    +generate: true
