@@ -1,0 +1,389 @@
+version: 2
+
+models:
+  - name: go_process_audit
+    description: "Gold layer process audit table for tracking all pipeline executions"
+    columns:
+      - name: audit_key
+        description: "Unique audit record identifier"
+        tests:
+          - not_null
+      - name: pipeline_name
+        description: "Name of the pipeline being executed"
+        tests:
+          - not_null
+      - name: pipeline_run_timestamp
+        description: "Timestamp when pipeline was executed"
+      - name: source_table
+        description: "Source table name"
+      - name: target_table
+        description: "Target table name"
+      - name: execution_start_time
+        description: "Pipeline execution start time"
+      - name: execution_end_time
+        description: "Pipeline execution end time"
+      - name: execution_duration_seconds
+        description: "Total execution duration in seconds"
+      - name: records_read
+        description: "Number of records read from source"
+      - name: records_processed
+        description: "Number of records processed"
+      - name: records_inserted
+        description: "Number of records inserted"
+      - name: records_updated
+        description: "Number of records updated"
+      - name: records_rejected
+        description: "Number of records rejected due to errors"
+      - name: execution_status
+        description: "Pipeline execution status"
+        tests:
+          - accepted_values:
+              values: ['SUCCESS', 'FAILED', 'STARTED', 'COMPLETED', 'WARNING']
+      - name: error_message
+        description: "Error message if execution failed"
+      - name: processed_by
+        description: "User or system that processed the pipeline"
+      - name: data_freshness_timestamp
+        description: "Timestamp of the most recent source data"
+      - name: load_date
+        description: "Date when audit record was created"
+      - name: source_system
+        description: "Source system identifier"
+
+  - name: go_dim_user
+    description: "Gold layer user dimension table with SCD Type 2"
+    columns:
+      - name: user_key
+        description: "User business key"
+        tests:
+          - not_null
+      - name: user_name
+        description: "Standardized user name"
+      - name: email_domain
+        description: "Email domain extracted from user email"
+      - name: company
+        description: "User company name"
+      - name: plan_type
+        description: "Standardized plan type"
+        tests:
+          - accepted_values:
+              values: ['BASIC', 'PRO', 'BUSINESS', 'ENTERPRISE', 'FREE', 'EDUCATION', 'UNKNOWN']
+      - name: user_category
+        description: "User category based on plan type"
+        tests:
+          - accepted_values:
+              values: ['PREMIUM', 'STANDARD', 'BASIC', 'UNKNOWN']
+      - name: account_creation_date
+        description: "Date when user account was created"
+      - name: last_activity_date
+        description: "Date of user's last activity"
+      - name: effective_start_date
+        description: "SCD Type 2 effective start date"
+        tests:
+          - not_null
+      - name: effective_end_date
+        description: "SCD Type 2 effective end date"
+        tests:
+          - not_null
+      - name: current_record_flag
+        description: "Flag indicating current active record"
+        tests:
+          - not_null
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: source_system
+        description: "Source system identifier"
+
+  - name: go_dim_date
+    description: "Gold layer date dimension table"
+    columns:
+      - name: date_key
+        description: "Date value serving as primary key"
+        tests:
+          - not_null
+          - unique
+      - name: year
+        description: "Calendar year"
+        tests:
+          - not_null
+      - name: quarter
+        description: "Calendar quarter (1-4)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4]
+      - name: month
+        description: "Calendar month (1-12)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+      - name: month_name
+        description: "Month name"
+      - name: week_of_year
+        description: "Week number in year"
+      - name: day_of_month
+        description: "Day of month (1-31)"
+      - name: day_of_week
+        description: "Day of week (1-7)"
+      - name: day_name
+        description: "Day name"
+      - name: is_weekend
+        description: "Flag indicating weekend day"
+      - name: is_holiday
+        description: "Flag indicating holiday"
+      - name: fiscal_year
+        description: "Fiscal year"
+      - name: fiscal_quarter
+        description: "Fiscal quarter"
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: source_system
+        description: "Source system identifier"
+
+  - name: go_dim_license
+    description: "Gold layer license dimension table with SCD Type 2"
+    columns:
+      - name: license_key
+        description: "License business key"
+        tests:
+          - not_null
+      - name: license_type
+        description: "Standardized license type"
+        tests:
+          - accepted_values:
+              values: ['BASIC', 'PRO', 'BUSINESS', 'ENTERPRISE', 'EDUCATION', 'UNKNOWN']
+      - name: license_tier
+        description: "License tier classification"
+        tests:
+          - accepted_values:
+              values: ['TIER_1', 'TIER_2', 'TIER_3', 'TIER_4', 'TIER_5']
+      - name: start_date
+        description: "License start date"
+      - name: end_date
+        description: "License end date"
+      - name: license_status
+        description: "Current license status"
+        tests:
+          - accepted_values:
+              values: ['ACTIVE', 'EXPIRED', 'SUSPENDED', 'PENDING', 'UNKNOWN']
+      - name: days_to_expiry
+        description: "Days until license expires"
+      - name: license_cost
+        description: "Monthly license cost"
+      - name: utilization_rate
+        description: "License utilization rate"
+      - name: effective_start_date
+        description: "SCD Type 2 effective start date"
+        tests:
+          - not_null
+      - name: effective_end_date
+        description: "SCD Type 2 effective end date"
+        tests:
+          - not_null
+      - name: current_record_flag
+        description: "Flag indicating current active record"
+        tests:
+          - not_null
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: source_system
+        description: "Source system identifier"
+
+  - name: go_code_feature_types
+    description: "Gold layer feature types code table"
+    columns:
+      - name: feature_code
+        description: "Standardized feature code"
+        tests:
+          - not_null
+          - unique
+      - name: feature_name
+        description: "Feature display name"
+        tests:
+          - not_null
+      - name: feature_category
+        description: "Feature category classification"
+        tests:
+          - accepted_values:
+              values: ['COLLABORATION', 'RECORDING', 'COMMUNICATION', 'ADVANCED', 'ENGAGEMENT', 'MEDIA', 'BASIC']
+      - name: feature_description
+        description: "Feature description"
+      - name: is_premium_feature
+        description: "Flag indicating premium feature"
+        tests:
+          - not_null
+      - name: adoption_priority
+        description: "Feature adoption priority"
+        tests:
+          - accepted_values:
+              values: ['HIGH', 'MEDIUM', 'LOW']
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: source_system
+        description: "Source system identifier"
+
+  - name: go_code_plan_types
+    description: "Gold layer plan types code table"
+    columns:
+      - name: plan_code
+        description: "Standardized plan code"
+        tests:
+          - not_null
+          - unique
+      - name: plan_name
+        description: "Plan display name"
+        tests:
+          - not_null
+      - name: plan_tier
+        description: "Plan tier classification"
+        tests:
+          - accepted_values:
+              values: ['PREMIUM', 'STANDARD', 'BASIC']
+      - name: plan_description
+        description: "Plan description"
+      - name: monthly_cost
+        description: "Monthly plan cost"
+        tests:
+          - not_null
+      - name: max_participants
+        description: "Maximum participants allowed"
+        tests:
+          - not_null
+      - name: feature_set
+        description: "Available feature set"
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: source_system
+        description: "Source system identifier"
+
+  - name: go_fact_meeting_activity
+    description: "Gold layer meeting activity fact table"
+    columns:
+      - name: meeting_date
+        description: "Date of the meeting"
+        tests:
+          - not_null
+      - name: host_user_key
+        description: "Meeting host user key"
+        tests:
+          - not_null
+      - name: meeting_topic
+        description: "Meeting topic or title"
+      - name: start_time
+        description: "Meeting start timestamp"
+        tests:
+          - not_null
+      - name: end_time
+        description: "Meeting end timestamp"
+      - name: duration_minutes
+        description: "Meeting duration in minutes"
+        tests:
+          - not_null
+      - name: participant_count
+        description: "Number of meeting participants"
+      - name: total_attendance_minutes
+        description: "Total attendance minutes across all participants"
+      - name: average_attendance_minutes
+        description: "Average attendance minutes per participant"
+      - name: feature_usage_count
+        description: "Number of features used during meeting"
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: source_system
+        description: "Source system identifier"
+
+  - name: go_fact_support_activity
+    description: "Gold layer support activity fact table"
+    columns:
+      - name: ticket_date
+        description: "Date when ticket was created"
+        tests:
+          - not_null
+      - name: user_key
+        description: "User who created the ticket"
+        tests:
+          - not_null
+      - name: ticket_type
+        description: "Type of support ticket"
+        tests:
+          - not_null
+      - name: resolution_status
+        description: "Current resolution status"
+        tests:
+          - accepted_values:
+              values: ['RESOLVED', 'CLOSED', 'PENDING', 'OPEN', 'IN_PROGRESS', 'UNKNOWN']
+      - name: open_date
+        description: "Date when ticket was opened"
+        tests:
+          - not_null
+      - name: resolution_time_hours
+        description: "Time taken to resolve in hours"
+      - name: priority_level
+        description: "Ticket priority level based on user plan"
+        tests:
+          - accepted_values:
+              values: ['HIGH', 'MEDIUM', 'STANDARD']
+      - name: first_contact_resolution_flag
+        description: "Flag indicating first contact resolution"
+        tests:
+          - not_null
+      - name: escalation_flag
+        description: "Flag indicating ticket escalation"
+        tests:
+          - not_null
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: source_system
+        description: "Source system identifier"
+
+  - name: go_fact_revenue_activity
+    description: "Gold layer revenue activity fact table"
+    columns:
+      - name: event_date
+        description: "Date of the billing event"
+        tests:
+          - not_null
+      - name: user_key
+        description: "User associated with billing event"
+        tests:
+          - not_null
+      - name: event_type
+        description: "Type of billing event"
+        tests:
+          - accepted_values:
+              values: ['SUBSCRIPTION', 'RENEWAL', 'UPGRADE', 'DOWNGRADE', 'PAYMENT', 'REFUND', 'CHARGEBACK', 'OTHER']
+      - name: amount
+        description: "Billing amount"
+        tests:
+          - not_null
+      - name: currency_code
+        description: "Currency code"
+        tests:
+          - not_null
+      - name: payment_method
+        description: "Payment method used"
+      - name: recurring_revenue_flag
+        description: "Flag indicating recurring revenue"
+        tests:
+          - not_null
+      - name: churn_risk_score
+        description: "Calculated churn risk score"
+      - name: load_date
+        description: "Date when record was loaded"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: source_system
+        description: "Source system identifier"
