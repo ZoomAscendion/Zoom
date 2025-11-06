@@ -1,0 +1,187 @@
+version: 2
+
+sources:
+  - name: silver
+    description: "Silver layer tables containing cleansed and standardized data"
+    database: DB_POC_ZOOM
+    schema: SILVER
+    tables:
+      - name: si_users
+        description: "Silver layer users table with cleansed user data"
+        columns:
+          - name: user_id
+            description: "Unique identifier for user"
+          - name: user_name
+            description: "User display name"
+          - name: email
+            description: "User email address"
+          - name: company
+            description: "User company name"
+          - name: plan_type
+            description: "User subscription plan type"
+          - name: load_date
+            description: "Date when record was loaded"
+          - name: update_date
+            description: "Date when record was last updated"
+          - name: source_system
+            description: "Source system identifier"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+
+      - name: si_meetings
+        description: "Silver layer meetings table with cleansed meeting data"
+        columns:
+          - name: meeting_id
+            description: "Unique identifier for meeting"
+          - name: host_id
+            description: "Meeting host user identifier"
+          - name: meeting_topic
+            description: "Meeting topic or title"
+          - name: start_time
+            description: "Meeting start timestamp"
+          - name: end_time
+            description: "Meeting end timestamp"
+          - name: duration_minutes
+            description: "Meeting duration in minutes"
+          - name: load_date
+            description: "Date when record was loaded"
+          - name: update_date
+            description: "Date when record was last updated"
+          - name: source_system
+            description: "Source system identifier"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+
+      - name: si_participants
+        description: "Silver layer participants table with cleansed participant data"
+        columns:
+          - name: participant_id
+            description: "Unique identifier for participant"
+          - name: meeting_id
+            description: "Meeting identifier"
+          - name: user_id
+            description: "Participant user identifier"
+          - name: join_time
+            description: "Participant join timestamp"
+          - name: leave_time
+            description: "Participant leave timestamp"
+          - name: attendance_duration
+            description: "Participant attendance duration in minutes"
+          - name: load_date
+            description: "Date when record was loaded"
+          - name: update_date
+            description: "Date when record was last updated"
+          - name: source_system
+            description: "Source system identifier"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+
+      - name: si_feature_usage
+        description: "Silver layer feature usage table with cleansed usage data"
+        columns:
+          - name: usage_id
+            description: "Unique identifier for usage record"
+          - name: meeting_id
+            description: "Meeting identifier"
+          - name: feature_name
+            description: "Feature name used"
+          - name: usage_count
+            description: "Number of times feature was used"
+          - name: usage_date
+            description: "Date of feature usage"
+          - name: load_date
+            description: "Date when record was loaded"
+          - name: update_date
+            description: "Date when record was last updated"
+          - name: source_system
+            description: "Source system identifier"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+
+      - name: si_support_tickets
+        description: "Silver layer support tickets table with cleansed ticket data"
+        columns:
+          - name: ticket_id
+            description: "Unique identifier for support ticket"
+          - name: user_id
+            description: "User identifier who created ticket"
+          - name: ticket_type
+            description: "Type of support ticket"
+          - name: resolution_status
+            description: "Current resolution status"
+          - name: open_date
+            description: "Date when ticket was opened"
+          - name: resolution_time_hours
+            description: "Time taken to resolve in hours"
+          - name: load_date
+            description: "Date when record was loaded"
+          - name: update_date
+            description: "Date when record was last updated"
+          - name: source_system
+            description: "Source system identifier"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+
+      - name: si_billing_events
+        description: "Silver layer billing events table with cleansed billing data"
+        columns:
+          - name: event_id
+            description: "Unique identifier for billing event"
+          - name: user_id
+            description: "User identifier for billing event"
+          - name: event_type
+            description: "Type of billing event"
+          - name: amount
+            description: "Billing amount"
+          - name: event_date
+            description: "Date of billing event"
+          - name: currency_code
+            description: "Currency code for amount"
+          - name: load_date
+            description: "Date when record was loaded"
+          - name: update_date
+            description: "Date when record was last updated"
+          - name: source_system
+            description: "Source system identifier"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+
+      - name: si_licenses
+        description: "Silver layer licenses table with cleansed license data"
+        columns:
+          - name: license_id
+            description: "Unique identifier for license"
+          - name: license_type
+            description: "Type of license"
+          - name: assigned_to_user_id
+            description: "User identifier license is assigned to"
+          - name: start_date
+            description: "License start date"
+          - name: end_date
+            description: "License end date"
+          - name: license_status
+            description: "Current license status"
+          - name: days_to_expiry
+            description: "Days until license expires"
+          - name: load_date
+            description: "Date when record was loaded"
+          - name: update_date
+            description: "Date when record was last updated"
+          - name: source_system
+            description: "Source system identifier"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
