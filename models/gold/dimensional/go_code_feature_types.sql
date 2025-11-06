@@ -19,7 +19,8 @@ WITH source_features AS (
 
 feature_standardization AS (
     SELECT 
-        UPPER(REPLACE(TRIM(FEATURE_NAME), ' ', '_'))::VARCHAR(50) AS FEATURE_CODE,
+        -- Create unique feature code by adding row number to handle duplicates
+        (UPPER(REPLACE(TRIM(FEATURE_NAME), ' ', '_')) || '_' || ROW_NUMBER() OVER (PARTITION BY UPPER(REPLACE(TRIM(FEATURE_NAME), ' ', '_')) ORDER BY FEATURE_NAME))::VARCHAR(50) AS FEATURE_CODE,
         TRIM(FEATURE_NAME)::VARCHAR(16777216) AS FEATURE_NAME,
         CASE 
             WHEN LOWER(FEATURE_NAME) LIKE '%screen%share%' OR LOWER(FEATURE_NAME) LIKE '%share%screen%' THEN 'COLLABORATION'
