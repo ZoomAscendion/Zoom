@@ -19,17 +19,3 @@ models:
   zoom_bronze_pipeline:
     bronze:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'bz_audit_log' %}
-          INSERT INTO {{ ref('bz_audit_log') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
-          VALUES ('{{ this.name }}', CURRENT_TIMESTAMP(), 'DBT_PROCESS', 0, 'STARTED')
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'bz_audit_log' %}
-          UPDATE {{ ref('bz_audit_log') }}
-          SET STATUS = 'COMPLETED',
-              PROCESSING_TIME = DATEDIFF('second', LOAD_TIMESTAMP, CURRENT_TIMESTAMP())
-          WHERE SOURCE_TABLE = '{{ this.name }}'
-            AND STATUS = 'STARTED'
-            AND LOAD_TIMESTAMP = (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_audit_log') }} WHERE SOURCE_TABLE = '{{ this.name }}' AND STATUS = 'STARTED')
-        {% endif %}
