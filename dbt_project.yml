@@ -2,10 +2,8 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_silver_pipeline'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -18,49 +16,10 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/example/
     silver:
       +materialized: table
-      +pre-hook: 
-        - "{{ log('Starting transformation for ' ~ this.name, info=true) }}"
-      +post-hook:
-        - "{{ log('Completed transformation for ' ~ this.name ~ ' with ' ~ (this.rows | default(0)) ~ ' rows', info=true) }}"
-
-# Model execution order - audit table must run first
-model-ordering:
-  - "si_pipeline_audit"
-  - "si_users"
-  - "si_meetings"
-  - "si_participants"
-  - "si_feature_usage"
-  - "si_support_tickets"
-  - "si_billing_events"
-  - "si_licenses"
-
-# Global configurations
-vars:
-  # Default values for pipeline execution
-  pipeline_run_id: "{{ run_started_at.strftime('%Y%m%d_%H%M%S') }}"
-  processed_by: "DBT_PIPELINE"
-  processing_mode: "INCREMENTAL"
-  
-# Snapshot configurations
-snapshots:
-  zoom_silver_pipeline:
-    +target_schema: snapshots
-    +strategy: timestamp
-    +updated_at: update_timestamp
-
-# Test configurations
-tests:
-  zoom_silver_pipeline:
-    +severity: error
-    +store_failures: true
-
-# Documentation
-docs:
-  zoom_silver_pipeline:
-    +generate: true
+      si_pipeline_audit:
+        +pre-hook: []
+        +post-hook: []
