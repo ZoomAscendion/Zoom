@@ -9,27 +9,69 @@
 -- Standardizes plan information for revenue and usage analysis
 
 WITH plan_definitions AS (
-    SELECT 'ENT' AS PLAN_CODE, 'Enterprise' AS PLAN_NAME, 'PREMIUM' AS PLAN_TIER, 'Full enterprise features with unlimited participants' AS PLAN_DESCRIPTION, 240.00 AS MONTHLY_COST, 1000 AS MAX_PARTICIPANTS, 'ALL_FEATURES' AS FEATURE_SET
+    SELECT 
+        'ENT' AS PLAN_CODE, 
+        'Enterprise' AS PLAN_NAME, 
+        'PREMIUM' AS PLAN_TIER, 
+        'Full enterprise features with unlimited participants' AS PLAN_DESCRIPTION, 
+        240.00 AS MONTHLY_COST, 
+        1000 AS MAX_PARTICIPANTS, 
+        'ALL_FEATURES' AS FEATURE_SET
     UNION ALL
-    SELECT 'BUS', 'Business', 'PREMIUM', 'Business features with advanced collaboration tools', 120.00, 300, 'BUSINESS_FEATURES'
+    SELECT 
+        'BUS' AS PLAN_CODE, 
+        'Business' AS PLAN_NAME, 
+        'PREMIUM' AS PLAN_TIER, 
+        'Business features with advanced collaboration tools' AS PLAN_DESCRIPTION, 
+        120.00 AS MONTHLY_COST, 
+        300 AS MAX_PARTICIPANTS, 
+        'BUSINESS_FEATURES' AS FEATURE_SET
     UNION ALL
-    SELECT 'PRO', 'Professional', 'STANDARD', 'Professional features for small teams', 60.00, 100, 'PRO_FEATURES'
+    SELECT 
+        'PRO' AS PLAN_CODE, 
+        'Professional' AS PLAN_NAME, 
+        'STANDARD' AS PLAN_TIER, 
+        'Professional features for small teams' AS PLAN_DESCRIPTION, 
+        60.00 AS MONTHLY_COST, 
+        100 AS MAX_PARTICIPANTS, 
+        'PRO_FEATURES' AS FEATURE_SET
     UNION ALL
-    SELECT 'BAS', 'Basic', 'STANDARD', 'Basic meeting features', 20.00, 40, 'BASIC_FEATURES'
+    SELECT 
+        'BAS' AS PLAN_CODE, 
+        'Basic' AS PLAN_NAME, 
+        'STANDARD' AS PLAN_TIER, 
+        'Basic meeting features' AS PLAN_DESCRIPTION, 
+        20.00 AS MONTHLY_COST, 
+        40 AS MAX_PARTICIPANTS, 
+        'BASIC_FEATURES' AS FEATURE_SET
     UNION ALL
-    SELECT 'FREE', 'Free', 'BASIC', 'Free tier with limited features', 0.00, 3, 'FREE_FEATURES'
+    SELECT 
+        'FREE' AS PLAN_CODE, 
+        'Free' AS PLAN_NAME, 
+        'BASIC' AS PLAN_TIER, 
+        'Free tier with limited features' AS PLAN_DESCRIPTION, 
+        0.00 AS MONTHLY_COST, 
+        3 AS MAX_PARTICIPANTS, 
+        'FREE_FEATURES' AS FEATURE_SET
     UNION ALL
-    SELECT 'EDU', 'Education', 'STANDARD', 'Educational institution features', 30.00, 100, 'EDUCATION_FEATURES'
+    SELECT 
+        'EDU' AS PLAN_CODE, 
+        'Education' AS PLAN_NAME, 
+        'STANDARD' AS PLAN_TIER, 
+        'Educational institution features' AS PLAN_DESCRIPTION, 
+        30.00 AS MONTHLY_COST, 
+        100 AS MAX_PARTICIPANTS, 
+        'EDUCATION_FEATURES' AS FEATURE_SET
 )
 
 SELECT 
-    PLAN_CODE::VARCHAR(50),
-    PLAN_NAME::VARCHAR(16777216),
-    PLAN_TIER::VARCHAR(100),
-    PLAN_DESCRIPTION::VARCHAR(16777216),
-    MONTHLY_COST::NUMBER(10,2),
-    MAX_PARTICIPANTS::NUMBER(38,0),
-    FEATURE_SET::VARCHAR(16777216),
+    PLAN_CODE::VARCHAR(50) AS PLAN_CODE,
+    PLAN_NAME::VARCHAR(16777216) AS PLAN_NAME,
+    PLAN_TIER::VARCHAR(100) AS PLAN_TIER,
+    PLAN_DESCRIPTION::VARCHAR(16777216) AS PLAN_DESCRIPTION,
+    MONTHLY_COST::NUMBER(10,2) AS MONTHLY_COST,
+    MAX_PARTICIPANTS::NUMBER(38,0) AS MAX_PARTICIPANTS,
+    FEATURE_SET::VARCHAR(16777216) AS FEATURE_SET,
     CURRENT_DATE()::DATE AS LOAD_DATE,
     CURRENT_DATE()::DATE AS UPDATE_DATE,
     'BUSINESS_RULES'::VARCHAR(16777216) AS SOURCE_SYSTEM
