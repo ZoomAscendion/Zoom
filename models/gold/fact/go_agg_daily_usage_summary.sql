@@ -39,18 +39,32 @@ daily_participants AS (
     GROUP BY DATE(p.JOIN_TIME)
 ),
 
-daily_features AS (
+-- Fixed feature aggregation without window functions in GROUP BY
+daily_features_base AS (
     SELECT 
         f.USAGE_DATE AS SUMMARY_DATE,
-        COUNT(f.USAGE_ID) AS FEATURE_USAGE_EVENTS,
-        -- Get most used feature using MODE or alternative approach
-        FIRST_VALUE(f.FEATURE_NAME) OVER (
-            PARTITION BY f.USAGE_DATE 
-            ORDER BY COUNT(f.USAGE_ID) OVER (PARTITION BY f.USAGE_DATE, f.FEATURE_NAME) DESC
-        ) AS MOST_USED_FEATURE
+        f.FEATURE_NAME,
+        COUNT(f.USAGE_ID) AS FEATURE_COUNT
     FROM {{ source('silver', 'si_feature_usage') }} f
     WHERE f.USAGE_DATE IS NOT NULL
     GROUP BY f.USAGE_DATE, f.FEATURE_NAME
+),
+
+daily_features AS (
+    SELECT 
+        SUMMARY_DATE,
+        SUM(FEATURE_COUNT) AS FEATURE_USAGE_EVENTS,
+        -- Get most used feature by selecting the one with max count
+        MAX(CASE WHEN rn = 1 THEN FEATURE_NAME ELSE NULL END) AS MOST_USED_FEATURE
+    FROM (
+        SELECT 
+            SUMMARY_DATE,
+            FEATURE_NAME,
+            FEATURE_COUNT,
+            ROW_NUMBER() OVER (PARTITION BY SUMMARY_DATE ORDER BY FEATURE_COUNT DESC) AS rn
+        FROM daily_features_base
+    ) ranked_features
+    GROUP BY SUMMARY_DATE
 ),
 
 daily_aggregation AS (
@@ -71,14 +85,7 @@ daily_aggregation AS (
     FROM daily_meetings dm
     LEFT JOIN user_plans up ON dm.HOST_ID = up.USER_ID
     LEFT JOIN daily_participants dp ON dm.SUMMARY_DATE = dp.SUMMARY_DATE
-    LEFT JOIN (
-        SELECT 
-            SUMMARY_DATE,
-            SUM(FEATURE_USAGE_EVENTS) AS FEATURE_USAGE_EVENTS,
-            MAX(MOST_USED_FEATURE) AS MOST_USED_FEATURE
-        FROM daily_features
-        GROUP BY SUMMARY_DATE
-    ) df ON dm.SUMMARY_DATE = df.SUMMARY_DATE
+    LEFT JOIN daily_features df ON dm.SUMMARY_DATE = df.SUMMARY_DATE
     GROUP BY 
         dm.SUMMARY_DATE, 
         COALESCE(up.PLAN_TYPE, 'UNKNOWN'),
