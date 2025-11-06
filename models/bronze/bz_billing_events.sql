@@ -8,13 +8,11 @@
   Description:
   - 1:1 mapping from RAW.BILLING_EVENTS to BZ_BILLING_EVENTS
   - Preserves all source data without transformation
-  - Adds audit trail through pre/post hooks
+  - Clean Bronze layer implementation
 */
 
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ this.database }}.{{ this.schema }}.BZ_AUDIT_LOG (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) VALUES ('BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'DBT_PROCESS', 0, 'STARTED')",
-    post_hook="UPDATE {{ this.database }}.{{ this.schema }}.BZ_AUDIT_LOG SET STATUS = 'COMPLETED', PROCESSING_TIME = 1 WHERE SOURCE_TABLE = 'BZ_BILLING_EVENTS' AND STATUS = 'STARTED'"
+    materialized='table'
 ) }}
 
 -- Raw data extraction with 1:1 mapping
