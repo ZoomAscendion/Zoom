@@ -1,0 +1,587 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<workbook version='18.1' xml:base='https://help.tableau.com/samples/en-us/superstore_sample.twb' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <IntuitiveSorting />
+    <IntuitiveSorting_SP2 />
+    <ReferenceLine_SP2 />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
+  <datasources>
+    <datasource caption='Zoom Analytics Data' inline='true' name='federated.1A2B3C4D5E6F7890ABCDEF1234567890' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='wdfmbah-ia58548' name='snowflake.1A2B3C4D5E6F7890ABCDEF1234567890'>
+            <connection authentication='username-password' class='snowflake' dbname='DB_POC_ZOOM' odbc-native-protocol='' one-time-sql='' port='443' schema='GOLD' server='wdfmbah-ia58548.snowflakecomputing.com' service='' username='KARTHIKVALLURI1985' warehouse='COMPUTE_WH' workgroup-auth-mode='' />
+          </connection>
+        </named-connection>
+      </named-connections>
+      <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='snowflake.1A2B3C4D5E6F7890ABCDEF1234567890' name='Custom SQL Query' type='text'>
+        SELECT 
+          d.DATE_KEY,
+          d.YEAR,
+          d.QUARTER, 
+          d.MONTH,
+          d.MONTH_NAME,
+          d.DAY_NAME,
+          u.USER_BUSINESS_KEY,
+          u.USER_NAME,
+          u.EMAIL_DOMAIN,
+          u.COMPANY_NAME,
+          u.PLAN_TYPE,
+          u.ACCOUNT_STATUS,
+          u.USER_SEGMENT,
+          ma.MEETING_DURATION_MINUTES,
+          ma.PARTICIPANT_COUNT,
+          ma.MEETING_TYPE,
+          ma.RECORDING_ENABLED_FLAG,
+          ma.FEATURE_USAGE_COUNT,
+          ma.TOTAL_ATTENDANCE_MINUTES,
+          ma.HOST_PLAN_TYPE,
+          fu.FEATURE_NAME,
+          fu.FEATURE_CATEGORY,
+          fu.USAGE_COUNT,
+          fu.USAGE_DURATION_MINUTES,
+          re.TRANSACTION_AMOUNT_USD,
+          re.EVENT_TYPE,
+          re.PAYMENT_METHOD,
+          re.LICENSE_TYPE,
+          re.MRR_IMPACT,
+          sm.RESOLUTION_TIME_HOURS,
+          sm.TICKET_TYPE,
+          sm.PRIORITY_LEVEL,
+          sm.RESOLUTION_STATUS,
+          sm.FIRST_CONTACT_RESOLUTION_FLAG,
+          sm.ESCALATION_FLAG,
+          sm.SATISFACTION_SCORE,
+          l.LICENSE_NAME,
+          l.LICENSE_TIER,
+          l.MONTHLY_COST,
+          l.ANNUAL_COST,
+          l.MAX_PARTICIPANTS,
+          l.STORAGE_GB
+        FROM GO_DIM_DATE d
+        LEFT JOIN GO_FACT_MEETING_ACTIVITY ma ON d.DATE_KEY = ma.DATE_KEY
+        LEFT JOIN GO_DIM_USER u ON ma.USER_KEY = u.USER_BUSINESS_KEY
+        LEFT JOIN GO_FACT_FEATURE_USAGE fu ON d.DATE_KEY = fu.DATE_KEY AND u.USER_BUSINESS_KEY = fu.USER_KEY
+        LEFT JOIN GO_FACT_REVENUE_EVENTS re ON d.DATE_KEY = re.DATE_KEY AND u.USER_BUSINESS_KEY = re.USER_KEY
+        LEFT JOIN GO_FACT_SUPPORT_METRICS sm ON d.DATE_KEY = sm.DATE_KEY AND u.USER_BUSINESS_KEY = sm.USER_KEY
+        LEFT JOIN GO_DIM_LICENSE l ON re.LICENSE_KEY = l.LICENSE_TYPE_KEY
+        WHERE d.DATE_KEY >= '2023-01-01'
+      </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+      <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.1A2B3C4D5E6F7890ABCDEF1234567890' name='Custom SQL Query' type='text'>
+        SELECT 
+          d.DATE_KEY,
+          d.YEAR,
+          d.QUARTER, 
+          d.MONTH,
+          d.MONTH_NAME,
+          d.DAY_NAME,
+          u.USER_BUSINESS_KEY,
+          u.USER_NAME,
+          u.EMAIL_DOMAIN,
+          u.COMPANY_NAME,
+          u.PLAN_TYPE,
+          u.ACCOUNT_STATUS,
+          u.USER_SEGMENT,
+          ma.MEETING_DURATION_MINUTES,
+          ma.PARTICIPANT_COUNT,
+          ma.MEETING_TYPE,
+          ma.RECORDING_ENABLED_FLAG,
+          ma.FEATURE_USAGE_COUNT,
+          ma.TOTAL_ATTENDANCE_MINUTES,
+          ma.HOST_PLAN_TYPE,
+          fu.FEATURE_NAME,
+          fu.FEATURE_CATEGORY,
+          fu.USAGE_COUNT,
+          fu.USAGE_DURATION_MINUTES,
+          re.TRANSACTION_AMOUNT_USD,
+          re.EVENT_TYPE,
+          re.PAYMENT_METHOD,
+          re.LICENSE_TYPE,
+          re.MRR_IMPACT,
+          sm.RESOLUTION_TIME_HOURS,
+          sm.TICKET_TYPE,
+          sm.PRIORITY_LEVEL,
+          sm.RESOLUTION_STATUS,
+          sm.FIRST_CONTACT_RESOLUTION_FLAG,
+          sm.ESCALATION_FLAG,
+          sm.SATISFACTION_SCORE,
+          l.LICENSE_NAME,
+          l.LICENSE_TIER,
+          l.MONTHLY_COST,
+          l.ANNUAL_COST,
+          l.MAX_PARTICIPANTS,
+          l.STORAGE_GB
+        FROM GO_DIM_DATE d
+        LEFT JOIN GO_FACT_MEETING_ACTIVITY ma ON d.DATE_KEY = ma.DATE_KEY
+        LEFT JOIN GO_DIM_USER u ON ma.USER_KEY = u.USER_BUSINESS_KEY
+        LEFT JOIN GO_FACT_FEATURE_USAGE fu ON d.DATE_KEY = fu.DATE_KEY AND u.USER_BUSINESS_KEY = fu.USER_KEY
+        LEFT JOIN GO_FACT_REVENUE_EVENTS re ON d.DATE_KEY = re.DATE_KEY AND u.USER_BUSINESS_KEY = re.USER_KEY
+        LEFT JOIN GO_FACT_SUPPORT_METRICS sm ON d.DATE_KEY = sm.DATE_KEY AND u.USER_BUSINESS_KEY = sm.USER_KEY
+        LEFT JOIN GO_DIM_LICENSE l ON re.LICENSE_KEY = l.LICENSE_TYPE_KEY
+        WHERE d.DATE_KEY >= '2023-01-01'
+      </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+      <refresh increment-key='' incremental-updates='false' />
+      <cols>
+        <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+        <column caption='Year' datatype='integer' name='[YEAR]' role='dimension' type='ordinal' />
+        <column caption='Quarter' datatype='integer' name='[QUARTER]' role='dimension' type='ordinal' />
+        <column caption='Month' datatype='integer' name='[MONTH]' role='dimension' type='ordinal' />
+        <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+        <column caption='Day Name' datatype='string' name='[DAY_NAME]' role='dimension' type='nominal' />
+        <column caption='User Business Key' datatype='string' name='[USER_BUSINESS_KEY]' role='dimension' type='nominal' />
+        <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+        <column caption='Email Domain' datatype='string' name='[EMAIL_DOMAIN]' role='dimension' type='nominal' />
+        <column caption='Company Name' datatype='string' name='[COMPANY_NAME]' role='dimension' type='nominal' />
+        <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+        <column caption='Account Status' datatype='string' name='[ACCOUNT_STATUS]' role='dimension' type='nominal' />
+        <column caption='User Segment' datatype='string' name='[USER_SEGMENT]' role='dimension' type='nominal' />
+        <column caption='Meeting Duration Minutes' datatype='integer' name='[MEETING_DURATION_MINUTES]' role='measure' type='quantitative' />
+        <column caption='Participant Count' datatype='integer' name='[PARTICIPANT_COUNT]' role='measure' type='quantitative' />
+        <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
+        <column caption='Recording Enabled Flag' datatype='boolean' name='[RECORDING_ENABLED_FLAG]' role='dimension' type='nominal' />
+        <column caption='Feature Usage Count' datatype='integer' name='[FEATURE_USAGE_COUNT]' role='measure' type='quantitative' />
+        <column caption='Total Attendance Minutes' datatype='integer' name='[TOTAL_ATTENDANCE_MINUTES]' role='measure' type='quantitative' />
+        <column caption='Host Plan Type' datatype='string' name='[HOST_PLAN_TYPE]' role='dimension' type='nominal' />
+        <column caption='Feature Name' datatype='string' name='[FEATURE_NAME]' role='dimension' type='nominal' />
+        <column caption='Feature Category' datatype='string' name='[FEATURE_CATEGORY]' role='dimension' type='nominal' />
+        <column caption='Usage Count' datatype='integer' name='[USAGE_COUNT]' role='measure' type='quantitative' />
+        <column caption='Usage Duration Minutes' datatype='integer' name='[USAGE_DURATION_MINUTES]' role='measure' type='quantitative' />
+        <column caption='Transaction Amount USD' datatype='real' name='[TRANSACTION_AMOUNT_USD]' role='measure' type='quantitative' />
+        <column caption='Event Type' datatype='string' name='[EVENT_TYPE]' role='dimension' type='nominal' />
+        <column caption='Payment Method' datatype='string' name='[PAYMENT_METHOD]' role='dimension' type='nominal' />
+        <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
+        <column caption='MRR Impact' datatype='real' name='[MRR_IMPACT]' role='measure' type='quantitative' />
+        <column caption='Resolution Time Hours' datatype='real' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+        <column caption='Ticket Type' datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
+        <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
+        <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+        <column caption='First Contact Resolution Flag' datatype='boolean' name='[FIRST_CONTACT_RESOLUTION_FLAG]' role='dimension' type='nominal' />
+        <column caption='Escalation Flag' datatype='boolean' name='[ESCALATION_FLAG]' role='dimension' type='nominal' />
+        <column caption='Satisfaction Score' datatype='integer' name='[SATISFACTION_SCORE]' role='measure' type='quantitative' />
+        <column caption='License Name' datatype='string' name='[LICENSE_NAME]' role='dimension' type='nominal' />
+        <column caption='License Tier' datatype='string' name='[LICENSE_TIER]' role='dimension' type='nominal' />
+        <column caption='Monthly Cost' datatype='real' name='[MONTHLY_COST]' role='measure' type='quantitative' />
+        <column caption='Annual Cost' datatype='real' name='[ANNUAL_COST]' role='measure' type='quantitative' />
+        <column caption='Max Participants' datatype='integer' name='[MAX_PARTICIPANTS]' role='measure' type='quantitative' />
+        <column caption='Storage GB' datatype='integer' name='[STORAGE_GB]' role='measure' type='quantitative' />
+        <column caption='Daily Active Users' datatype='integer' name='[Calculation_DAU]' role='measure' type='quantitative'>
+          <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;,[DATE_KEY],TODAY()) = 0 THEN [USER_BUSINESS_KEY] END)' />
+        </column>
+        <column caption='Weekly Active Users' datatype='integer' name='[Calculation_WAU]' role='measure' type='quantitative'>
+          <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;,[DATE_KEY],TODAY()) &lt;= 7 THEN [USER_BUSINESS_KEY] END)' />
+        </column>
+        <column caption='Monthly Active Users' datatype='integer' name='[Calculation_MAU]' role='measure' type='quantitative'>
+          <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;,[DATE_KEY],TODAY()) &lt;= 30 THEN [USER_BUSINESS_KEY] END)' />
+        </column>
+        <column caption='Total Meeting Minutes' datatype='integer' name='[Calculation_Total_Meeting_Minutes]' role='measure' type='quantitative'>
+          <calculation class='tableau' formula='SUM([MEETING_DURATION_MINUTES])' />
+        </column>
+        <column caption='Average Meeting Duration' datatype='real' name='[Calculation_Avg_Meeting_Duration]' role='measure' type='quantitative'>
+          <calculation class='tableau' formula='AVG([MEETING_DURATION_MINUTES])' />
+        </column>
+        <column caption='Feature Adoption Rate' datatype='real' name='[Calculation_Feature_Adoption_Rate]' role='measure' type='quantitative'>
+          <calculation class='tableau' formula='COUNTD(IF [USAGE_COUNT] &gt; 0 THEN [USER_BUSINESS_KEY] END) / COUNTD([USER_BUSINESS_KEY])' />
+        </column>
+        <column caption='Monthly Recurring Revenue' datatype='real' name='[Calculation_MRR]' role='measure' type='quantitative'>
+          <calculation class='tableau' formula='SUM([MRR_IMPACT])' />
+        </column>
+        <column caption='License Utilization Rate' datatype='real' name='[Calculation_License_Utilization]' role='measure' type='quantitative'>
+          <calculation class='tableau' formula='COUNTD(IF NOT ISNULL([LICENSE_TYPE]) THEN [USER_BUSINESS_KEY] END) / COUNTD([USER_BUSINESS_KEY])' />
+        </column>
+        <column caption='Average Resolution Time' datatype='real' name='[Calculation_Avg_Resolution_Time]' role='measure' type='quantitative'>
+          <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
+        </column>
+        <column caption='First Contact Resolution Rate' datatype='real' name='[Calculation_FCR_Rate]' role='measure' type='quantitative'>
+          <calculation class='tableau' formula='SUM(IF [FIRST_CONTACT_RESOLUTION_FLAG] = TRUE THEN 1 ELSE 0 END) / COUNT([TICKET_TYPE])' />
+        </column>
+        <column caption='Revenue by License Type' datatype='real' name='[Calculation_Revenue_by_License]' role='measure' type='quantitative'>
+          <calculation class='tableau' formula='SUM([TRANSACTION_AMOUNT_USD])' />
+        </column>
+        <column caption='Meetings per User' datatype='real' name='[Calculation_Meetings_per_User]' role='measure' type='quantitative'>
+          <calculation class='tableau' formula='COUNT([MEETING_DURATION_MINUTES]) / COUNTD([USER_BUSINESS_KEY])' />
+        </column>
+      </cols>
+      <metadata-records>
+        <metadata-record class='capability'>
+          <remote-name />
+          <remote-type>0</remote-type>
+          <parent-name>[DATE_KEY]</parent-name>
+          <remote-alias />
+          <aggregation>Year</aggregation>
+          <contains-null>true</contains-null>
+          <attributes>
+            <attribute datatype='string' name='DebugRemoteType'>&quot;DATE&quot;</attribute>
+          </attributes>
+          <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[federated.1A2B3C4D5E6F7890ABCDEF1234567890]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+        </metadata-record>
+      </metadata-records>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Platform Usage Dashboard'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Analytics Data' name='federated.1A2B3C4D5E6F7890ABCDEF1234567890' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1A2B3C4D5E6F7890ABCDEF1234567890'>
+            <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+            <column caption='Daily Active Users' datatype='integer' name='[Calculation_DAU]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;,[DATE_KEY],TODAY()) = 0 THEN [USER_BUSINESS_KEY] END)' />
+            </column>
+            <column caption='Weekly Active Users' datatype='integer' name='[Calculation_WAU]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;,[DATE_KEY],TODAY()) &lt;= 7 THEN [USER_BUSINESS_KEY] END)' />
+            </column>
+            <column caption='Monthly Active Users' datatype='integer' name='[Calculation_MAU]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;,[DATE_KEY],TODAY()) &lt;= 30 THEN [USER_BUSINESS_KEY] END)' />
+            </column>
+            <column-instance column='[DATE_KEY]' derivation='Month-Trunc' name='[mn:DATE_KEY:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Calculation_DAU]' derivation='Sum' name='[sum:Calculation_DAU:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_WAU]' derivation='Sum' name='[sum:Calculation_WAU:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_MAU]' derivation='Sum' name='[sum:Calculation_MAU:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <color column='[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[:Measure Names]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[Multiple Values]</rows>
+        <cols>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[mn:DATE_KEY:ok]</cols>
+        <mark-labels>
+          <mark-label id='0' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <columns>
+                    <column>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[mn:DATE_KEY:ok]</column>
+                    <column>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[:Measure Names]</column>
+                  </columns>
+                </pane-descriptor>
+                <columns>
+                  <column>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[mn:DATE_KEY:ok]</column>
+                  <column>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[:Measure Names]</column>
+                </columns>
+              </tuple-descriptor>
+            </tuple-reference>
+          </mark-label>
+        </mark-labels>
+      </table>
+      <simple-id uuid='{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}' />
+    </worksheet>
+    <worksheet name='Meeting Analytics'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Analytics Data' name='federated.1A2B3C4D5E6F7890ABCDEF1234567890' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1A2B3C4D5E6F7890ABCDEF1234567890'>
+            <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
+            <column caption='Average Meeting Duration' datatype='real' name='[Calculation_Avg_Meeting_Duration]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([MEETING_DURATION_MINUTES])' />
+            </column>
+            <column caption='Total Meeting Minutes' datatype='integer' name='[Calculation_Total_Meeting_Minutes]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM([MEETING_DURATION_MINUTES])' />
+            </column>
+            <column-instance column='[MEETING_TYPE]' derivation='None' name='[none:MEETING_TYPE:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_Avg_Meeting_Duration]' derivation='Sum' name='[sum:Calculation_Avg_Meeting_Duration:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_Total_Meeting_Minutes]' derivation='Sum' name='[sum:Calculation_Total_Meeting_Minutes:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[none:MEETING_TYPE:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[sum:Calculation_Avg_Meeting_Duration:qk]</rows>
+        <cols>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[none:MEETING_TYPE:nk]</cols>
+      </table>
+      <simple-id uuid='{B2C3D4E5-F6A7-8901-BCDE-F23456789012}' />
+    </worksheet>
+    <worksheet name='Feature Usage Analysis'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Analytics Data' name='federated.1A2B3C4D5E6F7890ABCDEF1234567890' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1A2B3C4D5E6F7890ABCDEF1234567890'>
+            <column caption='Feature Category' datatype='string' name='[FEATURE_CATEGORY]' role='dimension' type='nominal' />
+            <column caption='Usage Count' datatype='integer' name='[USAGE_COUNT]' role='measure' type='quantitative' />
+            <column caption='Feature Adoption Rate' datatype='real' name='[Calculation_Feature_Adoption_Rate]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD(IF [USAGE_COUNT] &gt; 0 THEN [USER_BUSINESS_KEY] END) / COUNTD([USER_BUSINESS_KEY])' />
+            </column>
+            <column-instance column='[FEATURE_CATEGORY]' derivation='None' name='[none:FEATURE_CATEGORY:nk]' pivot='key' type='nominal' />
+            <column-instance column='[USAGE_COUNT]' derivation='Sum' name='[sum:USAGE_COUNT:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_Feature_Adoption_Rate]' derivation='Sum' name='[sum:Calculation_Feature_Adoption_Rate:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Pie' />
+            <encodings>
+              <color column='[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[none:FEATURE_CATEGORY:nk]' />
+              <size column='[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[sum:USAGE_COUNT:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{C3D4E5F6-A7B8-9012-CDEF-345678901234}' />
+    </worksheet>
+    <worksheet name='Support Metrics'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Analytics Data' name='federated.1A2B3C4D5E6F7890ABCDEF1234567890' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1A2B3C4D5E6F7890ABCDEF1234567890'>
+            <column caption='Ticket Type' datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
+            <column caption='Average Resolution Time' datatype='real' name='[Calculation_Avg_Resolution_Time]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
+            </column>
+            <column caption='First Contact Resolution Rate' datatype='real' name='[Calculation_FCR_Rate]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM(IF [FIRST_CONTACT_RESOLUTION_FLAG] = TRUE THEN 1 ELSE 0 END) / COUNT([TICKET_TYPE])' />
+            </column>
+            <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+            <column-instance column='[TICKET_TYPE]' derivation='None' name='[none:TICKET_TYPE:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_Avg_Resolution_Time]' derivation='Sum' name='[sum:Calculation_Avg_Resolution_Time:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_FCR_Rate]' derivation='Sum' name='[sum:Calculation_FCR_Rate:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[DATE_KEY]' derivation='Month-Trunc' name='[mn:DATE_KEY:ok]' pivot='key' type='ordinal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[none:TICKET_TYPE:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[sum:Calculation_Avg_Resolution_Time:qk]</rows>
+        <cols>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[mn:DATE_KEY:ok]</cols>
+      </table>
+      <simple-id uuid='{D4E5F6A7-B8C9-0123-DEF4-56789012345A}' />
+    </worksheet>
+    <worksheet name='Revenue Analysis'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Analytics Data' name='federated.1A2B3C4D5E6F7890ABCDEF1234567890' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1A2B3C4D5E6F7890ABCDEF1234567890'>
+            <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
+            <column caption='Monthly Recurring Revenue' datatype='real' name='[Calculation_MRR]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM([MRR_IMPACT])' />
+            </column>
+            <column caption='Revenue by License Type' datatype='real' name='[Calculation_Revenue_by_License]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM([TRANSACTION_AMOUNT_USD])' />
+            </column>
+            <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+            <column-instance column='[LICENSE_TYPE]' derivation='None' name='[none:LICENSE_TYPE:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_MRR]' derivation='Sum' name='[sum:Calculation_MRR:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_Revenue_by_License]' derivation='Sum' name='[sum:Calculation_Revenue_by_License:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[DATE_KEY]' derivation='Month-Trunc' name='[mn:DATE_KEY:ok]' pivot='key' type='ordinal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[none:LICENSE_TYPE:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[sum:Calculation_MRR:qk]</rows>
+        <cols>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[mn:DATE_KEY:ok]</cols>
+      </table>
+      <simple-id uuid='{E5F6A7B8-C9D0-1234-EF56-789012345BCD}' />
+    </worksheet>
+    <worksheet name='License Utilization'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Analytics Data' name='federated.1A2B3C4D5E6F7890ABCDEF1234567890' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1A2B3C4D5E6F7890ABCDEF1234567890'>
+            <column caption='License Tier' datatype='string' name='[LICENSE_TIER]' role='dimension' type='nominal' />
+            <column caption='License Utilization Rate' datatype='real' name='[Calculation_License_Utilization]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD(IF NOT ISNULL([LICENSE_TYPE]) THEN [USER_BUSINESS_KEY] END) / COUNTD([USER_BUSINESS_KEY])' />
+            </column>
+            <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+            <column-instance column='[LICENSE_TIER]' derivation='None' name='[none:LICENSE_TIER:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_License_Utilization]' derivation='Sum' name='[sum:Calculation_License_Utilization:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[PLAN_TYPE]' derivation='None' name='[none:PLAN_TYPE:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[none:PLAN_TYPE:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[sum:Calculation_License_Utilization:qk]</rows>
+        <cols>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[none:LICENSE_TIER:nk]</cols>
+      </table>
+      <simple-id uuid='{F6A7B8C9-D0E1-2345-F678-90123456CDEF}' />
+    </worksheet>
+  </worksheets>
+  <dashboards>
+    <dashboard name='Zoom Platform Analytics Dashboard'>
+      <style />
+      <size maxheight='800' maxwidth='1000' minheight='800' minwidth='1000' />
+      <zones>
+        <zone h='100000' id='4' type='layout-basic' w='100000' x='0' y='0'>
+          <zone h='98000' id='5' param='[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[none:LICENSE_TIER:nk]' type='filter' w='12000' x='0' y='0' />
+          <zone h='98000' id='6' type='layout-basic' w='88000' x='12000' y='0'>
+            <zone h='48000' id='7' type='layout-basic' w='88000' x='12000' y='0'>
+              <zone h='48000' id='8' name='Platform Usage Dashboard' w='44000' x='12000' y='0' />
+              <zone h='48000' id='9' name='Meeting Analytics' w='44000' x='56000' y='0' />
+            </zone>
+            <zone h='50000' id='10' type='layout-basic' w='88000' x='12000' y='48000'>
+              <zone h='25000' id='11' name='Feature Usage Analysis' w='44000' x='12000' y='48000' />
+              <zone h='25000' id='12' name='Support Metrics' w='44000' x='56000' y='48000' />
+              <zone h='25000' id='13' name='Revenue Analysis' w='44000' x='12000' y='73000' />
+              <zone h='25000' id='14' name='License Utilization' w='44000' x='56000' y='73000' />
+            </zone>
+          </zone>
+        </zone>
+      </zones>
+      <devicelayouts>
+        <devicelayout auto-generated='true' name='Phone'>
+          <size maxheight='700' minheight='700' sizing-mode='vscroll' />
+          <zones>
+            <zone h='100000' id='15' type='layout-basic' w='100000' x='0' y='0'>
+              <zone h='20000' id='16' param='[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[none:LICENSE_TIER:nk]' type='filter' w='100000' x='0' y='0' />
+              <zone h='80000' id='17' type='layout-basic' w='100000' x='0' y='20000'>
+                <zone h='13333' id='18' name='Platform Usage Dashboard' w='100000' x='0' y='20000' />
+                <zone h='13333' id='19' name='Meeting Analytics' w='100000' x='0' y='33333' />
+                <zone h='13333' id='20' name='Feature Usage Analysis' w='100000' x='0' y='46666' />
+                <zone h='13333' id='21' name='Support Metrics' w='100000' x='0' y='59999' />
+                <zone h='13333' id='22' name='Revenue Analysis' w='100000' x='0' y='73332' />
+                <zone h='13333' id='23' name='License Utilization' w='100000' x='0' y='86665' />
+              </zone>
+            </zone>
+          </zones>
+        </devicelayout>
+      </devicelayouts>
+      <simple-id uuid='{1A2B3C4D-5E6F-7890-ABCD-EF1234567890}' />
+    </dashboard>
+  </dashboards>
+  <windows source-height='30'>
+    <window class='worksheet' maximized='true' name='Platform Usage Dashboard'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[:Measure Names]</field>
+            <field>[federated.1A2B3C4D5E6F7890ABCDEF1234567890].[mn:DATE_KEY:ok]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}' />
+    </window>
+    <window class='dashboard' name='Zoom Platform Analytics Dashboard'>
+      <viewpoints>
+        <viewpoint name='Platform Usage Dashboard'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Meeting Analytics'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Feature Usage Analysis'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Support Metrics'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Revenue Analysis'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='License Utilization'>
+          <zoom type='entire-view' />
+        </viewpoint>
+      </viewpoints>
+      <active id='-1' />
+      <simple-id uuid='{1A2B3C4D-5E6F-7890-ABCD-EF1234567890}' />
+    </window>
+  </windows>
+</workbook>
