@@ -1,8 +1,8 @@
-name: 'zoom_silver_pipeline'
+name: 'zoom_analytics_gold'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_silver_pipeline'
+profile: 'zoom_analytics_gold'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,9 +17,15 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_silver_pipeline:
-    silver:
+  zoom_analytics_gold:
+    +materialized: table
+    gold:
       +materialized: table
-      si_pipeline_audit:
-        +pre-hook: []
-        +post-hook: []
+      dimensional:
+        +materialized: table
+      fact:
+        +materialized: table
+
+vars:
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
