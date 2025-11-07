@@ -1,9 +1,9 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*:   
+## *Created on*:   07-11-2025
 ## *Description*: Bronze layer data mapping for Zoom Platform Analytics System following Medallion architecture
 ## *Version*: 1 
-## *Updated on*: 
+## *Updated on*: 07-11-2025
 _____________________________________________
 
 # Bronze Layer Data Mapping - Zoom Platform Analytics System
