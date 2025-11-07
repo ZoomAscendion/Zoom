@@ -1,9 +1,9 @@
-name: 'zoom_silver_pipeline'
+name: 'zoom_gold_pipeline'
 version: '1.0.0'
 config-version: 2
 
 # This setting configures which "profile" dbt uses for this project.
-profile: 'zoom_silver_pipeline'
+profile: 'zoom_gold_pipeline'
 
 # These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
@@ -20,40 +20,18 @@ clean-targets:
 
 # Configuring models
 models:
-  zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/example/
-    silver:
+  zoom_gold_pipeline:
+    # Config indicated by + and applies to all files under models/gold/
+    gold:
       +materialized: table
-      # Ensure audit log runs first
-      SI_Audit_Log:
-        +pre-hook: []
-        +post-hook: []
-      # All other models depend on audit log
-      SI_USERS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_MEETINGS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_PARTICIPANTS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-          - ref('SI_MEETINGS')
-      SI_FEATURE_USAGE:
-        +depends_on:
-          - ref('SI_Audit_Log')
-          - ref('SI_MEETINGS')
-      SI_SUPPORT_TICKETS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_BILLING_EVENTS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_LICENSES:
-        +depends_on:
-          - ref('SI_Audit_Log')
+      +pre_hook: ""
+      +post_hook: ""
+      dimensional:
+        +materialized: table
+      fact:
+        +materialized: table
 
 vars:
-  # dbt Cloud environment variables
+  # The `start_date` variable will be accessible in all resources
   start_date: '2020-01-01'
   end_date: '2030-12-31'
