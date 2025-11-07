@@ -29,8 +29,8 @@ participant_stats AS (
         SUM(DATEDIFF('minute', p.JOIN_TIME, COALESCE(p.LEAVE_TIME, m.END_TIME))) as total_join_time_minutes,
         AVG(DATEDIFF('minute', p.JOIN_TIME, COALESCE(p.LEAVE_TIME, m.END_TIME))) as avg_participation_minutes,
         CASE 
-            WHEN AVG(DATEDIFF('minute', p.JOIN_TIME, COALESCE(p.LEAVE_TIME, m.END_TIME))) / NULLIF(m.DURATION_MINUTES, 0) > 0.7 THEN 8.0
-            WHEN AVG(DATEDIFF('minute', p.JOIN_TIME, COALESCE(p.LEAVE_TIME, m.END_TIME))) / NULLIF(m.DURATION_MINUTES, 0) > 0.5 THEN 6.0
+            WHEN AVG(DATEDIFF('minute', p.JOIN_TIME, COALESCE(p.LEAVE_TIME, m.END_TIME))) / NULLIF(MAX(m.DURATION_MINUTES), 0) > 0.7 THEN 8.0
+            WHEN AVG(DATEDIFF('minute', p.JOIN_TIME, COALESCE(p.LEAVE_TIME, m.END_TIME))) / NULLIF(MAX(m.DURATION_MINUTES), 0) > 0.5 THEN 6.0
             ELSE 4.0
         END as engagement_factor
     FROM {{ source('silver', 'si_participants') }} p
