@@ -27,26 +27,26 @@ support_enriched AS (
         -- Calculate close date based on resolution status
         CASE 
             WHEN UPPER(RESOLUTION_STATUS) IN ('RESOLVED', 'CLOSED') THEN 
-                OPEN_DATE + INTERVAL '1 day' * 
+                DATEADD('day', 
                 CASE 
                     WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' THEN 1
                     WHEN UPPER(TICKET_TYPE) LIKE '%HIGH%' THEN 2
                     WHEN UPPER(TICKET_TYPE) LIKE '%MEDIUM%' THEN 5
                     ELSE 7
-                END
+                END, OPEN_DATE)
             ELSE NULL
         END as TICKET_CLOSE_DATE,
         TIMESTAMP_FROM_PARTS(OPEN_DATE, TIME('09:00:00')) as TICKET_CREATED_TIMESTAMP,
         -- Calculate resolved timestamp
         CASE 
             WHEN UPPER(RESOLUTION_STATUS) IN ('RESOLVED', 'CLOSED') THEN 
-                TIMESTAMP_FROM_PARTS(OPEN_DATE + INTERVAL '1 day' * 
+                TIMESTAMP_FROM_PARTS(DATEADD('day', 
                 CASE 
                     WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' THEN 1
                     WHEN UPPER(TICKET_TYPE) LIKE '%HIGH%' THEN 2
                     WHEN UPPER(TICKET_TYPE) LIKE '%MEDIUM%' THEN 5
                     ELSE 7
-                END, TIME('17:00:00'))
+                END, OPEN_DATE), TIME('17:00:00'))
             ELSE NULL
         END as TICKET_RESOLVED_TIMESTAMP,
         -- First response timestamp (estimated 2 hours after creation)
@@ -107,7 +107,7 @@ support_enriched AS (
         END as AGENT_PERFORMANCE_SCORE,
         -- First contact resolution flag
         CASE 
-            WHEN UPPER(TICKET_TYPE) LIKE '%LOW%' OR UPPER(TICKET_TYPE) LIKE '%MEDIUM%' 
+            WHEN (UPPER(TICKET_TYPE) LIKE '%LOW%' OR UPPER(TICKET_TYPE) LIKE '%MEDIUM%') 
                 AND UPPER(RESOLUTION_STATUS) = 'RESOLVED' THEN TRUE
             ELSE FALSE
         END as FIRST_CONTACT_RESOLUTION_FLAG,
