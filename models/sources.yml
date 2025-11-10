@@ -1,0 +1,182 @@
+version: 2
+
+sources:
+  - name: silver
+    description: "Silver layer containing cleansed and validated data"
+    database: DB_POC_ZOOM
+    schema: SILVER
+    freshness:
+      warn_after: {count: 12, period: hour}
+      error_after: {count: 24, period: hour}
+    
+    tables:
+      - name: si_users
+        description: "Silver layer user profile and subscription information"
+        columns:
+          - name: user_id
+            description: "Unique identifier for each user"
+            tests:
+              - not_null
+              - unique
+          - name: user_name
+            description: "Display name of the user"
+          - name: email
+            description: "Email address of the user"
+            tests:
+              - not_null
+          - name: company
+            description: "Company or organization name"
+          - name: plan_type
+            description: "Subscription plan type"
+            tests:
+              - accepted_values:
+                  values: ['Basic', 'Pro', 'Business', 'Enterprise']
+          - name: validation_status
+            description: "Data validation status"
+            tests:
+              - accepted_values:
+                  values: ['PASSED', 'FAILED', 'WARNING']
+          - name: data_quality_score
+            description: "Quality score from validation process"
+            tests:
+              - dbt_expectations.expect_column_values_to_be_between:
+                  min_value: 0
+                  max_value: 100
+
+      - name: si_meetings
+        description: "Silver layer meeting information and session details"
+        columns:
+          - name: meeting_id
+            description: "Unique identifier for each meeting"
+            tests:
+              - not_null
+              - unique
+          - name: host_id
+            description: "User ID of the meeting host"
+            tests:
+              - not_null
+              - relationships:
+                  to: source('silver', 'si_users')
+                  field: user_id
+          - name: start_time
+            description: "Meeting start timestamp"
+            tests:
+              - not_null
+          - name: end_time
+            description: "Meeting end timestamp"
+          - name: duration_minutes
+            description: "Meeting duration in minutes"
+            tests:
+              - dbt_expectations.expect_column_values_to_be_between:
+                  min_value: 0
+                  max_value: 1440
+
+      - name: si_participants
+        description: "Silver layer meeting participants and session details"
+        columns:
+          - name: participant_id
+            description: "Unique identifier for each participant"
+            tests:
+              - not_null
+              - unique
+          - name: meeting_id
+            description: "Reference to meeting"
+            tests:
+              - not_null
+              - relationships:
+                  to: source('silver', 'si_meetings')
+                  field: meeting_id
+          - name: user_id
+            description: "Reference to user who participated"
+            tests:
+              - relationships:
+                  to: source('silver', 'si_users')
+                  field: user_id
+
+      - name: si_feature_usage
+        description: "Silver layer platform feature usage during meetings"
+        columns:
+          - name: usage_id
+            description: "Unique identifier for each usage record"
+            tests:
+              - not_null
+              - unique
+          - name: meeting_id
+            description: "Reference to meeting"
+            tests:
+              - relationships:
+                  to: source('silver', 'si_meetings')
+                  field: meeting_id
+          - name: feature_name
+            description: "Name of the feature being tracked"
+            tests:
+              - not_null
+          - name: usage_count
+            description: "Number of times feature was used"
+            tests:
+              - dbt_expectations.expect_column_values_to_be_between:
+                  min_value: 0
+                  max_value: 10000
+
+      - name: si_support_tickets
+        description: "Silver layer customer support requests and resolution tracking"
+        columns:
+          - name: ticket_id
+            description: "Unique identifier for each support ticket"
+            tests:
+              - not_null
+              - unique
+          - name: user_id
+            description: "Reference to user who created the ticket"
+            tests:
+              - relationships:
+                  to: source('silver', 'si_users')
+                  field: user_id
+          - name: ticket_type
+            description: "Type of support ticket"
+            tests:
+              - not_null
+          - name: resolution_status
+            description: "Current status of ticket resolution"
+
+      - name: si_billing_events
+        description: "Silver layer financial transactions and billing activities"
+        columns:
+          - name: event_id
+            description: "Unique identifier for each billing event"
+            tests:
+              - not_null
+              - unique
+          - name: user_id
+            description: "Reference to user associated with billing event"
+            tests:
+              - relationships:
+                  to: source('silver', 'si_users')
+                  field: user_id
+          - name: amount
+            description: "Monetary amount for the billing event"
+            tests:
+              - dbt_expectations.expect_column_values_to_be_between:
+                  min_value: 0
+                  max_value: 100000
+
+      - name: si_licenses
+        description: "Silver layer license assignments and entitlements"
+        columns:
+          - name: license_id
+            description: "Unique identifier for each license"
+            tests:
+              - not_null
+              - unique
+          - name: assigned_to_user_id
+            description: "User ID to whom license is assigned"
+            tests:
+              - relationships:
+                  to: source('silver', 'si_users')
+                  field: user_id
+          - name: start_date
+            description: "License validity start date"
+            tests:
+              - not_null
+          - name: end_date
+            description: "License validity end date"
