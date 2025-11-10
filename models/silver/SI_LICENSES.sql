@@ -10,31 +10,23 @@ WITH bronze_licenses AS (
         LICENSE_ID,
         LICENSE_TYPE,
         ASSIGNED_TO_USER_ID,
-        -- Handle different date formats including DD/MM/YYYY
-        TRY_TO_DATE(START_DATE, 'DD/MM/YYYY') AS START_DATE_PARSED1,
-        TRY_TO_DATE(START_DATE, 'YYYY-MM-DD') AS START_DATE_PARSED2,
-        TRY_TO_DATE(START_DATE) AS START_DATE_PARSED3,
-        TRY_TO_DATE(END_DATE, 'DD/MM/YYYY') AS END_DATE_PARSED1,
-        TRY_TO_DATE(END_DATE, 'YYYY-MM-DD') AS END_DATE_PARSED2,
-        TRY_TO_DATE(END_DATE) AS END_DATE_PARSED3,
+        -- Handle different date formats using multiple TRY_TO_DATE attempts
+        CASE 
+            WHEN START_DATE LIKE '%/%/%' THEN 
+                TRY_TO_DATE(START_DATE, 'DD/MM/YYYY')
+            ELSE 
+                TRY_TO_DATE(START_DATE)
+        END AS START_DATE_PARSED,
+        CASE 
+            WHEN END_DATE LIKE '%/%/%' THEN 
+                TRY_TO_DATE(END_DATE, 'DD/MM/YYYY')
+            ELSE 
+                TRY_TO_DATE(END_DATE)
+        END AS END_DATE_PARSED,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM BRONZE.BZ_LICENSES
-),
-
--- Select the first successful date parse
-date_normalized_licenses AS (
-    SELECT 
-        LICENSE_ID,
-        LICENSE_TYPE,
-        ASSIGNED_TO_USER_ID,
-        COALESCE(START_DATE_PARSED1, START_DATE_PARSED2, START_DATE_PARSED3) AS START_DATE,
-        COALESCE(END_DATE_PARSED1, END_DATE_PARSED2, END_DATE_PARSED3) AS END_DATE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
-    FROM bronze_licenses
 ),
 
 -- Data quality validation and cleansing
@@ -43,8 +35,8 @@ cleansed_licenses AS (
         LICENSE_ID,
         UPPER(TRIM(LICENSE_TYPE)) AS LICENSE_TYPE,
         ASSIGNED_TO_USER_ID,
-        START_DATE,
-        END_DATE,
+        START_DATE_PARSED AS START_DATE,
+        END_DATE_PARSED AS END_DATE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
@@ -54,8 +46,8 @@ cleansed_licenses AS (
             WHEN LICENSE_ID IS NULL THEN 0
             WHEN LICENSE_TYPE IS NULL OR LENGTH(TRIM(LICENSE_TYPE)) = 0 THEN 20
             WHEN ASSIGNED_TO_USER_ID IS NULL THEN 30
-            WHEN START_DATE IS NULL OR END_DATE IS NULL THEN 40
-            WHEN START_DATE >= END_DATE THEN 50
+            WHEN START_DATE_PARSED IS NULL OR END_DATE_PARSED IS NULL THEN 40
+            WHEN START_DATE_PARSED >= END_DATE_PARSED THEN 50
             WHEN LENGTH(LICENSE_TYPE) > 100 THEN 80
             ELSE 100
         END AS DATA_QUALITY_SCORE,
@@ -64,12 +56,12 @@ cleansed_licenses AS (
         CASE 
             WHEN LICENSE_ID IS NULL OR ASSIGNED_TO_USER_ID IS NULL THEN 'FAILED'
             WHEN LICENSE_TYPE IS NULL OR LENGTH(TRIM(LICENSE_TYPE)) = 0 THEN 'FAILED'
-            WHEN START_DATE IS NULL OR END_DATE IS NULL THEN 'FAILED'
-            WHEN START_DATE >= END_DATE THEN 'FAILED'
+            WHEN START_DATE_PARSED IS NULL OR END_DATE_PARSED IS NULL THEN 'FAILED'
+            WHEN START_DATE_PARSED >= END_DATE_PARSED THEN 'FAILED'
             WHEN LENGTH(LICENSE_TYPE) > 100 THEN 'WARNING'
             ELSE 'PASSED'
         END AS VALIDATION_STATUS
-    FROM date_normalized_licenses
+    FROM bronze_licenses
 ),
 
 -- Remove duplicates using ROW_NUMBER
