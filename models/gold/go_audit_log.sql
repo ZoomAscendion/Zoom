@@ -6,7 +6,7 @@
 -- This table must be created first and runs before any other models
 
 SELECT 
-    GENERATE_UUID() AS AUDIT_ID,
+    UUID_STRING() AS AUDIT_ID,
     'GOLD_LAYER_INIT' AS PIPELINE_NAME,
     'N/A' AS SOURCE_TABLE,
     'GO_AUDIT_LOG' AS TARGET_TABLE,
