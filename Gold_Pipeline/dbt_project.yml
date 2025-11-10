@@ -1,0 +1,149 @@
+# =====================================================
+# DBT PROJECT CONFIGURATION
+# Project: Zoom Platform Analytics System - Gold Layer
+# Database: DB_POC_ZOOM
+# Source Schema: SILVER
+# Target Schema: GOLD
+# =====================================================
+
+name: 'zoom_gold_pipeline'
+version: '1.0.0'
+config-version: 2
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'zoom_gold_pipeline'
+
+# These configurations specify where dbt should look for different types of files.
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Configuring models
+models:
+  zoom_gold_pipeline:
+    # Global configurations for all models
+    +materialized: table
+    +on_schema_change: "fail"
+    +pre-hook: |
+      INSERT INTO {{ ref('go_audit_log') }} (
+        EXECUTION_ID,
+        MODEL_NAME,
+        EXECUTION_START_TIME,
+        EXECUTION_STATUS,
+        EXECUTED_BY,
+        LOAD_TIMESTAMP
+      )
+      VALUES (
+        '{{ invocation_id }}',
+        '{{ this.name }}',
+        CURRENT_TIMESTAMP(),
+        'STARTED',
+        '{{ target.user }}',
+        CURRENT_TIMESTAMP()
+      )
+    +post-hook: |
+      INSERT INTO {{ ref('go_audit_log') }} (
+        EXECUTION_ID,
+        MODEL_NAME,
+        EXECUTION_END_TIME,
+        EXECUTION_STATUS,
+        RECORDS_PROCESSED,
+        EXECUTED_BY,
+        UPDATE_TIMESTAMP
+      )
+      VALUES (
+        '{{ invocation_id }}',
+        '{{ this.name }}',
+        CURRENT_TIMESTAMP(),
+        'COMPLETED',
+        (SELECT COUNT(*) FROM {{ this }}),
+        '{{ target.user }}',
+        CURRENT_TIMESTAMP()
+      )
+    
+    # Gold layer specific configurations
+    gold:
+      # Audit table runs first
+      +materialized: table
+      +cluster_by: ["LOAD_DATE"]
+      
+      # Dimension tables configuration
+      dimension:
+        +materialized: table
+        +cluster_by: ["LOAD_DATE"]
+        +tags: ["dimension"]
+        
+      # Fact tables configuration  
+      fact:
+        +materialized: table
+        +cluster_by: ["LOAD_DATE"]
+        +tags: ["fact"]
+
+# Test configurations
+tests:
+  +store_failures: true
+  +schema: "GOLD_TESTS"
+
+# Snapshot configurations
+snapshots:
+  zoom_gold_pipeline:
+    +target_schema: "GOLD_SNAPSHOTS"
+    +strategy: "timestamp"
+    +updated_at: "UPDATE_TIMESTAMP"
+
+# Seed configurations
+seeds:
+  zoom_gold_pipeline:
+    +schema: "GOLD_SEEDS"
+
+# Variables
+vars:
+  # Date variables for incremental processing
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
+  
+  # Data quality thresholds
+  min_data_quality_score: 80
+  validation_status: 'PASSED'
+  
+  # Business rule variables
+  tax_rate: 0.08
+  enterprise_discount: 0.15
+  pro_discount: 0.10
+  commission_rate: 0.05
+  
+  # Performance variables
+  batch_size: 10000
+  
+# Dispatch configuration for cross-database compatibility
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['zoom_gold_pipeline', 'dbt_utils']
+
+# Documentation
+docs:
+  generate: true
+  
+# Quoting configuration for Snowflake
+quoting:
+  database: false
+  schema: false
+  identifier: false
+
+# Require dbt version
+require-dbt-version: [">=1.0.0", "<2.0.0"]
+
+# Flags
+flags:
+  send_anonymous_usage_stats: false
+  use_colors: true
+  partial_parse: true
+  static_parser: true
