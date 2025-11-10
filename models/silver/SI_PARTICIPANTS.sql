@@ -12,8 +12,8 @@ WITH bronze_participants AS (
         PARTICIPANT_ID,
         MEETING_ID,
         USER_ID,
-        JOIN_TIME,
-        LEAVE_TIME,
+        TRY_TO_TIMESTAMP(JOIN_TIME) AS JOIN_TIME,
+        TRY_TO_TIMESTAMP(LEAVE_TIME) AS LEAVE_TIME,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
@@ -49,7 +49,7 @@ cleansed_participants AS (
             WHEN bp.JOIN_TIME IS NULL OR bp.LEAVE_TIME IS NULL THEN 30
             WHEN bp.LEAVE_TIME <= bp.JOIN_TIME THEN 40
             WHEN mb.MEETING_ID IS NULL THEN 50
-            WHEN bp.JOIN_TIME < mb.START_TIME OR bp.LEAVE_TIME > mb.END_TIME THEN 70
+            WHEN mb.START_TIME IS NOT NULL AND mb.END_TIME IS NOT NULL AND (bp.JOIN_TIME < mb.START_TIME OR bp.LEAVE_TIME > mb.END_TIME) THEN 70
             ELSE 100
         END AS DATA_QUALITY_SCORE,
         -- Validation status
@@ -58,7 +58,7 @@ cleansed_participants AS (
             WHEN bp.JOIN_TIME IS NULL OR bp.LEAVE_TIME IS NULL THEN 'FAILED'
             WHEN bp.LEAVE_TIME <= bp.JOIN_TIME THEN 'FAILED'
             WHEN mb.MEETING_ID IS NULL THEN 'FAILED'
-            WHEN bp.JOIN_TIME < mb.START_TIME OR bp.LEAVE_TIME > mb.END_TIME THEN 'WARNING'
+            WHEN mb.START_TIME IS NOT NULL AND mb.END_TIME IS NOT NULL AND (bp.JOIN_TIME < mb.START_TIME OR bp.LEAVE_TIME > mb.END_TIME) THEN 'WARNING'
             ELSE 'PASSED'
         END AS VALIDATION_STATUS
     FROM bronze_participants bp
