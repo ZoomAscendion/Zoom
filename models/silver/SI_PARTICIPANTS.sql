@@ -1,0 +1,106 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_START_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP) SELECT UUID_STRING(), 'BRONZE_TO_SILVER_PARTICIPANTS', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'RUNNING', 'BZ_PARTICIPANTS', 'SI_PARTICIPANTS', 'DBT_PIPELINE', CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'SI_Audit_Log'",
+    post_hook="UPDATE {{ ref('SI_Audit_Log') }} SET EXECUTION_END_TIME = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}), UPDATE_TIMESTAMP = CURRENT_TIMESTAMP() WHERE PIPELINE_NAME = 'BRONZE_TO_SILVER_PARTICIPANTS' AND EXECUTION_STATUS = 'RUNNING' AND '{{ this.name }}' != 'SI_Audit_Log'"
+) }}
+
+-- Silver layer transformation for Participants table
+-- Applies data quality checks, referential integrity, and time boundary validation
+
+WITH bronze_participants AS (
+    SELECT 
+        bp.PARTICIPANT_ID,
+        bp.MEETING_ID,
+        bp.USER_ID,
+        bp.JOIN_TIME,
+        bp.LEAVE_TIME,
+        bp.LOAD_TIMESTAMP,
+        bp.UPDATE_TIMESTAMP,
+        bp.SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_PARTICIPANTS') }} bp
+),
+
+-- Join with meetings for boundary validation
+participants_with_meetings AS (
+    SELECT 
+        bp.PARTICIPANT_ID,
+        bp.MEETING_ID,
+        bp.USER_ID,
+        bp.JOIN_TIME,
+        bp.LEAVE_TIME,
+        bp.LOAD_TIMESTAMP,
+        bp.UPDATE_TIMESTAMP,
+        bp.SOURCE_SYSTEM,
+        sm.START_TIME AS meeting_start_time,
+        sm.END_TIME AS meeting_end_time
+    FROM bronze_participants bp
+    LEFT JOIN {{ ref('SI_MEETINGS') }} sm ON bp.MEETING_ID = sm.MEETING_ID
+),
+
+-- Data quality validation and cleansing
+cleansed_participants AS (
+    SELECT 
+        PARTICIPANT_ID,
+        MEETING_ID,
+        USER_ID,
+        JOIN_TIME,
+        LEAVE_TIME,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        meeting_start_time,
+        meeting_end_time,
+        
+        -- Data quality scoring
+        CASE 
+            WHEN PARTICIPANT_ID IS NULL THEN 0
+            WHEN MEETING_ID IS NULL THEN 20
+            WHEN USER_ID IS NULL THEN 30
+            WHEN JOIN_TIME IS NULL OR LEAVE_TIME IS NULL THEN 40
+            WHEN LEAVE_TIME <= JOIN_TIME THEN 50
+            WHEN meeting_start_time IS NULL THEN 60
+            WHEN JOIN_TIME < meeting_start_time OR LEAVE_TIME > meeting_end_time THEN 70
+            ELSE 100
+        END AS DATA_QUALITY_SCORE,
+        
+        -- Validation status
+        CASE 
+            WHEN PARTICIPANT_ID IS NULL OR MEETING_ID IS NULL OR USER_ID IS NULL THEN 'FAILED'
+            WHEN JOIN_TIME IS NULL OR LEAVE_TIME IS NULL OR LEAVE_TIME <= JOIN_TIME THEN 'FAILED'
+            WHEN meeting_start_time IS NULL THEN 'FAILED'
+            WHEN JOIN_TIME < meeting_start_time OR LEAVE_TIME > meeting_end_time THEN 'WARNING'
+            ELSE 'PASSED'
+        END AS VALIDATION_STATUS
+    FROM participants_with_meetings
+),
+
+-- Remove duplicates using ROW_NUMBER
+deduped_participants AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY PARTICIPANT_ID ORDER BY UPDATE_TIMESTAMP DESC NULLS LAST, LOAD_TIMESTAMP DESC) AS rn
+    FROM cleansed_participants
+    WHERE PARTICIPANT_ID IS NOT NULL
+      AND MEETING_ID IS NOT NULL
+      AND USER_ID IS NOT NULL
+      AND JOIN_TIME IS NOT NULL
+      AND LEAVE_TIME IS NOT NULL
+      AND LEAVE_TIME > JOIN_TIME
+      AND meeting_start_time IS NOT NULL
+)
+
+SELECT 
+    PARTICIPANT_ID,
+    MEETING_ID,
+    USER_ID,
+    JOIN_TIME,
+    LEAVE_TIME,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+    DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+    DATA_QUALITY_SCORE,
+    VALIDATION_STATUS
+FROM deduped_participants
+WHERE rn = 1
+  AND VALIDATION_STATUS IN ('PASSED', 'WARNING')
