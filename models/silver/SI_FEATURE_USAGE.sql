@@ -13,7 +13,12 @@ WITH bronze_feature_usage AS (
         MEETING_ID,
         FEATURE_NAME,
         USAGE_COUNT,
-        USAGE_DATE,
+        -- Handle different date formats
+        CASE 
+            WHEN USAGE_DATE IS NOT NULL THEN
+                TRY_TO_DATE(USAGE_DATE, 'DD/MM/YYYY')
+            ELSE NULL
+        END AS USAGE_DATE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
