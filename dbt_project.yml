@@ -1,8 +1,8 @@
-name: 'zoom_gold_analytics'
+name: 'zoom_analytics_gold'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_gold_analytics'
+profile: 'zoom_analytics'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,6 +17,35 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_gold_analytics:
+  zoom_analytics_gold:
+    +materialized: table
     gold:
       +materialized: table
+      +pre-hook: |
+        {% if this.name != 'go_audit_log' %}
+        INSERT INTO {{ ref('go_audit_log') }} (
+          EXECUTION_ID, PIPELINE_NAME, EXECUTION_START_TIME, EXECUTION_STATUS, 
+          SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP
+        ) VALUES (
+          '{{ invocation_id }}', '{{ this.name }}', CURRENT_TIMESTAMP(), 'STARTED',
+          'SILVER', '{{ this.name }}', '{{ target.user }}', CURRENT_TIMESTAMP()
+        )
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'go_audit_log' %}
+        UPDATE {{ ref('go_audit_log') }} 
+        SET EXECUTION_END_TIME = CURRENT_TIMESTAMP(),
+            EXECUTION_STATUS = 'COMPLETED',
+            RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
+            UPDATE_TIMESTAMP = CURRENT_TIMESTAMP()
+        WHERE EXECUTION_ID = '{{ invocation_id }}' AND PIPELINE_NAME = '{{ this.name }}'
+        {% endif %}
+      dimension:
+        +cluster_by: ["LOAD_DATE"]
+      fact:
+        +cluster_by: ["LOAD_DATE"]
+
+vars:
+  data_quality_threshold: 80
+  validation_status_filter: "'PASSED'"
+  audit_retention_days: 90
