@@ -12,8 +12,17 @@ WITH bronze_participants AS (
         PARTICIPANT_ID,
         MEETING_ID,
         USER_ID,
-        JOIN_TIME,
-        LEAVE_TIME,
+        -- Handle different timestamp formats
+        CASE 
+            WHEN JOIN_TIME IS NOT NULL THEN
+                TRY_TO_TIMESTAMP(JOIN_TIME, 'DD/MM/YYYY HH24:MI')
+            ELSE NULL
+        END AS JOIN_TIME,
+        CASE 
+            WHEN LEAVE_TIME IS NOT NULL THEN
+                TRY_TO_TIMESTAMP(LEAVE_TIME, 'DD/MM/YYYY HH24:MI')
+            ELSE NULL
+        END AS LEAVE_TIME,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
