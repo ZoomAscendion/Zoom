@@ -1,0 +1,244 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<workbook source-build='2023.3.0 (20233.23.1017.1841)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  
+  <datasources>
+    <datasource caption='Service Reliability &amp; Support Data' inline='true' name='federated.0abc5678' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='wdfmbah-ia58548.snowflakecomputing.com' name='snowflake.2def9012'>
+            <connection authentication='username-password' 
+                        class='snowflake' 
+                        dbname='DB_POC_ZOOM' 
+                        odbc-connect-string-extras='' 
+                        schema='GOLD' 
+                        server='wdfmbah-ia58548.snowflakecomputing.com' 
+                        service='' 
+                        username='KARTHIKVALLURI1985' 
+                        warehouse='COMPUTE_WH' 
+                        workgroup-auth-mode='prompt'>
+              <connection-customization>
+                <vendor name='snowflake'/>
+                <driver name='snowflake'/>
+                <customizations>
+                  <customization name='CAP_CREATE_TEMP_TABLES' value='yes' />
+                  <customization name='odbc-connect-string-extras' value='' />
+                </customizations>
+              </connection-customization>
+            </connection>
+          </named-connection>
+        </named-connections>
+        <relation connection='snowflake.2def9012' name='Custom SQL Query' type='text'>
+          SELECT * FROM GOLD.GO_FACT_SUPPORT_METRICS
+        </relation>
+      </connection>
+      
+      <aliases enabled='yes' />
+      
+      <!-- GO_FACT_SUPPORT_METRICS columns -->
+      <column datatype='string' name='[FACT_SUPPORT_METRICS_ID]' role='dimension' type='nominal' />
+      <column datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+      <column datatype='string' name='[USER_KEY]' role='dimension' type='nominal' />
+      <column datatype='string' name='[SUPPORT_CATEGORY_KEY]' role='dimension' type='nominal' />
+      <column datatype='date' name='[TICKET_DATE]' role='dimension' type='ordinal' />
+      <column aggregation='Sum' datatype='real' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+      <column datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
+      <column datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
+      <column datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+      <column datatype='boolean' name='[FIRST_CONTACT_RESOLUTION_FLAG]' role='dimension' type='nominal' />
+      <column datatype='boolean' name='[ESCALATION_FLAG]' role='dimension' type='nominal' />
+      <column datatype='string' name='[CUSTOMER_PLAN_TYPE]' role='dimension' type='nominal' />
+      <column aggregation='Sum' datatype='integer' name='[SATISFACTION_SCORE]' role='measure' type='quantitative' />
+      <column datatype='date' name='[LOAD_DATE]' role='dimension' type='ordinal' />
+      <column datatype='date' name='[UPDATE_DATE]' role='dimension' type='ordinal' />
+      <column datatype='string' name='[SOURCE_SYSTEM]' role='dimension' type='nominal' />
+      
+      <!-- GO_DIM_DATE columns -->
+      <column datatype='string' name='[DIM_DATE_ID]' role='dimension' type='nominal' />
+      <column datatype='date' name='[DATE_KEY (GO_DIM_DATE)]' role='dimension' type='ordinal' />
+      <column aggregation='Sum' datatype='integer' name='[YEAR]' role='dimension' type='quantitative' />
+      <column aggregation='Sum' datatype='integer' name='[QUARTER]' role='dimension' type='quantitative' />
+      <column aggregation='Sum' datatype='integer' name='[MONTH]' role='dimension' type='quantitative' />
+      <column datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+      <column aggregation='Sum' datatype='integer' name='[WEEK_OF_YEAR]' role='dimension' type='quantitative' />
+      <column aggregation='Sum' datatype='integer' name='[DAY_OF_MONTH]' role='dimension' type='quantitative' />
+      <column aggregation='Sum' datatype='integer' name='[DAY_OF_WEEK]' role='dimension' type='quantitative' />
+      <column datatype='string' name='[DAY_NAME]' role='dimension' type='nominal' />
+      <column datatype='boolean' name='[IS_WEEKEND]' role='dimension' type='nominal' />
+      <column datatype='boolean' name='[IS_HOLIDAY]' role='dimension' type='nominal' />
+      <column aggregation='Sum' datatype='integer' name='[FISCAL_YEAR]' role='dimension' type='quantitative' />
+      <column aggregation='Sum' datatype='integer' name='[FISCAL_QUARTER]' role='dimension' type='quantitative' />
+      
+      <!-- GO_DIM_USER columns -->
+      <column datatype='string' name='[DIM_USER_ID]' role='dimension' type='nominal' />
+      <column datatype='string' name='[USER_BUSINESS_KEY]' role='dimension' type='nominal' />
+      <column datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+      <column datatype='string' name='[EMAIL_DOMAIN]' role='dimension' type='nominal' />
+      <column datatype='string' name='[COMPANY_NAME]' role='dimension' type='nominal' />
+      <column datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+      <column datatype='string' name='[ACCOUNT_STATUS]' role='dimension' type='nominal' />
+      <column datatype='date' name='[REGISTRATION_DATE]' role='dimension' type='ordinal' />
+      <column datatype='string' name='[USER_SEGMENT]' role='dimension' type='nominal' />
+      <column datatype='date' name='[EFFECTIVE_START_DATE]' role='dimension' type='ordinal' />
+      <column datatype='date' name='[EFFECTIVE_END_DATE]' role='dimension' type='ordinal' />
+      <column datatype='boolean' name='[IS_CURRENT]' role='dimension' type='nominal' />
+      
+      <!-- GO_DIM_SUPPORT_CATEGORY columns -->
+      <column datatype='string' name='[DIM_SUPPORT_CATEGORY_ID]' role='dimension' type='nominal' />
+      <column datatype='string' name='[CATEGORY_KEY]' role='dimension' type='nominal' />
+      <column datatype='string' name='[CATEGORY_GROUP]' role='dimension' type='nominal' />
+      <column aggregation='Sum' datatype='integer' name='[SLA_HOURS]' role='measure' type='quantitative' />
+      <column aggregation='Sum' datatype='integer' name='[ESCALATION_THRESHOLD_HOURS]' role='measure' type='quantitative' />
+      <column datatype='boolean' name='[REQUIRES_TECHNICAL_EXPERTISE]' role='dimension' type='nominal' />
+      
+      <!-- Calculated fields for KPIs -->
+      <column datatype='integer' name='[Tickets Per Day]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([FACT_SUPPORT_METRICS_ID])'/>
+      </column>
+      
+      <column datatype='real' name='[Average Resolution Time]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])'/>
+      </column>
+      
+      <column datatype='real' name='[First Contact Resolution Rate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [FIRST_CONTACT_RESOLUTION_FLAG] THEN 1 ELSE 0 END) / COUNT([FACT_SUPPORT_METRICS_ID])'/>
+      </column>
+      
+      <column datatype='real' name='[Tickets Per 1000 Users]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([FACT_SUPPORT_METRICS_ID]) / COUNTD([USER_KEY]) * 1000'/>
+      </column>
+      
+      <column datatype='real' name='[Average Satisfaction Score]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([SATISFACTION_SCORE])'/>
+      </column>
+      
+      <layout dim-ordering='alphabetic' dim-percentage='0.5' measure-ordering='alphabetic' measure-percentage='0.4' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+    </datasource>
+  </datasources>
+  
+  <worksheets>
+    <worksheet name='Ticket Volume by Type'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service Reliability &amp; Support Data' name='federated.0abc5678' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0abc5678'>
+            <column datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal'/>
+            <column datatype='integer' name='[Tickets Per Day]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNT([FACT_SUPPORT_METRICS_ID])'/>
+            </column>
+            <column-instance column='[TICKET_TYPE]' derivation='None' name='[none:TICKET_TYPE:nk]' pivot='key' type='nominal'/>
+            <column-instance column='[Tickets Per Day]' derivation='None' name='[none:Tickets Per Day:qk]' pivot='key' type='quantitative'/>
+          </datasource-dependencies>
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+          </pane>
+        </panes>
+        <rows>[federated.0abc5678].[none:Tickets Per Day:qk]</rows>
+        <cols>[federated.0abc5678].[none:TICKET_TYPE:nk]</cols>
+      </table>
+      <simple-id uuid='{E5F6A7B8-C9D0-4123-E456-F7A8B9C0D1E2}' />
+    </worksheet>
+    
+    <worksheet name='Resolution Time Trends'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service Reliability &amp; Support Data' name='federated.0abc5678' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0abc5678'>
+            <column datatype='date' name='[TICKET_DATE]' role='dimension' type='ordinal'/>
+            <column datatype='real' name='[Average Resolution Time]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])'/>
+            </column>
+            <column-instance column='[TICKET_DATE]' derivation='None' name='[none:TICKET_DATE:ok]' pivot='key' type='ordinal'/>
+            <column-instance column='[Average Resolution Time]' derivation='None' name='[none:Average Resolution Time:qk]' pivot='key' type='quantitative'/>
+          </datasource-dependencies>
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+          </pane>
+        </panes>
+        <rows>[federated.0abc5678].[none:Average Resolution Time:qk]</rows>
+        <cols>[federated.0abc5678].[none:TICKET_DATE:ok]</cols>
+      </table>
+      <simple-id uuid='{F6A7B8C9-D0E1-4234-F567-A8B9C0D1E2F3}' />
+    </worksheet>
+    
+    <worksheet name='Priority Level Analysis'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service Reliability &amp; Support Data' name='federated.0abc5678' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0abc5678'>
+            <column datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal'/>
+            <column aggregation='Sum' datatype='real' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative'/>
+            <column datatype='real' name='[First Contact Resolution Rate]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM(IF [FIRST_CONTACT_RESOLUTION_FLAG] THEN 1 ELSE 0 END) / COUNT([FACT_SUPPORT_METRICS_ID])'/>
+            </column>
+            <column-instance column='[PRIORITY_LEVEL]' derivation='None' name='[none:PRIORITY_LEVEL:nk]' pivot='key' type='nominal'/>
+            <column-instance column='[RESOLUTION_TIME_HOURS]' derivation='Sum' name='[sum:RESOLUTION_TIME_HOURS:qk]' pivot='key' type='quantitative'/>
+            <column-instance column='[First Contact Resolution Rate]' derivation='None' name='[none:First Contact Resolution Rate:qk]' pivot='key' type='quantitative'/>
+          </datasource-dependencies>
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+          </pane>
+        </panes>
+        <rows>[federated.0abc5678].[sum:RESOLUTION_TIME_HOURS:qk]</rows>
+        <cols>[federated.0abc5678].[none:PRIORITY_LEVEL:nk]</cols>
+      </table>
+      <simple-id uuid='{A7B8C9D0-E1F2-4345-A678-B9C0D1E2F3A4}' />
+    </worksheet>
+  </worksheets>
+  
+  <windows source-height='30'>
+    <window class='worksheet' maximized='true' name='Ticket Volume by Type'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{B8C9D0E1-F2A3-4456-B789-C0D1E2F3A4B5}' />
+    </window>
+  </windows>
+</workbook>
