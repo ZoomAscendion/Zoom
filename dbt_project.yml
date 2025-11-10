@@ -2,10 +2,8 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_silver_pipeline'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -13,23 +11,40 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+target-path: "target"
+clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
   zoom_silver_pipeline:
+    +materialized: table
     silver:
       +materialized: table
-
-# Global configurations
-vars:
-  # The `start_date` variable will be accessible in all resources
-  start_date: '2024-01-01'
-  # Set timezone for standardization
-  default_timezone: 'UTC'
-  # Data quality thresholds
-  dq_threshold_critical: 70
-  dq_threshold_warning: 90
+      +on_schema_change: sync_all_columns
+      +pre_hook: |
+        {% if this.name != 'si_audit_log' %}
+          INSERT INTO {{ ref('si_audit_log') }} (
+            EXECUTION_ID, PIPELINE_NAME, EXECUTION_START_TIME, EXECUTION_STATUS, 
+            SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP
+          ) VALUES (
+            '{{ invocation_id }}', 
+            'BRONZE_TO_SILVER_{{ this.name | upper }}', 
+            CURRENT_TIMESTAMP(), 
+            'RUNNING', 
+            'BRONZE.{{ this.name | replace("si_", "bz_") | upper }}', 
+            '{{ this }}', 
+            'DBT_PIPELINE', 
+            CURRENT_TIMESTAMP()
+          )
+        {% endif %}
+      +post_hook: |
+        {% if this.name != 'si_audit_log' %}
+          UPDATE {{ ref('si_audit_log') }} 
+          SET EXECUTION_END_TIME = CURRENT_TIMESTAMP(),
+              EXECUTION_STATUS = 'SUCCESS',
+              RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
+              RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }})
+          WHERE EXECUTION_ID = '{{ invocation_id }}' 
+          AND PIPELINE_NAME = 'BRONZE_TO_SILVER_{{ this.name | upper }}'
+        {% endif %}
