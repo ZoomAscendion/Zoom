@@ -12,8 +12,8 @@ WITH bronze_participants AS (
         PARTICIPANT_ID,
         MEETING_ID,
         USER_ID,
-        JOIN_TIME,
-        LEAVE_TIME,
+        TRY_TO_TIMESTAMP(JOIN_TIME) AS JOIN_TIME,
+        TRY_TO_TIMESTAMP(LEAVE_TIME) AS LEAVE_TIME,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
