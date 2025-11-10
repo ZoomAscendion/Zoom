@@ -12,31 +12,21 @@ WITH bronze_licenses AS (
         LICENSE_ID,
         LICENSE_TYPE,
         ASSIGNED_TO_USER_ID,
-        -- Handle various date formats safely
-        TRY_TO_DATE(START_DATE, 'DD/MM/YYYY') AS START_DATE_PARSED1,
-        TRY_TO_DATE(START_DATE, 'YYYY-MM-DD') AS START_DATE_PARSED2,
-        TRY_TO_DATE(START_DATE) AS START_DATE_PARSED3,
-        TRY_TO_DATE(END_DATE, 'DD/MM/YYYY') AS END_DATE_PARSED1,
-        TRY_TO_DATE(END_DATE, 'YYYY-MM-DD') AS END_DATE_PARSED2,
-        TRY_TO_DATE(END_DATE) AS END_DATE_PARSED3,
+        -- Handle various date formats using multiple approaches
+        CASE 
+            WHEN REGEXP_LIKE(START_DATE, '^\\d{2}/\\d{2}/\\d{4}$') THEN TO_DATE(START_DATE, 'DD/MM/YYYY')
+            WHEN REGEXP_LIKE(START_DATE, '^\\d{4}-\\d{2}-\\d{2}$') THEN TO_DATE(START_DATE, 'YYYY-MM-DD')
+            ELSE TRY_TO_DATE(START_DATE)
+        END AS START_DATE,
+        CASE 
+            WHEN REGEXP_LIKE(END_DATE, '^\\d{2}/\\d{2}/\\d{4}$') THEN TO_DATE(END_DATE, 'DD/MM/YYYY')
+            WHEN REGEXP_LIKE(END_DATE, '^\\d{4}-\\d{2}-\\d{2}$') THEN TO_DATE(END_DATE, 'YYYY-MM-DD')
+            ELSE TRY_TO_DATE(END_DATE)
+        END AS END_DATE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM {{ source('bronze', 'BZ_LICENSES') }}
-),
-
--- Select the first successful date parse
-date_normalized_licenses AS (
-    SELECT 
-        LICENSE_ID,
-        LICENSE_TYPE,
-        ASSIGNED_TO_USER_ID,
-        COALESCE(START_DATE_PARSED1, START_DATE_PARSED2, START_DATE_PARSED3) AS START_DATE,
-        COALESCE(END_DATE_PARSED1, END_DATE_PARSED2, END_DATE_PARSED3) AS END_DATE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
-    FROM bronze_licenses
 ),
 
 -- Data quality validation and cleansing
@@ -68,7 +58,7 @@ cleansed_licenses AS (
             WHEN START_DATE >= END_DATE THEN 'FAILED'
             ELSE 'PASSED'
         END AS VALIDATION_STATUS
-    FROM date_normalized_licenses
+    FROM bronze_licenses
 ),
 
 -- Remove duplicates keeping the latest record
