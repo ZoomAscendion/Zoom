@@ -1,0 +1,20 @@
+{{ config(
+    materialized='table',
+    pre_hook="",
+    post_hook=""
+) }}
+
+-- Gold Layer Process Audit Log
+-- This table tracks all transformation processes in the Gold layer
+
+SELECT 
+    ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP()) AS PROCESS_ID,
+    CAST('GOLD_LAYER_INITIALIZATION' AS VARCHAR(255)) AS PROCESS_NAME,
+    CAST('INITIALIZATION' AS VARCHAR(255)) AS SOURCE_TABLE,
+    CAST('GO_AUDIT_LOG' AS VARCHAR(255)) AS TARGET_TABLE,
+    CURRENT_TIMESTAMP() AS PROCESS_START_TIME,
+    CURRENT_TIMESTAMP() AS PROCESS_END_TIME,
+    CAST('SUCCESS' AS VARCHAR(50)) AS PROCESS_STATUS,
+    CAST('Initial audit log creation' AS VARCHAR(500)) AS PROCESS_NOTES,
+    CURRENT_DATE() AS LOAD_DATE,
+    CURRENT_DATE() AS UPDATE_DATE
