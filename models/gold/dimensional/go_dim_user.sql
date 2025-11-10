@@ -1,13 +1,37 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_DIM_USER_TRANSFORMATION', 'SI_USERS', 'GO_DIM_USER', CURRENT_TIMESTAMP(), 'STARTED', 'User dimension transformation started', CURRENT_DATE(), CURRENT_DATE())",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_END_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_DIM_USER_TRANSFORMATION', 'SI_USERS', 'GO_DIM_USER', CURRENT_TIMESTAMP(), 'COMPLETED', 'User dimension transformation completed successfully', CURRENT_DATE(), CURRENT_DATE())"
+    materialized='table'
 ) }}
 
 -- User Dimension Table with SCD Type 2
 -- Transforms Silver layer user data into business-ready dimension
 
-WITH user_transformations AS (
+WITH user_base AS (
+    SELECT 
+        USER_ID,
+        USER_NAME,
+        EMAIL,
+        COMPANY,
+        PLAN_TYPE,
+        LOAD_TIMESTAMP,
+        LOAD_DATE,
+        SOURCE_SYSTEM,
+        VALIDATION_STATUS,
+        DATA_QUALITY_SCORE
+    FROM SILVER.SI_USERS
+    WHERE VALIDATION_STATUS = 'PASSED'
+        AND DATA_QUALITY_SCORE >= 80
+),
+
+license_info AS (
+    SELECT 
+        ASSIGNED_TO_USER_ID,
+        LICENSE_ID,
+        END_DATE
+    FROM SILVER.SI_LICENSES
+    WHERE VALIDATION_STATUS = 'PASSED'
+),
+
+user_transformations AS (
     SELECT 
         ROW_NUMBER() OVER (ORDER BY u.USER_ID, u.LOAD_TIMESTAMP) AS USER_DIM_ID,
         COALESCE(TRIM(UPPER(u.USER_NAME)), 'Unknown User') AS USER_NAME,
@@ -49,11 +73,8 @@ WITH user_transformations AS (
         CURRENT_DATE() AS LOAD_DATE,
         CURRENT_DATE() AS UPDATE_DATE,
         u.SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_users') }} u
-    LEFT JOIN {{ source('silver', 'si_licenses') }} l 
-        ON u.USER_ID = l.ASSIGNED_TO_USER_ID
-    WHERE u.VALIDATION_STATUS = 'PASSED'
-        AND u.DATA_QUALITY_SCORE >= 80
+    FROM user_base u
+    LEFT JOIN license_info l ON u.USER_ID = l.ASSIGNED_TO_USER_ID
 )
 
 SELECT * FROM user_transformations
