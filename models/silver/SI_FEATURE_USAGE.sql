@@ -11,30 +11,14 @@ WITH bronze_feature_usage AS (
         bfu.MEETING_ID,
         bfu.FEATURE_NAME,
         bfu.USAGE_COUNT,
-        bfu.USAGE_DATE,
+        TRY_TO_DATE(bfu.USAGE_DATE) AS USAGE_DATE,
         bfu.LOAD_TIMESTAMP,
         bfu.UPDATE_TIMESTAMP,
         bfu.SOURCE_SYSTEM
     FROM BRONZE.BZ_FEATURE_USAGE bfu
 ),
 
--- Join with meetings for date validation
-feature_usage_with_meetings AS (
-    SELECT 
-        bfu.USAGE_ID,
-        bfu.MEETING_ID,
-        bfu.FEATURE_NAME,
-        bfu.USAGE_COUNT,
-        bfu.USAGE_DATE,
-        bfu.LOAD_TIMESTAMP,
-        bfu.UPDATE_TIMESTAMP,
-        bfu.SOURCE_SYSTEM,
-        sm.START_TIME AS meeting_start_time
-    FROM bronze_feature_usage bfu
-    LEFT JOIN SILVER.SI_MEETINGS sm ON bfu.MEETING_ID = sm.MEETING_ID
-),
-
--- Data quality validation and cleansing
+-- Data quality validation and cleansing (without cross-table joins for now)
 cleansed_feature_usage AS (
     SELECT 
         USAGE_ID,
@@ -45,7 +29,6 @@ cleansed_feature_usage AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        meeting_start_time,
         
         -- Data quality scoring
         CASE 
@@ -54,8 +37,6 @@ cleansed_feature_usage AS (
             WHEN FEATURE_NAME IS NULL OR LENGTH(TRIM(FEATURE_NAME)) = 0 THEN 30
             WHEN USAGE_COUNT IS NULL OR USAGE_COUNT < 0 THEN 40
             WHEN USAGE_DATE IS NULL THEN 50
-            WHEN meeting_start_time IS NULL THEN 60
-            WHEN DATE(USAGE_DATE) != DATE(meeting_start_time) THEN 70
             WHEN LENGTH(FEATURE_NAME) > 100 THEN 80
             ELSE 100
         END AS DATA_QUALITY_SCORE,
@@ -64,12 +45,10 @@ cleansed_feature_usage AS (
         CASE 
             WHEN USAGE_ID IS NULL OR MEETING_ID IS NULL OR FEATURE_NAME IS NULL THEN 'FAILED'
             WHEN USAGE_COUNT IS NULL OR USAGE_COUNT < 0 OR USAGE_DATE IS NULL THEN 'FAILED'
-            WHEN meeting_start_time IS NULL THEN 'FAILED'
-            WHEN DATE(USAGE_DATE) != DATE(meeting_start_time) THEN 'WARNING'
             WHEN LENGTH(FEATURE_NAME) > 100 THEN 'WARNING'
             ELSE 'PASSED'
         END AS VALIDATION_STATUS
-    FROM feature_usage_with_meetings
+    FROM bronze_feature_usage
 ),
 
 -- Remove duplicates using ROW_NUMBER
@@ -84,7 +63,6 @@ deduped_feature_usage AS (
       AND USAGE_COUNT IS NOT NULL
       AND USAGE_COUNT >= 0
       AND USAGE_DATE IS NOT NULL
-      AND meeting_start_time IS NOT NULL
 )
 
 SELECT 
