@@ -1,0 +1,135 @@
+version: 2
+
+sources:
+  - name: silver
+    description: "Silver layer containing cleansed and validated data from Bronze layer"
+    database: DB_POC_ZOOM
+    schema: SILVER
+    tables:
+      - name: si_users
+        description: "Cleansed user profile and subscription information"
+        columns:
+          - name: USER_ID
+            description: "Unique identifier for each user account"
+          - name: USER_NAME
+            description: "Display name of the user (cleaned and standardized format)"
+          - name: EMAIL
+            description: "Email address of the user (validated and standardized)"
+          - name: COMPANY
+            description: "Company or organization name (cleaned and standardized)"
+          - name: PLAN_TYPE
+            description: "Subscription plan type (standardized values: Basic, Pro, Business, Enterprise)"
+          - name: VALIDATION_STATUS
+            description: "Status of data validation (PASSED, FAILED, WARNING)"
+          - name: DATA_QUALITY_SCORE
+            description: "Quality score from validation process (0-100)"
+
+      - name: si_meetings
+        description: "Cleansed meeting information and session details"
+        columns:
+          - name: MEETING_ID
+            description: "Unique identifier for each meeting"
+          - name: HOST_ID
+            description: "User ID of the meeting host"
+          - name: MEETING_TOPIC
+            description: "Topic or title of the meeting (cleaned and standardized)"
+          - name: START_TIME
+            description: "Meeting start timestamp (standardized timezone)"
+          - name: END_TIME
+            description: "Meeting end timestamp (standardized timezone)"
+          - name: DURATION_MINUTES
+            description: "Meeting duration in minutes (validated and calculated)"
+          - name: VALIDATION_STATUS
+            description: "Status of data validation (PASSED, FAILED, WARNING)"
+          - name: DATA_QUALITY_SCORE
+            description: "Quality score from validation process (0-100)"
+
+      - name: si_participants
+        description: "Cleansed meeting participants and their session details"
+        columns:
+          - name: PARTICIPANT_ID
+            description: "Unique identifier for each meeting participant"
+          - name: MEETING_ID
+            description: "Reference to meeting"
+          - name: USER_ID
+            description: "Reference to user who participated"
+          - name: JOIN_TIME
+            description: "Timestamp when participant joined meeting (standardized timezone)"
+          - name: LEAVE_TIME
+            description: "Timestamp when participant left meeting (standardized timezone)"
+          - name: VALIDATION_STATUS
+            description: "Status of data validation (PASSED, FAILED, WARNING)"
+          - name: DATA_QUALITY_SCORE
+            description: "Quality score from validation process (0-100)"
+
+      - name: si_feature_usage
+        description: "Cleansed platform feature usage during meetings"
+        columns:
+          - name: USAGE_ID
+            description: "Unique identifier for each feature usage record"
+          - name: MEETING_ID
+            description: "Reference to meeting where feature was used"
+          - name: FEATURE_NAME
+            description: "Name of the feature being tracked (standardized naming)"
+          - name: USAGE_COUNT
+            description: "Number of times feature was used (validated)"
+          - name: USAGE_DATE
+            description: "Date when feature usage occurred (standardized format)"
+          - name: VALIDATION_STATUS
+            description: "Status of data validation (PASSED, FAILED, WARNING)"
+          - name: DATA_QUALITY_SCORE
+            description: "Quality score from validation process (0-100)"
+
+      - name: si_support_tickets
+        description: "Cleansed customer support requests and resolution tracking"
+        columns:
+          - name: TICKET_ID
+            description: "Unique identifier for each support ticket"
+          - name: USER_ID
+            description: "Reference to user who created the ticket"
+          - name: TICKET_TYPE
+            description: "Type of support ticket (standardized categories)"
+          - name: RESOLUTION_STATUS
+            description: "Current status of ticket resolution (standardized values)"
+          - name: OPEN_DATE
+            description: "Date when ticket was opened (standardized format)"
+          - name: VALIDATION_STATUS
+            description: "Status of data validation (PASSED, FAILED, WARNING)"
+          - name: DATA_QUALITY_SCORE
+            description: "Quality score from validation process (0-100)"
+
+      - name: si_billing_events
+        description: "Cleansed financial transactions and billing activities"
+        columns:
+          - name: EVENT_ID
+            description: "Unique identifier for each billing event"
+          - name: USER_ID
+            description: "Reference to user associated with billing event"
+          - name: EVENT_TYPE
+            description: "Type of billing event (standardized categories)"
+          - name: AMOUNT
+            description: "Monetary amount for the billing event (validated and standardized)"
+          - name: EVENT_DATE
+            description: "Date when the billing event occurred (standardized format)"
+          - name: VALIDATION_STATUS
+            description: "Status of data validation (PASSED, FAILED, WARNING)"
+          - name: DATA_QUALITY_SCORE
+            description: "Quality score from validation process (0-100)"
+
+      - name: si_licenses
+        description: "Cleansed license assignments and entitlements"
+        columns:
+          - name: LICENSE_ID
+            description: "Unique identifier for each license"
+          - name: LICENSE_TYPE
+            description: "Type of license (standardized categories)"
+          - name: ASSIGNED_TO_USER_ID
+            description: "User ID to whom license is assigned"
+          - name: START_DATE
+            description: "License validity start date (standardized format)"
+          - name: END_DATE
+            description: "License validity end date (standardized format)"
+          - name: VALIDATION_STATUS
+            description: "Status of data validation (PASSED, FAILED, WARNING)"
+          - name: DATA_QUALITY_SCORE
+            description: "Quality score from validation process (0-100)"
