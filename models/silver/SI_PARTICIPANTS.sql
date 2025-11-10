@@ -10,8 +10,15 @@ WITH bronze_participants AS (
         bp.PARTICIPANT_ID,
         bp.MEETING_ID,
         bp.USER_ID,
-        TRY_TO_TIMESTAMP(bp.JOIN_TIME) AS JOIN_TIME,
-        TRY_TO_TIMESTAMP(bp.LEAVE_TIME) AS LEAVE_TIME,
+        -- Handle timestamp conversion - check if already timestamp or string
+        CASE 
+            WHEN TRY_TO_TIMESTAMP(bp.JOIN_TIME) IS NOT NULL THEN TRY_TO_TIMESTAMP(bp.JOIN_TIME)
+            ELSE bp.JOIN_TIME
+        END AS JOIN_TIME,
+        CASE 
+            WHEN TRY_TO_TIMESTAMP(bp.LEAVE_TIME) IS NOT NULL THEN TRY_TO_TIMESTAMP(bp.LEAVE_TIME)
+            ELSE bp.LEAVE_TIME
+        END AS LEAVE_TIME,
         bp.LOAD_TIMESTAMP,
         bp.UPDATE_TIMESTAMP,
         bp.SOURCE_SYSTEM
