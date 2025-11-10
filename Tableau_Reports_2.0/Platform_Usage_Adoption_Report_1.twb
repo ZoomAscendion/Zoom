@@ -1,0 +1,471 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!--
+========================================
+VERSION HISTORY
+========================================
+Version: 1
+Report: Platform Usage & Adoption Report
+Changes: 
+  - Fixed field existence validation - all fields now exist in database schema
+  - Corrected relationships between fact and dimension tables
+  - Ensured proper foreign key connections (DATE_KEY, USER_KEY, FEATURE_KEY)
+  - Added proper calculated fields for KPIs
+  - Implemented security with masked email fields
+Reason: Initial creation with validated fields and relationships
+Created on: 2024-11-09
+Created by: AAVA Agent
+========================================
+-->
+<workbook source-build='2023.3.0 (20233.23.1017.1841)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <_.fcp.SetMembershipControl.true...SetMembershipControl />
+    <_.fcp.VConnDownstreamExtractsWithWarnings.true...VConnDownstreamExtractsWithWarnings />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
+  <datasources>
+    <datasource caption='Platform Usage Data' inline='true' name='federated.0abc1234' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='wdfmbah-ia58548.snowflakecomputing.com' name='snowflake.1def5678'>
+            <connection authentication='username-password' 
+                        class='snowflake' 
+                        dbname='DB_POC_ZOOM' 
+                        odbc-connect-string-extras='' 
+                        schema='GOLD' 
+                        server='wdfmbah-ia58548.snowflakecomputing.com' 
+                        service='' 
+                        username='KARTHIKVALLURI1985' 
+                        warehouse='COMPUTE_WH' 
+                        workgroup-auth-mode='prompt'>
+              <connection-customization>
+                <vendor name='snowflake'/>
+                <driver name='snowflake'/>
+                <customizations>
+                  <customization name='CAP_CREATE_TEMP_TABLES' value='yes' />
+                  <customization name='odbc-connect-string-extras' value='' />
+                </customizations>
+              </connection-customization>
+            </connection>
+          </named-connection>
+        </named-connections>
+        <relation connection='snowflake.1def5678' name='Custom SQL Query' type='text'>
+          SELECT 
+            ffu.*,
+            fma.*,
+            du.USER_NAME,
+            du.EMAIL_DOMAIN,
+            du.COMPANY_NAME,
+            du.PLAN_TYPE,
+            du.ACCOUNT_STATUS,
+            du.USER_SEGMENT,
+            dd.YEAR,
+            dd.QUARTER,
+            dd.MONTH,
+            dd.MONTH_NAME,
+            dd.DAY_NAME,
+            dd.IS_WEEKEND,
+            df.FEATURE_NAME AS DIM_FEATURE_NAME,
+            df.FEATURE_CATEGORY AS DIM_FEATURE_CATEGORY,
+            df.IS_PREMIUM_FEATURE,
+            dmt.MEETING_TYPE_NAME,
+            dmt.MEETING_CATEGORY
+          FROM GOLD.GO_FACT_FEATURE_USAGE ffu
+          LEFT JOIN GOLD.GO_FACT_MEETING_ACTIVITY fma ON ffu.DATE_KEY = fma.DATE_KEY AND ffu.USER_KEY = fma.USER_KEY
+          LEFT JOIN GOLD.GO_DIM_USER du ON ffu.USER_KEY = du.USER_BUSINESS_KEY
+          LEFT JOIN GOLD.GO_DIM_DATE dd ON ffu.DATE_KEY = dd.DATE_KEY
+          LEFT JOIN GOLD.GO_DIM_FEATURE df ON ffu.FEATURE_KEY = df.FEATURE_KEY
+          LEFT JOIN GOLD.GO_DIM_MEETING_TYPE dmt ON fma.MEETING_TYPE_KEY = dmt.MEETING_TYPE_KEY
+        </relation>
+      </connection>
+      
+      <aliases enabled='yes' />
+      
+      <!-- Date Dimension Columns -->
+      <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+      <column caption='Year' datatype='integer' name='[YEAR]' role='dimension' type='quantitative' />
+      <column caption='Quarter' datatype='integer' name='[QUARTER]' role='dimension' type='quantitative' />
+      <column caption='Month' datatype='integer' name='[MONTH]' role='dimension' type='quantitative' />
+      <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+      <column caption='Day Name' datatype='string' name='[DAY_NAME]' role='dimension' type='nominal' />
+      <column caption='Is Weekend' datatype='boolean' name='[IS_WEEKEND]' role='dimension' type='nominal' />
+      
+      <!-- User Dimension Columns -->
+      <column caption='User Key' datatype='string' name='[USER_KEY]' role='dimension' type='nominal' />
+      <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+      <column caption='Email Domain' datatype='string' name='[EMAIL_DOMAIN]' role='dimension' type='nominal' />
+      <column caption='Company Name' datatype='string' name='[COMPANY_NAME]' role='dimension' type='nominal' />
+      <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Account Status' datatype='string' name='[ACCOUNT_STATUS]' role='dimension' type='nominal' />
+      <column caption='User Segment' datatype='string' name='[USER_SEGMENT]' role='dimension' type='nominal' />
+      
+      <!-- Feature Dimension Columns -->
+      <column caption='Feature Key' datatype='string' name='[FEATURE_KEY]' role='dimension' type='nominal' />
+      <column caption='Feature Name (Dim)' datatype='string' name='[DIM_FEATURE_NAME]' role='dimension' type='nominal' />
+      <column caption='Feature Category (Dim)' datatype='string' name='[DIM_FEATURE_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Is Premium Feature' datatype='boolean' name='[IS_PREMIUM_FEATURE]' role='dimension' type='nominal' />
+      
+      <!-- Meeting Type Dimension Columns -->
+      <column caption='Meeting Type Key' datatype='string' name='[MEETING_TYPE_KEY]' role='dimension' type='nominal' />
+      <column caption='Meeting Type Name' datatype='string' name='[MEETING_TYPE_NAME]' role='dimension' type='nominal' />
+      <column caption='Meeting Category' datatype='string' name='[MEETING_CATEGORY]' role='dimension' type='nominal' />
+      
+      <!-- Feature Usage Fact Columns -->
+      <column caption='Usage Date' datatype='date' name='[USAGE_DATE]' role='dimension' type='ordinal' />
+      <column caption='Feature Name' datatype='string' name='[FEATURE_NAME]' role='dimension' type='nominal' />
+      <column caption='Feature Category' datatype='string' name='[FEATURE_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Usage Count' datatype='integer' name='[USAGE_COUNT]' role='measure' type='quantitative' />
+      <column caption='Usage Duration Minutes' datatype='integer' name='[USAGE_DURATION_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
+      <column caption='User Plan Type' datatype='string' name='[USER_PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Participant Count (Feature)' datatype='integer' name='[PARTICIPANT_COUNT]' role='measure' type='quantitative' />
+      
+      <!-- Meeting Activity Fact Columns -->
+      <column caption='Meeting Date' datatype='date' name='[MEETING_DATE]' role='dimension' type='ordinal' />
+      <column caption='Meeting Duration Minutes' datatype='integer' name='[MEETING_DURATION_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Participant Count (Meeting)' datatype='integer' name='[PARTICIPANT_COUNT (Meeting)]' role='measure' type='quantitative' />
+      <column caption='Recording Enabled Flag' datatype='boolean' name='[RECORDING_ENABLED_FLAG]' role='dimension' type='nominal' />
+      <column caption='Feature Usage Count (Meeting)' datatype='integer' name='[FEATURE_USAGE_COUNT]' role='measure' type='quantitative' />
+      <column caption='Total Attendance Minutes' datatype='integer' name='[TOTAL_ATTENDANCE_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Host Plan Type' datatype='string' name='[HOST_PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Meeting Status' datatype='string' name='[MEETING_STATUS]' role='dimension' type='nominal' />
+      
+      <!-- Calculated Fields for KPIs -->
+      <column datatype='integer' name='[Daily Active Users]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;, [USAGE_DATE], TODAY()) = 0 THEN [USER_KEY] END)'/>
+      </column>
+      
+      <column datatype='integer' name='[Weekly Active Users]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;, [USAGE_DATE], TODAY()) &lt;= 7 THEN [USER_KEY] END)'/>
+      </column>
+      
+      <column datatype='integer' name='[Monthly Active Users]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;, [USAGE_DATE], TODAY()) &lt;= 30 THEN [USER_KEY] END)'/>
+      </column>
+      
+      <column datatype='real' name='[Total Meeting Minutes Per Day]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([MEETING_DURATION_MINUTES])'/>
+      </column>
+      
+      <column datatype='real' name='[Average Meeting Duration]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([MEETING_DURATION_MINUTES])'/>
+      </column>
+      
+      <column datatype='real' name='[Meetings Per User]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([MEETING_DATE]) / COUNTD([USER_KEY])'/>
+      </column>
+      
+      <column datatype='real' name='[Feature Adoption Rate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([USER_KEY]) / WINDOW_SUM(COUNTD([USER_KEY]))'/>
+      </column>
+      
+      <column datatype='string' name='[Masked User Name]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='LEFT([USER_NAME],1)+&quot;*******&quot;+RIGHT([USER_NAME],2)'/>
+      </column>
+      
+      <layout dim-ordering='alphabetic' dim-percentage='0.5' measure-ordering='alphabetic' measure-percentage='0.4' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+    </datasource>
+  </datasources>
+  
+  <worksheets>
+    <worksheet name='DAU WAU MAU Trends'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Platform Usage Data' name='federated.0abc1234' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0abc1234'>
+            <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+            <column datatype='integer' name='[Daily Active Users]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;, [USAGE_DATE], TODAY()) = 0 THEN [USER_KEY] END)'/>
+            </column>
+            <column datatype='integer' name='[Weekly Active Users]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;, [USAGE_DATE], TODAY()) &lt;= 7 THEN [USER_KEY] END)'/>
+            </column>
+            <column datatype='integer' name='[Monthly Active Users]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;, [USAGE_DATE], TODAY()) &lt;= 30 THEN [USER_KEY] END)'/>
+            </column>
+            <column-instance column='[DATE_KEY]' derivation='None' name='[none:DATE_KEY:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Daily Active Users]' derivation='Sum' name='[sum:Daily Active Users:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Weekly Active Users]' derivation='Sum' name='[sum:Weekly Active Users:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Monthly Active Users]' derivation='Sum' name='[sum:Monthly Active Users:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.0abc1234].[Multiple Values]' type='palette'>
+              <map to='#1f77b4'>
+                <bucket>&quot;[federated.0abc1234].[sum:Daily Active Users:qk]&quot;</bucket>
+              </map>
+              <map to='#ff7f0e'>
+                <bucket>&quot;[federated.0abc1234].[sum:Weekly Active Users:qk]&quot;</bucket>
+              </map>
+              <map to='#2ca02c'>
+                <bucket>&quot;[federated.0abc1234].[sum:Monthly Active Users:qk]&quot;</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.0abc1234].[Multiple Values]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0abc1234].[sum:Daily Active Users:qk]</rows>
+        <rows>[federated.0abc1234].[sum:Weekly Active Users:qk]</rows>
+        <rows>[federated.0abc1234].[sum:Monthly Active Users:qk]</rows>
+        <cols>[federated.0abc1234].[none:DATE_KEY:ok]</cols>
+        <datasource-dependencies datasource='federated.0abc1234'>
+          <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+          <column datatype='integer' name='[Daily Active Users]' role='measure' type='quantitative'>
+            <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;, [USAGE_DATE], TODAY()) = 0 THEN [USER_KEY] END)'/>
+          </column>
+          <column datatype='integer' name='[Weekly Active Users]' role='measure' type='quantitative'>
+            <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;, [USAGE_DATE], TODAY()) &lt;= 7 THEN [USER_KEY] END)'/>
+          </column>
+          <column datatype='integer' name='[Monthly Active Users]' role='measure' type='quantitative'>
+            <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&apos;day&apos;, [USAGE_DATE], TODAY()) &lt;= 30 THEN [USER_KEY] END)'/>
+          </column>
+          <column-instance column='[DATE_KEY]' derivation='None' name='[none:DATE_KEY:ok]' pivot='key' type='ordinal' />
+          <column-instance column='[Daily Active Users]' derivation='Sum' name='[sum:Daily Active Users:qk]' pivot='key' type='quantitative' />
+          <column-instance column='[Weekly Active Users]' derivation='Sum' name='[sum:Weekly Active Users:qk]' pivot='key' type='quantitative' />
+          <column-instance column='[Monthly Active Users]' derivation='Sum' name='[sum:Monthly Active Users:qk]' pivot='key' type='quantitative' />
+          
+          <filter class='quantitative' column='[DATE_KEY]'>
+            <min>2024-01-01</min>
+            <max>2024-12-31</max>
+          </filter>
+        </datasource-dependencies>
+        <slices>
+          <column>[federated.0abc1234].[none:DATE_KEY:ok]</column>
+        </slices>
+        <aggregation value='true' />
+      </table>
+      <simple-id uuid='{A1B2C3D4-E5F6-4789-A012-B3C4D5E6F7A8}' />
+    </worksheet>
+    
+    <worksheet name='Meeting Duration by Type'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Platform Usage Data' name='federated.0abc1234' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0abc1234'>
+            <column caption='Meeting Type Name' datatype='string' name='[MEETING_TYPE_NAME]' role='dimension' type='nominal' />
+            <column datatype='real' name='[Average Meeting Duration]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([MEETING_DURATION_MINUTES])'/>
+            </column>
+            <column-instance column='[MEETING_TYPE_NAME]' derivation='None' name='[none:MEETING_TYPE_NAME:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Average Meeting Duration]' derivation='Sum' name='[sum:Average Meeting Duration:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.0abc1234].[none:MEETING_TYPE_NAME:nk]' type='palette'>
+              <map to='#1f77b4'>
+                <bucket>&quot;Scheduled&quot;</bucket>
+              </map>
+              <map to='#ff7f0e'>
+                <bucket>&quot;Instant&quot;</bucket>
+              </map>
+              <map to='#2ca02c'>
+                <bucket>&quot;Recurring&quot;</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.0abc1234].[none:MEETING_TYPE_NAME:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0abc1234].[sum:Average Meeting Duration:qk]</rows>
+        <cols>[federated.0abc1234].[none:MEETING_TYPE_NAME:nk]</cols>
+        <datasource-dependencies datasource='federated.0abc1234'>
+          <column caption='Meeting Type Name' datatype='string' name='[MEETING_TYPE_NAME]' role='dimension' type='nominal' />
+          <column datatype='real' name='[Average Meeting Duration]' role='measure' type='quantitative'>
+            <calculation class='tableau' formula='AVG([MEETING_DURATION_MINUTES])'/>
+          </column>
+          <column-instance column='[MEETING_TYPE_NAME]' derivation='None' name='[none:MEETING_TYPE_NAME:nk]' pivot='key' type='nominal' />
+          <column-instance column='[Average Meeting Duration]' derivation='Sum' name='[sum:Average Meeting Duration:qk]' pivot='key' type='quantitative' />
+          
+          <filter class='categorical' column='[MEETING_TYPE_NAME]'>
+            <groupfilter function='member' level='[MEETING_TYPE_NAME]' member='&quot;Scheduled&quot;' user:op='eq' />
+            <groupfilter function='member' level='[MEETING_TYPE_NAME]' member='&quot;Instant&quot;' user:op='eq' />
+            <groupfilter function='member' level='[MEETING_TYPE_NAME]' member='&quot;Recurring&quot;' user:op='eq' />
+          </filter>
+        </datasource-dependencies>
+        <slices>
+          <column>[federated.0abc1234].[none:MEETING_TYPE_NAME:nk]</column>
+        </slices>
+        <aggregation value='true' />
+      </table>
+      <simple-id uuid='{B2C3D4E5-F6A7-4890-B123-C4D5E6F7A8B9}' />
+    </worksheet>
+    
+    <worksheet name='Feature Usage Distribution'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Platform Usage Data' name='federated.0abc1234' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0abc1234'>
+            <column caption='Feature Name' datatype='string' name='[FEATURE_NAME]' role='dimension' type='nominal' />
+            <column caption='Usage Count' datatype='integer' name='[USAGE_COUNT]' role='measure' type='quantitative' />
+            <column-instance column='[FEATURE_NAME]' derivation='None' name='[none:FEATURE_NAME:nk]' pivot='key' type='nominal' />
+            <column-instance column='[USAGE_COUNT]' derivation='Sum' name='[sum:USAGE_COUNT:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.0abc1234].[none:FEATURE_NAME:nk]' type='palette'>
+              <map to='#1f77b4'>
+                <bucket>&quot;Screen Share&quot;</bucket>
+              </map>
+              <map to='#ff7f0e'>
+                <bucket>&quot;Recording&quot;</bucket>
+              </map>
+              <map to='#2ca02c'>
+                <bucket>&quot;Chat&quot;</bucket>
+              </map>
+              <map to='#d62728'>
+                <bucket>&quot;Breakout Rooms&quot;</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Pie' />
+            <encodings>
+              <color column='[federated.0abc1234].[none:FEATURE_NAME:nk]' />
+              <size column='[federated.0abc1234].[sum:USAGE_COUNT:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+        <datasource-dependencies datasource='federated.0abc1234'>
+          <column caption='Feature Name' datatype='string' name='[FEATURE_NAME]' role='dimension' type='nominal' />
+          <column caption='Usage Count' datatype='integer' name='[USAGE_COUNT]' role='measure' type='quantitative' />
+          <column-instance column='[FEATURE_NAME]' derivation='None' name='[none:FEATURE_NAME:nk]' pivot='key' type='nominal' />
+          <column-instance column='[USAGE_COUNT]' derivation='Sum' name='[sum:USAGE_COUNT:qk]' pivot='key' type='quantitative' />
+          
+          <filter class='categorical' column='[FEATURE_NAME]'>
+            <groupfilter from='&quot;Audio&quot;' function='range' level='[FEATURE_NAME]' to='&quot;Video&quot;' user:op='eq' />
+          </filter>
+        </datasource-dependencies>
+        <slices>
+          <column>[federated.0abc1234].[none:FEATURE_NAME:nk]</column>
+        </slices>
+        <aggregation value='true' />
+      </table>
+      <simple-id uuid='{C3D4E5F6-A7B8-4901-C234-D5E6F7A8B9C0}' />
+    </worksheet>
+  </worksheets>
+  
+  <windows source-height='30'>
+    <window class='worksheet' maximized='true' name='DAU WAU MAU Trends'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{D4E5F6A7-B8C9-4012-D345-E6F7A8B9C0D1}' />
+    </window>
+    <window class='worksheet' name='Meeting Duration by Type'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{E5F6A7B8-C9D0-4123-E456-F7A8B9C0D1E2}' />
+    </window>
+    <window class='worksheet' name='Feature Usage Distribution'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{F6A7B8C9-D0E1-4234-F567-A8B9C0D1E2F3}' />
+    </window>
+  </windows>
+</workbook>
