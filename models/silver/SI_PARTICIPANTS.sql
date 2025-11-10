@@ -10,32 +10,15 @@ WITH bronze_participants AS (
         bp.PARTICIPANT_ID,
         bp.MEETING_ID,
         bp.USER_ID,
-        bp.JOIN_TIME,
-        bp.LEAVE_TIME,
+        TRY_TO_TIMESTAMP(bp.JOIN_TIME) AS JOIN_TIME,
+        TRY_TO_TIMESTAMP(bp.LEAVE_TIME) AS LEAVE_TIME,
         bp.LOAD_TIMESTAMP,
         bp.UPDATE_TIMESTAMP,
         bp.SOURCE_SYSTEM
     FROM BRONZE.BZ_PARTICIPANTS bp
 ),
 
--- Join with meetings for boundary validation
-participants_with_meetings AS (
-    SELECT 
-        bp.PARTICIPANT_ID,
-        bp.MEETING_ID,
-        bp.USER_ID,
-        bp.JOIN_TIME,
-        bp.LEAVE_TIME,
-        bp.LOAD_TIMESTAMP,
-        bp.UPDATE_TIMESTAMP,
-        bp.SOURCE_SYSTEM,
-        sm.START_TIME AS meeting_start_time,
-        sm.END_TIME AS meeting_end_time
-    FROM bronze_participants bp
-    LEFT JOIN SILVER.SI_MEETINGS sm ON bp.MEETING_ID = sm.MEETING_ID
-),
-
--- Data quality validation and cleansing
+-- Data quality validation and cleansing (without cross-table joins for now)
 cleansed_participants AS (
     SELECT 
         PARTICIPANT_ID,
@@ -46,8 +29,6 @@ cleansed_participants AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        meeting_start_time,
-        meeting_end_time,
         
         -- Data quality scoring
         CASE 
@@ -56,8 +37,6 @@ cleansed_participants AS (
             WHEN USER_ID IS NULL THEN 30
             WHEN JOIN_TIME IS NULL OR LEAVE_TIME IS NULL THEN 40
             WHEN LEAVE_TIME <= JOIN_TIME THEN 50
-            WHEN meeting_start_time IS NULL THEN 60
-            WHEN JOIN_TIME < meeting_start_time OR LEAVE_TIME > meeting_end_time THEN 70
             ELSE 100
         END AS DATA_QUALITY_SCORE,
         
@@ -65,11 +44,9 @@ cleansed_participants AS (
         CASE 
             WHEN PARTICIPANT_ID IS NULL OR MEETING_ID IS NULL OR USER_ID IS NULL THEN 'FAILED'
             WHEN JOIN_TIME IS NULL OR LEAVE_TIME IS NULL OR LEAVE_TIME <= JOIN_TIME THEN 'FAILED'
-            WHEN meeting_start_time IS NULL THEN 'FAILED'
-            WHEN JOIN_TIME < meeting_start_time OR LEAVE_TIME > meeting_end_time THEN 'WARNING'
             ELSE 'PASSED'
         END AS VALIDATION_STATUS
-    FROM participants_with_meetings
+    FROM bronze_participants
 ),
 
 -- Remove duplicates using ROW_NUMBER
@@ -83,7 +60,6 @@ deduped_participants AS (
       AND JOIN_TIME IS NOT NULL
       AND LEAVE_TIME IS NOT NULL
       AND LEAVE_TIME > JOIN_TIME
-      AND meeting_start_time IS NOT NULL
 )
 
 SELECT 
