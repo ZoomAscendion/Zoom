@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_ID, PIPELINE_NAME, SOURCE_TABLE, TARGET_TABLE, EXECUTION_START_TIME, EXECUTION_STATUS) VALUES (GENERATE_UUID(), 'GO_DIM_DATE', 'SYSTEM_GENERATED', 'GO_DIM_DATE', CURRENT_TIMESTAMP(), 'STARTED')",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_ID, PIPELINE_NAME, SOURCE_TABLE, TARGET_TABLE, EXECUTION_END_TIME, EXECUTION_STATUS, RECORDS_PROCESSED) VALUES (GENERATE_UUID(), 'GO_DIM_DATE', 'SYSTEM_GENERATED', 'GO_DIM_DATE', CURRENT_TIMESTAMP(), 'COMPLETED', (SELECT COUNT(*) FROM {{ this }}))"
+    materialized='table'
 ) }}
 
 -- Gold Dimension: Date Dimension
@@ -9,7 +7,7 @@
 
 WITH date_range AS (
     SELECT DATEADD(day, ROW_NUMBER() OVER (ORDER BY NULL) - 1, '2020-01-01'::DATE) AS date_value
-    FROM TABLE(GENERATOR(ROWCOUNT => 3653)) -- 10 years
+    FROM TABLE(GENERATOR(ROWCOUNT => 1461)) -- 4 years
 ),
 
 date_attributes AS (
@@ -24,7 +22,7 @@ date_attributes AS (
         DAYOFWEEK(date_value) AS DAY_OF_WEEK,
         DAYNAME(date_value) AS DAY_NAME,
         CASE WHEN DAYOFWEEK(date_value) IN (1, 7) THEN TRUE ELSE FALSE END AS IS_WEEKEND,
-        FALSE AS IS_HOLIDAY, -- To be updated with holiday logic
+        FALSE AS IS_HOLIDAY,
         CASE WHEN MONTH(date_value) <= 6 THEN YEAR(date_value) ELSE YEAR(date_value) + 1 END AS FISCAL_YEAR,
         CASE WHEN MONTH(date_value) <= 6 THEN QUARTER(date_value) + 2 ELSE QUARTER(date_value) - 2 END AS FISCAL_QUARTER,
         WEEKOFYEAR(date_value) AS WEEK_OF_YEAR,
