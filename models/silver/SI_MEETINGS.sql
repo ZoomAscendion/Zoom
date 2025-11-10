@@ -10,15 +10,9 @@ WITH bronze_meetings AS (
         MEETING_ID,
         HOST_ID,
         MEETING_TOPIC,
-        -- Handle timestamp conversion - check if already timestamp or string
-        CASE 
-            WHEN TRY_TO_TIMESTAMP(START_TIME) IS NOT NULL THEN TRY_TO_TIMESTAMP(START_TIME)
-            ELSE START_TIME
-        END AS START_TIME,
-        CASE 
-            WHEN TRY_TO_TIMESTAMP(END_TIME) IS NOT NULL THEN TRY_TO_TIMESTAMP(END_TIME)
-            ELSE END_TIME
-        END AS END_TIME,
+        -- Use columns as-is since they're already timestamps
+        START_TIME,
+        END_TIME,
         DURATION_MINUTES,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
