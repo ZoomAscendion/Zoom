@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_ID, PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, PROCESS_STATUS, CREATED_AT, UPDATED_AT) VALUES (GENERATE_UUID(), 'go_fact_feature_usage_transformation', 'SI_FEATURE_USAGE', 'GO_FACT_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'STARTED', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP())",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET PROCESS_END_TIME = CURRENT_TIMESTAMP(), PROCESS_STATUS = 'COMPLETED', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}), UPDATED_AT = CURRENT_TIMESTAMP() WHERE PROCESS_NAME = 'go_fact_feature_usage_transformation' AND PROCESS_STATUS = 'STARTED'"
+    materialized='table'
 ) }}
 
 -- Feature Usage Fact Table
@@ -21,7 +19,7 @@ WITH feature_usage_base AS (
         ON fu.MEETING_ID = m.MEETING_ID
     WHERE fu.VALIDATION_STATUS = 'PASSED'
         AND fu.DATA_QUALITY_SCORE >= 80
-        AND m.VALIDATION_STATUS = 'PASSED'
+        AND (m.VALIDATION_STATUS = 'PASSED' OR m.VALIDATION_STATUS IS NULL)
 ),
 
 total_features AS (
