@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_ID, PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, PROCESS_STATUS, CREATED_AT, UPDATED_AT) VALUES (GENERATE_UUID(), 'go_fact_support_metrics_transformation', 'SI_SUPPORT_TICKETS', 'GO_FACT_SUPPORT_METRICS', CURRENT_TIMESTAMP(), 'STARTED', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP())",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET PROCESS_END_TIME = CURRENT_TIMESTAMP(), PROCESS_STATUS = 'COMPLETED', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}), UPDATED_AT = CURRENT_TIMESTAMP() WHERE PROCESS_NAME = 'go_fact_support_metrics_transformation' AND PROCESS_STATUS = 'STARTED'"
+    materialized='table'
 ) }}
 
 -- Support Metrics Fact Table
@@ -24,26 +22,29 @@ support_enriched AS (
         -- Calculate close date based on resolution status
         CASE 
             WHEN sb.RESOLUTION_STATUS IN ('Resolved', 'Closed') THEN 
-                sb.OPEN_DATE + INTERVAL '1 day' * 
+                DATEADD('day', 
                 CASE 
                     WHEN sb.TICKET_TYPE = 'Critical' THEN 1
                     WHEN sb.TICKET_TYPE = 'High' THEN 2
                     WHEN sb.TICKET_TYPE = 'Medium' THEN 5
                     ELSE 7
-                END
+                END, sb.OPEN_DATE)
             ELSE NULL
         END as TICKET_CLOSE_DATE,
         TIMESTAMP_FROM_PARTS(sb.OPEN_DATE, TIME('09:00:00')) as TICKET_CREATED_TIMESTAMP,
         -- Calculate resolved timestamp
         CASE 
             WHEN sb.RESOLUTION_STATUS IN ('Resolved', 'Closed') THEN 
-                TIMESTAMP_FROM_PARTS(sb.OPEN_DATE + INTERVAL '1 day' * 
-                CASE 
-                    WHEN sb.TICKET_TYPE = 'Critical' THEN 1
-                    WHEN sb.TICKET_TYPE = 'High' THEN 2
-                    WHEN sb.TICKET_TYPE = 'Medium' THEN 5
-                    ELSE 7
-                END, TIME('17:00:00'))
+                TIMESTAMP_FROM_PARTS(
+                    DATEADD('day', 
+                    CASE 
+                        WHEN sb.TICKET_TYPE = 'Critical' THEN 1
+                        WHEN sb.TICKET_TYPE = 'High' THEN 2
+                        WHEN sb.TICKET_TYPE = 'Medium' THEN 5
+                        ELSE 7
+                    END, sb.OPEN_DATE), 
+                    TIME('17:00:00')
+                )
             ELSE NULL
         END as TICKET_RESOLVED_TIMESTAMP,
         -- First response timestamp (estimated 2 hours after creation)
