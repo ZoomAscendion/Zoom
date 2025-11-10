@@ -21,15 +21,16 @@ clean-targets:
 # Configuring models
 models:
   zoom_silver_pipeline:
+    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
 
-vars:
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
+# Specify the minimum version of dbt required
+require-dbt-version: ">=1.0.0"
 
-# Global configurations
-quoting:
-  database: false
-  schema: false
-  identifier: false
+# Variables that can be referenced in models
+vars:
+  # The start date for incremental models
+  start_date: '2020-01-01'
+  # Data quality threshold
+  dq_threshold: 70
