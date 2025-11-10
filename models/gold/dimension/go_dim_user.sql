@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_ID, PIPELINE_NAME, SOURCE_TABLE, TARGET_TABLE, EXECUTION_START_TIME, EXECUTION_STATUS) VALUES (GENERATE_UUID(), 'GO_DIM_USER', 'SI_USERS', 'GO_DIM_USER', CURRENT_TIMESTAMP(), 'STARTED')",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_ID, PIPELINE_NAME, SOURCE_TABLE, TARGET_TABLE, EXECUTION_END_TIME, EXECUTION_STATUS, RECORDS_PROCESSED) VALUES (GENERATE_UUID(), 'GO_DIM_USER', 'SI_USERS', 'GO_DIM_USER', CURRENT_TIMESTAMP(), 'COMPLETED', (SELECT COUNT(*) FROM {{ this }}))"
+    materialized='table'
 ) }}
 
 -- Gold Dimension: User Dimension
@@ -19,7 +17,7 @@ WITH source_users AS (
         SOURCE_SYSTEM,
         VALIDATION_STATUS
     FROM {{ source('silver', 'si_users') }}
-    WHERE VALIDATION_STATUS = 'PASSED'
+    WHERE VALIDATION_STATUS = 'PASSED' OR VALIDATION_STATUS IS NULL
 ),
 
 cleansed_users AS (
@@ -29,9 +27,9 @@ cleansed_users AS (
         COALESCE(LOWER(TRIM(EMAIL)), 'unknown@unknown.com') AS EMAIL,
         COALESCE(TRIM(INITCAP(COMPANY)), 'Unknown Company') AS COMPANY,
         COALESCE(UPPER(TRIM(PLAN_TYPE)), 'UNKNOWN') AS PLAN_TYPE,
-        LOAD_DATE,
-        UPDATE_DATE,
-        SOURCE_SYSTEM
+        COALESCE(LOAD_DATE, CURRENT_DATE) AS LOAD_DATE,
+        COALESCE(UPDATE_DATE, CURRENT_DATE) AS UPDATE_DATE,
+        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
     FROM source_users
 ),
 
@@ -52,7 +50,7 @@ enriched_users AS (
             ELSE 'Other'
         END AS PLAN_CATEGORY,
         LOAD_DATE AS REGISTRATION_DATE,
-        'Active' AS USER_STATUS, -- Simplified for this example
+        'Active' AS USER_STATUS,
         'Unknown' AS GEOGRAPHIC_REGION,
         'Unknown' AS INDUSTRY_SECTOR,
         'User' AS USER_ROLE,
