@@ -1,9 +1,11 @@
-name: 'zoom_analytics_gold'
+name: 'zoom_gold_analytics'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_analytics'
+# This setting configures which "profile" dbt uses for this project.
+profile: 'zoom_gold_analytics'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -16,36 +18,35 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
-  zoom_analytics_gold:
-    +materialized: table
+  zoom_gold_analytics:
+    # Config indicated by + and applies to all files under models/gold/
     gold:
       +materialized: table
-      +pre-hook: |
+      +pre_hook: |
         {% if this.name != 'go_audit_log' %}
-        INSERT INTO {{ ref('go_audit_log') }} (
-          EXECUTION_ID, PIPELINE_NAME, EXECUTION_START_TIME, EXECUTION_STATUS, 
-          SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP
-        ) VALUES (
-          '{{ invocation_id }}', '{{ this.name }}', CURRENT_TIMESTAMP(), 'STARTED',
-          'SILVER', '{{ this.name }}', '{{ target.user }}', CURRENT_TIMESTAMP()
-        )
+          INSERT INTO {{ ref('go_audit_log') }} (AUDIT_ID, PIPELINE_NAME, SOURCE_TABLE, TARGET_TABLE, EXECUTION_START_TIME, EXECUTION_STATUS) 
+          VALUES (GENERATE_UUID(), '{{ this.name | upper }}', 'SILVER_LAYER', '{{ this.name | upper }}', CURRENT_TIMESTAMP(), 'STARTED')
         {% endif %}
-      +post-hook: |
+      +post_hook: |
         {% if this.name != 'go_audit_log' %}
-        UPDATE {{ ref('go_audit_log') }} 
-        SET EXECUTION_END_TIME = CURRENT_TIMESTAMP(),
-            EXECUTION_STATUS = 'COMPLETED',
-            RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
-            UPDATE_TIMESTAMP = CURRENT_TIMESTAMP()
-        WHERE EXECUTION_ID = '{{ invocation_id }}' AND PIPELINE_NAME = '{{ this.name }}'
+          INSERT INTO {{ ref('go_audit_log') }} (AUDIT_ID, PIPELINE_NAME, SOURCE_TABLE, TARGET_TABLE, EXECUTION_END_TIME, EXECUTION_STATUS, RECORDS_PROCESSED) 
+          VALUES (GENERATE_UUID(), '{{ this.name | upper }}', 'SILVER_LAYER', '{{ this.name | upper }}', CURRENT_TIMESTAMP(), 'COMPLETED', (SELECT COUNT(*) FROM {{ this }}))
         {% endif %}
       dimension:
-        +cluster_by: ["LOAD_DATE"]
+        +materialized: table
       fact:
-        +cluster_by: ["LOAD_DATE"]
+        +materialized: table
 
+# Global configurations
 vars:
-  data_quality_threshold: 80
-  validation_status_filter: "'PASSED'"
-  audit_retention_days: 90
+  # dbt-date configurations
+  'dbt_date:time_zone': 'UTC'
+  
+# Dependencies and run order
+on-run-start:
+  - "{{ log('Starting Gold Layer Transformation Pipeline', info=True) }}"
+  
+on-run-end:
+  - "{{ log('Gold Layer Transformation Pipeline Completed', info=True) }}"
