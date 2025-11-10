@@ -13,7 +13,12 @@ WITH bronze_support_tickets AS (
         USER_ID,
         TICKET_TYPE,
         RESOLUTION_STATUS,
-        OPEN_DATE,
+        -- Handle different date formats
+        CASE 
+            WHEN OPEN_DATE IS NOT NULL THEN
+                TRY_TO_DATE(OPEN_DATE, 'DD/MM/YYYY')
+            ELSE NULL
+        END AS OPEN_DATE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
