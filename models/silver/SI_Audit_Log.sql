@@ -3,8 +3,8 @@
     on_schema_change='sync_all_columns'
 ) }}
 
--- Audit Log table for Silver layer pipeline execution tracking
--- This table must be created first before any other Silver models
+-- Audit log table for Silver layer pipeline execution tracking
+-- This table must be created first before other models run
 
 SELECT 
     CAST(NULL AS VARCHAR(255)) AS EXECUTION_ID,
