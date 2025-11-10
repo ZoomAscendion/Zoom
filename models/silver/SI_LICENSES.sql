@@ -12,17 +12,9 @@ WITH bronze_licenses AS (
         LICENSE_ID,
         LICENSE_TYPE,
         ASSIGNED_TO_USER_ID,
-        -- Handle various date formats using multiple approaches
-        CASE 
-            WHEN REGEXP_LIKE(START_DATE, '^\\d{2}/\\d{2}/\\d{4}$') THEN TO_DATE(START_DATE, 'DD/MM/YYYY')
-            WHEN REGEXP_LIKE(START_DATE, '^\\d{4}-\\d{2}-\\d{2}$') THEN TO_DATE(START_DATE, 'YYYY-MM-DD')
-            ELSE TRY_TO_DATE(START_DATE)
-        END AS START_DATE,
-        CASE 
-            WHEN REGEXP_LIKE(END_DATE, '^\\d{2}/\\d{2}/\\d{4}$') THEN TO_DATE(END_DATE, 'DD/MM/YYYY')
-            WHEN REGEXP_LIKE(END_DATE, '^\\d{4}-\\d{2}-\\d{2}$') THEN TO_DATE(END_DATE, 'YYYY-MM-DD')
-            ELSE TRY_TO_DATE(END_DATE)
-        END AS END_DATE,
+        -- Handle various date formats using TRY_TO_DATE only
+        TRY_TO_DATE(START_DATE) AS START_DATE,
+        TRY_TO_DATE(END_DATE) AS END_DATE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
