@@ -12,8 +12,17 @@ WITH bronze_licenses AS (
         LICENSE_ID,
         LICENSE_TYPE,
         ASSIGNED_TO_USER_ID,
-        START_DATE,
-        END_DATE,
+        -- Handle different date formats
+        CASE 
+            WHEN START_DATE IS NOT NULL THEN
+                TRY_TO_DATE(START_DATE, 'DD/MM/YYYY')
+            ELSE NULL
+        END AS START_DATE,
+        CASE 
+            WHEN END_DATE IS NOT NULL THEN
+                TRY_TO_DATE(END_DATE, 'DD/MM/YYYY')
+            ELSE NULL
+        END AS END_DATE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
