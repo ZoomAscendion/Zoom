@@ -12,8 +12,9 @@ WITH bronze_meetings AS (
         MEETING_ID,
         HOST_ID,
         MEETING_TOPIC,
-        START_TIME,
-        END_TIME,
+        -- Handle various timestamp formats safely
+        TRY_TO_TIMESTAMP(START_TIME) AS START_TIME,
+        TRY_TO_TIMESTAMP(END_TIME) AS END_TIME,
         DURATION_MINUTES,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
@@ -33,8 +34,12 @@ cleansed_meetings AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        -- Calculate actual duration for validation
-        DATEDIFF('minute', START_TIME, END_TIME) AS CALCULATED_DURATION,
+        -- Calculate actual duration for validation (only if both timestamps are valid)
+        CASE 
+            WHEN START_TIME IS NOT NULL AND END_TIME IS NOT NULL 
+            THEN DATEDIFF('minute', START_TIME, END_TIME)
+            ELSE NULL
+        END AS CALCULATED_DURATION,
         -- Data quality scoring
         CASE 
             WHEN MEETING_ID IS NULL THEN 0
@@ -42,14 +47,16 @@ cleansed_meetings AS (
             WHEN START_TIME IS NULL OR END_TIME IS NULL THEN 30
             WHEN END_TIME <= START_TIME THEN 40
             WHEN DURATION_MINUTES < 0 OR DURATION_MINUTES > 1440 THEN 50
-            WHEN ABS(DURATION_MINUTES - DATEDIFF('minute', START_TIME, END_TIME)) > 1 THEN 70
+            WHEN START_TIME IS NOT NULL AND END_TIME IS NOT NULL AND ABS(DURATION_MINUTES - DATEDIFF('minute', START_TIME, END_TIME)) > 1 THEN 70
             ELSE 100
         END AS DATA_QUALITY_SCORE,
         -- Validation status
         CASE 
-            WHEN MEETING_ID IS NULL OR HOST_ID IS NULL OR START_TIME IS NULL OR END_TIME IS NULL THEN 'FAILED'
-            WHEN END_TIME <= START_TIME OR DURATION_MINUTES < 0 OR DURATION_MINUTES > 1440 THEN 'FAILED'
-            WHEN ABS(DURATION_MINUTES - DATEDIFF('minute', START_TIME, END_TIME)) > 1 THEN 'WARNING'
+            WHEN MEETING_ID IS NULL OR HOST_ID IS NULL THEN 'FAILED'
+            WHEN START_TIME IS NULL OR END_TIME IS NULL THEN 'FAILED'
+            WHEN END_TIME <= START_TIME THEN 'FAILED'
+            WHEN DURATION_MINUTES < 0 OR DURATION_MINUTES > 1440 THEN 'FAILED'
+            WHEN START_TIME IS NOT NULL AND END_TIME IS NOT NULL AND ABS(DURATION_MINUTES - DATEDIFF('minute', START_TIME, END_TIME)) > 1 THEN 'WARNING'
             ELSE 'PASSED'
         END AS VALIDATION_STATUS
     FROM bronze_meetings
