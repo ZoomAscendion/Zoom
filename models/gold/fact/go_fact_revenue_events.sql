@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_FACT_REVENUE_EVENTS_TRANSFORMATION', 'SI_BILLING_EVENTS', 'GO_FACT_REVENUE_EVENTS', CURRENT_TIMESTAMP(), 'STARTED', 'Revenue events fact transformation started', CURRENT_DATE(), CURRENT_DATE())",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_END_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_FACT_REVENUE_EVENTS_TRANSFORMATION', 'SI_BILLING_EVENTS', 'GO_FACT_REVENUE_EVENTS', CURRENT_TIMESTAMP(), 'COMPLETED', 'Revenue events fact transformation completed successfully', CURRENT_DATE(), CURRENT_DATE())"
+    materialized='table'
 ) }}
 
 -- Revenue Events Fact Table
@@ -14,15 +12,27 @@ WITH revenue_base AS (
         be.EVENT_TYPE,
         be.AMOUNT,
         be.EVENT_DATE,
-        u.PLAN_TYPE,
-        l.LICENSE_TYPE,
         be.SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_billing_events') }} be
-    LEFT JOIN {{ source('silver', 'si_users') }} u ON be.USER_ID = u.USER_ID
-    LEFT JOIN {{ source('silver', 'si_licenses') }} l ON u.USER_ID = l.ASSIGNED_TO_USER_ID
+    FROM SILVER.SI_BILLING_EVENTS be
     WHERE be.VALIDATION_STATUS = 'PASSED'
         AND be.DATA_QUALITY_SCORE >= 80
         AND be.AMOUNT > 0
+),
+
+user_info AS (
+    SELECT 
+        USER_ID,
+        PLAN_TYPE
+    FROM SILVER.SI_USERS
+    WHERE VALIDATION_STATUS = 'PASSED'
+),
+
+license_info AS (
+    SELECT 
+        ASSIGNED_TO_USER_ID,
+        LICENSE_TYPE
+    FROM SILVER.SI_LICENSES
+    WHERE VALIDATION_STATUS = 'PASSED'
 ),
 
 revenue_calculations AS (
@@ -43,15 +53,15 @@ revenue_calculations AS (
         rb.AMOUNT * 0.08 AS TAX_AMOUNT,
         -- Discount calculation based on plan type
         CASE 
-            WHEN rb.PLAN_TYPE = 'Enterprise' THEN rb.AMOUNT * 0.15
-            WHEN rb.PLAN_TYPE = 'Pro' THEN rb.AMOUNT * 0.10
+            WHEN u.PLAN_TYPE = 'Enterprise' THEN rb.AMOUNT * 0.15
+            WHEN u.PLAN_TYPE = 'Pro' THEN rb.AMOUNT * 0.10
             ELSE 0
         END AS DISCOUNT_AMOUNT,
         -- Net amount calculation
         rb.AMOUNT - (rb.AMOUNT * 0.08) - 
         CASE 
-            WHEN rb.PLAN_TYPE = 'Enterprise' THEN rb.AMOUNT * 0.15
-            WHEN rb.PLAN_TYPE = 'Pro' THEN rb.AMOUNT * 0.10
+            WHEN u.PLAN_TYPE = 'Enterprise' THEN rb.AMOUNT * 0.15
+            WHEN u.PLAN_TYPE = 'Pro' THEN rb.AMOUNT * 0.10
             ELSE 0
         END AS NET_AMOUNT,
         'USD' AS CURRENCY_CODE,
@@ -66,8 +76,8 @@ revenue_calculations AS (
         'Completed' AS PAYMENT_STATUS,
         -- Subscription period determination
         CASE 
-            WHEN UPPER(rb.LICENSE_TYPE) LIKE '%ANNUAL%' THEN 12
-            WHEN UPPER(rb.LICENSE_TYPE) LIKE '%MONTHLY%' THEN 1
+            WHEN UPPER(l.LICENSE_TYPE) LIKE '%ANNUAL%' THEN 12
+            WHEN UPPER(l.LICENSE_TYPE) LIKE '%MONTHLY%' THEN 1
             ELSE 12
         END AS SUBSCRIPTION_PERIOD_MONTHS,
         -- Recurring revenue flag
@@ -77,22 +87,22 @@ revenue_calculations AS (
         END AS IS_RECURRING_REVENUE,
         -- Customer lifetime value calculation
         CASE 
-            WHEN rb.PLAN_TYPE = 'Enterprise' THEN rb.AMOUNT * 24
-            WHEN rb.PLAN_TYPE = 'Pro' THEN rb.AMOUNT * 18
-            WHEN rb.PLAN_TYPE = 'Basic' THEN rb.AMOUNT * 12
+            WHEN u.PLAN_TYPE = 'Enterprise' THEN rb.AMOUNT * 24
+            WHEN u.PLAN_TYPE = 'Pro' THEN rb.AMOUNT * 18
+            WHEN u.PLAN_TYPE = 'Basic' THEN rb.AMOUNT * 12
             ELSE rb.AMOUNT * 6
         END AS CUSTOMER_LIFETIME_VALUE,
         -- MRR impact calculation
         CASE 
-            WHEN UPPER(rb.EVENT_TYPE) LIKE '%SUBSCRIPTION%' AND UPPER(rb.LICENSE_TYPE) LIKE '%MONTHLY%' THEN rb.AMOUNT
-            WHEN UPPER(rb.EVENT_TYPE) LIKE '%SUBSCRIPTION%' AND UPPER(rb.LICENSE_TYPE) LIKE '%ANNUAL%' THEN rb.AMOUNT / 12
+            WHEN UPPER(rb.EVENT_TYPE) LIKE '%SUBSCRIPTION%' AND UPPER(l.LICENSE_TYPE) LIKE '%MONTHLY%' THEN rb.AMOUNT
+            WHEN UPPER(rb.EVENT_TYPE) LIKE '%SUBSCRIPTION%' AND UPPER(l.LICENSE_TYPE) LIKE '%ANNUAL%' THEN rb.AMOUNT / 12
             ELSE 0
         END AS MRR_IMPACT,
         -- ARR impact calculation
         CASE 
             WHEN UPPER(rb.EVENT_TYPE) LIKE '%SUBSCRIPTION%' THEN 
                 CASE 
-                    WHEN UPPER(rb.LICENSE_TYPE) LIKE '%MONTHLY%' THEN rb.AMOUNT * 12
+                    WHEN UPPER(l.LICENSE_TYPE) LIKE '%MONTHLY%' THEN rb.AMOUNT * 12
                     ELSE rb.AMOUNT
                 END
             ELSE 0
@@ -103,6 +113,8 @@ revenue_calculations AS (
         CURRENT_DATE() AS UPDATE_DATE,
         rb.SOURCE_SYSTEM
     FROM revenue_base rb
+    LEFT JOIN user_info u ON rb.USER_ID = u.USER_ID
+    LEFT JOIN license_info l ON rb.USER_ID = l.ASSIGNED_TO_USER_ID
 )
 
 SELECT * FROM revenue_calculations
