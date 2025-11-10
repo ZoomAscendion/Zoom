@@ -12,12 +12,31 @@ WITH bronze_licenses AS (
         LICENSE_ID,
         LICENSE_TYPE,
         ASSIGNED_TO_USER_ID,
-        START_DATE,
-        END_DATE,
+        -- Handle various date formats safely
+        TRY_TO_DATE(START_DATE, 'DD/MM/YYYY') AS START_DATE_PARSED1,
+        TRY_TO_DATE(START_DATE, 'YYYY-MM-DD') AS START_DATE_PARSED2,
+        TRY_TO_DATE(START_DATE) AS START_DATE_PARSED3,
+        TRY_TO_DATE(END_DATE, 'DD/MM/YYYY') AS END_DATE_PARSED1,
+        TRY_TO_DATE(END_DATE, 'YYYY-MM-DD') AS END_DATE_PARSED2,
+        TRY_TO_DATE(END_DATE) AS END_DATE_PARSED3,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM {{ source('bronze', 'BZ_LICENSES') }}
+),
+
+-- Select the first successful date parse
+date_normalized_licenses AS (
+    SELECT 
+        LICENSE_ID,
+        LICENSE_TYPE,
+        ASSIGNED_TO_USER_ID,
+        COALESCE(START_DATE_PARSED1, START_DATE_PARSED2, START_DATE_PARSED3) AS START_DATE,
+        COALESCE(END_DATE_PARSED1, END_DATE_PARSED2, END_DATE_PARSED3) AS END_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM bronze_licenses
 ),
 
 -- Data quality validation and cleansing
@@ -49,7 +68,7 @@ cleansed_licenses AS (
             WHEN START_DATE >= END_DATE THEN 'FAILED'
             ELSE 'PASSED'
         END AS VALIDATION_STATUS
-    FROM bronze_licenses
+    FROM date_normalized_licenses
 ),
 
 -- Remove duplicates keeping the latest record
