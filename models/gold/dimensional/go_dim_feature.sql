@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_DIM_FEATURE_TRANSFORMATION', 'SI_FEATURE_USAGE', 'GO_DIM_FEATURE', CURRENT_TIMESTAMP(), 'STARTED', 'Feature dimension transformation started', CURRENT_DATE(), CURRENT_DATE())",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_END_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_DIM_FEATURE_TRANSFORMATION', 'SI_FEATURE_USAGE', 'GO_DIM_FEATURE', CURRENT_TIMESTAMP(), 'COMPLETED', 'Feature dimension transformation completed successfully', CURRENT_DATE(), CURRENT_DATE())"
+    materialized='table'
 ) }}
 
 -- Feature Dimension Table
@@ -11,7 +9,7 @@ WITH distinct_features AS (
     SELECT DISTINCT 
         FEATURE_NAME,
         SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_feature_usage') }}
+    FROM SILVER.SI_FEATURE_USAGE
     WHERE FEATURE_NAME IS NOT NULL
         AND TRIM(FEATURE_NAME) != ''
         AND VALIDATION_STATUS = 'PASSED'
