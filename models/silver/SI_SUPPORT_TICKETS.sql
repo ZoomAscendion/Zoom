@@ -13,7 +13,7 @@ WITH bronze_support_tickets AS (
         USER_ID,
         TICKET_TYPE,
         RESOLUTION_STATUS,
-        OPEN_DATE,
+        TRY_TO_DATE(OPEN_DATE) AS OPEN_DATE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
