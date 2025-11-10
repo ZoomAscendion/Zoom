@@ -1,0 +1,89 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_DIM_SUPPORT_CATEGORY_TRANSFORMATION', 'SI_SUPPORT_TICKETS', 'GO_DIM_SUPPORT_CATEGORY', CURRENT_TIMESTAMP(), 'STARTED', 'Support category dimension transformation started', CURRENT_DATE(), CURRENT_DATE())",
+    post_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_END_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_DIM_SUPPORT_CATEGORY_TRANSFORMATION', 'SI_SUPPORT_TICKETS', 'GO_DIM_SUPPORT_CATEGORY', CURRENT_TIMESTAMP(), 'COMPLETED', 'Support category dimension transformation completed successfully', CURRENT_DATE(), CURRENT_DATE())"
+) }}
+
+-- Support Category Dimension Table
+-- Standardizes support ticket categories and resolution characteristics
+
+WITH distinct_ticket_types AS (
+    SELECT DISTINCT 
+        TICKET_TYPE,
+        SOURCE_SYSTEM
+    FROM {{ source('silver', 'si_support_tickets') }}
+    WHERE TICKET_TYPE IS NOT NULL
+        AND TRIM(TICKET_TYPE) != ''
+        AND VALIDATION_STATUS = 'PASSED'
+),
+
+support_category_attributes AS (
+    SELECT 
+        ROW_NUMBER() OVER (ORDER BY TICKET_TYPE) AS SUPPORT_CATEGORY_ID,
+        TICKET_TYPE AS SUPPORT_CATEGORY,
+        CASE 
+            WHEN UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN 'Technical'
+            WHEN UPPER(TICKET_TYPE) LIKE '%BILLING%' THEN 'Billing'
+            WHEN UPPER(TICKET_TYPE) LIKE '%FEATURE%' THEN 'Feature Request'
+            WHEN UPPER(TICKET_TYPE) LIKE '%ACCOUNT%' THEN 'Account'
+            WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' THEN 'Critical Issue'
+            WHEN UPPER(TICKET_TYPE) LIKE '%HIGH%' THEN 'High Priority'
+            WHEN UPPER(TICKET_TYPE) LIKE '%MEDIUM%' THEN 'Medium Priority'
+            WHEN UPPER(TICKET_TYPE) LIKE '%LOW%' THEN 'Low Priority'
+            ELSE 'General'
+        END AS SUPPORT_SUBCATEGORY,
+        CASE 
+            WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' THEN 'Critical'
+            WHEN UPPER(TICKET_TYPE) LIKE '%HIGH%' THEN 'High'
+            WHEN UPPER(TICKET_TYPE) LIKE '%MEDIUM%' THEN 'Medium'
+            WHEN UPPER(TICKET_TYPE) LIKE '%LOW%' THEN 'Low'
+            ELSE 'Medium'
+        END AS PRIORITY_LEVEL,
+        CASE 
+            WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' THEN 4
+            WHEN UPPER(TICKET_TYPE) LIKE '%HIGH%' THEN 24
+            WHEN UPPER(TICKET_TYPE) LIKE '%MEDIUM%' THEN 72
+            WHEN UPPER(TICKET_TYPE) LIKE '%LOW%' THEN 168
+            ELSE 72
+        END AS EXPECTED_RESOLUTION_HOURS,
+        CASE 
+            WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' OR UPPER(TICKET_TYPE) LIKE '%HIGH%' THEN TRUE
+            ELSE FALSE
+        END AS REQUIRES_ESCALATION,
+        CASE 
+            WHEN UPPER(TICKET_TYPE) LIKE '%LOW%' OR UPPER(TICKET_TYPE) LIKE '%MEDIUM%' THEN TRUE
+            ELSE FALSE
+        END AS SELF_SERVICE_AVAILABLE,
+        CASE 
+            WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' OR UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN TRUE
+            ELSE FALSE
+        END AS SPECIALIST_REQUIRED,
+        CASE 
+            WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' THEN 'High'
+            WHEN UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN 'Medium'
+            ELSE 'Low'
+        END AS CATEGORY_COMPLEXITY,
+        CASE 
+            WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' THEN 'High'
+            WHEN UPPER(TICKET_TYPE) LIKE '%HIGH%' THEN 'Medium'
+            ELSE 'Low'
+        END AS CUSTOMER_IMPACT_LEVEL,
+        CASE 
+            WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' THEN 'Phone Support'
+            WHEN UPPER(TICKET_TYPE) LIKE '%HIGH%' THEN 'Email/Chat'
+            ELSE 'Self-Service'
+        END AS RESOLUTION_METHOD,
+        CASE 
+            WHEN UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN 15
+            WHEN UPPER(TICKET_TYPE) LIKE '%BILLING%' THEN 8
+            WHEN UPPER(TICKET_TYPE) LIKE '%ACCOUNT%' THEN 5
+            ELSE 3
+        END AS KNOWLEDGE_BASE_ARTICLES,
+        CURRENT_DATE() AS LOAD_DATE,
+        CURRENT_DATE() AS UPDATE_DATE,
+        SOURCE_SYSTEM
+    FROM distinct_ticket_types
+)
+
+SELECT * FROM support_category_attributes
+ORDER BY SUPPORT_CATEGORY_ID
