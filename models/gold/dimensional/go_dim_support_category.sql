@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_DIM_SUPPORT_CATEGORY_TRANSFORMATION', 'SI_SUPPORT_TICKETS', 'GO_DIM_SUPPORT_CATEGORY', CURRENT_TIMESTAMP(), 'STARTED', 'Support category dimension transformation started', CURRENT_DATE(), CURRENT_DATE())",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_END_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_DIM_SUPPORT_CATEGORY_TRANSFORMATION', 'SI_SUPPORT_TICKETS', 'GO_DIM_SUPPORT_CATEGORY', CURRENT_TIMESTAMP(), 'COMPLETED', 'Support category dimension transformation completed successfully', CURRENT_DATE(), CURRENT_DATE())"
+    materialized='table'
 ) }}
 
 -- Support Category Dimension Table
@@ -11,7 +9,7 @@ WITH distinct_ticket_types AS (
     SELECT DISTINCT 
         TICKET_TYPE,
         SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_support_tickets') }}
+    FROM SILVER.SI_SUPPORT_TICKETS
     WHERE TICKET_TYPE IS NOT NULL
         AND TRIM(TICKET_TYPE) != ''
         AND VALIDATION_STATUS = 'PASSED'
