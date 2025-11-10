@@ -10,9 +10,9 @@
 
 SELECT 
     ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP()) AS record_id,
-    'BZ_DATA_AUDIT' AS source_table,
+    CAST('BZ_DATA_AUDIT' AS VARCHAR(255)) AS source_table,
     CURRENT_TIMESTAMP() AS load_timestamp,
-    'DBT_SYSTEM' AS processed_by,
-    0.0 AS processing_time,
-    'INITIALIZED' AS status
+    CAST('DBT_SYSTEM' AS VARCHAR(255)) AS processed_by,
+    CAST(0.0 AS NUMBER(38,3)) AS processing_time,
+    CAST('INITIALIZED' AS VARCHAR(255)) AS status
 WHERE FALSE -- This creates the table structure without inserting any data
