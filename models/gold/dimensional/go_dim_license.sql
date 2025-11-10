@@ -1,13 +1,25 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_DIM_LICENSE_TRANSFORMATION', 'SI_LICENSES', 'GO_DIM_LICENSE', CURRENT_TIMESTAMP(), 'STARTED', 'License dimension transformation started', CURRENT_DATE(), CURRENT_DATE())",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_END_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_DIM_LICENSE_TRANSFORMATION', 'SI_LICENSES', 'GO_DIM_LICENSE', CURRENT_TIMESTAMP(), 'COMPLETED', 'License dimension transformation completed successfully', CURRENT_DATE(), CURRENT_DATE())"
+    materialized='table'
 ) }}
 
 -- License Dimension Table
 -- Transforms Silver layer license data with business rules and entitlements
 
-WITH license_transformations AS (
+WITH license_base AS (
+    SELECT 
+        LICENSE_ID,
+        LICENSE_TYPE,
+        START_DATE,
+        END_DATE,
+        SOURCE_SYSTEM,
+        VALIDATION_STATUS,
+        DATA_QUALITY_SCORE
+    FROM SILVER.SI_LICENSES
+    WHERE VALIDATION_STATUS = 'PASSED'
+        AND DATA_QUALITY_SCORE >= 80
+),
+
+license_transformations AS (
     SELECT 
         ROW_NUMBER() OVER (ORDER BY LICENSE_TYPE, START_DATE) AS LICENSE_ID,
         LICENSE_TYPE,
@@ -89,9 +101,7 @@ WITH license_transformations AS (
         CURRENT_DATE() AS LOAD_DATE,
         CURRENT_DATE() AS UPDATE_DATE,
         SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_licenses') }}
-    WHERE VALIDATION_STATUS = 'PASSED'
-        AND DATA_QUALITY_SCORE >= 80
+    FROM license_base
 )
 
 SELECT * FROM license_transformations
