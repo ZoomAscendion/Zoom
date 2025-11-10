@@ -3,214 +3,33 @@ version: 2
 models:
   - name: go_audit_log
     description: "Audit log table for tracking all Gold layer transformations"
-    columns:
-      - name: audit_id
-        description: "Unique identifier for each audit record"
-      - name: pipeline_name
-        description: "Name of the pipeline or transformation"
-      - name: source_table
-        description: "Source table name"
-      - name: target_table
-        description: "Target table name"
-      - name: execution_start_time
-        description: "Timestamp when execution started"
-      - name: execution_end_time
-        description: "Timestamp when execution ended"
-      - name: execution_status
-        description: "Status of execution (STARTED, COMPLETED, FAILED)"
-      - name: records_processed
-        description: "Number of records processed"
-      - name: error_message
-        description: "Error message if any"
-        
+    
   - name: go_dim_date
     description: "Standard date dimension for time-based analysis"
-    columns:
-      - name: date_id
-        description: "Unique identifier for each date"
-      - name: date_value
-        description: "Actual date value"
-      - name: year
-        description: "Year component"
-      - name: quarter
-        description: "Quarter component (1-4)"
-      - name: month
-        description: "Month component (1-12)"
-      - name: month_name
-        description: "Full month name"
-      - name: day_of_month
-        description: "Day of month (1-31)"
-      - name: day_of_week
-        description: "Day of week (1-7)"
-      - name: day_name
-        description: "Full day name"
-      - name: is_weekend
-        description: "Flag indicating if date is weekend"
-      - name: is_holiday
-        description: "Flag indicating if date is holiday"
-      - name: fiscal_year
-        description: "Fiscal year"
-      - name: fiscal_quarter
-        description: "Fiscal quarter"
-      - name: week_of_year
-        description: "Week number in year"
-      - name: quarter_name
-        description: "Quarter name (Q1, Q2, Q3, Q4)"
-      - name: month_year
-        description: "Month-Year combination"
-        
+    
   - name: go_dim_user
     description: "User profile and subscription information with SCD Type 2"
-    columns:
-      - name: user_dim_id
-        description: "Surrogate key for user dimension"
-      - name: user_name
-        description: "Display name of the user"
-      - name: email_domain
-        description: "Domain extracted from email address"
-      - name: company
-        description: "Company or organization name"
-      - name: plan_type
-        description: "Subscription plan type"
-      - name: plan_category
-        description: "Standardized plan category"
-      - name: registration_date
-        description: "User registration date"
-      - name: user_status
-        description: "Current user status"
-      - name: effective_start_date
-        description: "SCD Type 2 effective start date"
-      - name: effective_end_date
-        description: "SCD Type 2 effective end date"
-      - name: is_current_record
-        description: "Flag indicating current record"
-        
+    
   - name: go_dim_feature
     description: "Platform features and their characteristics"
-    columns:
-      - name: feature_id
-        description: "Unique identifier for each feature"
-      - name: feature_name
-        description: "Name of the feature"
-      - name: feature_category
-        description: "Category of the feature"
-      - name: feature_type
-        description: "Type of feature (Core, Advanced)"
-      - name: feature_complexity
-        description: "Complexity level of the feature"
-      - name: is_premium_feature
-        description: "Flag indicating if feature is premium"
-        
+    
   - name: go_dim_license
     description: "License types and entitlements"
-    columns:
-      - name: license_id
-        description: "Unique identifier for each license type"
-      - name: license_type
-        description: "Type of license"
-      - name: license_category
-        description: "Category of license"
-      - name: license_tier
-        description: "Tier of license"
-      - name: max_participants
-        description: "Maximum participants allowed"
-      - name: monthly_price
-        description: "Monthly price of license"
-      - name: annual_price
-        description: "Annual price of license"
-        
+    
   - name: go_dim_meeting_type
     description: "Meeting types and characteristics"
-    columns:
-      - name: meeting_type_id
-        description: "Unique identifier for each meeting type"
-      - name: meeting_type
-        description: "Type of meeting"
-      - name: meeting_category
-        description: "Category of meeting"
-      - name: duration_category
-        description: "Duration category of meeting"
-      - name: max_participants_allowed
-        description: "Maximum participants allowed for this meeting type"
-        
+    
   - name: go_dim_support_category
     description: "Support ticket categories and characteristics"
-    columns:
-      - name: support_category_id
-        description: "Unique identifier for each support category"
-      - name: support_category
-        description: "Category of support ticket"
-      - name: support_subcategory
-        description: "Subcategory of support ticket"
-      - name: priority_level
-        description: "Priority level of support category"
-      - name: expected_resolution_hours
-        description: "Expected resolution time in hours"
-        
+    
   - name: go_fact_feature_usage
     description: "Detailed feature usage metrics and patterns"
-    columns:
-      - name: feature_usage_id
-        description: "Unique identifier for each feature usage record"
-      - name: usage_date
-        description: "Date of feature usage"
-      - name: feature_name
-        description: "Name of the feature used"
-      - name: usage_count
-        description: "Number of times feature was used"
-      - name: usage_duration_minutes
-        description: "Duration of feature usage in minutes"
-      - name: user_experience_score
-        description: "User experience score for the feature"
-        
+    
   - name: go_fact_meeting_activity
     description: "Comprehensive meeting activities and engagement metrics"
-    columns:
-      - name: meeting_activity_id
-        description: "Unique identifier for each meeting activity record"
-      - name: meeting_date
-        description: "Date of the meeting"
-      - name: meeting_start_time
-        description: "Meeting start timestamp"
-      - name: meeting_end_time
-        description: "Meeting end timestamp"
-      - name: participant_count
-        description: "Number of participants in meeting"
-      - name: unique_participants
-        description: "Number of unique participants"
-      - name: meeting_quality_score
-        description: "Overall meeting quality score"
-        
+    
   - name: go_fact_revenue_events
     description: "Revenue-generating events and financial transactions"
-    columns:
-      - name: revenue_event_id
-        description: "Unique identifier for each revenue event"
-      - name: transaction_date
-        description: "Date of the transaction"
-      - name: event_type
-        description: "Type of revenue event"
-      - name: gross_amount
-        description: "Gross amount of the transaction"
-      - name: net_amount
-        description: "Net amount after taxes and discounts"
-      - name: is_recurring_revenue
-        description: "Flag indicating if this is recurring revenue"
-        
+    
   - name: go_fact_support_metrics
     description: "Support ticket activities and resolution performance metrics"
-    columns:
-      - name: support_metrics_id
-        description: "Unique identifier for each support metrics record"
-      - name: ticket_open_date
-        description: "Date when ticket was opened"
-      - name: ticket_close_date
-        description: "Date when ticket was closed"
-      - name: ticket_type
-        description: "Type of support ticket"
-      - name: resolution_status
-        description: "Status of ticket resolution"
-      - name: resolution_time_hours
-        description: "Time taken to resolve ticket in hours"
-      - name: customer_satisfaction_score
-        description: "Customer satisfaction score for the support"
