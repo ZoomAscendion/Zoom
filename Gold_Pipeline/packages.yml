@@ -1,0 +1,49 @@
+# packages.yml
+# Zoom Platform Analytics System - DBT Package Dependencies
+# Author: Data Engineering Team
+# Description: External package dependencies for the Gold layer transformation pipeline
+
+packages:
+  # dbt-utils: Essential macros and tests for data transformations
+  - package: dbt-labs/dbt_utils
+    version: 1.1.1
+    
+  # dbt-expectations: Advanced data quality tests and validations
+  - package: calogica/dbt_expectations
+    version: 0.10.1
+    
+  # dbt-audit-helper: Tools for comparing datasets and validating transformations
+  - package: dbt-labs/audit_helper
+    version: 0.9.0
+    
+  # dbt-codegen: Code generation utilities for faster development
+  - package: dbt-labs/codegen
+    version: 0.12.1
+
+# Package configuration
+# These packages provide:
+# 
+# dbt_utils:
+# - generate_surrogate_key(): For creating dimension keys
+# - get_column_values(): For dynamic value extraction
+# - pivot(): For data pivoting operations
+# - date_spine(): For date dimension generation
+# - safe_cast(): For safe data type conversions
+# - union_relations(): For combining multiple tables
+#
+# dbt_expectations:
+# - expect_column_values_to_be_unique(): Uniqueness validation
+# - expect_column_values_to_not_be_null(): Null value checks
+# - expect_column_values_to_be_in_set(): Value validation
+# - expect_table_row_count_to_be_between(): Row count validation
+# - expect_column_mean_to_be_between(): Statistical validation
+#
+# audit_helper:
+# - compare_relations(): Compare source and target data
+# - compare_column_values(): Validate transformation accuracy
+# - compare_all_columns(): Comprehensive data comparison
+#
+# codegen:
+# - generate_source(): Auto-generate source configurations
+# - generate_base_model(): Create base model templates
+# - generate_model_yaml(): Generate model documentation
