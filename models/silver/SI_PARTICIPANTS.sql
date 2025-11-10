@@ -10,9 +10,9 @@ WITH bronze_participants AS (
         bp.PARTICIPANT_ID,
         bp.MEETING_ID,
         bp.USER_ID,
-        -- Use columns as-is since they're already timestamps
-        bp.JOIN_TIME,
-        bp.LEAVE_TIME,
+        -- Handle timestamp conversion with TRY_TO_TIMESTAMP for string timestamps
+        TRY_TO_TIMESTAMP(bp.JOIN_TIME) AS JOIN_TIME,
+        TRY_TO_TIMESTAMP(bp.LEAVE_TIME) AS LEAVE_TIME,
         bp.LOAD_TIMESTAMP,
         bp.UPDATE_TIMESTAMP,
         bp.SOURCE_SYSTEM
