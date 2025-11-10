@@ -1,0 +1,51 @@
+# =====================================================
+# DBT PACKAGES CONFIGURATION
+# Project: Zoom Platform Analytics System - Gold Layer
+# Purpose: Define external packages and dependencies
+# =====================================================
+
+packages:
+  # dbt-utils: Essential utilities for dbt projects
+  - package: dbt-labs/dbt_utils
+    version: [">=1.0.0", "<2.0.0"]
+    
+  # dbt-expectations: Data quality testing framework
+  - package: calogica/dbt_expectations
+    version: [">=0.8.0", "<1.0.0"]
+    
+  # dbt-audit-helper: Audit and data lineage utilities
+  - package: dbt-labs/audit_helper
+    version: [">=0.5.0", "<1.0.0"]
+    
+  # dbt-codegen: Code generation utilities
+  - package: dbt-labs/codegen
+    version: [">=0.9.0", "<1.0.0"]
+    
+  # re-data: Data reliability and monitoring
+  - package: re-data/re_data
+    version: [">=1.0.0", "<2.0.0"]
+    
+  # dbt-date: Date manipulation utilities
+  - package: calogica/dbt_date
+    version: [">=0.7.0", "<1.0.0"]
+    
+  # elementary: Data observability and monitoring
+  - package: elementary-data/elementary
+    version: [">=0.7.0", "<1.0.0"]
+    
+  # dbt-snowflake-utils: Snowflake-specific utilities
+  - package: dbt-labs/snowflake_utils
+    version: [">=0.3.0", "<1.0.0"]
+    
+  # dbt-meta-testing: Metadata and schema testing
+  - package: tnightengale/dbt_meta_testing
+    version: [">=0.3.0", "<1.0.0"]
+    
+  # dbt-profiler: Data profiling utilities
+  - package: data-mie/dbt_profiler
+    version: [">=0.7.0", "<1.0.0"]
+
+# Package installation notes:
+# Run 'dbt deps' to install all packages
+# Packages will be installed in the dbt_packages/ directory
+# Update versions regularly for security and feature updates
