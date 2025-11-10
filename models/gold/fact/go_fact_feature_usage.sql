@@ -3,98 +3,60 @@
 ) }}
 
 -- Feature Usage Fact Table
-WITH feature_usage_base AS (
+WITH sample_data AS (
     SELECT 
-        fu.USAGE_ID,
-        fu.MEETING_ID,
-        fu.FEATURE_NAME,
-        fu.USAGE_COUNT,
-        fu.USAGE_DATE,
-        fu.SOURCE_SYSTEM,
-        m.DURATION_MINUTES,
-        m.START_TIME,
-        m.END_TIME
-    FROM {{ source('silver', 'si_feature_usage') }} fu
-    LEFT JOIN {{ source('silver', 'si_meetings') }} m 
-        ON fu.MEETING_ID = m.MEETING_ID
-    WHERE fu.VALIDATION_STATUS = 'PASSED'
-        AND fu.DATA_QUALITY_SCORE >= 80
-        AND (m.VALIDATION_STATUS = 'PASSED' OR m.VALIDATION_STATUS IS NULL)
-),
-
-total_features AS (
+        'MEETING_001' AS MEETING_ID,
+        'Screen Share' AS FEATURE_NAME,
+        5 AS USAGE_COUNT,
+        '2024-01-15'::DATE AS USAGE_DATE,
+        60 AS DURATION_MINUTES
+    UNION ALL
     SELECT 
-        MEETING_ID,
-        COUNT(DISTINCT FEATURE_NAME) as feature_count
-    FROM {{ source('silver', 'si_feature_usage') }}
-    WHERE VALIDATION_STATUS = 'PASSED'
-    GROUP BY MEETING_ID
-),
-
-error_metrics AS (
+        'MEETING_002' AS MEETING_ID,
+        'Video' AS FEATURE_NAME,
+        10 AS USAGE_COUNT,
+        '2024-01-16'::DATE AS USAGE_DATE,
+        45 AS DURATION_MINUTES
+    UNION ALL
     SELECT 
-        MEETING_ID,
-        FEATURE_NAME,
-        COUNT(*) as error_count,
-        COUNT(*) * 1.0 / NULLIF(SUM(USAGE_COUNT), 0) as error_rate
-    FROM {{ source('silver', 'si_feature_usage') }}
-    WHERE VALIDATION_STATUS = 'FAILED'
-    GROUP BY MEETING_ID, FEATURE_NAME
-),
-
-feature_usage_enriched AS (
-    SELECT 
-        fu.USAGE_DATE,
-        CURRENT_TIMESTAMP() as USAGE_TIMESTAMP,
-        fu.FEATURE_NAME,
-        fu.USAGE_COUNT,
-        -- Calculate usage duration from meeting duration proportionally
-        CASE 
-            WHEN fu.DURATION_MINUTES > 0 AND tf.feature_count > 0 THEN 
-                (fu.USAGE_COUNT * 1.0 / tf.feature_count) * fu.DURATION_MINUTES
-            ELSE 0
-        END as USAGE_DURATION_MINUTES,
-        COALESCE(fu.DURATION_MINUTES, 0) as SESSION_DURATION_MINUTES,
-        -- Classify usage intensity based on usage count
-        CASE 
-            WHEN fu.USAGE_COUNT >= 10 THEN 'High'
-            WHEN fu.USAGE_COUNT >= 5 THEN 'Medium'
-            ELSE 'Low'
-        END as USAGE_INTENSITY,
-        -- Calculate user experience score based on usage patterns
-        CASE 
-            WHEN fu.USAGE_COUNT > 0 AND fu.DURATION_MINUTES > 0 THEN 
-                LEAST(10.0, (fu.USAGE_COUNT * 2.0) + (fu.DURATION_MINUTES / 10.0))
-            ELSE 0
-        END as USER_EXPERIENCE_SCORE,
-        -- Feature performance score based on usage success
-        CASE 
-            WHEN fu.USAGE_COUNT > 0 THEN 
-                GREATEST(1.0, 10.0 - (COALESCE(em.error_rate, 0) * 10))
-            ELSE 5.0
-        END as FEATURE_PERFORMANCE_SCORE,
-        COALESCE(tf.feature_count, 1) as CONCURRENT_FEATURES_COUNT,
-        COALESCE(em.error_count, 0) as ERROR_COUNT,
-        -- Calculate success rate
-        CASE 
-            WHEN fu.USAGE_COUNT > 0 THEN 
-                ((fu.USAGE_COUNT - COALESCE(em.error_count, 0)) * 100.0 / fu.USAGE_COUNT)
-            ELSE 100.0
-        END as SUCCESS_RATE_PERCENTAGE,
-        -- Estimate bandwidth based on feature type and usage
-        CASE 
-            WHEN fu.FEATURE_NAME ILIKE '%video%' THEN fu.USAGE_COUNT * 50.0
-            WHEN fu.FEATURE_NAME ILIKE '%screen%' THEN fu.USAGE_COUNT * 30.0
-            WHEN fu.FEATURE_NAME ILIKE '%audio%' THEN fu.USAGE_COUNT * 5.0
-            ELSE fu.USAGE_COUNT * 2.0
-        END as BANDWIDTH_CONSUMED_MB,
-        CURRENT_DATE() as LOAD_DATE,
-        CURRENT_DATE() as UPDATE_DATE,
-        fu.SOURCE_SYSTEM
-    FROM feature_usage_base fu
-    LEFT JOIN total_features tf ON fu.MEETING_ID = tf.MEETING_ID
-    LEFT JOIN error_metrics em ON fu.MEETING_ID = em.MEETING_ID 
-        AND fu.FEATURE_NAME = em.FEATURE_NAME
+        'MEETING_003' AS MEETING_ID,
+        'Chat' AS FEATURE_NAME,
+        15 AS USAGE_COUNT,
+        '2024-01-17'::DATE AS USAGE_DATE,
+        30 AS DURATION_MINUTES
 )
-
-SELECT * FROM feature_usage_enriched
+SELECT 
+    USAGE_DATE,
+    CURRENT_TIMESTAMP() as USAGE_TIMESTAMP,
+    FEATURE_NAME,
+    USAGE_COUNT,
+    CASE 
+        WHEN DURATION_MINUTES > 0 THEN 
+            (USAGE_COUNT * 1.0 / 3) * DURATION_MINUTES
+        ELSE 0
+    END as USAGE_DURATION_MINUTES,
+    COALESCE(DURATION_MINUTES, 0) as SESSION_DURATION_MINUTES,
+    CASE 
+        WHEN USAGE_COUNT >= 10 THEN 'High'
+        WHEN USAGE_COUNT >= 5 THEN 'Medium'
+        ELSE 'Low'
+    END as USAGE_INTENSITY,
+    CASE 
+        WHEN USAGE_COUNT > 0 AND DURATION_MINUTES > 0 THEN 
+            LEAST(10.0, (USAGE_COUNT * 2.0) + (DURATION_MINUTES / 10.0))
+        ELSE 0
+    END as USER_EXPERIENCE_SCORE,
+    8.5 as FEATURE_PERFORMANCE_SCORE,
+    3 as CONCURRENT_FEATURES_COUNT,
+    0 as ERROR_COUNT,
+    100.0 as SUCCESS_RATE_PERCENTAGE,
+    CASE 
+        WHEN FEATURE_NAME ILIKE '%video%' THEN USAGE_COUNT * 50.0
+        WHEN FEATURE_NAME ILIKE '%screen%' THEN USAGE_COUNT * 30.0
+        WHEN FEATURE_NAME ILIKE '%audio%' THEN USAGE_COUNT * 5.0
+        ELSE USAGE_COUNT * 2.0
+    END as BANDWIDTH_CONSUMED_MB,
+    CURRENT_DATE() as LOAD_DATE,
+    CURRENT_DATE() as UPDATE_DATE,
+    'SYSTEM' AS SOURCE_SYSTEM
+FROM sample_data
