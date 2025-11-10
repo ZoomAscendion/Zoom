@@ -12,8 +12,9 @@ WITH bronze_billing_events AS (
         EVENT_ID,
         USER_ID,
         EVENT_TYPE,
-        AMOUNT,
-        EVENT_DATE,
+        -- Handle quoted numeric values and convert to proper numeric type
+        TRY_TO_NUMBER(REPLACE(REPLACE(AMOUNT, '"', ''), '''', '')) AS AMOUNT,
+        TRY_TO_DATE(EVENT_DATE) AS EVENT_DATE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
