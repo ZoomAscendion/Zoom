@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_DIM_MEETING_TYPE_TRANSFORMATION', 'SYSTEM_GENERATED', 'GO_DIM_MEETING_TYPE', CURRENT_TIMESTAMP(), 'STARTED', 'Meeting type dimension transformation started', CURRENT_DATE(), CURRENT_DATE())",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_END_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_DIM_MEETING_TYPE_TRANSFORMATION', 'SYSTEM_GENERATED', 'GO_DIM_MEETING_TYPE', CURRENT_TIMESTAMP(), 'COMPLETED', 'Meeting type dimension transformation completed successfully', CURRENT_DATE(), CURRENT_DATE())"
+    materialized='table'
 ) }}
 
 -- Meeting Type Dimension Table
