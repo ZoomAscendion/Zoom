@@ -1,9 +1,11 @@
-name: 'zoom_bronze_pipeline'
+name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_bronze_pipeline'
+# This setting configures which "profile" dbt uses for this project.
+profile: 'zoom_silver_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -11,13 +13,92 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"
-clean-targets:
+target-path: "target"  # directory which will store compiled SQL files
+clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
-  zoom_bronze_pipeline:
-    bronze:
+  zoom_silver_pipeline:
+    # Config indicated by + and applies to all files under models/example/
+    silver:
       +materialized: table
-      +on_schema_change: "fail"
+      +pre-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (
+            EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_START_TIME, 
+            EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP
+          ) 
+          SELECT 
+            UUID_STRING(), 
+            'BRONZE_TO_SILVER_{{ this.name }}', 
+            'BRONZE_TO_SILVER', 
+            CURRENT_TIMESTAMP(), 
+            'RUNNING', 
+            'BZ_{{ this.name | replace("SI_", "") }}', 
+            '{{ this.name }}', 
+            'DBT_PIPELINE', 
+            CURRENT_TIMESTAMP()
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          UPDATE {{ ref('SI_Audit_Log') }} 
+          SET 
+            EXECUTION_END_TIME = CURRENT_TIMESTAMP(), 
+            EXECUTION_STATUS = 'SUCCESS', 
+            RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}), 
+            UPDATE_TIMESTAMP = CURRENT_TIMESTAMP() 
+          WHERE 
+            PIPELINE_NAME = 'BRONZE_TO_SILVER_{{ this.name }}' 
+            AND EXECUTION_STATUS = 'RUNNING'
+        {% endif %}
+
+# Specify the order of model execution
+# SI_Audit_Log must run first, then other models can run
+model-ordering:
+  - name: SI_Audit_Log
+    depends_on: []
+  - name: SI_USERS
+    depends_on: [SI_Audit_Log]
+  - name: SI_MEETINGS
+    depends_on: [SI_Audit_Log, SI_USERS]
+  - name: SI_PARTICIPANTS
+    depends_on: [SI_Audit_Log, SI_MEETINGS, SI_USERS]
+  - name: SI_FEATURE_USAGE
+    depends_on: [SI_Audit_Log, SI_MEETINGS]
+  - name: SI_SUPPORT_TICKETS
+    depends_on: [SI_Audit_Log, SI_USERS]
+  - name: SI_BILLING_EVENTS
+    depends_on: [SI_Audit_Log, SI_USERS]
+  - name: SI_LICENSES
+    depends_on: [SI_Audit_Log, SI_USERS]
+
+# Global configurations
+vars:
+  # The `start_date` variable will be accessible in all resources
+  start_date: '2024-01-01'
+  # Set timezone for standardization
+  default_timezone: 'UTC'
+  # Data quality thresholds
+  dq_threshold_critical: 70
+  dq_threshold_warning: 90
+
+# Snapshot configurations
+snapshots:
+  zoom_silver_pipeline:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: updated_at
+
+# Seeds configurations
+seeds:
+  zoom_silver_pipeline:
+    +enabled: true
+    +schema: seeds
+
+# Test configurations
+tests:
+  zoom_silver_pipeline:
+    +store_failures: true
+    +schema: test_failures
