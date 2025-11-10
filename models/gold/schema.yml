@@ -1,0 +1,162 @@
+version: 2
+
+models:
+  - name: go_audit_log
+    description: "Gold layer process audit log for tracking transformations"
+    columns:
+      - name: process_id
+        description: "Unique identifier for each process execution"
+      - name: process_name
+        description: "Name of the transformation process"
+      - name: source_table
+        description: "Source table being processed"
+      - name: target_table
+        description: "Target table being created/updated"
+      - name: process_start_time
+        description: "Process start timestamp"
+      - name: process_end_time
+        description: "Process end timestamp"
+      - name: process_status
+        description: "Status of the process execution"
+
+  - name: go_dim_date
+    description: "Date dimension table for time-based analysis"
+    columns:
+      - name: date_id
+        description: "Unique identifier for each date"
+      - name: date_value
+        description: "Actual date value"
+      - name: year
+        description: "Year component"
+      - name: quarter
+        description: "Quarter component"
+      - name: month
+        description: "Month component"
+      - name: is_weekend
+        description: "Flag indicating if date is weekend"
+
+  - name: go_dim_user
+    description: "User dimension with SCD Type 2 implementation"
+    columns:
+      - name: user_dim_id
+        description: "Surrogate key for user dimension"
+      - name: user_name
+        description: "Standardized user name"
+      - name: email_domain
+        description: "Extracted email domain"
+      - name: plan_category
+        description: "Standardized plan category"
+      - name: is_current_record
+        description: "Flag indicating current active record"
+
+  - name: go_dim_feature
+    description: "Feature dimension for usage analysis"
+    columns:
+      - name: feature_id
+        description: "Unique identifier for each feature"
+      - name: feature_name
+        description: "Name of the platform feature"
+      - name: feature_category
+        description: "Category classification of feature"
+      - name: is_premium_feature
+        description: "Flag indicating if feature is premium"
+
+  - name: go_dim_license
+    description: "License dimension with entitlements and pricing"
+    columns:
+      - name: license_id
+        description: "Unique identifier for each license type"
+      - name: license_type
+        description: "Type of license"
+      - name: license_category
+        description: "Standardized license category"
+      - name: max_participants
+        description: "Maximum participants allowed"
+      - name: monthly_price
+        description: "Monthly subscription price"
+
+  - name: go_dim_meeting_type
+    description: "Meeting type dimension for meeting analysis"
+    columns:
+      - name: meeting_type_id
+        description: "Unique identifier for meeting type"
+      - name: meeting_type
+        description: "Type of meeting"
+      - name: meeting_category
+        description: "Category of meeting"
+      - name: supports_recording
+        description: "Flag indicating recording support"
+
+  - name: go_dim_support_category
+    description: "Support category dimension for ticket analysis"
+    columns:
+      - name: support_category_id
+        description: "Unique identifier for support category"
+      - name: support_category
+        description: "Category of support ticket"
+      - name: priority_level
+        description: "Priority level of category"
+      - name: expected_resolution_hours
+        description: "Expected resolution time in hours"
+
+  - name: go_fact_feature_usage
+    description: "Feature usage fact table with comprehensive metrics"
+    columns:
+      - name: feature_usage_id
+        description: "Unique identifier for usage record"
+      - name: usage_date
+        description: "Date of feature usage"
+      - name: feature_name
+        description: "Name of feature used"
+      - name: usage_count
+        description: "Number of times feature was used"
+      - name: user_experience_score
+        description: "Calculated user experience score"
+      - name: bandwidth_consumed_mb
+        description: "Estimated bandwidth consumption"
+
+  - name: go_fact_meeting_activity
+    description: "Meeting activity fact table with engagement metrics"
+    columns:
+      - name: meeting_activity_id
+        description: "Unique identifier for meeting activity"
+      - name: meeting_date
+        description: "Date of the meeting"
+      - name: participant_count
+        description: "Total number of participants"
+      - name: participant_engagement_score
+        description: "Calculated engagement score"
+      - name: meeting_quality_score
+        description: "Overall meeting quality score"
+
+  - name: go_fact_revenue_events
+    description: "Revenue events fact table with financial metrics"
+    columns:
+      - name: revenue_event_id
+        description: "Unique identifier for revenue event"
+      - name: transaction_date
+        description: "Date of the transaction"
+      - name: revenue_type
+        description: "Type of revenue (Recurring, One-time, etc.)"
+      - name: gross_amount
+        description: "Gross transaction amount"
+      - name: net_amount
+        description: "Net amount after taxes and discounts"
+      - name: mrr_impact
+        description: "Monthly recurring revenue impact"
+      - name: arr_impact
+        description: "Annual recurring revenue impact"
+
+  - name: go_fact_support_metrics
+    description: "Support metrics fact table with performance indicators"
+    columns:
+      - name: support_metrics_id
+        description: "Unique identifier for support metrics"
+      - name: ticket_open_date
+        description: "Date when ticket was opened"
+      - name: resolution_time_hours
+        description: "Time taken to resolve ticket in hours"
+      - name: customer_satisfaction_score
+        description: "Customer satisfaction rating"
+      - name: sla_met_flag
+        description: "Flag indicating if SLA was met"
