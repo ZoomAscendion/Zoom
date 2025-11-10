@@ -12,9 +12,9 @@ WITH bronze_meetings AS (
         MEETING_ID,
         HOST_ID,
         MEETING_TOPIC,
-        -- Handle timestamp columns safely - just use as-is since they're already timestamps
-        START_TIME,
-        END_TIME,
+        -- Handle timestamp columns with timezone info safely
+        TRY_TO_TIMESTAMP(START_TIME) AS START_TIME,
+        TRY_TO_TIMESTAMP(END_TIME) AS END_TIME,
         DURATION_MINUTES,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
