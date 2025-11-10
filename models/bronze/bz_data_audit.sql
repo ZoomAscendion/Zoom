@@ -4,14 +4,13 @@
 -- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table',
-    pre_hook=None,
-    post_hook=None
+    materialized='table'
 ) }}
 
+-- Create audit table structure
 SELECT 
     -- Auto-incrementing unique identifier for each audit record
-    ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP()) AS RECORD_ID,
+    CAST(1 AS NUMBER) AS RECORD_ID,
     
     -- Name of the Bronze layer table (VARCHAR(255) to avoid truncation)
     CAST('AUDIT_INITIALIZATION' AS VARCHAR(255)) AS SOURCE_TABLE,
