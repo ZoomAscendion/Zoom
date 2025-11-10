@@ -24,33 +24,6 @@ models:
     # Config indicated by + and applies to all files under models/gold/
     gold:
       +materialized: table
-      +pre_hook: |
-        {% if this.name != 'go_audit_log' %}
-          INSERT INTO {{ ref('go_audit_log') }} (
-            PROCESS_ID, PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, 
-            PROCESS_START_TIME, PROCESS_STATUS, CREATED_AT, UPDATED_AT
-          ) VALUES (
-            GENERATE_UUID(), 
-            '{{ this.name }}_transformation', 
-            'SILVER_LAYER', 
-            '{{ this.name | upper }}', 
-            CURRENT_TIMESTAMP(), 
-            'STARTED', 
-            CURRENT_TIMESTAMP(), 
-            CURRENT_TIMESTAMP()
-          )
-        {% endif %}
-      +post_hook: |
-        {% if this.name != 'go_audit_log' %}
-          UPDATE {{ ref('go_audit_log') }} 
-          SET PROCESS_END_TIME = CURRENT_TIMESTAMP(), 
-              PROCESS_STATUS = 'COMPLETED', 
-              RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), 
-              RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}), 
-              UPDATED_AT = CURRENT_TIMESTAMP() 
-          WHERE PROCESS_NAME = '{{ this.name }}_transformation' 
-            AND PROCESS_STATUS = 'STARTED'
-        {% endif %}
       dimension:
         +materialized: table
       fact:
