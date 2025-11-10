@@ -1,0 +1,319 @@
+version: 2
+
+models:
+  - name: go_audit_log
+    description: "Audit log table for tracking all Gold layer transformations"
+    columns:
+      - name: PROCESS_ID
+        description: "Unique identifier for each process execution"
+        data_type: VARCHAR(255)
+      - name: PROCESS_NAME
+        description: "Name of the transformation process"
+        data_type: VARCHAR(255)
+      - name: SOURCE_TABLE
+        description: "Source table name for the transformation"
+        data_type: VARCHAR(255)
+      - name: TARGET_TABLE
+        description: "Target table name for the transformation"
+        data_type: VARCHAR(255)
+      - name: PROCESS_START_TIME
+        description: "Timestamp when process started"
+        data_type: TIMESTAMP_NTZ
+      - name: PROCESS_END_TIME
+        description: "Timestamp when process completed"
+        data_type: TIMESTAMP_NTZ
+      - name: PROCESS_STATUS
+        description: "Status of the process (STARTED, COMPLETED, FAILED)"
+        data_type: VARCHAR(50)
+      - name: RECORDS_PROCESSED
+        description: "Number of records processed"
+        data_type: NUMBER
+      - name: RECORDS_SUCCESS
+        description: "Number of records successfully processed"
+        data_type: NUMBER
+      - name: RECORDS_FAILED
+        description: "Number of records that failed processing"
+        data_type: NUMBER
+      - name: CREATED_AT
+        description: "Record creation timestamp"
+        data_type: TIMESTAMP_NTZ
+      - name: UPDATED_AT
+        description: "Record last update timestamp"
+        data_type: TIMESTAMP_NTZ
+
+  - name: go_dim_user
+    description: "User dimension table containing user profile and subscription information"
+    columns:
+      - name: USER_DIM_ID
+        description: "Surrogate key for user dimension"
+        data_type: NUMBER
+      - name: USER_ID
+        description: "Business key - unique identifier for each user account"
+        data_type: VARCHAR(255)
+      - name: USER_NAME
+        description: "Display name of the user"
+        data_type: VARCHAR(255)
+      - name: EMAIL_DOMAIN
+        description: "Domain extracted from user email address"
+        data_type: VARCHAR(255)
+      - name: COMPANY
+        description: "Company or organization name"
+        data_type: VARCHAR(255)
+      - name: PLAN_TYPE
+        description: "Subscription plan type"
+        data_type: VARCHAR(100)
+      - name: PLAN_CATEGORY
+        description: "Standardized plan category (Basic, Professional, Enterprise, Other)"
+        data_type: VARCHAR(50)
+      - name: IS_CURRENT_RECORD
+        description: "Flag indicating if this is the current record for SCD Type 2"
+        data_type: BOOLEAN
+
+  - name: go_dim_date
+    description: "Standard date dimension for time-based analysis"
+    columns:
+      - name: DATE_ID
+        description: "Surrogate key for date dimension"
+        data_type: NUMBER
+      - name: DATE_VALUE
+        description: "Actual date value"
+        data_type: DATE
+      - name: YEAR
+        description: "Year component"
+        data_type: NUMBER
+      - name: QUARTER
+        description: "Quarter component (1-4)"
+        data_type: NUMBER
+      - name: MONTH
+        description: "Month component (1-12)"
+        data_type: NUMBER
+      - name: MONTH_NAME
+        description: "Full month name"
+        data_type: VARCHAR(20)
+      - name: DAY_OF_MONTH
+        description: "Day of month (1-31)"
+        data_type: NUMBER
+      - name: DAY_OF_WEEK
+        description: "Day of week (1-7)"
+        data_type: NUMBER
+      - name: DAY_NAME
+        description: "Full day name"
+        data_type: VARCHAR(20)
+      - name: IS_WEEKEND
+        description: "Flag indicating if date falls on weekend"
+        data_type: BOOLEAN
+      - name: IS_HOLIDAY
+        description: "Flag indicating if date is a holiday"
+        data_type: BOOLEAN
+
+  - name: go_dim_feature
+    description: "Feature dimension containing platform features and their characteristics"
+    columns:
+      - name: FEATURE_ID
+        description: "Surrogate key for feature dimension"
+        data_type: NUMBER
+      - name: FEATURE_NAME
+        description: "Name of the platform feature"
+        data_type: VARCHAR(255)
+      - name: FEATURE_CATEGORY
+        description: "Category of the feature (Collaboration, Recording, Communication, etc.)"
+        data_type: VARCHAR(100)
+      - name: FEATURE_TYPE
+        description: "Type of feature (Core, Advanced)"
+        data_type: VARCHAR(100)
+      - name: FEATURE_COMPLEXITY
+        description: "Complexity level (Low, Medium, High)"
+        data_type: VARCHAR(50)
+      - name: IS_PREMIUM_FEATURE
+        description: "Flag indicating if feature requires premium subscription"
+        data_type: BOOLEAN
+
+  - name: go_dim_license
+    description: "License dimension containing license types and entitlements"
+    columns:
+      - name: LICENSE_ID
+        description: "Surrogate key for license dimension"
+        data_type: NUMBER
+      - name: LICENSE_TYPE
+        description: "Type of license"
+        data_type: VARCHAR(100)
+      - name: LICENSE_CATEGORY
+        description: "Category of license (Basic, Professional, Business, Enterprise)"
+        data_type: VARCHAR(50)
+      - name: LICENSE_TIER
+        description: "Tier level of license (Tier 1-4)"
+        data_type: VARCHAR(50)
+      - name: MAX_PARTICIPANTS
+        description: "Maximum number of participants allowed"
+        data_type: NUMBER
+      - name: MONTHLY_PRICE
+        description: "Monthly subscription price"
+        data_type: NUMBER
+      - name: ANNUAL_PRICE
+        description: "Annual subscription price"
+        data_type: NUMBER
+
+  - name: go_dim_meeting_type
+    description: "Meeting type dimension containing meeting types and characteristics"
+    columns:
+      - name: MEETING_TYPE_ID
+        description: "Surrogate key for meeting type dimension"
+        data_type: NUMBER
+      - name: MEETING_TYPE
+        description: "Type of meeting"
+        data_type: VARCHAR(100)
+      - name: MEETING_CATEGORY
+        description: "Category of meeting (Instant, Scheduled, Webinar, etc.)"
+        data_type: VARCHAR(100)
+      - name: DURATION_CATEGORY
+        description: "Expected duration category (Short, Medium, Long, Variable)"
+        data_type: VARCHAR(50)
+      - name: IS_RECURRING_TYPE
+        description: "Flag indicating if meeting type supports recurring meetings"
+        data_type: BOOLEAN
+      - name: SUPPORTS_RECORDING
+        description: "Flag indicating if meeting type supports recording"
+        data_type: BOOLEAN
+
+  - name: go_dim_support_category
+    description: "Support category dimension containing support ticket categories"
+    columns:
+      - name: SUPPORT_CATEGORY_ID
+        description: "Surrogate key for support category dimension"
+        data_type: NUMBER
+      - name: SUPPORT_CATEGORY
+        description: "Category of support ticket"
+        data_type: VARCHAR(100)
+      - name: SUPPORT_SUBCATEGORY
+        description: "Subcategory of support ticket"
+        data_type: VARCHAR(100)
+      - name: PRIORITY_LEVEL
+        description: "Priority level (Critical, High, Medium, Low)"
+        data_type: VARCHAR(50)
+      - name: EXPECTED_RESOLUTION_HOURS
+        description: "Expected resolution time in hours"
+        data_type: NUMBER
+      - name: REQUIRES_ESCALATION
+        description: "Flag indicating if category typically requires escalation"
+        data_type: BOOLEAN
+
+  - name: go_fact_feature_usage
+    description: "Fact table capturing detailed feature usage metrics and patterns"
+    columns:
+      - name: USAGE_DATE
+        description: "Date when feature usage occurred"
+        data_type: DATE
+      - name: FEATURE_NAME
+        description: "Name of the feature used"
+        data_type: VARCHAR(255)
+      - name: USAGE_COUNT
+        description: "Number of times feature was used"
+        data_type: NUMBER
+      - name: USAGE_DURATION_MINUTES
+        description: "Duration of feature usage in minutes"
+        data_type: NUMBER
+      - name: USAGE_INTENSITY
+        description: "Intensity level of usage (High, Medium, Low)"
+        data_type: VARCHAR(50)
+      - name: USER_EXPERIENCE_SCORE
+        description: "Calculated user experience score (0-10)"
+        data_type: NUMBER
+      - name: SUCCESS_RATE_PERCENTAGE
+        description: "Success rate percentage for feature usage"
+        data_type: NUMBER
+      - name: BANDWIDTH_CONSUMED_MB
+        description: "Estimated bandwidth consumed in MB"
+        data_type: NUMBER
+
+  - name: go_fact_meeting_activity
+    description: "Fact table capturing comprehensive meeting activities and engagement metrics"
+    columns:
+      - name: MEETING_DATE
+        description: "Date when meeting occurred"
+        data_type: DATE
+      - name: MEETING_START_TIME
+        description: "Meeting start timestamp"
+        data_type: TIMESTAMP_NTZ
+      - name: MEETING_END_TIME
+        description: "Meeting end timestamp"
+        data_type: TIMESTAMP_NTZ
+      - name: ACTUAL_DURATION_MINUTES
+        description: "Actual meeting duration in minutes"
+        data_type: NUMBER
+      - name: PARTICIPANT_COUNT
+        description: "Total number of participants"
+        data_type: NUMBER
+      - name: UNIQUE_PARTICIPANTS
+        description: "Number of unique participants"
+        data_type: NUMBER
+      - name: PARTICIPANT_ENGAGEMENT_SCORE
+        description: "Calculated participant engagement score (0-10)"
+        data_type: NUMBER
+      - name: MEETING_QUALITY_SCORE
+        description: "Overall meeting quality score (0-10)"
+        data_type: NUMBER
+      - name: FEATURES_USED_COUNT
+        description: "Number of different features used during meeting"
+        data_type: NUMBER
+
+  - name: go_fact_revenue_events
+    description: "Fact table capturing all revenue-generating events and financial transactions"
+    columns:
+      - name: TRANSACTION_DATE
+        description: "Date when transaction occurred"
+        data_type: DATE
+      - name: EVENT_TYPE
+        description: "Type of revenue event"
+        data_type: VARCHAR(100)
+      - name: REVENUE_TYPE
+        description: "Classification of revenue (Recurring, Expansion, Add-on, One-time)"
+        data_type: VARCHAR(100)
+      - name: GROSS_AMOUNT
+        description: "Gross transaction amount"
+        data_type: NUMBER
+      - name: NET_AMOUNT
+        description: "Net transaction amount after taxes and discounts"
+        data_type: NUMBER
+      - name: USD_AMOUNT
+        description: "Amount in USD"
+        data_type: NUMBER
+      - name: IS_RECURRING_REVENUE
+        description: "Flag indicating if this is recurring revenue"
+        data_type: BOOLEAN
+      - name: MRR_IMPACT
+        description: "Monthly Recurring Revenue impact"
+        data_type: NUMBER
+      - name: ARR_IMPACT
+        description: "Annual Recurring Revenue impact"
+        data_type: NUMBER
+
+  - name: go_fact_support_metrics
+    description: "Fact table capturing support ticket activities and resolution performance"
+    columns:
+      - name: TICKET_OPEN_DATE
+        description: "Date when ticket was opened"
+        data_type: DATE
+      - name: TICKET_CLOSE_DATE
+        description: "Date when ticket was closed"
+        data_type: DATE
+      - name: TICKET_TYPE
+        description: "Type of support ticket"
+        data_type: VARCHAR(100)
+      - name: RESOLUTION_STATUS
+        description: "Current resolution status"
+        data_type: VARCHAR(100)
+      - name: PRIORITY_LEVEL
+        description: "Priority level (P1, P2, P3, P4)"
+        data_type: VARCHAR(50)
+      - name: RESOLUTION_TIME_HOURS
+        description: "Time taken to resolve ticket in hours"
+        data_type: NUMBER
+      - name: CUSTOMER_SATISFACTION_SCORE
+        description: "Customer satisfaction score (0-10)"
+        data_type: NUMBER
+      - name: SLA_MET_FLAG
+        description: "Flag indicating if SLA was met"
+        data_type: BOOLEAN
+      - name: FIRST_CONTACT_RESOLUTION_FLAG
+        description: "Flag indicating if resolved on first contact"
+        data_type: BOOLEAN
