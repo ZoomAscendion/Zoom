@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_FACT_SUPPORT_METRICS_TRANSFORMATION', 'SI_SUPPORT_TICKETS', 'GO_FACT_SUPPORT_METRICS', CURRENT_TIMESTAMP(), 'STARTED', 'Support metrics fact transformation started', CURRENT_DATE(), CURRENT_DATE())",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_END_TIME, PROCESS_STATUS, PROCESS_NOTES, LOAD_DATE, UPDATE_DATE) VALUES ('GO_FACT_SUPPORT_METRICS_TRANSFORMATION', 'SI_SUPPORT_TICKETS', 'GO_FACT_SUPPORT_METRICS', CURRENT_TIMESTAMP(), 'COMPLETED', 'Support metrics fact transformation completed successfully', CURRENT_DATE(), CURRENT_DATE())"
+    materialized='table'
 ) }}
 
 -- Support Metrics Fact Table
@@ -15,7 +13,7 @@ WITH support_base AS (
         st.RESOLUTION_STATUS,
         st.OPEN_DATE,
         st.SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_support_tickets') }} st
+    FROM SILVER.SI_SUPPORT_TICKETS st
     WHERE st.VALIDATION_STATUS = 'PASSED'
         AND st.DATA_QUALITY_SCORE >= 80
 ),
@@ -27,13 +25,15 @@ support_metrics_calculations AS (
         -- Calculate close date based on resolution status and type
         CASE 
             WHEN sb.RESOLUTION_STATUS IN ('Resolved', 'Closed') THEN 
-                sb.OPEN_DATE + INTERVAL '1 day' * 
-                CASE 
-                    WHEN UPPER(sb.TICKET_TYPE) LIKE '%CRITICAL%' THEN 1
-                    WHEN UPPER(sb.TICKET_TYPE) LIKE '%HIGH%' THEN 2
-                    WHEN UPPER(sb.TICKET_TYPE) LIKE '%MEDIUM%' THEN 5
-                    ELSE 7
-                END
+                DATEADD('day', 
+                    CASE 
+                        WHEN UPPER(sb.TICKET_TYPE) LIKE '%CRITICAL%' THEN 1
+                        WHEN UPPER(sb.TICKET_TYPE) LIKE '%HIGH%' THEN 2
+                        WHEN UPPER(sb.TICKET_TYPE) LIKE '%MEDIUM%' THEN 5
+                        ELSE 7
+                    END, 
+                    sb.OPEN_DATE
+                )
             ELSE NULL
         END AS TICKET_CLOSE_DATE,
         TIMESTAMP_FROM_PARTS(sb.OPEN_DATE, TIME('09:00:00')) AS TICKET_CREATED_TIMESTAMP,
@@ -41,13 +41,15 @@ support_metrics_calculations AS (
         CASE 
             WHEN sb.RESOLUTION_STATUS IN ('Resolved', 'Closed') THEN 
                 TIMESTAMP_FROM_PARTS(
-                    sb.OPEN_DATE + INTERVAL '1 day' * 
-                    CASE 
-                        WHEN UPPER(sb.TICKET_TYPE) LIKE '%CRITICAL%' THEN 1
-                        WHEN UPPER(sb.TICKET_TYPE) LIKE '%HIGH%' THEN 2
-                        WHEN UPPER(sb.TICKET_TYPE) LIKE '%MEDIUM%' THEN 5
-                        ELSE 7
-                    END, 
+                    DATEADD('day', 
+                        CASE 
+                            WHEN UPPER(sb.TICKET_TYPE) LIKE '%CRITICAL%' THEN 1
+                            WHEN UPPER(sb.TICKET_TYPE) LIKE '%HIGH%' THEN 2
+                            WHEN UPPER(sb.TICKET_TYPE) LIKE '%MEDIUM%' THEN 5
+                            ELSE 7
+                        END, 
+                        sb.OPEN_DATE
+                    ), 
                     TIME('17:00:00')
                 )
             ELSE NULL
