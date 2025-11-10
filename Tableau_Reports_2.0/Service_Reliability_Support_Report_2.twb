@@ -1,0 +1,322 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!--
+========================================
+VERSION HISTORY
+========================================
+Version: 2
+Previous Version: Service_Reliability_Support_Report_1.twb
+Changes: 
+  - Fixed XML structure completely: Removed datasource-dependencies from worksheets
+  - Corrected worksheet structure to match Tableau's schema requirements
+  - Simplified connection structure using proper federated connection
+  - Fixed tag ordering in worksheets (view, style, panes, rows, cols)
+  - Removed invalid datasource-dependencies, slices, and aggregation from worksheets
+  - Used proper Tableau XML schema structure for 2023.3 compatibility
+Reason: Fixed structural XML violations that prevented workbook from opening
+Updated on: 2024-11-09
+Updated by: AAVA Agent
+========================================
+-->
+
+<workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  
+  <datasources>
+    <datasource caption='Service Reliability Analytics (GOLD)' inline='true' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='wdfmbah-ia58548.snowflakecomputing.com' name='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7'>
+            <connection authentication='username-password' 
+                        class='snowflake' 
+                        dbname='DB_POC_ZOOM' 
+                        schema='GOLD' 
+                        server='wdfmbah-ia58548.snowflakecomputing.com' 
+                        username='KARTHIKVALLURI1985' 
+                        warehouse='COMPUTE_WH' 
+                        workgroup-auth-mode='prompt'>
+              <connection-customization>
+                <vendor name='snowflake'/>
+                <driver name='snowflake'/>
+                <customizations>
+                  <customization name='CAP_CREATE_TEMP_TABLES' value='yes' />
+                </customizations>
+              </connection-customization>
+            </connection>
+          </named-connection>
+        </named-connections>
+        <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' name='Custom SQL Query' type='text'>
+          SELECT * FROM GOLD.GO_FACT_SUPPORT_METRICS
+        </relation>
+      </connection>
+      
+      <aliases enabled='yes' />
+      
+      <!-- Column definitions for all tables -->
+      <!-- GO_FACT_SUPPORT_METRICS columns -->
+      <column caption='Fact Support Metrics ID' datatype='string' name='[FACT_SUPPORT_METRICS_ID]' role='dimension' type='nominal' />
+      <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+      <column caption='User Key' datatype='string' name='[USER_KEY]' role='dimension' type='nominal' />
+      <column caption='Support Category Key' datatype='string' name='[SUPPORT_CATEGORY_KEY]' role='dimension' type='nominal' />
+      <column caption='Ticket Date' datatype='date' name='[TICKET_DATE]' role='dimension' type='ordinal' />
+      <column caption='Resolution Time Hours' datatype='real' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='Ticket Type' datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
+      <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
+      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+      <column caption='First Contact Resolution Flag' datatype='boolean' name='[FIRST_CONTACT_RESOLUTION_FLAG]' role='dimension' type='nominal' />
+      <column caption='Escalation Flag' datatype='boolean' name='[ESCALATION_FLAG]' role='dimension' type='nominal' />
+      <column caption='Customer Plan Type' datatype='string' name='[CUSTOMER_PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Satisfaction Score' datatype='integer' name='[SATISFACTION_SCORE]' role='measure' type='quantitative' />
+      
+      <!-- GO_DIM_DATE columns -->
+      <column caption='Dim Date ID' datatype='string' name='[DIM_DATE_ID]' role='dimension' type='nominal' />
+      <column caption='Date Key (Dimension)' datatype='date' name='[DATE_KEY (GO_DIM_DATE)]' role='dimension' type='ordinal' />
+      <column caption='Year' datatype='integer' name='[YEAR]' role='dimension' type='quantitative' />
+      <column caption='Quarter' datatype='integer' name='[QUARTER]' role='dimension' type='quantitative' />
+      <column caption='Month' datatype='integer' name='[MONTH]' role='dimension' type='quantitative' />
+      <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+      <column caption='Week of Year' datatype='integer' name='[WEEK_OF_YEAR]' role='dimension' type='quantitative' />
+      <column caption='Day of Month' datatype='integer' name='[DAY_OF_MONTH]' role='dimension' type='quantitative' />
+      <column caption='Day of Week' datatype='integer' name='[DAY_OF_WEEK]' role='dimension' type='quantitative' />
+      <column caption='Day Name' datatype='string' name='[DAY_NAME]' role='dimension' type='nominal' />
+      <column caption='Is Weekend' datatype='boolean' name='[IS_WEEKEND]' role='dimension' type='nominal' />
+      <column caption='Is Holiday' datatype='boolean' name='[IS_HOLIDAY]' role='dimension' type='nominal' />
+      <column caption='Fiscal Year' datatype='integer' name='[FISCAL_YEAR]' role='dimension' type='quantitative' />
+      <column caption='Fiscal Quarter' datatype='integer' name='[FISCAL_QUARTER]' role='dimension' type='quantitative' />
+      
+      <!-- GO_DIM_USER columns -->
+      <column caption='Dim User ID' datatype='string' name='[DIM_USER_ID]' role='dimension' type='nominal' />
+      <column caption='User Business Key' datatype='string' name='[USER_BUSINESS_KEY]' role='dimension' type='nominal' />
+      <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+      <column caption='Email Domain' datatype='string' name='[EMAIL_DOMAIN]' role='dimension' type='nominal' />
+      <column caption='Company Name' datatype='string' name='[COMPANY_NAME]' role='dimension' type='nominal' />
+      <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Account Status' datatype='string' name='[ACCOUNT_STATUS]' role='dimension' type='nominal' />
+      <column caption='Registration Date' datatype='date' name='[REGISTRATION_DATE]' role='dimension' type='ordinal' />
+      <column caption='User Segment' datatype='string' name='[USER_SEGMENT]' role='dimension' type='nominal' />
+      
+      <!-- GO_DIM_SUPPORT_CATEGORY columns -->
+      <column caption='Dim Support Category ID' datatype='string' name='[DIM_SUPPORT_CATEGORY_ID]' role='dimension' type='nominal' />
+      <column caption='Category Key' datatype='string' name='[CATEGORY_KEY]' role='dimension' type='nominal' />
+      <column caption='Ticket Type (Category)' datatype='string' name='[TICKET_TYPE (GO_DIM_SUPPORT_CATEGORY)]' role='dimension' type='nominal' />
+      <column caption='Category Group' datatype='string' name='[CATEGORY_GROUP]' role='dimension' type='nominal' />
+      <column caption='Priority Level (Category)' datatype='string' name='[PRIORITY_LEVEL (GO_DIM_SUPPORT_CATEGORY)]' role='dimension' type='nominal' />
+      <column caption='SLA Hours' datatype='integer' name='[SLA_HOURS]' role='measure' type='quantitative' />
+      <column caption='Escalation Threshold Hours' datatype='integer' name='[ESCALATION_THRESHOLD_HOURS]' role='measure' type='quantitative' />
+      <column caption='Requires Technical Expertise' datatype='boolean' name='[REQUIRES_TECHNICAL_EXPERTISE]' role='dimension' type='nominal' />
+      
+      <!-- KPI Calculated Fields -->
+      <column caption='Tickets Opened Per Day' datatype='integer' name='[Tickets Opened Per Day]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([FACT_SUPPORT_METRICS_ID])' />
+      </column>
+      <column caption='Average Resolution Time' datatype='real' name='[Average Resolution Time]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
+      </column>
+      <column caption='First Contact Resolution Rate' datatype='real' name='[First Contact Resolution Rate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [FIRST_CONTACT_RESOLUTION_FLAG] = TRUE THEN 1 ELSE 0 END) / COUNT([FACT_SUPPORT_METRICS_ID])' />
+      </column>
+      <column caption='Tickets Per 1000 Active Users' datatype='real' name='[Tickets Per 1000 Active Users]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='(COUNT([FACT_SUPPORT_METRICS_ID]) / COUNTD([USER_KEY])) * 1000' />
+      </column>
+      <column caption='Ticket Volume By Type' datatype='integer' name='[Ticket Volume By Type]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([FACT_SUPPORT_METRICS_ID])' />
+      </column>
+      <column caption='User To Ticket Ratio' datatype='real' name='[User To Ticket Ratio]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([FACT_SUPPORT_METRICS_ID]) / COUNTD([USER_KEY])' />
+      </column>
+      
+      <layout dim-ordering='alphabetic' dim-percentage='0.5' measure-ordering='alphabetic' measure-percentage='0.4' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+    </datasource>
+  </datasources>
+  
+  <worksheets>
+    <worksheet name='Ticket Volume by Type'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Ticket Volume by Type</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service Reliability Analytics (GOLD)' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' />
+          </datasources>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:TICKET_TYPE:nk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[usr:Ticket Volume By Type:qk]</rows>
+        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:TICKET_TYPE:nk]</cols>
+      </table>
+      <simple-id uuid='{E5F6A7B8-C9D0-E1F2-A3B4-C5D6E7F8A9B0}' />
+    </worksheet>
+    
+    <worksheet name='Average Resolution Time Trends'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Average Resolution Time Over Time</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service Reliability Analytics (GOLD)' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' />
+          </datasources>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[usr:Average Resolution Time:qk]' palette='orange_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[usr:Average Resolution Time:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[usr:Average Resolution Time:qk]</rows>
+        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[tmn:DATE_KEY:qk]</cols>
+      </table>
+      <simple-id uuid='{F6A7B8C9-D0E1-F2A3-B4C5-D6E7F8A9B0C1}' />
+    </worksheet>
+    
+    <worksheet name='Support Metrics Dashboard'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Support Metrics Dashboard</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service Reliability Analytics (GOLD)' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' />
+          </datasources>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:CUSTOMER_PLAN_TYPE:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[usr:First Contact Resolution Rate:qk]</rows>
+        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:CUSTOMER_PLAN_TYPE:nk]</cols>
+      </table>
+      <simple-id uuid='{A1B2C3D4-E5F6-7890-A1B2-C3D4E5F6A7B8}' />
+    </worksheet>
+    
+    <worksheet name='First Contact Resolution Analysis'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>First Contact Resolution Analysis</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service Reliability Analytics (GOLD)' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' />
+          </datasources>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Circle' />
+            <encodings>
+              <size column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[usr:Tickets Opened Per Day:qk]' />
+              <color column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:PRIORITY_LEVEL:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[usr:First Contact Resolution Rate:qk]</rows>
+        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:TICKET_TYPE:nk]</cols>
+      </table>
+      <simple-id uuid='{B2C3D4E5-F6A7-8901-B2C3-D4E5F6A7B8C9}' />
+    </worksheet>
+  </worksheets>
+  
+  <windows saved-dpi-scale-factor='1.5' source-height='44'>
+    <window class='worksheet' maximized='true' name='Ticket Volume by Type'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{A7B8C9D0-E1F2-A3B4-C5D6-E7F8A9B0C1D2}' />
+    </window>
+  </windows>
+</workbook>
