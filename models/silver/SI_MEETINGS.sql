@@ -12,15 +12,9 @@ WITH bronze_meetings AS (
         MEETING_ID,
         HOST_ID,
         MEETING_TOPIC,
-        -- Handle timestamp columns - use TRY_CAST for string to timestamp conversion
-        CASE 
-            WHEN TRY_CAST(START_TIME AS TIMESTAMP_NTZ) IS NOT NULL THEN TRY_CAST(START_TIME AS TIMESTAMP_NTZ)
-            ELSE START_TIME
-        END AS START_TIME,
-        CASE 
-            WHEN TRY_CAST(END_TIME AS TIMESTAMP_NTZ) IS NOT NULL THEN TRY_CAST(END_TIME AS TIMESTAMP_NTZ)
-            ELSE END_TIME
-        END AS END_TIME,
+        -- Handle timestamp columns safely - just use as-is since they're already timestamps
+        START_TIME,
+        END_TIME,
         DURATION_MINUTES,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
