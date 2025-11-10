@@ -41,16 +41,18 @@ support_enriched AS (
             ELSE 'Severity 3'
         END AS severity_level,
         
-        -- Calculate close date based on resolution status and type
+        -- Calculate close date based on resolution status and type (using DATEADD)
         CASE 
             WHEN sb.resolution_status IN ('Resolved', 'Closed') THEN 
-                sb.open_date + INTERVAL '1 day' * 
-                CASE 
-                    WHEN UPPER(sb.ticket_type) LIKE '%CRITICAL%' THEN 1
-                    WHEN UPPER(sb.ticket_type) LIKE '%HIGH%' THEN 2
-                    WHEN UPPER(sb.ticket_type) LIKE '%MEDIUM%' THEN 5
-                    ELSE 7
-                END
+                DATEADD('day', 
+                    CASE 
+                        WHEN UPPER(sb.ticket_type) LIKE '%CRITICAL%' THEN 1
+                        WHEN UPPER(sb.ticket_type) LIKE '%HIGH%' THEN 2
+                        WHEN UPPER(sb.ticket_type) LIKE '%MEDIUM%' THEN 5
+                        ELSE 7
+                    END,
+                    sb.open_date
+                )
             ELSE NULL
         END AS calculated_close_date,
         
