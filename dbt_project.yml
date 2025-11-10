@@ -1,9 +1,11 @@
-name: 'zoom_silver_pipeline'
+name: 'zoom_analytics_gold'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_silver_pipeline'
+# This setting configures which "profile" dbt uses for this project.
+profile: 'zoom_analytics_gold'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -16,35 +18,68 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
-  zoom_silver_pipeline:
-    +materialized: table
-    silver:
+  zoom_analytics_gold:
+    # Config indicated by + and applies to all files under models/gold/
+    gold:
       +materialized: table
-      +on_schema_change: sync_all_columns
       +pre_hook: |
-        {% if this.name != 'si_audit_log' %}
-          INSERT INTO {{ ref('si_audit_log') }} (
-            EXECUTION_ID, PIPELINE_NAME, EXECUTION_START_TIME, EXECUTION_STATUS, 
-            SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP
+        {% if this.name != 'go_audit_log' %}
+          INSERT INTO {{ ref('go_audit_log') }} (
+            PROCESS_ID, PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, 
+            PROCESS_START_TIME, PROCESS_STATUS, CREATED_AT, UPDATED_AT
           ) VALUES (
-            '{{ invocation_id }}', 
-            'BRONZE_TO_SILVER_{{ this.name | upper }}', 
+            GENERATE_UUID(), 
+            '{{ this.name }}_transformation', 
+            'SILVER_LAYER', 
+            '{{ this.name | upper }}', 
             CURRENT_TIMESTAMP(), 
-            'RUNNING', 
-            'BRONZE.{{ this.name | replace("si_", "bz_") | upper }}', 
-            '{{ this }}', 
-            'DBT_PIPELINE', 
+            'STARTED', 
+            CURRENT_TIMESTAMP(), 
             CURRENT_TIMESTAMP()
           )
         {% endif %}
       +post_hook: |
-        {% if this.name != 'si_audit_log' %}
-          UPDATE {{ ref('si_audit_log') }} 
-          SET EXECUTION_END_TIME = CURRENT_TIMESTAMP(),
-              EXECUTION_STATUS = 'SUCCESS',
-              RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
-              RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }})
-          WHERE EXECUTION_ID = '{{ invocation_id }}' 
-          AND PIPELINE_NAME = 'BRONZE_TO_SILVER_{{ this.name | upper }}'
+        {% if this.name != 'go_audit_log' %}
+          UPDATE {{ ref('go_audit_log') }} 
+          SET PROCESS_END_TIME = CURRENT_TIMESTAMP(), 
+              PROCESS_STATUS = 'COMPLETED', 
+              RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), 
+              RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}), 
+              UPDATED_AT = CURRENT_TIMESTAMP() 
+          WHERE PROCESS_NAME = '{{ this.name }}_transformation' 
+            AND PROCESS_STATUS = 'STARTED'
         {% endif %}
+      dimension:
+        +materialized: table
+      fact:
+        +materialized: table
+
+vars:
+  # dbt Cloud IDE variables
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
+  
+# Seeds configuration
+seeds:
+  zoom_analytics_gold:
+    +quote_columns: false
+
+# Snapshots configuration
+snapshots:
+  zoom_analytics_gold:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: updated_at
+
+# Test configuration
+tests:
+  zoom_analytics_gold:
+    +store_failures: true
+    +schema: test_failures
+
+# Documentation configuration
+docs:
+  zoom_analytics_gold:
+    +node_color: "#4CAF50"
