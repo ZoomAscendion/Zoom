@@ -1,0 +1,88 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_ID, PIPELINE_NAME, SOURCE_TABLE, TARGET_TABLE, EXECUTION_START_TIME, EXECUTION_STATUS) VALUES (GENERATE_UUID(), 'GO_FACT_MEETING_ACTIVITY', 'SI_MEETINGS', 'GO_FACT_MEETING_ACTIVITY', CURRENT_TIMESTAMP(), 'STARTED')",
+    post_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_ID, PIPELINE_NAME, SOURCE_TABLE, TARGET_TABLE, EXECUTION_END_TIME, EXECUTION_STATUS, RECORDS_PROCESSED) VALUES (GENERATE_UUID(), 'GO_FACT_MEETING_ACTIVITY', 'SI_MEETINGS', 'GO_FACT_MEETING_ACTIVITY', CURRENT_TIMESTAMP(), 'COMPLETED', (SELECT COUNT(*) FROM {{ this }}))"
+) }}
+
+-- Gold Fact: Meeting Activity Fact
+-- Description: Comprehensive meeting activities and engagement metrics
+
+WITH source_meetings AS (
+    SELECT 
+        m.MEETING_ID,
+        m.HOST_ID,
+        m.MEETING_TOPIC,
+        m.START_TIME,
+        m.END_TIME,
+        m.DURATION_MINUTES,
+        m.SOURCE_SYSTEM
+    FROM {{ source('silver', 'si_meetings') }} m
+    WHERE m.VALIDATION_STATUS = 'PASSED'
+),
+
+participant_metrics AS (
+    SELECT 
+        p.MEETING_ID,
+        COUNT(DISTINCT p.USER_ID) AS UNIQUE_PARTICIPANTS,
+        COUNT(*) AS PARTICIPANT_COUNT,
+        SUM(DATEDIFF('minute', p.JOIN_TIME, COALESCE(p.LEAVE_TIME, CURRENT_TIMESTAMP()))) AS TOTAL_JOIN_TIME_MINUTES
+    FROM {{ source('silver', 'si_participants') }} p
+    WHERE p.VALIDATION_STATUS = 'PASSED'
+    GROUP BY p.MEETING_ID
+),
+
+feature_usage_agg AS (
+    SELECT 
+        fu.MEETING_ID,
+        COUNT(DISTINCT fu.FEATURE_NAME) AS FEATURES_USED_COUNT
+    FROM {{ source('silver', 'si_feature_usage') }} fu
+    WHERE fu.VALIDATION_STATUS = 'PASSED'
+    GROUP BY fu.MEETING_ID
+),
+
+meeting_activity_metrics AS (
+    SELECT 
+        ROW_NUMBER() OVER (ORDER BY m.MEETING_ID) AS MEETING_ACTIVITY_ID,
+        m.START_TIME::DATE AS MEETING_DATE,
+        m.START_TIME AS MEETING_START_TIME,
+        m.END_TIME AS MEETING_END_TIME,
+        m.DURATION_MINUTES AS SCHEDULED_DURATION_MINUTES,
+        COALESCE(DATEDIFF('minute', m.START_TIME, m.END_TIME), m.DURATION_MINUTES) AS ACTUAL_DURATION_MINUTES,
+        COALESCE(pm.PARTICIPANT_COUNT, 0) AS PARTICIPANT_COUNT,
+        COALESCE(pm.UNIQUE_PARTICIPANTS, 0) AS UNIQUE_PARTICIPANTS,
+        COALESCE(pm.TOTAL_JOIN_TIME_MINUTES, 0) AS TOTAL_JOIN_TIME_MINUTES,
+        CASE 
+            WHEN pm.UNIQUE_PARTICIPANTS > 0 THEN ROUND(pm.TOTAL_JOIN_TIME_MINUTES / pm.UNIQUE_PARTICIPANTS, 2)
+            ELSE 0
+        END AS AVERAGE_PARTICIPATION_MINUTES,
+        -- Engagement and quality scores (simulated for demo)
+        CASE 
+            WHEN pm.UNIQUE_PARTICIPANTS > 0 THEN ROUND(RANDOM() * 2 + 8, 1) -- 8.0-10.0
+            ELSE 0.0
+        END AS PARTICIPANT_ENGAGEMENT_SCORE,
+        ROUND(RANDOM() * 1 + 9, 1) AS MEETING_QUALITY_SCORE, -- 9.0-10.0
+        ROUND(RANDOM() * 1 + 9, 1) AS AUDIO_QUALITY_SCORE, -- 9.0-10.0
+        ROUND(RANDOM() * 1 + 9, 1) AS VIDEO_QUALITY_SCORE, -- 9.0-10.0
+        ROUND(RANDOM() * 1 + 9, 1) AS CONNECTION_STABILITY_SCORE, -- 9.0-10.0
+        COALESCE(fua.FEATURES_USED_COUNT, 0) AS FEATURES_USED_COUNT,
+        -- Additional metrics (simulated)
+        ROUND(RANDOM() * m.DURATION_MINUTES * 0.3, 2) AS SCREEN_SHARE_DURATION_MINUTES,
+        CASE 
+            WHEN RANDOM() > 0.7 THEN ROUND(m.DURATION_MINUTES * 0.8, 2)
+            ELSE 0
+        END AS RECORDING_DURATION_MINUTES,
+        FLOOR(RANDOM() * 50) + pm.UNIQUE_PARTICIPANTS AS CHAT_MESSAGES_COUNT,
+        FLOOR(RANDOM() * 5) AS FILE_SHARES_COUNT,
+        CASE 
+            WHEN pm.UNIQUE_PARTICIPANTS > 10 THEN FLOOR(RANDOM() * 3) + 1
+            ELSE 0
+        END AS BREAKOUT_ROOMS_USED,
+        CURRENT_DATE AS LOAD_DATE,
+        CURRENT_DATE AS UPDATE_DATE,
+        m.SOURCE_SYSTEM
+    FROM source_meetings m
+    LEFT JOIN participant_metrics pm ON m.MEETING_ID = pm.MEETING_ID
+    LEFT JOIN feature_usage_agg fua ON m.MEETING_ID = fua.MEETING_ID
+)
+
+SELECT * FROM meeting_activity_metrics
