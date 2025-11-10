@@ -2,10 +2,8 @@ name: 'zoom_gold_analytics'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_gold_analytics'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -18,35 +16,11 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
   zoom_gold_analytics:
-    # Config indicated by + and applies to all files under models/gold/
     gold:
       +materialized: table
-      +pre_hook: |
-        {% if this.name != 'go_audit_log' %}
-          INSERT INTO {{ ref('go_audit_log') }} (AUDIT_ID, PIPELINE_NAME, SOURCE_TABLE, TARGET_TABLE, EXECUTION_START_TIME, EXECUTION_STATUS) 
-          VALUES (GENERATE_UUID(), '{{ this.name | upper }}', 'SILVER_LAYER', '{{ this.name | upper }}', CURRENT_TIMESTAMP(), 'STARTED')
-        {% endif %}
-      +post_hook: |
-        {% if this.name != 'go_audit_log' %}
-          INSERT INTO {{ ref('go_audit_log') }} (AUDIT_ID, PIPELINE_NAME, SOURCE_TABLE, TARGET_TABLE, EXECUTION_END_TIME, EXECUTION_STATUS, RECORDS_PROCESSED) 
-          VALUES (GENERATE_UUID(), '{{ this.name | upper }}', 'SILVER_LAYER', '{{ this.name | upper }}', CURRENT_TIMESTAMP(), 'COMPLETED', (SELECT COUNT(*) FROM {{ this }}))
-        {% endif %}
       dimension:
         +materialized: table
       fact:
         +materialized: table
-
-# Global configurations
-vars:
-  # dbt-date configurations
-  'dbt_date:time_zone': 'UTC'
-  
-# Dependencies and run order
-on-run-start:
-  - "{{ log('Starting Gold Layer Transformation Pipeline', info=True) }}"
-  
-on-run-end:
-  - "{{ log('Gold Layer Transformation Pipeline Completed', info=True) }}"
