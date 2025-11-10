@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_ID, PIPELINE_NAME, SOURCE_TABLE, TARGET_TABLE, EXECUTION_START_TIME, EXECUTION_STATUS) VALUES (GENERATE_UUID(), 'GO_DIM_FEATURE', 'SI_FEATURE_USAGE', 'GO_DIM_FEATURE', CURRENT_TIMESTAMP(), 'STARTED')",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_ID, PIPELINE_NAME, SOURCE_TABLE, TARGET_TABLE, EXECUTION_END_TIME, EXECUTION_STATUS, RECORDS_PROCESSED) VALUES (GENERATE_UUID(), 'GO_DIM_FEATURE', 'SI_FEATURE_USAGE', 'GO_DIM_FEATURE', CURRENT_TIMESTAMP(), 'COMPLETED', (SELECT COUNT(*) FROM {{ this }}))"
+    materialized='table'
 ) }}
 
 -- Gold Dimension: Feature Dimension
@@ -51,7 +49,7 @@ feature_categorization AS (
         'Desktop, Mobile, Web' AS PLATFORM_AVAILABILITY,
         CURRENT_DATE AS LOAD_DATE,
         CURRENT_DATE AS UPDATE_DATE,
-        SOURCE_SYSTEM
+        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
     FROM source_features
 )
 
