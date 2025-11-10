@@ -2,10 +2,8 @@ name: 'zoom_analytics_gold'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_analytics_gold'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -18,10 +16,8 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
   zoom_analytics_gold:
-    # Config indicated by + and applies to all files under models/gold/
     gold:
       +materialized: table
       dimension:
@@ -30,29 +26,20 @@ models:
         +materialized: table
 
 vars:
-  # dbt Cloud IDE variables
   start_date: '2020-01-01'
   end_date: '2030-12-31'
-  
-# Seeds configuration
+
 seeds:
   zoom_analytics_gold:
     +quote_columns: false
 
-# Snapshots configuration
 snapshots:
   zoom_analytics_gold:
     +target_schema: snapshots
     +strategy: timestamp
     +updated_at: updated_at
 
-# Test configuration
 tests:
   zoom_analytics_gold:
     +store_failures: true
     +schema: test_failures
-
-# Documentation configuration
-docs:
-  zoom_analytics_gold:
-    +node_color: "#4CAF50"
