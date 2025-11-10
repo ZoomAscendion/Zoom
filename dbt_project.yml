@@ -1,8 +1,8 @@
-name: 'zoom_gold_analytics'
+name: 'zoom_analytics_gold'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_gold_analytics'
+profile: 'zoom_analytics'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,10 +17,37 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_gold_analytics:
+  zoom_analytics_gold:
+    +materialized: table
+    +pre-hook: |
+      {% if this.name != 'go_audit_log' %}
+        INSERT INTO {{ ref('go_audit_log') }} (
+          PROCESS_ID, PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, 
+          PROCESS_START_TIME, PROCESS_STATUS, RECORDS_PROCESSED, 
+          LOAD_DATE, SOURCE_SYSTEM
+        ) VALUES (
+          '{{ invocation_id }}', '{{ this.name }}', 'SILVER_LAYER', '{{ this }}',
+          CURRENT_TIMESTAMP(), 'STARTED', 0, CURRENT_DATE(), 'DBT_GOLD_PIPELINE'
+        )
+      {% endif %}
+    +post-hook: |
+      {% if this.name != 'go_audit_log' %}
+        UPDATE {{ ref('go_audit_log') }} 
+        SET PROCESS_END_TIME = CURRENT_TIMESTAMP(),
+            PROCESS_STATUS = 'COMPLETED',
+            RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }})
+        WHERE PROCESS_ID = '{{ invocation_id }}' 
+          AND PROCESS_NAME = '{{ this.name }}'
+          AND PROCESS_STATUS = 'STARTED'
+      {% endif %}
     gold:
       +materialized: table
       dimension:
+        +tags: ["dimension"]
         +materialized: table
       fact:
+        +tags: ["fact"]
         +materialized: table
+    audit:
+      +materialized: table
+      +tags: ["audit"]
