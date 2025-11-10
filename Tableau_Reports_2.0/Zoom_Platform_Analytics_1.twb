@@ -1,0 +1,748 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<workbook source-build='2023.3.0 (20233.23.1017.1841)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <_.fcp.SetMembershipControl.true...SetMembershipControl />
+    <_.fcp.VConnDownstreamExtractsWithWarnings.true...VConnDownstreamExtractsWithWarnings />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
+  <datasources>
+    <datasource caption='Zoom Platform Analytics Data' inline='true' name='federated.0abc1234' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='wdfmbah-ia58548.snowflakecomputing.com' name='snowflake.1def5678'>
+            <connection authentication='username-password' class='snowflake' dbname='DB_POC_ZOOM' odbc-connect-string-extras='' schema='GOLD' server='wdfmbah-ia58548.snowflakecomputing.com' service='' username='KARTHIKVALLURI1985' warehouse='COMPUTE_WH' workgroup-auth-mode='prompt'>
+              <connection-customization>
+                <vendor name='snowflake'/>
+                <driver name='snowflake'/>
+                <customizations>
+                  <customization name='CAP_CREATE_TEMP_TABLES' value='yes' />
+                  <customization name='odbc-connect-string-extras' value='' />
+                </customizations>
+              </connection-customization>
+            </connection>
+          </named-connection>
+        </named-connections>
+        <relation connection='snowflake.1def5678' name='Custom SQL Query' type='text'>
+          SELECT * FROM GOLD.GO_FACT_MEETING_ACTIVITY
+        </relation>
+      </connection>
+      <aliases enabled='yes' />
+      
+      <!-- GO_DIM_DATE columns -->
+      <column caption='Date Dimension ID' datatype='string' name='[DIM_DATE_ID]' role='dimension' type='nominal' />
+      <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+      <column aggregation='Sum' caption='Year' datatype='integer' name='[YEAR]' role='dimension' type='quantitative' />
+      <column aggregation='Sum' caption='Quarter' datatype='integer' name='[QUARTER]' role='dimension' type='quantitative' />
+      <column aggregation='Sum' caption='Month' datatype='integer' name='[MONTH]' role='dimension' type='quantitative' />
+      <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+      <column aggregation='Sum' caption='Week of Year' datatype='integer' name='[WEEK_OF_YEAR]' role='dimension' type='quantitative' />
+      <column aggregation='Sum' caption='Day of Month' datatype='integer' name='[DAY_OF_MONTH]' role='dimension' type='quantitative' />
+      <column aggregation='Sum' caption='Day of Week' datatype='integer' name='[DAY_OF_WEEK]' role='dimension' type='quantitative' />
+      <column caption='Day Name' datatype='string' name='[DAY_NAME]' role='dimension' type='nominal' />
+      <column caption='Is Weekend' datatype='boolean' name='[IS_WEEKEND]' role='dimension' type='nominal' />
+      <column caption='Is Holiday' datatype='boolean' name='[IS_HOLIDAY]' role='dimension' type='nominal' />
+      <column aggregation='Sum' caption='Fiscal Year' datatype='integer' name='[FISCAL_YEAR]' role='dimension' type='quantitative' />
+      <column aggregation='Sum' caption='Fiscal Quarter' datatype='integer' name='[FISCAL_QUARTER]' role='dimension' type='quantitative' />
+      <column caption='Load Date (Date Dim)' datatype='date' name='[LOAD_DATE (GO_DIM_DATE)]' role='dimension' type='ordinal' />
+      <column caption='Update Date (Date Dim)' datatype='date' name='[UPDATE_DATE (GO_DIM_DATE)]' role='dimension' type='ordinal' />
+      <column caption='Source System (Date Dim)' datatype='string' name='[SOURCE_SYSTEM (GO_DIM_DATE)]' role='dimension' type='nominal' />
+      
+      <!-- GO_DIM_FEATURE columns -->
+      <column caption='Feature Dimension ID' datatype='string' name='[DIM_FEATURE_ID]' role='dimension' type='nominal' />
+      <column caption='Feature Key' datatype='string' name='[FEATURE_KEY]' role='dimension' type='nominal' />
+      <column caption='Feature Name' datatype='string' name='[FEATURE_NAME]' role='dimension' type='nominal' />
+      <column caption='Feature Category' datatype='string' name='[FEATURE_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Feature Subcategory' datatype='string' name='[FEATURE_SUBCATEGORY]' role='dimension' type='nominal' />
+      <column caption='Is Premium Feature' datatype='boolean' name='[IS_PREMIUM_FEATURE]' role='dimension' type='nominal' />
+      <column caption='Release Date' datatype='date' name='[RELEASE_DATE]' role='dimension' type='ordinal' />
+      <column caption='Deprecation Date' datatype='date' name='[DEPRECATION_DATE]' role='dimension' type='ordinal' />
+      <column caption='Is Active Feature' datatype='boolean' name='[IS_ACTIVE]' role='dimension' type='nominal' />
+      <column caption='Load Date (Feature Dim)' datatype='date' name='[LOAD_DATE (GO_DIM_FEATURE)]' role='dimension' type='ordinal' />
+      <column caption='Update Date (Feature Dim)' datatype='date' name='[UPDATE_DATE (GO_DIM_FEATURE)]' role='dimension' type='ordinal' />
+      <column caption='Source System (Feature Dim)' datatype='string' name='[SOURCE_SYSTEM (GO_DIM_FEATURE)]' role='dimension' type='nominal' />
+      
+      <!-- GO_DIM_LICENSE columns -->
+      <column caption='License Dimension ID' datatype='string' name='[DIM_LICENSE_ID]' role='dimension' type='nominal' />
+      <column caption='License Type Key' datatype='string' name='[LICENSE_TYPE_KEY]' role='dimension' type='nominal' />
+      <column caption='License Name' datatype='string' name='[LICENSE_NAME]' role='dimension' type='nominal' />
+      <column caption='License Tier' datatype='string' name='[LICENSE_TIER]' role='dimension' type='nominal' />
+      <column aggregation='Sum' caption='Monthly Cost' datatype='real' name='[MONTHLY_COST]' role='measure' type='quantitative' />
+      <column aggregation='Sum' caption='Annual Cost' datatype='real' name='[ANNUAL_COST]' role='measure' type='quantitative' />
+      <column aggregation='Sum' caption='Max Participants' datatype='integer' name='[MAX_PARTICIPANTS]' role='measure' type='quantitative' />
+      <column aggregation='Sum' caption='Storage GB' datatype='integer' name='[STORAGE_GB]' role='measure' type='quantitative' />
+      <column caption='Features Included' datatype='string' name='[FEATURES_INCLUDED]' role='dimension' type='nominal' />
+      <column caption='Effective Start Date' datatype='date' name='[EFFECTIVE_START_DATE]' role='dimension' type='ordinal' />
+      <column caption='Effective End Date' datatype='date' name='[EFFECTIVE_END_DATE]' role='dimension' type='ordinal' />
+      <column caption='Is Current License' datatype='boolean' name='[IS_CURRENT]' role='dimension' type='nominal' />
+      <column caption='Load Date (License Dim)' datatype='date' name='[LOAD_DATE (GO_DIM_LICENSE)]' role='dimension' type='ordinal' />
+      <column caption='Update Date (License Dim)' datatype='date' name='[UPDATE_DATE (GO_DIM_LICENSE)]' role='dimension' type='ordinal' />
+      <column caption='Source System (License Dim)' datatype='string' name='[SOURCE_SYSTEM (GO_DIM_LICENSE)]' role='dimension' type='nominal' />
+      
+      <!-- GO_DIM_MEETING_TYPE columns -->
+      <column caption='Meeting Type Dimension ID' datatype='string' name='[DIM_MEETING_TYPE_ID]' role='dimension' type='nominal' />
+      <column caption='Meeting Type Key' datatype='string' name='[MEETING_TYPE_KEY]' role='dimension' type='nominal' />
+      <column caption='Meeting Type Name' datatype='string' name='[MEETING_TYPE_NAME]' role='dimension' type='nominal' />
+      <column caption='Meeting Category' datatype='string' name='[MEETING_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Is Scheduled Meeting' datatype='boolean' name='[IS_SCHEDULED]' role='dimension' type='nominal' />
+      <column caption='Supports Recording' datatype='boolean' name='[SUPPORTS_RECORDING]' role='dimension' type='nominal' />
+      <column aggregation='Sum' caption='Max Participants (Meeting Type)' datatype='integer' name='[MAX_PARTICIPANTS (GO_DIM_MEETING_TYPE)]' role='measure' type='quantitative' />
+      <column caption='Requires License' datatype='boolean' name='[REQUIRES_LICENSE]' role='dimension' type='nominal' />
+      <column caption='Load Date (Meeting Type Dim)' datatype='date' name='[LOAD_DATE (GO_DIM_MEETING_TYPE)]' role='dimension' type='ordinal' />
+      <column caption='Update Date (Meeting Type Dim)' datatype='date' name='[UPDATE_DATE (GO_DIM_MEETING_TYPE)]' role='dimension' type='ordinal' />
+      <column caption='Source System (Meeting Type Dim)' datatype='string' name='[SOURCE_SYSTEM (GO_DIM_MEETING_TYPE)]' role='dimension' type='nominal' />
+      
+      <!-- GO_DIM_SUPPORT_CATEGORY columns -->
+      <column caption='Support Category Dimension ID' datatype='string' name='[DIM_SUPPORT_CATEGORY_ID]' role='dimension' type='nominal' />
+      <column caption='Category Key' datatype='string' name='[CATEGORY_KEY]' role='dimension' type='nominal' />
+      <column caption='Ticket Type' datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
+      <column caption='Category Group' datatype='string' name='[CATEGORY_GROUP]' role='dimension' type='nominal' />
+      <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
+      <column aggregation='Sum' caption='SLA Hours' datatype='integer' name='[SLA_HOURS]' role='measure' type='quantitative' />
+      <column aggregation='Sum' caption='Escalation Threshold Hours' datatype='integer' name='[ESCALATION_THRESHOLD_HOURS]' role='measure' type='quantitative' />
+      <column caption='Requires Technical Expertise' datatype='boolean' name='[REQUIRES_TECHNICAL_EXPERTISE]' role='dimension' type='nominal' />
+      <column caption='Load Date (Support Category Dim)' datatype='date' name='[LOAD_DATE (GO_DIM_SUPPORT_CATEGORY)]' role='dimension' type='ordinal' />
+      <column caption='Update Date (Support Category Dim)' datatype='date' name='[UPDATE_DATE (GO_DIM_SUPPORT_CATEGORY)]' role='dimension' type='ordinal' />
+      <column caption='Source System (Support Category Dim)' datatype='string' name='[SOURCE_SYSTEM (GO_DIM_SUPPORT_CATEGORY)]' role='dimension' type='nominal' />
+      
+      <!-- GO_DIM_USER columns -->
+      <column caption='User Dimension ID' datatype='string' name='[DIM_USER_ID]' role='dimension' type='nominal' />
+      <column caption='User Business Key' datatype='string' name='[USER_BUSINESS_KEY]' role='dimension' type='nominal' />
+      <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+      <column caption='Email Domain' datatype='string' name='[EMAIL_DOMAIN]' role='dimension' type='nominal' />
+      <column caption='Company Name' datatype='string' name='[COMPANY_NAME]' role='dimension' type='nominal' />
+      <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Account Status' datatype='string' name='[ACCOUNT_STATUS]' role='dimension' type='nominal' />
+      <column caption='Registration Date' datatype='date' name='[REGISTRATION_DATE]' role='dimension' type='ordinal' />
+      <column caption='User Segment' datatype='string' name='[USER_SEGMENT]' role='dimension' type='nominal' />
+      <column caption='Effective Start Date (User)' datatype='date' name='[EFFECTIVE_START_DATE (GO_DIM_USER)]' role='dimension' type='ordinal' />
+      <column caption='Effective End Date (User)' datatype='date' name='[EFFECTIVE_END_DATE (GO_DIM_USER)]' role='dimension' type='ordinal' />
+      <column caption='Is Current User' datatype='boolean' name='[IS_CURRENT (GO_DIM_USER)]' role='dimension' type='nominal' />
+      <column caption='Load Date (User Dim)' datatype='date' name='[LOAD_DATE (GO_DIM_USER)]' role='dimension' type='ordinal' />
+      <column caption='Update Date (User Dim)' datatype='date' name='[UPDATE_DATE (GO_DIM_USER)]' role='dimension' type='ordinal' />
+      <column caption='Source System (User Dim)' datatype='string' name='[SOURCE_SYSTEM (GO_DIM_USER)]' role='dimension' type='nominal' />
+      
+      <!-- GO_FACT_FEATURE_USAGE columns -->
+      <column caption='Feature Usage Fact ID' datatype='string' name='[FACT_FEATURE_USAGE_ID]' role='dimension' type='nominal' />
+      <column caption='Date Key (Feature Usage)' datatype='date' name='[DATE_KEY (GO_FACT_FEATURE_USAGE)]' role='dimension' type='ordinal' />
+      <column caption='User Key (Feature Usage)' datatype='string' name='[USER_KEY (GO_FACT_FEATURE_USAGE)]' role='dimension' type='nominal' />
+      <column caption='Feature Key (Feature Usage)' datatype='string' name='[FEATURE_KEY (GO_FACT_FEATURE_USAGE)]' role='dimension' type='nominal' />
+      <column caption='Usage Date' datatype='date' name='[USAGE_DATE]' role='dimension' type='ordinal' />
+      <column caption='Feature Name (Feature Usage)' datatype='string' name='[FEATURE_NAME (GO_FACT_FEATURE_USAGE)]' role='dimension' type='nominal' />
+      <column caption='Feature Category (Feature Usage)' datatype='string' name='[FEATURE_CATEGORY (GO_FACT_FEATURE_USAGE)]' role='dimension' type='nominal' />
+      <column aggregation='Sum' caption='Usage Count' datatype='integer' name='[USAGE_COUNT]' role='measure' type='quantitative' />
+      <column aggregation='Sum' caption='Usage Duration Minutes' datatype='integer' name='[USAGE_DURATION_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Meeting Type (Feature Usage)' datatype='string' name='[MEETING_TYPE (GO_FACT_FEATURE_USAGE)]' role='dimension' type='nominal' />
+      <column caption='User Plan Type (Feature Usage)' datatype='string' name='[USER_PLAN_TYPE (GO_FACT_FEATURE_USAGE)]' role='dimension' type='nominal' />
+      <column aggregation='Sum' caption='Participant Count (Feature Usage)' datatype='integer' name='[PARTICIPANT_COUNT (GO_FACT_FEATURE_USAGE)]' role='measure' type='quantitative' />
+      <column caption='Load Date (Feature Usage)' datatype='date' name='[LOAD_DATE (GO_FACT_FEATURE_USAGE)]' role='dimension' type='ordinal' />
+      <column caption='Update Date (Feature Usage)' datatype='date' name='[UPDATE_DATE (GO_FACT_FEATURE_USAGE)]' role='dimension' type='ordinal' />
+      <column caption='Source System (Feature Usage)' datatype='string' name='[SOURCE_SYSTEM (GO_FACT_FEATURE_USAGE)]' role='dimension' type='nominal' />
+      
+      <!-- GO_FACT_MEETING_ACTIVITY columns -->
+      <column caption='Meeting Activity Fact ID' datatype='string' name='[FACT_MEETING_ACTIVITY_ID]' role='dimension' type='nominal' />
+      <column caption='Date Key (Meeting Activity)' datatype='date' name='[DATE_KEY (GO_FACT_MEETING_ACTIVITY)]' role='dimension' type='ordinal' />
+      <column caption='User Key (Meeting Activity)' datatype='string' name='[USER_KEY (GO_FACT_MEETING_ACTIVITY)]' role='dimension' type='nominal' />
+      <column caption='Meeting Type Key (Meeting Activity)' datatype='string' name='[MEETING_TYPE_KEY (GO_FACT_MEETING_ACTIVITY)]' role='dimension' type='nominal' />
+      <column caption='Meeting Date' datatype='date' name='[MEETING_DATE]' role='dimension' type='ordinal' />
+      <column aggregation='Sum' caption='Meeting Duration Minutes' datatype='integer' name='[MEETING_DURATION_MINUTES]' role='measure' type='quantitative' />
+      <column aggregation='Sum' caption='Participant Count (Meeting Activity)' datatype='integer' name='[PARTICIPANT_COUNT (GO_FACT_MEETING_ACTIVITY)]' role='measure' type='quantitative' />
+      <column caption='Meeting Type (Meeting Activity)' datatype='string' name='[MEETING_TYPE (GO_FACT_MEETING_ACTIVITY)]' role='dimension' type='nominal' />
+      <column caption='Recording Enabled Flag' datatype='boolean' name='[RECORDING_ENABLED_FLAG]' role='dimension' type='nominal' />
+      <column aggregation='Sum' caption='Feature Usage Count (Meeting Activity)' datatype='integer' name='[FEATURE_USAGE_COUNT]' role='measure' type='quantitative' />
+      <column aggregation='Sum' caption='Total Attendance Minutes' datatype='integer' name='[TOTAL_ATTENDANCE_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Host Plan Type' datatype='string' name='[HOST_PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Meeting Status' datatype='string' name='[MEETING_STATUS]' role='dimension' type='nominal' />
+      <column caption='Load Date (Meeting Activity)' datatype='date' name='[LOAD_DATE (GO_FACT_MEETING_ACTIVITY)]' role='dimension' type='ordinal' />
+      <column caption='Update Date (Meeting Activity)' datatype='date' name='[UPDATE_DATE (GO_FACT_MEETING_ACTIVITY)]' role='dimension' type='ordinal' />
+      <column caption='Source System (Meeting Activity)' datatype='string' name='[SOURCE_SYSTEM (GO_FACT_MEETING_ACTIVITY)]' role='dimension' type='nominal' />
+      
+      <!-- GO_FACT_REVENUE_EVENTS columns -->
+      <column caption='Revenue Events Fact ID' datatype='string' name='[FACT_REVENUE_EVENTS_ID]' role='dimension' type='nominal' />
+      <column caption='Date Key (Revenue Events)' datatype='date' name='[DATE_KEY (GO_FACT_REVENUE_EVENTS)]' role='dimension' type='ordinal' />
+      <column caption='User Key (Revenue Events)' datatype='string' name='[USER_KEY (GO_FACT_REVENUE_EVENTS)]' role='dimension' type='nominal' />
+      <column caption='License Key (Revenue Events)' datatype='string' name='[LICENSE_KEY]' role='dimension' type='nominal' />
+      <column caption='Transaction Date' datatype='date' name='[TRANSACTION_DATE]' role='dimension' type='ordinal' />
+      <column aggregation='Sum' caption='Transaction Amount USD' datatype='real' name='[TRANSACTION_AMOUNT_USD]' role='measure' type='quantitative' />
+      <column aggregation='Sum' caption='Original Amount' datatype='real' name='[ORIGINAL_AMOUNT]' role='measure' type='quantitative' />
+      <column caption='Currency Code' datatype='string' name='[CURRENCY_CODE]' role='dimension' type='nominal' />
+      <column caption='Event Type' datatype='string' name='[EVENT_TYPE]' role='dimension' type='nominal' />
+      <column caption='Payment Method' datatype='string' name='[PAYMENT_METHOD]' role='dimension' type='nominal' />
+      <column caption='License Type (Revenue Events)' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
+      <column caption='Customer Plan Type' datatype='string' name='[CUSTOMER_PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Transaction Status' datatype='string' name='[TRANSACTION_STATUS]' role='dimension' type='nominal' />
+      <column aggregation='Sum' caption='MRR Impact' datatype='real' name='[MRR_IMPACT]' role='measure' type='quantitative' />
+      <column caption='Load Date (Revenue Events)' datatype='date' name='[LOAD_DATE (GO_FACT_REVENUE_EVENTS)]' role='dimension' type='ordinal' />
+      <column caption='Update Date (Revenue Events)' datatype='date' name='[UPDATE_DATE (GO_FACT_REVENUE_EVENTS)]' role='dimension' type='ordinal' />
+      <column caption='Source System (Revenue Events)' datatype='string' name='[SOURCE_SYSTEM (GO_FACT_REVENUE_EVENTS)]' role='dimension' type='nominal' />
+      
+      <!-- GO_FACT_SUPPORT_METRICS columns -->
+      <column caption='Support Metrics Fact ID' datatype='string' name='[FACT_SUPPORT_METRICS_ID]' role='dimension' type='nominal' />
+      <column caption='Date Key (Support Metrics)' datatype='date' name='[DATE_KEY (GO_FACT_SUPPORT_METRICS)]' role='dimension' type='ordinal' />
+      <column caption='User Key (Support Metrics)' datatype='string' name='[USER_KEY (GO_FACT_SUPPORT_METRICS)]' role='dimension' type='nominal' />
+      <column caption='Support Category Key' datatype='string' name='[SUPPORT_CATEGORY_KEY]' role='dimension' type='nominal' />
+      <column caption='Ticket Date' datatype='date' name='[TICKET_DATE]' role='dimension' type='ordinal' />
+      <column aggregation='Sum' caption='Resolution Time Hours' datatype='real' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='Ticket Type (Support Metrics)' datatype='string' name='[TICKET_TYPE (GO_FACT_SUPPORT_METRICS)]' role='dimension' type='nominal' />
+      <column caption='Priority Level (Support Metrics)' datatype='string' name='[PRIORITY_LEVEL (GO_FACT_SUPPORT_METRICS)]' role='dimension' type='nominal' />
+      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+      <column caption='First Contact Resolution Flag' datatype='boolean' name='[FIRST_CONTACT_RESOLUTION_FLAG]' role='dimension' type='nominal' />
+      <column caption='Escalation Flag' datatype='boolean' name='[ESCALATION_FLAG]' role='dimension' type='nominal' />
+      <column caption='Customer Plan Type (Support Metrics)' datatype='string' name='[CUSTOMER_PLAN_TYPE (GO_FACT_SUPPORT_METRICS)]' role='dimension' type='nominal' />
+      <column aggregation='Sum' caption='Satisfaction Score' datatype='integer' name='[SATISFACTION_SCORE]' role='measure' type='quantitative' />
+      <column caption='Load Date (Support Metrics)' datatype='date' name='[LOAD_DATE (GO_FACT_SUPPORT_METRICS)]' role='dimension' type='ordinal' />
+      <column caption='Update Date (Support Metrics)' datatype='date' name='[UPDATE_DATE (GO_FACT_SUPPORT_METRICS)]' role='dimension' type='ordinal' />
+      <column caption='Source System (Support Metrics)' datatype='string' name='[SOURCE_SYSTEM (GO_FACT_SUPPORT_METRICS)]' role='dimension' type='nominal' />
+      
+      <!-- Calculated Fields for KPIs -->
+      <column datatype='real' name='[Average Meeting Duration]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([MEETING_DURATION_MINUTES])'/>
+      </column>
+      
+      <column datatype='integer' name='[Total Meeting Minutes]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([MEETING_DURATION_MINUTES])'/>
+      </column>
+      
+      <column datatype='integer' name='[Active Users Count]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([USER_KEY (GO_FACT_MEETING_ACTIVITY)])'/>
+      </column>
+      
+      <column datatype='real' name='[Average Resolution Time]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])'/>
+      </column>
+      
+      <column datatype='real' name='[Monthly Recurring Revenue]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([MRR_IMPACT])'/>
+      </column>
+      
+      <column datatype='real' name='[Feature Adoption Rate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([USER_KEY (GO_FACT_FEATURE_USAGE)]) / COUNTD([USER_KEY (GO_FACT_MEETING_ACTIVITY)])'/>
+      </column>
+      
+      <column datatype='integer' name='[Ticket Volume]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([FACT_SUPPORT_METRICS_ID])'/>
+      </column>
+      
+      <column datatype='real' name='[First Contact Resolution Rate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [FIRST_CONTACT_RESOLUTION_FLAG] THEN 1 ELSE 0 END) / COUNT([FACT_SUPPORT_METRICS_ID])'/>
+      </column>
+      
+      <column datatype='real' name='[License Utilization Rate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([USER_KEY (GO_FACT_REVENUE_EVENTS)]) / COUNT([DIM_LICENSE_ID])'/>
+      </column>
+      
+      <layout dim-ordering='alphabetic' dim-percentage='0.5' measure-ordering='alphabetic' measure-percentage='0.4' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+    </datasource>
+  </datasources>
+  
+  <worksheets>
+    <worksheet name='DAU WAU MAU Trends'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Platform Analytics Data' name='federated.0abc1234' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0abc1234'>
+            <column caption='Date Key (Meeting Activity)' datatype='date' name='[DATE_KEY (GO_FACT_MEETING_ACTIVITY)]' role='dimension' type='ordinal' />
+            <column datatype='integer' name='[Active Users Count]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD([USER_KEY (GO_FACT_MEETING_ACTIVITY)])'/>
+            </column>
+            <column-instance column='[DATE_KEY (GO_FACT_MEETING_ACTIVITY)]' derivation='None' name='[none:DATE_KEY (GO_FACT_MEETING_ACTIVITY):ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Active Users Count]' derivation='User' name='[usr:Active Users Count:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[none:DATE_KEY (GO_FACT_MEETING_ACTIVITY):ok]' type='palette'>
+              <map to='#1f77b4'>
+                <bucket>2024</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.0abc1234].[none:DATE_KEY (GO_FACT_MEETING_ACTIVITY):ok]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0abc1234].[usr:Active Users Count:qk]</rows>
+        <cols>[federated.0abc1234].[none:DATE_KEY (GO_FACT_MEETING_ACTIVITY):ok]</cols>
+      </table>
+      <simple-id uuid='{A1B2C3D4-E5F6-4789-A012-B3C4D5E6F7A8}' />
+    </worksheet>
+    
+    <worksheet name='Average Meeting Duration by Type'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Platform Analytics Data' name='federated.0abc1234' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0abc1234'>
+            <column caption='Meeting Type (Meeting Activity)' datatype='string' name='[MEETING_TYPE (GO_FACT_MEETING_ACTIVITY)]' role='dimension' type='nominal' />
+            <column datatype='real' name='[Average Meeting Duration]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([MEETING_DURATION_MINUTES])'/>
+            </column>
+            <column-instance column='[MEETING_TYPE (GO_FACT_MEETING_ACTIVITY)]' derivation='None' name='[none:MEETING_TYPE (GO_FACT_MEETING_ACTIVITY):nk]' pivot='key' type='nominal' />
+            <column-instance column='[Average Meeting Duration]' derivation='User' name='[usr:Average Meeting Duration:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[none:MEETING_TYPE (GO_FACT_MEETING_ACTIVITY):nk]' type='palette'>
+              <map to='#2ca02c'>
+                <bucket>&quot;Scheduled&quot;</bucket>
+              </map>
+              <map to='#ff7f0e'>
+                <bucket>&quot;Instant&quot;</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.0abc1234].[none:MEETING_TYPE (GO_FACT_MEETING_ACTIVITY):nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0abc1234].[usr:Average Meeting Duration:qk]</rows>
+        <cols>[federated.0abc1234].[none:MEETING_TYPE (GO_FACT_MEETING_ACTIVITY):nk]</cols>
+      </table>
+      <simple-id uuid='{B2C3D4E5-F6A7-4890-B123-C4D5E6F7A8B9}' />
+    </worksheet>
+    
+    <worksheet name='Feature Usage Distribution'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Platform Analytics Data' name='federated.0abc1234' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0abc1234'>
+            <column caption='Feature Category (Feature Usage)' datatype='string' name='[FEATURE_CATEGORY (GO_FACT_FEATURE_USAGE)]' role='dimension' type='nominal' />
+            <column aggregation='Sum' caption='Usage Count' datatype='integer' name='[USAGE_COUNT]' role='measure' type='quantitative' />
+            <column-instance column='[FEATURE_CATEGORY (GO_FACT_FEATURE_USAGE)]' derivation='None' name='[none:FEATURE_CATEGORY (GO_FACT_FEATURE_USAGE):nk]' pivot='key' type='nominal' />
+            <column-instance column='[USAGE_COUNT]' derivation='Sum' name='[sum:USAGE_COUNT:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[none:FEATURE_CATEGORY (GO_FACT_FEATURE_USAGE):nk]' type='palette'>
+              <map to='#d62728'>
+                <bucket>&quot;Audio&quot;</bucket>
+              </map>
+              <map to='#9467bd'>
+                <bucket>&quot;Video&quot;</bucket>
+              </map>
+              <map to='#8c564b'>
+                <bucket>&quot;Collaboration&quot;</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Pie' />
+            <encodings>
+              <color column='[federated.0abc1234].[none:FEATURE_CATEGORY (GO_FACT_FEATURE_USAGE):nk]' />
+              <wedge-size column='[federated.0abc1234].[sum:USAGE_COUNT:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{C3D4E5F6-A7B8-4901-C234-D5E6F7A8B9C0}' />
+    </worksheet>
+    
+    <worksheet name='Ticket Volume by Meeting Type'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Platform Analytics Data' name='federated.0abc1234' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0abc1234'>
+            <column caption='Ticket Type (Support Metrics)' datatype='string' name='[TICKET_TYPE (GO_FACT_SUPPORT_METRICS)]' role='dimension' type='nominal' />
+            <column datatype='integer' name='[Ticket Volume]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNT([FACT_SUPPORT_METRICS_ID])'/>
+            </column>
+            <column-instance column='[TICKET_TYPE (GO_FACT_SUPPORT_METRICS)]' derivation='None' name='[none:TICKET_TYPE (GO_FACT_SUPPORT_METRICS):nk]' pivot='key' type='nominal' />
+            <column-instance column='[Ticket Volume]' derivation='User' name='[usr:Ticket Volume:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[none:TICKET_TYPE (GO_FACT_SUPPORT_METRICS):nk]' type='palette'>
+              <map to='#e377c2'>
+                <bucket>&quot;Technical&quot;</bucket>
+              </map>
+              <map to='#7f7f7f'>
+                <bucket>&quot;Billing&quot;</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.0abc1234].[none:TICKET_TYPE (GO_FACT_SUPPORT_METRICS):nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0abc1234].[usr:Ticket Volume:qk]</rows>
+        <cols>[federated.0abc1234].[none:TICKET_TYPE (GO_FACT_SUPPORT_METRICS):nk]</cols>
+      </table>
+      <simple-id uuid='{D4E5F6A7-B8C9-4012-D345-E6F7A8B9C0D1}' />
+    </worksheet>
+    
+    <worksheet name='Resolution Time Trends'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Platform Analytics Data' name='federated.0abc1234' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0abc1234'>
+            <column caption='Ticket Date' datatype='date' name='[TICKET_DATE]' role='dimension' type='ordinal' />
+            <column datatype='real' name='[Average Resolution Time]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])'/>
+            </column>
+            <column-instance column='[TICKET_DATE]' derivation='None' name='[none:TICKET_DATE:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Average Resolution Time]' derivation='User' name='[usr:Average Resolution Time:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[none:TICKET_DATE:ok]' type='palette'>
+              <map to='#bcbd22'>
+                <bucket>2024</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.0abc1234].[none:TICKET_DATE:ok]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0abc1234].[usr:Average Resolution Time:qk]</rows>
+        <cols>[federated.0abc1234].[none:TICKET_DATE:ok]</cols>
+      </table>
+      <simple-id uuid='{E5F6A7B8-C9D0-4123-E456-F7A8B9C0D1E2}' />
+    </worksheet>
+    
+    <worksheet name='MRR Trends'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Platform Analytics Data' name='federated.0abc1234' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0abc1234'>
+            <column caption='Transaction Date' datatype='date' name='[TRANSACTION_DATE]' role='dimension' type='ordinal' />
+            <column datatype='real' name='[Monthly Recurring Revenue]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM([MRR_IMPACT])'/>
+            </column>
+            <column-instance column='[TRANSACTION_DATE]' derivation='None' name='[none:TRANSACTION_DATE:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Monthly Recurring Revenue]' derivation='User' name='[usr:Monthly Recurring Revenue:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[none:TRANSACTION_DATE:ok]' type='palette'>
+              <map to='#17becf'>
+                <bucket>2024</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.0abc1234].[none:TRANSACTION_DATE:ok]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0abc1234].[usr:Monthly Recurring Revenue:qk]</rows>
+        <cols>[federated.0abc1234].[none:TRANSACTION_DATE:ok]</cols>
+      </table>
+      <simple-id uuid='{F6A7B8C9-D0E1-4234-F567-A8B9C0D1E2F3}' />
+    </worksheet>
+    
+    <worksheet name='Revenue by License Type'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Platform Analytics Data' name='federated.0abc1234' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0abc1234'>
+            <column caption='License Type (Revenue Events)' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
+            <column aggregation='Sum' caption='Transaction Amount USD' datatype='real' name='[TRANSACTION_AMOUNT_USD]' role='measure' type='quantitative' />
+            <column-instance column='[LICENSE_TYPE]' derivation='None' name='[none:LICENSE_TYPE:nk]' pivot='key' type='nominal' />
+            <column-instance column='[TRANSACTION_AMOUNT_USD]' derivation='Sum' name='[sum:TRANSACTION_AMOUNT_USD:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[none:LICENSE_TYPE:nk]' type='palette'>
+              <map to='#1f77b4'>
+                <bucket>&quot;Basic&quot;</bucket>
+              </map>
+              <map to='#ff7f0e'>
+                <bucket>&quot;Pro&quot;</bucket>
+              </map>
+              <map to='#2ca02c'>
+                <bucket>&quot;Business&quot;</bucket>
+              </map>
+              <map to='#d62728'>
+                <bucket>&quot;Enterprise&quot;</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.0abc1234].[none:LICENSE_TYPE:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0abc1234].[sum:TRANSACTION_AMOUNT_USD:qk]</rows>
+        <cols>[federated.0abc1234].[none:LICENSE_TYPE:nk]</cols>
+        <datasource-dependencies datasource='federated.0abc1234'>
+          <column caption='License Type (Revenue Events)' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
+          <column aggregation='Sum' caption='Transaction Amount USD' datatype='real' name='[TRANSACTION_AMOUNT_USD]' role='measure' type='quantitative' />
+          <column-instance column='[LICENSE_TYPE]' derivation='None' name='[none:LICENSE_TYPE:nk]' pivot='key' type='nominal' />
+          <column-instance column='[TRANSACTION_AMOUNT_USD]' derivation='Sum' name='[sum:TRANSACTION_AMOUNT_USD:qk]' pivot='key' type='quantitative' />
+          <filter class='categorical' column='[LICENSE_TYPE]'>
+            <groupfilter from='&quot;Basic&quot;' function='range' level='[LICENSE_TYPE]' to='&quot;Enterprise&quot;' user:op='eq' />
+          </filter>
+        </datasource-dependencies>
+        <slices>
+          <column>[federated.0abc1234].[none:LICENSE_TYPE:nk]</column>
+        </slices>
+        <aggregation value='true' />
+      </table>
+      <simple-id uuid='{A7B8C9D0-E1F2-4345-A678-B9C0D1E2F3A4}' />
+    </worksheet>
+  </worksheets>
+  
+  <windows source-height='30'>
+    <window class='worksheet' maximized='true' name='DAU WAU MAU Trends'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{B8C9D0E1-F2A3-4456-B789-C0D1E2F3A4B5}' />
+    </window>
+    <window class='worksheet' name='Average Meeting Duration by Type'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{C9D0E1F2-A3B4-4567-C890-D1E2F3A4B5C6}' />
+    </window>
+    <window class='worksheet' name='Feature Usage Distribution'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{D0E1F2A3-B4C5-4678-D901-E2F3A4B5C6D7}' />
+    </window>
+    <window class='worksheet' name='Ticket Volume by Meeting Type'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{E1F2A3B4-C5D6-4789-E012-F3A4B5C6D7E8}' />
+    </window>
+    <window class='worksheet' name='Resolution Time Trends'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{F2A3B4C5-D6E7-4890-F123-A4B5C6D7E8F9}' />
+    </window>
+    <window class='worksheet' name='MRR Trends'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{A3B4C5D6-E7F8-4901-A234-B5C6D7E8F9A0}' />
+    </window>
+    <window class='worksheet' name='Revenue by License Type'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{B4C5D6E7-F8A9-4012-B345-C6D7E8F9A0B1}' />
+    </window>
+  </windows>
+  <thumbnails>
+    <thumbnail height='192' name='DAU WAU MAU Trends' width='192'>
+      iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAAA7DAAAOwwHHb6hkAAACFUlEQVR4nO3TMQEAIAzAMMC/5yFjRxMFfXpnZg5Eve0A2GQA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKQZgDQDkGYA0gxAmgFIMwBpBiDNAKR9Y+0ESPdeJbAAAAAASUVORK5CYII=
+    </thumbnail>
+  </thumbnails>
+</workbook>
