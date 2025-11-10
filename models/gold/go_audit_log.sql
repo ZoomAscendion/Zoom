@@ -1,28 +1,12 @@
 {{ config(
-    materialized='table',
-    pre_hook=none,
-    post_hook=none
+    materialized='table'
 ) }}
 
 -- Audit log table for tracking all Gold layer transformations
 -- This table must be created first and runs before any other models
 
-CREATE TABLE IF NOT EXISTS {{ this }} (
-    AUDIT_ID VARCHAR(255),
-    PIPELINE_NAME VARCHAR(255),
-    SOURCE_TABLE VARCHAR(255),
-    TARGET_TABLE VARCHAR(255),
-    EXECUTION_START_TIME TIMESTAMP_NTZ(9),
-    EXECUTION_END_TIME TIMESTAMP_NTZ(9),
-    EXECUTION_STATUS VARCHAR(50),
-    RECORDS_PROCESSED NUMBER(38,0),
-    ERROR_MESSAGE VARCHAR(1000),
-    CREATED_AT TIMESTAMP_NTZ(9) DEFAULT CURRENT_TIMESTAMP(),
-    UPDATED_AT TIMESTAMP_NTZ(9) DEFAULT CURRENT_TIMESTAMP()
-);
-
 SELECT 
-    'INIT' AS AUDIT_ID,
+    GENERATE_UUID() AS AUDIT_ID,
     'GOLD_LAYER_INIT' AS PIPELINE_NAME,
     'N/A' AS SOURCE_TABLE,
     'GO_AUDIT_LOG' AS TARGET_TABLE,
@@ -33,4 +17,3 @@ SELECT
     'Audit log initialized' AS ERROR_MESSAGE,
     CURRENT_TIMESTAMP() AS CREATED_AT,
     CURRENT_TIMESTAMP() AS UPDATED_AT
-WHERE FALSE -- This ensures no actual data is inserted during model creation
