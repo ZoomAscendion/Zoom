@@ -6,8 +6,6 @@ config-version: 2
 profile: 'zoom_silver_pipeline'
 
 # These configurations specify where dbt should look for different types of files.
-# The `model-paths` config, for example, states that models in this project can be
-# found in the "models/" directory. You probably won't need to change these!
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -15,98 +13,23 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+target-path: "target"
+clean-targets:
   - "target"
   - "dbt_packages"
 
 # Configuring models
-# Full documentation: https://docs.getdbt.com/docs/configuring-models
-
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            EXECUTION_ID, 
-            PIPELINE_NAME, 
-            PIPELINE_TYPE, 
-            EXECUTION_START_TIME, 
-            EXECUTION_STATUS, 
-            SOURCE_TABLE, 
-            TARGET_TABLE, 
-            EXECUTED_BY, 
-            LOAD_TIMESTAMP
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            'BRONZE_TO_SILVER_{{ this.name }}', 
-            'BRONZE_TO_SILVER', 
-            CURRENT_TIMESTAMP(), 
-            'RUNNING', 
-            'BZ_{{ this.name | replace("SI_", "") }}', 
-            '{{ this.name }}', 
-            'DBT_PIPELINE', 
-            CURRENT_TIMESTAMP()
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          UPDATE {{ ref('SI_Audit_Log') }} 
-          SET 
-            EXECUTION_END_TIME = CURRENT_TIMESTAMP(), 
-            EXECUTION_STATUS = 'SUCCESS', 
-            EXECUTION_DURATION_SECONDS = DATEDIFF('second', EXECUTION_START_TIME, CURRENT_TIMESTAMP()), 
-            UPDATE_TIMESTAMP = CURRENT_TIMESTAMP() 
-          WHERE 
-            PIPELINE_NAME = 'BRONZE_TO_SILVER_{{ this.name }}' 
-            AND EXECUTION_STATUS = 'RUNNING'
-        {% endif %}
-
-# Model execution order - SI_Audit_Log must run first
-model-ordering:
-  - name: SI_Audit_Log
-    depends_on: []
-  - name: SI_USERS
-    depends_on: [SI_Audit_Log]
-  - name: SI_MEETINGS
-    depends_on: [SI_Audit_Log, SI_USERS]
-  - name: SI_PARTICIPANTS
-    depends_on: [SI_Audit_Log, SI_MEETINGS]
-  - name: SI_FEATURE_USAGE
-    depends_on: [SI_Audit_Log, SI_MEETINGS]
-  - name: SI_SUPPORT_TICKETS
-    depends_on: [SI_Audit_Log, SI_USERS]
-  - name: SI_BILLING_EVENTS
-    depends_on: [SI_Audit_Log, SI_USERS]
-  - name: SI_LICENSES
-    depends_on: [SI_Audit_Log, SI_USERS]
-
-# Specify the order of execution
-run-order:
-  - SI_Audit_Log
-  - SI_USERS
-  - SI_MEETINGS
-  - SI_PARTICIPANTS
-  - SI_FEATURE_USAGE
-  - SI_SUPPORT_TICKETS
-  - SI_BILLING_EVENTS
-  - SI_LICENSES
 
 vars:
-  # dbt Cloud environment variables
   start_date: '2020-01-01'
   end_date: '2030-12-31'
-  
+
 # Global configurations
 quoting:
   database: false
   schema: false
   identifier: false
-
-# Dispatch configuration for cross-database compatibility
-dispatch:
-  - macro_namespace: dbt_utils
-    search_order: ['dbt_utils']
