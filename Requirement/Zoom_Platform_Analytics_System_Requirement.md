@@ -87,7 +87,7 @@ trends and areas for improvement.
 
 -   Line chart showing DAU and WAU and MAU trends.
 
--   Bar chart comparing average meeting duration by Meeting_Type.
+-   Bar chart comparing average meeting duration by Meeting Type and Category.
 
 -   Pie chart showing feature usage distribution.
 
