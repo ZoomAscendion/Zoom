@@ -1,0 +1,155 @@
+version: 2
+
+models:
+  - name: go_audit_log
+    description: "Gold layer process audit log for tracking ETL execution"
+    columns:
+      - name: audit_log_id
+        description: "Unique identifier for audit log entry"
+      - name: process_name
+        description: "Name of the process being executed"
+      - name: execution_status
+        description: "Status of process execution"
+        
+  - name: dim_date
+    description: "Date dimension for time-based analysis"
+    columns:
+      - name: date_key
+        description: "Primary key for date dimension"
+        tests:
+          - unique
+          - not_null
+      - name: year
+        description: "Calendar year"
+      - name: quarter
+        description: "Calendar quarter"
+      - name: month
+        description: "Calendar month"
+        
+  - name: dim_user
+    description: "User dimension with profile and subscription information"
+    columns:
+      - name: user_key
+        description: "Surrogate key for user dimension"
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: "Business key for user"
+      - name: plan_type
+        description: "User subscription plan type"
+        
+  - name: dim_feature
+    description: "Feature dimension with platform features"
+    columns:
+      - name: feature_key
+        description: "Surrogate key for feature dimension"
+        tests:
+          - unique
+          - not_null
+      - name: feature_name
+        description: "Name of the platform feature"
+        
+  - name: dim_license
+    description: "License dimension with license types and entitlements"
+    columns:
+      - name: license_key
+        description: "Surrogate key for license dimension"
+        tests:
+          - unique
+          - not_null
+      - name: license_type
+        description: "Type of license"
+        
+  - name: dim_meeting
+    description: "Meeting dimension with meeting characteristics"
+    columns:
+      - name: meeting_key
+        description: "Surrogate key for meeting dimension"
+        tests:
+          - unique
+          - not_null
+      - name: meeting_type
+        description: "Type of meeting"
+        
+  - name: dim_support_category
+    description: "Support category dimension with ticket categories"
+    columns:
+      - name: support_category_key
+        description: "Surrogate key for support category dimension"
+        tests:
+          - unique
+          - not_null
+      - name: support_category
+        description: "Support ticket category"
+        
+  - name: fact_meeting_activity
+    description: "Meeting activity fact table with comprehensive meeting metrics"
+    columns:
+      - name: meeting_activity_id
+        description: "Unique identifier for meeting activity record"
+        tests:
+          - unique
+          - not_null
+      - name: user_key
+        description: "Foreign key to user dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_user')
+              field: user_key
+      - name: date_key
+        description: "Foreign key to date dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+              
+  - name: fact_support_activity
+    description: "Support activity fact table with ticket metrics"
+    columns:
+      - name: support_activity_id
+        description: "Unique identifier for support activity record"
+        tests:
+          - unique
+          - not_null
+      - name: user_key
+        description: "Foreign key to user dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_user')
+              field: user_key
+              
+  - name: fact_revenue_activity
+    description: "Revenue activity fact table with billing and revenue metrics"
+    columns:
+      - name: revenue_activity_id
+        description: "Unique identifier for revenue activity record"
+        tests:
+          - unique
+          - not_null
+      - name: user_key
+        description: "Foreign key to user dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_user')
+              field: user_key
+              
+  - name: fact_feature_usage
+    description: "Feature usage fact table with usage metrics and patterns"
+    columns:
+      - name: feature_usage_id
+        description: "Unique identifier for feature usage record"
+        tests:
+          - unique
+          - not_null
+      - name: feature_key
+        description: "Foreign key to feature dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_feature')
+              field: feature_key
