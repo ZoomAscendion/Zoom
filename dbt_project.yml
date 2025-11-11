@@ -5,7 +5,29 @@ config-version: 2
 profile: 'zoom_gold_pipeline'
 
 model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
 
 models:
   zoom_gold_pipeline:
-    +materialized: table
+    gold:
+      +materialized: table
+      +cluster_by: ['LOAD_DATE']
+      dimensional:
+        +materialized: table
+        +cluster_by: ['LOAD_DATE']
+      fact:
+        +materialized: table
+        +cluster_by: ['DATE_KEY']
+
+vars:
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
