@@ -1,9 +1,11 @@
-name: 'zoom_analytics_gold'
+name: 'zoom_gold_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_analytics'
+# This setting configures which "profile" dbt uses for this project.
+profile: 'zoom_gold_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -16,38 +18,35 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
-  zoom_analytics_gold:
-    +materialized: table
-    +pre-hook: |
-      {% if this.name != 'go_audit_log' %}
-        INSERT INTO {{ ref('go_audit_log') }} (
-          PROCESS_ID, PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, 
-          PROCESS_START_TIME, PROCESS_STATUS, RECORDS_PROCESSED, 
-          LOAD_DATE, SOURCE_SYSTEM
-        ) VALUES (
-          '{{ invocation_id }}', '{{ this.name }}', 'SILVER_LAYER', '{{ this }}',
-          CURRENT_TIMESTAMP(), 'STARTED', 0, CURRENT_DATE(), 'DBT_GOLD_PIPELINE'
-        )
-      {% endif %}
-    +post-hook: |
-      {% if this.name != 'go_audit_log' %}
-        UPDATE {{ ref('go_audit_log') }} 
-        SET PROCESS_END_TIME = CURRENT_TIMESTAMP(),
-            PROCESS_STATUS = 'COMPLETED',
-            RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }})
-        WHERE PROCESS_ID = '{{ invocation_id }}' 
-          AND PROCESS_NAME = '{{ this.name }}'
-          AND PROCESS_STATUS = 'STARTED'
-      {% endif %}
+  zoom_gold_pipeline:
+    # Config indicated by + and applies to all files under models/gold/
     gold:
       +materialized: table
-      dimension:
-        +tags: ["dimension"]
+      +tags: ["gold"]
+      # Audit log model runs first
+      go_audit_log:
+        +pre-hook: []
+        +post-hook: []
+      # Dimension models
+      dimensional:
         +materialized: table
+        +tags: ["dimension", "gold"]
+      # Fact models  
       fact:
-        +tags: ["fact"]
         +materialized: table
-    audit:
-      +materialized: table
-      +tags: ["audit"]
+        +tags: ["fact", "gold"]
+
+# Global configurations
+vars:
+  # DBT project variables
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
+  
+# Dependencies and run order
+on-run-start:
+  - "{{ log('Starting Gold Layer Pipeline Execution', info=True) }}"
+  
+on-run-end:
+  - "{{ log('Gold Layer Pipeline Execution Completed', info=True) }}"
