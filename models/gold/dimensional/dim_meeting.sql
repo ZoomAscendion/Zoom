@@ -2,9 +2,7 @@
   config(
     materialized='table',
     cluster_by=['MEETING_KEY'],
-    tags=['dimension', 'gold'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, LOAD_DATE, SOURCE_SYSTEM) SELECT '{{ invocation_id }}', 'DIM_MEETING_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_MEETINGS', 'GO_DIM_MEETING', CURRENT_DATE(), 'DBT_GOLD_PIPELINE' WHERE '{{ this.name }}' != 'go_audit_log'",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), EXECUTION_DURATION_SECONDS = DATEDIFF('second', EXECUTION_START_TIMESTAMP, CURRENT_TIMESTAMP()) WHERE AUDIT_LOG_ID = '{{ invocation_id }}' AND '{{ this.name }}' != 'go_audit_log'"
+    tags=['dimension', 'gold']
   )
 }}
 
@@ -56,7 +54,7 @@ WITH meeting_data AS (
         'Business Meeting' AS BUSINESS_PURPOSE,
         CURRENT_DATE() AS LOAD_DATE,
         CURRENT_DATE() AS UPDATE_DATE,
-        COALESCE(SOURCE_SYSTEM, 'SILVER_LAYER') AS SOURCE_SYSTEM
+        COALESCE(SOURCE_SYSTEM, 'SILVER') AS SOURCE_SYSTEM
     FROM {{ source('silver', 'si_meetings') }}
     WHERE COALESCE(VALIDATION_STATUS, '') = 'PASSED'
       AND MEETING_ID IS NOT NULL
