@@ -4,8 +4,6 @@
 ) }}
 
 -- Audit log table for Gold layer pipeline execution tracking
--- This table must be created first and run before any other models
-
 SELECT 
     CAST(UUID_STRING() AS VARCHAR(255)) AS PROCESS_ID,
     CAST('GOLD_PIPELINE_INIT' AS VARCHAR(255)) AS PROCESS_NAME,
@@ -31,4 +29,3 @@ SELECT
     CURRENT_DATE() AS LOAD_DATE,
     CURRENT_DATE() AS UPDATE_DATE,
     CAST('DBT_GOLD_PIPELINE' AS VARCHAR(100)) AS SOURCE_SYSTEM
-WHERE 1=1
