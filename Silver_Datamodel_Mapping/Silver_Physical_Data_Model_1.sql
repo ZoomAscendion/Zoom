@@ -1,9 +1,9 @@
 _____________________________________________
 -- *Author*: AAVA
--- *Created on*:   
+-- *Created on*:   11-11-2025
 -- *Description*: Silver layer physical data model for Zoom Platform Analytics System following Medallion architecture
 -- *Version*: 1 
--- *Updated on*: 
+-- *Updated on*: 11-11-2025
 _____________________________________________
 
 -- =====================================================
