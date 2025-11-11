@@ -11,104 +11,106 @@ ____________________________________________
 ## 1. Data Expectations
 
 ### 1.1 Data Completeness
-1. All foreign key relationships must be correctly implemented for accurate joins between entities
-2. Meeting records must have complete duration and timing information for usage analytics
-3. User records must include plan type information for segmentation analysis
-4. Support ticket records must have complete type and status information for resolution tracking
-5. Billing event records must include complete amount and event type data for revenue analysis
-6. License records must have complete start and end date information for utilization tracking
+1. All meeting records must have complete duration and timing information for accurate usage analytics
+2. User information must include plan type to enable proper segmentation analysis
+3. Support ticket records must contain complete type and status information for resolution tracking
+4. Billing events must have complete amount and event type data for revenue analysis
+5. License records must include start and end dates for utilization rate calculations
+6. Feature usage records must be complete to accurately measure adoption rates
 
 ### 1.2 Data Accuracy
-1. All calculated metrics must accurately reflect the underlying data relationships
-2. Active user counts must be based on actual meeting hosting activity
-3. Revenue calculations must accurately sum all monetary amounts from billing events
-4. Feature adoption rates must accurately reflect the proportion of users utilizing specific features
-5. Resolution time calculations must accurately measure time between ticket opening and closure
-6. License utilization rates must accurately reflect assigned versus available licenses
+1. Meeting duration calculations must accurately reflect actual session times
+2. User activity tracking must precisely identify unique active users for DAU/WAU/MAU metrics
+3. Ticket resolution time calculations must accurately measure support team performance
+4. Revenue calculations must precisely reflect actual billing amounts and events
+5. License utilization rates must accurately represent current assignment status
+6. Feature adoption metrics must correctly identify users who have used specific features
 
 ### 1.3 Data Format
-1. Duration_Minutes must be recorded as non-negative integer values
-2. Start_Time and End_Time must be valid timestamp formats
-3. Amount values must be recorded as positive numerical values
-4. Open_Date must be recorded in valid date format
-5. All date fields must follow consistent timestamp formatting
-6. Email addresses must follow standard email format validation
+1. All timestamp fields (Start_Time, End_Time, Open_Date) must follow consistent datetime format
+2. Duration_Minutes must be expressed as integer values for consistent calculations
+3. Amount fields must follow standard monetary format with appropriate precision
+4. Plan_Type and License_Type must use standardized naming conventions
+5. Email addresses must follow valid email format standards
+6. User_Name must follow consistent naming format guidelines
 
 ### 1.4 Data Consistency
-1. Meeting duration calculations must be consistent across all usage reports
-2. User identification must be consistent across all entity relationships
-3. License type classifications must be consistent across billing and license entities
-4. Meeting type classifications must be consistent across usage and support correlation analysis
-5. Time period calculations must be consistent for DAU, WAU, and MAU metrics
-6. Revenue aggregations must be consistent across different reporting periods
+1. User plan types must be consistently categorized across all related records
+2. Meeting types must be uniformly classified for accurate comparative analysis
+3. Support ticket types must follow consistent categorization standards
+4. License types must maintain uniform classification across all records
+5. Feature names must be consistently named across all usage records
+6. Company names must be standardized to avoid duplicate organizational entries
 
 ## 2. Constraints
 
 ### 2.1 Mandatory Fields
-1. **User_ID**: Required for all user-related entity relationships and cross-report analysis
-2. **Meeting_ID**: Required for meeting-related analytics and feature usage tracking
-3. **Duration_Minutes**: Required for calculating total meeting minutes and average duration metrics
-4. **Plan_Type**: Required for user segmentation and revenue analysis
-5. **Start_Time**: Required for temporal analysis and meeting scheduling patterns
-6. **Event_Type**: Required for categorizing billing transactions and revenue tracking
-7. **License_Type**: Required for license utilization analysis and revenue categorization
-8. **Type**: Required for support ticket categorization and resolution tracking
+1. **Duration_Minutes**: Required for all meeting records to calculate total meeting minutes and average duration metrics
+2. **Start_Time**: Essential for temporal analysis and trend identification across all reports
+3. **Plan_Type**: Necessary for user segmentation analysis in usage and revenue reports
+4. **User_ID**: Critical for linking user activities across meetings, support, and billing systems
+5. **Meeting_ID**: Required for proper relationship establishment between meetings and related entities
+6. **Amount**: Essential for revenue calculations and billing analysis
+7. **License_Type**: Necessary for license utilization and revenue analysis by license category
+8. **Type**: Required for support ticket categorization and volume analysis
 
 ### 2.2 Uniqueness Requirements
-1. **User_ID**: Must be unique across the Users entity for proper user identification
-2. **Meeting_ID**: Must be unique across the Meetings entity for proper meeting tracking
-3. **Support Ticket ID**: Must be unique for proper ticket tracking and resolution monitoring
-4. **License ID**: Must be unique for proper license assignment and utilization tracking
-5. **Billing Event ID**: Must be unique for accurate revenue calculation and transaction tracking
+1. **User_ID**: Must be unique across the Users entity to ensure proper user identification
+2. **Meeting_ID**: Must be unique across the Meetings entity to ensure accurate meeting tracking
+3. **Email**: Must be unique per user to prevent duplicate user accounts
+4. **Support Ticket ID**: Must be unique to ensure proper ticket tracking and resolution
+5. **License ID**: Must be unique to prevent license assignment conflicts
+6. **Billing Event ID**: Must be unique to ensure accurate revenue tracking
 
 ### 2.3 Data Type Limitations
 1. **Duration_Minutes**: Must be non-negative integer values only
-2. **Amount**: Must be positive numerical values for billing events
-3. **Usage_Count**: Must be non-negative integer values for feature usage tracking
-4. **Start_Date**: Must be valid date format and before End_Date for licenses
-5. **End_Date**: Must be valid date format and after Start_Date for licenses
-6. **Open_Date**: Must be valid date format for support ticket creation
+2. **Amount**: Must be positive numeric values for billing events
+3. **Start_Time/End_Time**: Must be valid timestamp formats
+4. **Open_Date**: Must be valid date format
+5. **Usage_Count**: Must be non-negative integer values
+6. **Plan_Type**: Must be from predefined list of valid plan types
+7. **License_Type**: Must be from predefined list of valid license categories
 
 ### 2.4 Dependencies
-1. **Attendees entity**: Depends on valid Meeting_ID existing in Meetings table
-2. **Features_Usage entity**: Depends on valid Meeting_ID existing in Meetings table
-3. **Support_Tickets entity**: Depends on valid User_ID existing in Users table
-4. **Billing_Events entity**: Depends on valid User_ID existing in Users table
-5. **Licenses entity**: Depends on valid Assigned_To_User_ID existing in Users table
-6. **Meeting hosting**: Depends on valid Host_ID existing in Users table
+1. **Meeting End_Time**: Must be after or equal to Start_Time for logical consistency
+2. **License End_Date**: Must be after Start_Date for valid license periods
+3. **Support Ticket Resolution**: Resolution_Status must align with actual ticket lifecycle
+4. **User Plan Consistency**: User plan type must be consistent across meetings and billing events
+5. **Feature Usage Dependency**: Feature usage records must correspond to actual meeting sessions
 
 ### 2.5 Referential Integrity
 1. **Meetings to Users**: Host_ID in Meetings must reference existing User_ID in Users table
 2. **Attendees to Meetings**: Meeting_ID in Attendees must reference existing Meeting_ID in Meetings table
-3. **Features_Usage to Meetings**: Meeting_ID in Features_Usage must reference existing Meeting_ID in Meetings table
-4. **Support_Tickets to Users**: User_ID in Support_Tickets must reference existing User_ID in Users table
-5. **Billing_Events to Users**: User_ID in Billing_Events must reference existing User_ID in Users table
-6. **Licenses to Users**: Assigned_To_User_ID in Licenses must reference existing User_ID in Users table
+3. **Attendees to Users**: User_ID in Attendees must reference existing User_ID in Users table
+4. **Features_Usage to Meetings**: Meeting_ID in Features_Usage must reference existing Meeting_ID in Meetings table
+5. **Support_Tickets to Users**: User_ID in Support_Tickets must reference existing User_ID in Users table
+6. **Billing_Events to Users**: User_ID in Billing_Events must reference existing User_ID in Users table
+7. **Licenses to Users**: Assigned_To_User_ID in Licenses must reference existing User_ID in Users table
 
 ## 3. Business Rules
 
 ### 3.1 Data Processing Rules
-1. Active user count must be calculated as unique users who have hosted at least one meeting within the specified time period
-2. Total meeting minutes must be calculated by summing Duration_Minutes across all meetings
-3. Average meeting duration must be calculated by averaging Duration_Minutes across all meetings
-4. Feature adoption rate must be calculated as proportion of users who used a specific feature at least once compared to total user base
-5. License utilization rate must be calculated as proportion of assigned licenses out of total available licenses
-6. Churn rate must be calculated as fraction of users who stopped using the platform compared to total users
+1. **Active User Definition**: A user is considered active if they have hosted at least one meeting within the specified time period
+2. **Meeting Duration Calculation**: Total meeting minutes are calculated by summing Duration_Minutes across all meeting records
+3. **Average Duration Calculation**: Average meeting duration is computed by dividing total duration by number of meetings
+4. **Feature Adoption Calculation**: Feature adoption rate is the proportion of users who have used a specific feature at least once
+5. **License Utilization Calculation**: License utilization rate is the proportion of licenses currently assigned to users
+6. **Churn Rate Calculation**: Churn rate measures the fraction of users who have stopped using the platform
 
 ### 3.2 Reporting Logic Rules
-1. DAU, WAU, and MAU calculations must be based on unique users hosting meetings within respective time periods
-2. Revenue analysis must aggregate billing events by license type and time period
-3. Support ticket analysis must correlate ticket types with meeting issues where applicable
-4. Usage correlation with billing events must identify users who upgrade after reaching usage thresholds
-5. Geographic revenue distribution must be based on user company information where available
-6. License expiration analysis must identify upcoming renewals based on End_Date proximity
+1. **DAU/WAU/MAU Calculation**: Active users must be counted as unique users within daily, weekly, or monthly periods
+2. **Revenue Aggregation**: Total revenue is calculated by summing all monetary amounts from billing events
+3. **Resolution Time Calculation**: Average resolution time is calculated by determining the average time taken to close tickets
+4. **User-to-Ticket Ratio**: Compares total number of tickets raised to the number of active users during the same period
+5. **MRR Calculation**: Monthly Recurring Revenue is calculated from subscription-based billing events
+6. **Geographic Revenue Distribution**: Revenue must be aggregated by user company location for geographic analysis
 
 ### 3.3 Transformation Guidelines
-1. Sensitive user data (Email, User_Name) must be anonymized or masked for non-authorized users
-2. Time-based aggregations must use consistent time zone handling across all reports
-3. Revenue calculations must handle different currency formats if applicable
-4. Meeting type classifications must be standardized for consistent analysis
-5. Support ticket resolution status must follow predefined workflow states
-6. Feature usage tracking must normalize feature names for consistent reporting
-7. User plan type classifications must align with billing event categorizations
-8. License assignment tracking must handle reassignment scenarios appropriately
+1. **Data Anonymization**: Sensitive user data (Email, User_Name) must be anonymized for non-authorized users
+2. **Time Zone Standardization**: All timestamp data must be converted to a consistent time zone for accurate analysis
+3. **Plan Type Standardization**: User plan types must be normalized to standard categories (Free vs. Paid)
+4. **Company Name Normalization**: Company names must be standardized to prevent duplicate organizational entries
+5. **Feature Name Consistency**: Feature names must be normalized across all usage tracking records
+6. **Ticket Type Categorization**: Support ticket types must be mapped to standard predefined categories
+7. **License Type Mapping**: License types must be mapped to standard revenue categories for analysis
+8. **Meeting Type Classification**: Meeting types must be consistently classified for comparative analysis
