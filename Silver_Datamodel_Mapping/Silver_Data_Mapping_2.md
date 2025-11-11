@@ -1,9 +1,9 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*:   
+## *Created on*:   11-11-2025
 ## *Description*: Comprehensive data mapping for Silver Layer in Zoom Platform Analytics System Medallion architecture with enhanced timestamp format validation
 ## *Version*: 2 
-## *Updated on*: 
+## *Updated on*: 11-11-2025
 ## *Changes*: Added enhanced timestamp format validation for SI_MEETINGS (EST timezone) and SI_PARTICIPANTS (MM/DD/YYYY HH:MM format) to address failing models
 ## *Reason*: Address failing models due to timestamp format issues - SI_MEETINGS with 'EST' timezone and SI_PARTICIPANTS with MM/DD/YYYY HH:MM format
 _____________________________________________
