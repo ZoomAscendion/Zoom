@@ -2,9 +2,7 @@
   config(
     materialized='table',
     cluster_by=['DATE_KEY', 'FEATURE_KEY'],
-    tags=['fact', 'gold'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, LOAD_DATE, SOURCE_SYSTEM) SELECT '{{ invocation_id }}', 'FACT_FEATURE_USAGE_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_FEATURE_USAGE', 'GO_FACT_FEATURE_USAGE', CURRENT_DATE(), 'DBT_GOLD_PIPELINE' WHERE '{{ this.name }}' != 'go_audit_log'",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), EXECUTION_DURATION_SECONDS = DATEDIFF('second', EXECUTION_START_TIMESTAMP, CURRENT_TIMESTAMP()) WHERE AUDIT_LOG_ID = '{{ invocation_id }}' AND '{{ this.name }}' != 'go_audit_log'"
+    tags=['fact', 'gold']
   )
 }}
 
@@ -81,7 +79,7 @@ fact_data AS (
         END AS SUCCESS_RATE,
         CURRENT_DATE() AS LOAD_DATE,
         CURRENT_DATE() AS UPDATE_DATE,
-        COALESCE(fub.SOURCE_SYSTEM, 'SILVER_TO_GOLD_ETL') AS SOURCE_SYSTEM
+        COALESCE(fub.SOURCE_SYSTEM, 'SILVER_ETL') AS SOURCE_SYSTEM
     FROM feature_usage_base fub
     LEFT JOIN {{ ref('dim_date') }} dd ON fub.USAGE_DATE = dd.DATE_KEY
     LEFT JOIN {{ ref('dim_feature') }} df ON {{ dbt_utils.generate_surrogate_key(['fub.FEATURE_NAME']) }} = df.FEATURE_KEY
