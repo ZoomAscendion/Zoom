@@ -1,9 +1,9 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*:   10-11-2025
+## *Created on*:   11-11-2025
 ## *Description*: Silver layer logical data model for Zoom Platform Analytics System following Medallion architecture
 ## *Version*: 1 
-## *Updated on*: 10-11-2025
+## *Updated on*: 11-11-2025
 _____________________________________________
 
 # Silver Layer Logical Data Model - Zoom Platform Analytics System
