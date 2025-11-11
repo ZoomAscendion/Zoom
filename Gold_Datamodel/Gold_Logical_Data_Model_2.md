@@ -1,11 +1,11 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*:   
+## *Created on*:   11-11-2025
 ## *Description*: Gold layer logical data model for Zoom Platform Analytics System with specific Dimension and Fact tables only
 ## *Version*: 2
 ## *Changes*: Generated only specified Dimension and Fact Tables as requested - removed aggregated tables, audit tables, and error tables
 ## *Reason*: User requested to generate only specific Dimension and Fact Tables with exact table names provided
-## *Updated on*: 
+## *Updated on*: 11-11-2025
 _____________________________________________
 
 # Gold Layer Logical Data Model - Zoom Platform Analytics System (Updated)
