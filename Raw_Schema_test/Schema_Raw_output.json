@@ -2,38 +2,37 @@
   "schema_metadata": {
     "database": "DB_POC_ZOOM",
     "schema": "RAW",
-    "extraction_timestamp": "2024-12-19T10:30:00Z",
+    "extraction_timestamp": "2024-12-19",
     "pipeline_id": "8083",
     "tables_and_views": {
       "BILLING_EVENTS": {
         "type": "TABLE",
-        "business_description": "Contains billing event information for user transactions and charges",
         "columns": [
           {
             "name": "EVENT_ID",
             "type": "VARCHAR(16777216)",
             "business_description": "Unique identifier for each billing event",
-            "constraints": "Primary Key, Not Null",
+            "constraints": "Primary Key",
             "domain_values": "N/A"
           },
           {
             "name": "USER_ID",
             "type": "VARCHAR(16777216)",
             "business_description": "Reference to the user associated with the billing event",
-            "constraints": "Foreign Key, Not Null",
+            "constraints": "Foreign Key",
             "domain_values": "N/A"
           },
           {
             "name": "EVENT_TYPE",
             "type": "VARCHAR(16777216)",
-            "business_description": "Type of billing event (charge, refund, adjustment)",
+            "business_description": "Type of billing event (subscription, usage, etc.)",
             "constraints": "Not Null",
-            "domain_values": "charge, refund, adjustment"
+            "domain_values": "subscription, usage, refund, charge"
           },
           {
             "name": "AMOUNT",
             "type": "VARCHAR(16777216)",
-            "business_description": "Monetary amount of the billing event",
+            "business_description": "Monetary amount associated with the billing event",
             "constraints": "Not Null",
             "domain_values": "N/A"
           },
@@ -63,39 +62,38 @@
             "type": "VARCHAR(16777216)",
             "business_description": "Source system from which the data originated",
             "constraints": "Not Null",
-            "domain_values": "N/A"
+            "domain_values": "billing_api, payment_gateway, manual_entry"
           }
         ]
       },
       "FEATURE_USAGE": {
         "type": "TABLE",
-        "business_description": "Tracks usage of various Zoom features during meetings",
         "columns": [
           {
             "name": "USAGE_ID",
             "type": "VARCHAR(16777216)",
             "business_description": "Unique identifier for each feature usage record",
-            "constraints": "Primary Key, Not Null",
+            "constraints": "Primary Key",
             "domain_values": "N/A"
           },
           {
             "name": "MEETING_ID",
             "type": "VARCHAR(16777216)",
             "business_description": "Reference to the meeting where feature was used",
-            "constraints": "Foreign Key, Not Null",
+            "constraints": "Foreign Key",
             "domain_values": "N/A"
           },
           {
             "name": "FEATURE_NAME",
             "type": "VARCHAR(16777216)",
-            "business_description": "Name of the Zoom feature that was used",
+            "business_description": "Name of the feature that was used",
             "constraints": "Not Null",
             "domain_values": "screen_share, recording, chat, breakout_rooms"
           },
           {
             "name": "USAGE_COUNT",
             "type": "NUMBER(38,0)",
-            "business_description": "Number of times the feature was used in the meeting",
+            "business_description": "Number of times the feature was used",
             "constraints": "Not Null",
             "domain_values": "N/A"
           },
@@ -125,25 +123,24 @@
             "type": "VARCHAR(16777216)",
             "business_description": "Source system from which the data originated",
             "constraints": "Not Null",
-            "domain_values": "N/A"
+            "domain_values": "zoom_api, meeting_analytics, feature_tracker"
           }
         ]
       },
       "LICENSES": {
         "type": "TABLE",
-        "business_description": "Contains information about Zoom licenses assigned to users",
         "columns": [
           {
             "name": "LICENSE_ID",
             "type": "VARCHAR(16777216)",
             "business_description": "Unique identifier for each license",
-            "constraints": "Primary Key, Not Null",
+            "constraints": "Primary Key",
             "domain_values": "N/A"
           },
           {
             "name": "LICENSE_TYPE",
             "type": "VARCHAR(16777216)",
-            "business_description": "Type of Zoom license (Basic, Pro, Business, Enterprise)",
+            "business_description": "Type of license (Basic, Pro, Business, Enterprise)",
             "constraints": "Not Null",
             "domain_values": "Basic, Pro, Business, Enterprise"
           },
@@ -151,20 +148,20 @@
             "name": "ASSIGNED_TO_USER_ID",
             "type": "VARCHAR(16777216)",
             "business_description": "User ID to whom the license is assigned",
-            "constraints": "Foreign Key, Not Null",
+            "constraints": "Foreign Key",
             "domain_values": "N/A"
           },
           {
             "name": "START_DATE",
             "type": "DATE",
-            "business_description": "Date when the license becomes active",
+            "business_description": "Start date of the license validity",
             "constraints": "Not Null",
             "domain_values": "N/A"
           },
           {
             "name": "END_DATE",
             "type": "VARCHAR(16777216)",
-            "business_description": "Date when the license expires",
+            "business_description": "End date of the license validity",
             "constraints": "Nullable",
             "domain_values": "N/A"
           },
@@ -187,26 +184,25 @@
             "type": "VARCHAR(16777216)",
             "business_description": "Source system from which the data originated",
             "constraints": "Not Null",
-            "domain_values": "N/A"
+            "domain_values": "license_management, admin_portal, billing_system"
           }
         ]
       },
       "MEETINGS": {
         "type": "TABLE",
-        "business_description": "Contains information about Zoom meetings and their details",
         "columns": [
           {
             "name": "MEETING_ID",
             "type": "VARCHAR(16777216)",
             "business_description": "Unique identifier for each meeting",
-            "constraints": "Primary Key, Not Null",
+            "constraints": "Primary Key",
             "domain_values": "N/A"
           },
           {
             "name": "HOST_ID",
             "type": "VARCHAR(16777216)",
             "business_description": "User ID of the meeting host",
-            "constraints": "Foreign Key, Not Null",
+            "constraints": "Foreign Key",
             "domain_values": "N/A"
           },
           {
@@ -256,40 +252,39 @@
             "type": "VARCHAR(16777216)",
             "business_description": "Source system from which the data originated",
             "constraints": "Not Null",
-            "domain_values": "N/A"
+            "domain_values": "zoom_api, meeting_service, scheduler"
           }
         ]
       },
       "PARTICIPANTS": {
         "type": "TABLE",
-        "business_description": "Contains information about meeting participants and their session details",
         "columns": [
           {
             "name": "PARTICIPANT_ID",
             "type": "VARCHAR(16777216)",
-            "business_description": "Unique identifier for each participant session",
-            "constraints": "Primary Key, Not Null",
+            "business_description": "Unique identifier for each meeting participant",
+            "constraints": "Primary Key",
             "domain_values": "N/A"
           },
           {
             "name": "MEETING_ID",
             "type": "VARCHAR(16777216)",
-            "business_description": "Reference to the meeting the participant joined",
-            "constraints": "Foreign Key, Not Null",
+            "business_description": "Reference to the meeting",
+            "constraints": "Foreign Key",
             "domain_values": "N/A"
           },
           {
             "name": "USER_ID",
             "type": "VARCHAR(16777216)",
-            "business_description": "Reference to the user who participated in the meeting",
-            "constraints": "Foreign Key, Not Null",
+            "business_description": "Reference to the user who participated",
+            "constraints": "Foreign Key",
             "domain_values": "N/A"
           },
           {
             "name": "JOIN_TIME",
             "type": "VARCHAR(16777216)",
             "business_description": "Timestamp when the participant joined the meeting",
-            "constraints": "Not Null",
+            "constraints": "Nullable",
             "domain_values": "N/A"
           },
           {
@@ -318,32 +313,31 @@
             "type": "VARCHAR(16777216)",
             "business_description": "Source system from which the data originated",
             "constraints": "Not Null",
-            "domain_values": "N/A"
+            "domain_values": "zoom_api, meeting_analytics, participant_tracker"
           }
         ]
       },
       "SUPPORT_TICKETS": {
         "type": "TABLE",
-        "business_description": "Contains information about customer support tickets and their resolution status",
         "columns": [
           {
             "name": "TICKET_ID",
             "type": "VARCHAR(16777216)",
             "business_description": "Unique identifier for each support ticket",
-            "constraints": "Primary Key, Not Null",
+            "constraints": "Primary Key",
             "domain_values": "N/A"
           },
           {
             "name": "USER_ID",
             "type": "VARCHAR(16777216)",
-            "business_description": "Reference to the user who created the support ticket",
-            "constraints": "Foreign Key, Not Null",
+            "business_description": "Reference to the user who created the ticket",
+            "constraints": "Foreign Key",
             "domain_values": "N/A"
           },
           {
             "name": "TICKET_TYPE",
             "type": "VARCHAR(16777216)",
-            "business_description": "Category or type of the support ticket",
+            "business_description": "Type or category of the support ticket",
             "constraints": "Not Null",
             "domain_values": "technical, billing, feature_request, bug_report"
           },
@@ -380,13 +374,12 @@
             "type": "VARCHAR(16777216)",
             "business_description": "Source system from which the data originated",
             "constraints": "Not Null",
-            "domain_values": "N/A"
+            "domain_values": "support_portal, email_integration, chat_system"
           }
         ]
       },
       "USERS": {
         "type": "TABLE",
-        "business_description": "Contains information about Zoom users and their account details",
         "columns": [
           {
             "name": "USER_ID",
@@ -419,7 +412,7 @@
           {
             "name": "PLAN_TYPE",
             "type": "VARCHAR(16777216)",
-            "business_description": "Type of Zoom plan the user is subscribed to",
+            "business_description": "Subscription plan type of the user",
             "constraints": "Not Null",
             "domain_values": "Basic, Pro, Business, Enterprise"
           },
@@ -442,7 +435,7 @@
             "type": "VARCHAR(16777216)",
             "business_description": "Source system from which the data originated",
             "constraints": "Not Null",
-            "domain_values": "N/A"
+            "domain_values": "user_management, registration_api, admin_portal"
           }
         ]
       }
