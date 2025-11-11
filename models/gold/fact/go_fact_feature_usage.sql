@@ -1,0 +1,95 @@
+{{ config(
+    materialized='table',
+    tags=['fact', 'gold'],
+    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_ID, PROCESS_NAME, PROCESS_TYPE, PROCESS_START_TIME, PROCESS_STATUS, SOURCE_TABLE, TARGET_TABLE, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, SOURCE_SYSTEM) VALUES (UUID_STRING(), 'GO_FACT_FEATURE_USAGE_LOAD', 'FACT_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_FEATURE_USAGE', 'GO_FACT_FEATURE_USAGE', 'DBT_MODEL_RUN', 'DBT_SYSTEM', CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
+    post_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_ID, PROCESS_NAME, PROCESS_TYPE, PROCESS_START_TIME, PROCESS_END_TIME, PROCESS_STATUS, SOURCE_TABLE, TARGET_TABLE, RECORDS_PROCESSED, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, SOURCE_SYSTEM) SELECT UUID_STRING(), 'GO_FACT_FEATURE_USAGE_LOAD', 'FACT_LOAD', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 'SUCCESS', 'SI_FEATURE_USAGE', 'GO_FACT_FEATURE_USAGE', (SELECT COUNT(*) FROM {{ this }}), 'DBT_MODEL_RUN', 'DBT_SYSTEM', CURRENT_DATE(), 'DBT_GOLD_PIPELINE'"
+) }}
+
+-- Feature usage fact table transformation
+WITH feature_usage_base AS (
+    SELECT 
+        fu.USAGE_ID,
+        fu.MEETING_ID,
+        fu.FEATURE_NAME,
+        fu.USAGE_COUNT,
+        fu.USAGE_DATE,
+        fu.SOURCE_SYSTEM
+    FROM {{ source('silver', 'si_feature_usage') }} fu
+    WHERE fu.VALIDATION_STATUS = 'PASSED'
+),
+
+meeting_context AS (
+    SELECT 
+        sm.MEETING_ID,
+        sm.HOST_ID,
+        sm.DURATION_MINUTES
+    FROM {{ source('silver', 'si_meetings') }} sm
+    WHERE sm.VALIDATION_STATUS = 'PASSED'
+),
+
+feature_metrics AS (
+    SELECT 
+        fub.*,
+        COALESCE(mc.HOST_ID, 'UNKNOWN') AS HOST_ID,
+        COALESCE(mc.DURATION_MINUTES, 0) AS SESSION_DURATION_MINUTES,
+        CASE 
+            WHEN fub.USAGE_COUNT >= 10 THEN 5.0
+            WHEN fub.USAGE_COUNT >= 5 THEN 4.0
+            WHEN fub.USAGE_COUNT >= 3 THEN 3.0
+            WHEN fub.USAGE_COUNT >= 1 THEN 2.0
+            ELSE 1.0
+        END AS FEATURE_ADOPTION_SCORE
+    FROM feature_usage_base fub
+    LEFT JOIN meeting_context mc ON fub.MEETING_ID = mc.MEETING_ID
+)
+
+SELECT 
+    ROW_NUMBER() OVER (ORDER BY fm.USAGE_ID) AS FEATURE_USAGE_ID,
+    -- Foreign Key Columns for BI Integration
+    dd.DATE_KEY,
+    df.FEATURE_KEY,
+    COALESCE(du.USER_KEY, 'UNKNOWN') AS USER_KEY,
+    COALESCE(dm.MEETING_KEY, 'UNKNOWN') AS MEETING_KEY,
+    -- Fact Measures
+    fm.USAGE_DATE,
+    fm.USAGE_DATE::TIMESTAMP_NTZ AS USAGE_TIMESTAMP,
+    fm.FEATURE_NAME,
+    fm.USAGE_COUNT,
+    fm.SESSION_DURATION_MINUTES AS USAGE_DURATION_MINUTES,
+    fm.SESSION_DURATION_MINUTES,
+    fm.FEATURE_ADOPTION_SCORE,
+    CASE 
+        WHEN fm.FEATURE_ADOPTION_SCORE >= 4.0 THEN 5.0
+        WHEN fm.FEATURE_ADOPTION_SCORE >= 3.0 THEN 4.0
+        WHEN fm.FEATURE_ADOPTION_SCORE >= 2.0 THEN 3.0
+        WHEN fm.FEATURE_ADOPTION_SCORE >= 1.0 THEN 2.0
+        ELSE 1.0
+    END AS USER_EXPERIENCE_RATING,
+    CASE 
+        WHEN fm.USAGE_COUNT > 0 THEN 5.0
+        ELSE 1.0
+    END AS FEATURE_PERFORMANCE_SCORE,
+    1 AS CONCURRENT_FEATURES_COUNT, -- Default value
+    CASE 
+        WHEN fm.SESSION_DURATION_MINUTES >= 60 THEN 'Extended Session'
+        WHEN fm.SESSION_DURATION_MINUTES >= 30 THEN 'Standard Session'
+        WHEN fm.SESSION_DURATION_MINUTES >= 15 THEN 'Short Session'
+        WHEN fm.SESSION_DURATION_MINUTES >= 5 THEN 'Brief Session'
+        ELSE 'Quick Access'
+    END AS USAGE_CONTEXT,
+    'Desktop' AS DEVICE_TYPE, -- Default value
+    'Latest' AS PLATFORM_VERSION, -- Default value
+    0 AS ERROR_COUNT, -- Default value
+    CASE 
+        WHEN fm.USAGE_COUNT > 0 THEN 100.0
+        ELSE 0.0
+    END AS SUCCESS_RATE,
+    -- Metadata
+    CURRENT_DATE AS LOAD_DATE,
+    CURRENT_DATE AS UPDATE_DATE,
+    fm.SOURCE_SYSTEM
+FROM feature_metrics fm
+JOIN {{ ref('go_dim_date') }} dd ON fm.USAGE_DATE = dd.DATE_KEY
+JOIN {{ ref('go_dim_feature') }} df ON MD5(UPPER(TRIM(fm.FEATURE_NAME))) = df.FEATURE_KEY
+LEFT JOIN {{ ref('go_dim_user') }} du ON fm.HOST_ID = du.USER_ID AND du.IS_CURRENT_RECORD = TRUE
+LEFT JOIN {{ ref('go_dim_meeting') }} dm ON MD5(fm.MEETING_ID) = dm.MEETING_KEY
