@@ -1,9 +1,9 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*: 2024-12-19
+## *Created on*: 11-11-2025
 ## *Description*: Bronze layer logical data model for Zoom Platform Analytics System following Medallion architecture
 ## *Version*: 1 
-## *Updated on*: 2024-12-19
+## *Updated on*: 11-11-2025
 _____________________________________________
 
 # Bronze Layer Logical Data Model - Zoom Platform Analytics System
