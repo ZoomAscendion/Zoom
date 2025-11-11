@@ -1,9 +1,9 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*:   
+## *Created on*:   11-11-2025
 ## *Description*: Comprehensive transformation rules for Zoom Platform Analytics System Gold layer fact tables
 ## *Version*: 1
-## *Updated on*:   
+## *Updated on*:   11-11-2025
 _____________________________________________
 
 # Snowflake Gold Fact Transformation Recommender
