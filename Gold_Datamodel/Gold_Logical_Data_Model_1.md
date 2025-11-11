@@ -1,9 +1,9 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*:   
+## *Created on*:   10-11-2025
 ## *Description*: Gold layer logical data model for Zoom Platform Analytics System following Medallion architecture with dimensional modeling
 ## *Version*: 1 
-## *Updated on*: 
+## *Updated on*:  10-11-2025
 _____________________________________________
 
 # Gold Layer Logical Data Model - Zoom Platform Analytics System
