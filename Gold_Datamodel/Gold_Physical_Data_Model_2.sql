@@ -1,11 +1,11 @@
 _____________________________________________
 -- *Author*: AAVA
--- *Created on*:   
+-- *Created on*:   11-11-2025
 -- *Description*: Gold layer physical data model for Zoom Platform Analytics System with specific Dimension and Fact tables only
 -- *Version*: 2
 -- *Changes*: Generated only specific Dimension and Fact tables as requested - removed audit and error tables to focus on core dimensional model
 -- *Reason*: User requested to generate only specific Dimension Tables (GO_DIM_DATE, GO_DIM_FEATURE, GO_DIM_LICENSE, GO_DIM_MEETING_TYPE, GO_DIM_SUPPORT_CATEGORY, GO_DIM_USER) and Fact Tables (GO_FACT_FEATURE_USAGE, GO_FACT_MEETING_ACTIVITY, GO_FACT_REVENUE_EVENTS, GO_FACT_SUPPORT_METRICS)
--- *Updated on*: 
+-- *Updated on*: 11-11-2025
 _____________________________________________
 
 -- =====================================================
