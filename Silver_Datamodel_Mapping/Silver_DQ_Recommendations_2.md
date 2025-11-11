@@ -1,9 +1,9 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*:   
+## *Created on*:   11-11-2025
 ## *Description*: Comprehensive data quality recommendations for Zoom Platform Analytics System Silver layer
 ## *Version*: 2 
-## *Updated on*: 
+## *Updated on*: 11-11-2025
 ## *Changes*: Added timestamp format validation checks for SI_MEETINGS and SI_PARTICIPANTS tables
 ## *Reason*: Address failing models due to timestamp format issues - SI_MEETINGS with 'EST' timezone and SI_PARTICIPANTS with MM/DD/YYYY HH:MM format
 _____________________________________________
