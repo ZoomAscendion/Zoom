@@ -1,9 +1,9 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*: 2024-12-19
+## *Created on*: 11-11-2025
 ## *Description*: Comprehensive data mapping for Fact tables transformation from Silver Layer to Gold Layer in Zoom Platform Analytics System
 ## *Version*: 1
-## *Updated on*: 2024-12-19
+## *Updated on*: 11-11-2025
 _____________________________________________
 
 # Snowflake Gold Fact Transformation Data Mapping
