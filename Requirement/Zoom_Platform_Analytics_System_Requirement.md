@@ -89,7 +89,6 @@ service quality and reduce ticket volume.
 -   User information (User_ID, Category, Sub Category, Resolution Status, Priority Level)
 
 **KPIs and Metrics in the Report**
-
 - Number of Users
 - 
 **Data Constraints**
