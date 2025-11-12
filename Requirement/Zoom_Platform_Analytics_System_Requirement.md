@@ -20,59 +20,31 @@ trends and areas for improvement.
 **Uses of the Report**
 
 -   Track key usage metrics like total meeting minutes and active users.
-
--   Identify trends in new user sign-ups and meeting creation.
-
--   Analyze usage patterns by user plan type (e.g., Free vs. Paid).
-
--   Assess the adoption of new features.
+-   Average Meeting Duration by Type,Category
+-   Number of Users by Meeting Topics
+-   Number of Meeting per User
 
 **Data Relationships Used**
 
--   Meetings \--\>Users (via Host_ID)
-
--   Attendees \--\>Meetings (via Meeting_ID)
-
--   Features_Usage \--\> Meetings (via Meeting_ID)
+-   Meeting Activity \--\>Users (via Date Key)
+-   Meeting Activity \--\>Meeting (via Meeting ID)
+-   Meeting Activity \--\>Users (via User Key)
+-   Feature Usage \--\>Dim Feature (via Feature Key)'
+-   Feature Usage \--\>Dim Date (via Date Key)
 
 **Data Attributes in the Report**
 
--   User information (User_ID, Plan_Type)
-
+-   User information (Number of users, meeting types, meeting topics, user names )
 -   Meeting information (Meeting_ID, Duration_Minutes, Start_Time)
-
--   Usage details (Feature_Name, Usage_Count)
-
--   Calculated metrics (Total_Meeting_Minutes, Active_Users_Count)
+-   Feature Usage Distribution (Feature_Name, Feature usage Count)
+-   Calculated metrics (Total Number of users, Average Meeting duration)
 
 **KPIs and Metrics in the Report**
 
--   Daily, Weekly and Monthly Active Users (DAU and WAU and MAU)
-
--   Total meeting minutes per day
-
+-   Total Number of users
 -   Average meeting duration
-
 -   Number of meetings created per user
-
--   New user sign-ups over time
-
--   Feature adoption rate
-
-**Calculations in the Report**
-
--   The total number of meeting minutes is determined by adding up the
-    duration (in minutes) of all meetings.
-
--   The average meeting duration is found by averaging the duration
-    across all meetings.
-
--   The active user count is the number of unique users who have hosted
-    at least one meeting.
-
--   The feature adoption rate measures the proportion of users who have
-    used a specific feature at least once, compared to the total user
-    base.
+-   Feature Usage Distribution
 
 **Data Constraints**
 
@@ -83,12 +55,13 @@ trends and areas for improvement.
 -   A Meeting_ID in Attendees or Features_Usage must exist in the
     Meetings table.
 
+-   Dimension should have  one/many to many relationships wiht fact tables.
+
 **Visualizations**
 
--   Line chart showing DAU and WAU and MAU trends.
-
--   Bar chart comparing average meeting duration by Meeting Type and Category.
-
+-   Bar chart showing Number of Meeting per User 
+-   Bar chart showcasing Number of Meeting per User
+-   Bar chart showcasing Average Duration meetings by type , category
 -   Pie chart showing feature usage distribution.
 
 **2. SERVICE RELIABILITY & SUPPORT REPORT**
