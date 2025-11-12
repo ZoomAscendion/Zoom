@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8' ?>
 
+<!-- build 20233.23.1017.0948 -->
 <workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
   <document-format-change-manifest>
     <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
@@ -16,25 +17,110 @@
     <preference name='ui.encoding.shelf.height' value='24' />
     <preference name='ui.shelf.height' value='26' />
   </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
   <datasources>
-    <datasource caption='RevenueLicenseAnalysis_DS' inline='true' name='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' version='18.1'>
+    <datasource caption='Revenue_License_Analysis_DS' inline='true' name='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' version='18.1'>
       <connection class='federated'>
         <named-connections>
-          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F'>
-            <connection authentication='username-password' class='snowflake' dbname='DB_POC_ZOOM' instanceurl='https://a8977680256071-ascendion_partner.snowflakecomputing.com' odbc-connect-string-extras='' one-time-sql='' role='FR__POC__ADMIN__ZOOM' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' server-oauth='' service='FR__POC__ADMIN__ZOOM' username='SATHYANARAYANAP' password='Sathyasnowflake@20' warehouse='WH_POC_ZOOM_DEV_XSMALL' />
+          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f'>
+            <connection authentication='oauth' class='snowflake' dbname='DB_POC_ZOOM' instanceurl='https://a8977680256071-ascendion_partner.snowflakecomputing.com' odbc-connect-string-extras='' one-time-sql='' role='FR__POC__ADMIN__ZOOM' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' server-oauth='' service='FR__POC__ADMIN__ZOOM' username='SATHYANARAYANAP' warehouse='WH_POC_ZOOM_DEV_XSMALL' />
           </named-connection>
         </named-connections>
         <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='collection'>
-          <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='FACT_REVENUE_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_REVENUE_ACTIVITY]' type='table' />
-          <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='DIM_DATE' table='[DB_POC_ZOOM].[GOLD].[DIM_DATE]' type='table' />
-          <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='DIM_USER' table='[DB_POC_ZOOM].[GOLD].[DIM_USER]' type='table' />
-          <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='DIM_LICENSE' table='[DB_POC_ZOOM].[GOLD].[DIM_LICENSE]' type='table' />
-          <relation connection='snowflake.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' name='FACT_MEETING_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
+          <relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' name='FACT_REVENUE_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_REVENUE_ACTIVITY]' type='table' />
+          <relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' name='DIM_DATE' table='[DB_POC_ZOOM].[GOLD].[DIM_DATE]' type='table' />
+          <relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' name='DIM_USER' table='[DB_POC_ZOOM].[GOLD].[DIM_USER]' type='table' />
+          <relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' name='DIM_LICENSE' table='[DB_POC_ZOOM].[GOLD].[DIM_LICENSE]' type='table' />
+          <relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' name='FACT_MEETING_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
         </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+          <objects>
+            <object caption='FACT_REVENUE_ACTIVITY' id='FACT_REVENUE_ACTIVITY_A3B4C5D6E7F8A9B0C1D2E3F4A5B6C7D8'>
+              <properties context=''>
+                <relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' name='FACT_REVENUE_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_REVENUE_ACTIVITY]' type='table' />
+              </properties>
+            </object>
+            <object caption='DIM_DATE' id='DIM_DATE_B4C5D6E7F8A9B0C1D2E3F4A5B6C7D8E9'>
+              <properties context=''>
+                <relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' name='DIM_DATE' table='[DB_POC_ZOOM].[GOLD].[DIM_DATE]' type='table' />
+              </properties>
+            </object>
+            <object caption='DIM_USER' id='DIM_USER_C5D6E7F8A9B0C1D2E3F4A5B6C7D8E9F0'>
+              <properties context=''>
+                <relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' name='DIM_USER' table='[DB_POC_ZOOM].[GOLD].[DIM_USER]' type='table' />
+              </properties>
+            </object>
+            <object caption='DIM_LICENSE' id='DIM_LICENSE_D6E7F8A9B0C1D2E3F4A5B6C7D8E9F0A1'>
+              <properties context=''>
+                <relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' name='DIM_LICENSE' table='[DB_POC_ZOOM].[GOLD].[DIM_LICENSE]' type='table' />
+              </properties>
+            </object>
+            <object caption='FACT_MEETING_ACTIVITY' id='FACT_MEETING_ACTIVITY_E7F8A9B0C1D2E3F4A5B6C7D8E9F0A1B2'>
+              <properties context=''>
+                <relation connection='snowflake.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' name='FACT_MEETING_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
+              </properties>
+            </object>
+          </objects>
+          <relationships>
+            <relationship id='1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D'>
+              <expression op='='>
+                <expression op='[FACT_REVENUE_ACTIVITY].[DATE_KEY]' />
+                <expression op='[DIM_DATE].[DATE_KEY]' />
+              </expression>
+            </relationship>
+            <relationship id='2B3C4D5E-6F7A-8B9C-0D1E-2F3A4B5C6D7E'>
+              <expression op='='>
+                <expression op='[FACT_REVENUE_ACTIVITY].[USER_KEY]' />
+                <expression op='[DIM_USER].[USER_KEY]' />
+              </expression>
+            </relationship>
+            <relationship id='3C4D5E6F-7A8B-9C0D-1E2F-3A4B5C6D7E8F'>
+              <expression op='='>
+                <expression op='[FACT_REVENUE_ACTIVITY].[LICENSE_KEY]' />
+                <expression op='[DIM_LICENSE].[LICENSE_KEY]' />
+              </expression>
+            </relationship>
+            <relationship id='4D5E6F7A-8B9C-0D1E-2F3A-4B5C6D7E8F9A'>
+              <expression op='='>
+                <expression op='[FACT_MEETING_ACTIVITY].[DATE_KEY]' />
+                <expression op='[DIM_DATE].[DATE_KEY]' />
+              </expression>
+            </relationship>
+            <relationship id='5E6F7A8B-9C0D-1E2F-3A4B-5C6D7E8F9A0B'>
+              <expression op='='>
+                <expression op='[FACT_MEETING_ACTIVITY].[USER_KEY]' />
+                <expression op='[DIM_USER].[USER_KEY]' />
+              </expression>
+            </relationship>
+          </relationships>
+        </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
         <cols>
-          <map key='[USER_KEY]' value='[FACT_REVENUE_ACTIVITY].[USER_KEY]' />
-          <map key='[LICENSE_KEY]' value='[FACT_REVENUE_ACTIVITY].[LICENSE_KEY]' />
-          <map key='[DATE_KEY]' value='[FACT_REVENUE_ACTIVITY].[DATE_KEY]' />
+          <map key='[DATE_KEY]' value='[DIM_DATE].[DATE_KEY]' />
+          <map key='[DATE_VALUE]' value='[DIM_DATE].[DATE_VALUE]' />
+          <map key='[YEAR]' value='[DIM_DATE].[YEAR]' />
+          <map key='[MONTH]' value='[DIM_DATE].[MONTH]' />
+          <map key='[MONTH_NAME]' value='[DIM_DATE].[MONTH_NAME]' />
+          <map key='[DAY_NAME]' value='[DIM_DATE].[DAY_NAME]' />
+          <map key='[USER_KEY]' value='[DIM_USER].[USER_KEY]' />
+          <map key='[USER_ID]' value='[DIM_USER].[USER_ID]' />
+          <map key='[USER_NAME]' value='[DIM_USER].[USER_NAME]' />
+          <map key='[EMAIL_DOMAIN]' value='[DIM_USER].[EMAIL_DOMAIN]' />
+          <map key='[COMPANY]' value='[DIM_USER].[COMPANY]' />
+          <map key='[PLAN_TYPE]' value='[DIM_USER].[PLAN_TYPE]' />
+          <map key='[GEOGRAPHIC_REGION]' value='[DIM_USER].[GEOGRAPHIC_REGION]' />
+          <map key='[LICENSE_TYPE]' value='[DIM_LICENSE].[LICENSE_TYPE]' />
+          <map key='[LICENSE_CATEGORY]' value='[DIM_LICENSE].[LICENSE_CATEGORY]' />
+          <map key='[LICENSE_TIER]' value='[DIM_LICENSE].[LICENSE_TIER]' />
+          <map key='[MAX_PARTICIPANTS]' value='[DIM_LICENSE].[MAX_PARTICIPANTS]' />
+          <map key='[MONTHLY_PRICE]' value='[DIM_LICENSE].[MONTHLY_PRICE]' />
+          <map key='[ANNUAL_PRICE]' value='[DIM_LICENSE].[ANNUAL_PRICE]' />
+          <map key='[EFFECTIVE_START_DATE]' value='[DIM_LICENSE].[EFFECTIVE_START_DATE]' />
+          <map key='[EFFECTIVE_END_DATE]' value='[DIM_LICENSE].[EFFECTIVE_END_DATE]' />
+          <map key='[REVENUE_ACTIVITY_ID]' value='[FACT_REVENUE_ACTIVITY].[REVENUE_ACTIVITY_ID]' />
           <map key='[TRANSACTION_DATE]' value='[FACT_REVENUE_ACTIVITY].[TRANSACTION_DATE]' />
           <map key='[EVENT_TYPE]' value='[FACT_REVENUE_ACTIVITY].[EVENT_TYPE]' />
           <map key='[AMOUNT]' value='[FACT_REVENUE_ACTIVITY].[AMOUNT]' />
@@ -48,32 +134,47 @@
           <map key='[ARR_IMPACT]' value='[FACT_REVENUE_ACTIVITY].[ARR_IMPACT]' />
           <map key='[CUSTOMER_LIFETIME_VALUE]' value='[FACT_REVENUE_ACTIVITY].[CUSTOMER_LIFETIME_VALUE]' />
           <map key='[CHURN_RISK_SCORE]' value='[FACT_REVENUE_ACTIVITY].[CHURN_RISK_SCORE]' />
+          <map key='[PAYMENT_STATUS]' value='[FACT_REVENUE_ACTIVITY].[PAYMENT_STATUS]' />
           <map key='[SALES_CHANNEL]' value='[FACT_REVENUE_ACTIVITY].[SALES_CHANNEL]' />
-          <map key='[DATE_VALUE]' value='[DIM_DATE].[DATE_VALUE]' />
-          <map key='[YEAR]' value='[DIM_DATE].[YEAR]' />
-          <map key='[MONTH]' value='[DIM_DATE].[MONTH]' />
-          <map key='[MONTH_NAME]' value='[DIM_DATE].[MONTH_NAME]' />
-          <map key='[DAY_NAME]' value='[DIM_DATE].[DAY_NAME]' />
-          <map key='[USER_NAME]' value='[DIM_USER].[USER_NAME]' />
-          <map key='[COMPANY]' value='[DIM_USER].[COMPANY]' />
-          <map key='[EMAIL_DOMAIN]' value='[DIM_USER].[EMAIL_DOMAIN]' />
-          <map key='[GEOGRAPHIC_REGION]' value='[DIM_USER].[GEOGRAPHIC_REGION]' />
-          <map key='[LICENSE_TYPE]' value='[DIM_LICENSE].[LICENSE_TYPE]' />
-          <map key='[LICENSE_CATEGORY]' value='[DIM_LICENSE].[LICENSE_CATEGORY]' />
-          <map key='[LICENSE_TIER]' value='[DIM_LICENSE].[LICENSE_TIER]' />
-          <map key='[MONTHLY_PRICE]' value='[DIM_LICENSE].[MONTHLY_PRICE]' />
-          <map key='[ANNUAL_PRICE]' value='[DIM_LICENSE].[ANNUAL_PRICE]' />
-          <map key='[EFFECTIVE_START_DATE]' value='[DIM_LICENSE].[EFFECTIVE_START_DATE]' />
-          <map key='[EFFECTIVE_END_DATE]' value='[DIM_LICENSE].[EFFECTIVE_END_DATE]' />
-          <map key='[DURATION_MINUTES]' value='[FACT_MEETING_ACTIVITY].[DURATION_MINUTES]' />
         </cols>
         <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[FACT_REVENUE_ACTIVITY]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='context'>0</attribute>
+              <attribute datatype='string' name='gridOrigin'>A1:Z1000:no:A1:Z1000:0</attribute>
+              <attribute datatype='boolean' name='header'>true</attribute>
+              <attribute datatype='integer' name='outcome'>2</attribute>
+            </attributes>
+          </metadata-record>
         </metadata-records>
       </connection>
       <aliases enabled='yes' />
-      <column caption='User Key' datatype='string' name='[USER_KEY]' role='dimension' type='nominal' />
-      <column caption='License Key' datatype='string' name='[LICENSE_KEY]' role='dimension' type='nominal' />
       <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+      <column caption='Date Value' datatype='date' name='[DATE_VALUE]' role='dimension' type='ordinal' />
+      <column caption='Year' datatype='integer' name='[YEAR]' role='dimension' type='quantitative' />
+      <column caption='Month' datatype='integer' name='[MONTH]' role='dimension' type='quantitative' />
+      <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+      <column caption='Day Name' datatype='string' name='[DAY_NAME]' role='dimension' type='nominal' />
+      <column caption='User ID' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
+      <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+      <column caption='Email Domain' datatype='string' name='[EMAIL_DOMAIN]' role='dimension' type='nominal' />
+      <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
+      <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Geographic Region' datatype='string' name='[GEOGRAPHIC_REGION]' role='dimension' type='nominal' />
+      <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
+      <column caption='License Category' datatype='string' name='[LICENSE_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='License Tier' datatype='string' name='[LICENSE_TIER]' role='dimension' type='nominal' />
+      <column caption='Max Participants' datatype='integer' name='[MAX_PARTICIPANTS]' role='measure' type='quantitative' />
+      <column caption='Monthly Price' datatype='real' name='[MONTHLY_PRICE]' role='measure' type='quantitative' />
+      <column caption='Annual Price' datatype='real' name='[ANNUAL_PRICE]' role='measure' type='quantitative' />
+      <column caption='Effective Start Date' datatype='date' name='[EFFECTIVE_START_DATE]' role='dimension' type='ordinal' />
+      <column caption='Effective End Date' datatype='date' name='[EFFECTIVE_END_DATE]' role='dimension' type='ordinal' />
       <column caption='Transaction Date' datatype='date' name='[TRANSACTION_DATE]' role='dimension' type='ordinal' />
       <column caption='Event Type' datatype='string' name='[EVENT_TYPE]' role='dimension' type='nominal' />
       <column caption='Amount' datatype='real' name='[AMOUNT]' role='measure' type='quantitative' />
@@ -87,28 +188,12 @@
       <column caption='ARR Impact' datatype='real' name='[ARR_IMPACT]' role='measure' type='quantitative' />
       <column caption='Customer Lifetime Value' datatype='real' name='[CUSTOMER_LIFETIME_VALUE]' role='measure' type='quantitative' />
       <column caption='Churn Risk Score' datatype='real' name='[CHURN_RISK_SCORE]' role='measure' type='quantitative' />
+      <column caption='Payment Status' datatype='string' name='[PAYMENT_STATUS]' role='dimension' type='nominal' />
       <column caption='Sales Channel' datatype='string' name='[SALES_CHANNEL]' role='dimension' type='nominal' />
-      <column caption='Date Value' datatype='date' name='[DATE_VALUE]' role='dimension' type='ordinal' />
-      <column caption='Year' datatype='integer' name='[YEAR]' role='dimension' type='quantitative' />
-      <column caption='Month' datatype='integer' name='[MONTH]' role='dimension' type='quantitative' />
-      <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
-      <column caption='Day Name' datatype='string' name='[DAY_NAME]' role='dimension' type='nominal' />
-      <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
-      <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
-      <column caption='Email Domain' datatype='string' name='[EMAIL_DOMAIN]' role='dimension' type='nominal' />
-      <column caption='Geographic Region' datatype='string' name='[GEOGRAPHIC_REGION]' role='dimension' type='nominal' />
-      <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
-      <column caption='License Category' datatype='string' name='[LICENSE_CATEGORY]' role='dimension' type='nominal' />
-      <column caption='License Tier' datatype='string' name='[LICENSE_TIER]' role='dimension' type='nominal' />
-      <column caption='Monthly Price' datatype='real' name='[MONTHLY_PRICE]' role='measure' type='quantitative' />
-      <column caption='Annual Price' datatype='real' name='[ANNUAL_PRICE]' role='measure' type='quantitative' />
-      <column caption='Effective Start Date' datatype='date' name='[EFFECTIVE_START_DATE]' role='dimension' type='ordinal' />
-      <column caption='Effective End Date' datatype='date' name='[EFFECTIVE_END_DATE]' role='dimension' type='ordinal' />
-      <column caption='Duration Minutes' datatype='integer' name='[DURATION_MINUTES]' role='measure' type='quantitative' />
       
       <!-- Calculated Fields for KPIs -->
       <column caption='Monthly Recurring Revenue' datatype='real' name='[Monthly_Recurring_Revenue]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='SUM([MRR_IMPACT])' />
+        <calculation class='tableau' formula='SUM(IF DATEPART(&quot;month&quot;, [TRANSACTION_DATE]) = DATEPART(&quot;month&quot;, TODAY()) AND DATEPART(&quot;year&quot;, [TRANSACTION_DATE]) = DATEPART(&quot;year&quot;, TODAY()) THEN [MRR_IMPACT] END)' />
       </column>
       
       <column caption='Revenue By License Type' datatype='real' name='[Revenue_By_License_Type]' role='measure' type='quantitative'>
@@ -116,11 +201,11 @@
       </column>
       
       <column caption='License Utilization Rate' datatype='real' name='[License_Utilization_Rate]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNTD([LICENSE_KEY]) / 100.0' />
+        <calculation class='tableau' formula='COUNTD([USER_KEY]) / COUNT([LICENSE_TYPE])' />
       </column>
       
-      <column caption='License Expiration Trends' datatype='integer' name='[License_Expiration_Trends]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&quot;day&quot;,TODAY(),[EFFECTIVE_END_DATE]) &lt;= 30 THEN [LICENSE_KEY] END)' />
+      <column caption='License Expiration Trend' datatype='integer' name='[License_Expiration_Trend]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT(IF DATEDIFF(&quot;day&quot;, TODAY(), [EFFECTIVE_END_DATE]) &lt;= 30 THEN [LICENSE_TYPE] END)' />
       </column>
       
       <column caption='Total Revenue' datatype='real' name='[Total_Revenue]' role='measure' type='quantitative'>
@@ -128,11 +213,15 @@
       </column>
       
       <column caption='Churn Rate' datatype='real' name='[Churn_Rate]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='AVG([CHURN_RISK_SCORE])' />
+        <calculation class='tableau' formula='SUM(IF [CHURN_RISK_SCORE] &gt; 7 THEN 1 ELSE 0 END) / COUNTD([USER_KEY])' />
       </column>
       
-      <column caption='Usage Correlation With Billing' datatype='real' name='[Usage_Correlation_With_Billing]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='SUM([DURATION_MINUTES]) / SUM([AMOUNT])' />
+      <column caption='Average Customer Lifetime Value' datatype='real' name='[Average_Customer_Lifetime_Value]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([CUSTOMER_LIFETIME_VALUE])' />
+      </column>
+      
+      <column caption='Revenue Growth Rate' datatype='real' name='[Revenue_Growth_Rate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='(SUM(IF DATEPART(&quot;month&quot;, [TRANSACTION_DATE]) = DATEPART(&quot;month&quot;, TODAY()) THEN [NET_REVENUE_AMOUNT] END) - SUM(IF DATEPART(&quot;month&quot;, [TRANSACTION_DATE]) = DATEPART(&quot;month&quot;, TODAY()) - 1 THEN [NET_REVENUE_AMOUNT] END)) / SUM(IF DATEPART(&quot;month&quot;, [TRANSACTION_DATE]) = DATEPART(&quot;month&quot;, TODAY()) - 1 THEN [NET_REVENUE_AMOUNT] END)' />
       </column>
       
       <column caption='Masked Email' datatype='string' name='[Masked_Email]' role='dimension' type='nominal'>
@@ -140,33 +229,41 @@
       </column>
       
       <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[RevenueLicenseAnalysis_DS_3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
     </datasource>
   </datasources>
   <worksheets>
-    <worksheet name='MRR Trends Over Time'>
+    <worksheet name='MRR_Trends_Over_Time'>
       <table>
         <view>
           <datasources>
-            <datasource caption='RevenueLicenseAnalysis_DS' name='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' />
+            <datasource caption='Revenue_License_Analysis_DS' name='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' />
           </datasources>
-          <datasource-dependencies datasource='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F'>
+          <datasource-dependencies datasource='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f'>
+            <column caption='Date Value' datatype='date' name='[DATE_VALUE]' role='dimension' type='ordinal' />
             <column caption='Monthly Recurring Revenue' datatype='real' name='[Monthly_Recurring_Revenue]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='SUM([MRR_IMPACT])' />
+              <calculation class='tableau' formula='SUM(IF DATEPART(&quot;month&quot;, [TRANSACTION_DATE]) = DATEPART(&quot;month&quot;, TODAY()) AND DATEPART(&quot;year&quot;, [TRANSACTION_DATE]) = DATEPART(&quot;year&quot;, TODAY()) THEN [MRR_IMPACT] END)' />
             </column>
-            <column caption='Transaction Date' datatype='date' name='[TRANSACTION_DATE]' role='dimension' type='ordinal' />
-            <column-instance column='[TRANSACTION_DATE]' derivation='None' name='[none:TRANSACTION_DATE:ok]' pivot='key' type='ordinal' />
-            <column-instance column='[Monthly_Recurring_Revenue]' derivation='User' name='[usr:Monthly_Recurring_Revenue:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
-        <style />
+        <style>
+          <style-rule element='axis'>
+            <encoding attr='space' class='0' field='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[DATE_VALUE]' field-type='ordinal' max='1.0' min='0.0' range-type='fixed' scope='rows' type='space' />
+          </style-rule>
+        </style>
         <panes>
           <pane selection-relaxation-option='selection-relaxation-allow'>
             <view>
               <breakdown value='auto' />
             </view>
             <mark class='Line' />
-            <mark-sizing mark-sizing-setting='marks-scaling-off' />
+            <encodings>
+              <color field='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[Monthly_Recurring_Revenue]' />
+            </encodings>
             <style>
               <style-rule element='mark'>
                 <format attr='mark-labels-show' value='true' />
@@ -175,38 +272,39 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[usr:Monthly_Recurring_Revenue:qk]</rows>
-        <cols>[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[none:TRANSACTION_DATE:ok]</cols>
+        <rows>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[Monthly_Recurring_Revenue]</rows>
+        <cols>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[DATE_VALUE]</cols>
       </table>
-      <simple-id uuid='{B4C5D6E7-F8A9-B0C1-D2E3-F4A5B6C7D8E9}' />
+      <simple-id uuid='{A3B4C5D6-E7F8-9A0B-1C2D-3E4F5A6B7C8D}' />
     </worksheet>
-    
-    <worksheet name='Revenue Distribution by License Type'>
+    <worksheet name='Revenue_Distribution_By_License_Type'>
       <table>
         <view>
           <datasources>
-            <datasource caption='RevenueLicenseAnalysis_DS' name='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' />
+            <datasource caption='Revenue_License_Analysis_DS' name='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' />
           </datasources>
-          <datasource-dependencies datasource='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F'>
+          <datasource-dependencies datasource='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f'>
+            <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
             <column caption='Revenue By License Type' datatype='real' name='[Revenue_By_License_Type]' role='measure' type='quantitative'>
               <calculation class='tableau' formula='SUM([NET_REVENUE_AMOUNT])' />
             </column>
-            <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
-            <column-instance column='[LICENSE_TYPE]' derivation='None' name='[none:LICENSE_TYPE:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Revenue_By_License_Type]' derivation='User' name='[usr:Revenue_By_License_Type:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
-        <style />
+        <style>
+          <style-rule element='axis'>
+            <encoding attr='space' class='0' field='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[LICENSE_TYPE]' field-type='nominal' max='1.0' min='0.0' range-type='fixed' scope='rows' type='space' />
+          </style-rule>
+        </style>
         <panes>
           <pane selection-relaxation-option='selection-relaxation-allow'>
             <view>
               <breakdown value='auto' />
             </view>
             <mark class='Bar' />
-            <mark-sizing mark-sizing-setting='marks-scaling-off' />
             <encodings>
-              <color column='[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[none:LICENSE_TYPE:nk]' />
+              <color field='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[LICENSE_TYPE]' />
+              <size field='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[Revenue_By_License_Type]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -216,86 +314,42 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[usr:Revenue_By_License_Type:qk]</rows>
-        <cols>[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[none:LICENSE_TYPE:nk]</cols>
+        <rows>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[LICENSE_TYPE]</rows>
+        <cols>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[Revenue_By_License_Type]</cols>
       </table>
-      <simple-id uuid='{C5D6E7F8-A9B0-C1D2-E3F4-A5B6C7D8E9F0}' />
+      <simple-id uuid='{B4C5D6E7-F8A9-0B1C-2D3E-4F5A6B7C8D9E}' />
     </worksheet>
-    
-    <worksheet name='License Expiration Table'>
+    <worksheet name='License_Expiration_Table'>
       <table>
         <view>
           <datasources>
-            <datasource caption='RevenueLicenseAnalysis_DS' name='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' />
+            <datasource caption='Revenue_License_Analysis_DS' name='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' />
           </datasources>
-          <datasource-dependencies datasource='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F'>
-            <column caption='License Expiration Trends' datatype='integer' name='[License_Expiration_Trends]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='COUNTD(IF DATEDIFF(&quot;day&quot;,TODAY(),[EFFECTIVE_END_DATE]) &lt;= 30 THEN [LICENSE_KEY] END)' />
-            </column>
+          <datasource-dependencies datasource='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f'>
             <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
             <column caption='Effective End Date' datatype='date' name='[EFFECTIVE_END_DATE]' role='dimension' type='ordinal' />
-            <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
-            <column-instance column='[LICENSE_TYPE]' derivation='None' name='[none:LICENSE_TYPE:nk]' pivot='key' type='nominal' />
-            <column-instance column='[EFFECTIVE_END_DATE]' derivation='None' name='[none:EFFECTIVE_END_DATE:ok]' pivot='key' type='ordinal' />
-            <column-instance column='[USER_NAME]' derivation='None' name='[none:USER_NAME:nk]' pivot='key' type='nominal' />
-            <column-instance column='[License_Expiration_Trends]' derivation='User' name='[usr:License_Expiration_Trends:qk]' pivot='key' type='quantitative' />
+            <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
+            <column caption='License Expiration Trend' datatype='integer' name='[License_Expiration_Trend]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNT(IF DATEDIFF(&quot;day&quot;, TODAY(), [EFFECTIVE_END_DATE]) &lt;= 30 THEN [LICENSE_TYPE] END)' />
+            </column>
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
-        <style />
+        <style>
+          <style-rule element='axis'>
+            <encoding attr='space' class='0' field='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[LICENSE_TYPE]' field-type='nominal' max='1.0' min='0.0' range-type='fixed' scope='rows' type='space' />
+          </style-rule>
+        </style>
         <panes>
           <pane selection-relaxation-option='selection-relaxation-allow'>
             <view>
               <breakdown value='auto' />
             </view>
             <mark class='Text' />
-            <mark-sizing mark-sizing-setting='marks-scaling-off' />
             <encodings>
-              <text column='[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[usr:License_Expiration_Trends:qk]' />
-            </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='false' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
-          </pane>
-        </panes>
-        <rows>[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[none:EFFECTIVE_END_DATE:ok]</rows>
-        <cols>([federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[none:LICENSE_TYPE:nk] / [federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[none:USER_NAME:nk])</cols>
-      </table>
-      <simple-id uuid='{D6E7F8A9-B0C1-D2E3-F4A5-B6C7D8E9F0A1}' />
-    </worksheet>
-    
-    <worksheet name='Geographic Revenue Distribution'>
-      <table>
-        <view>
-          <datasources>
-            <datasource caption='RevenueLicenseAnalysis_DS' name='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F' />
-          </datasources>
-          <datasource-dependencies datasource='federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F'>
-            <column caption='Total Revenue' datatype='real' name='[Total_Revenue]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='SUM([AMOUNT])' />
-            </column>
-            <column caption='Geographic Region' datatype='string' name='[GEOGRAPHIC_REGION]' role='dimension' type='nominal' />
-            <column-instance column='[GEOGRAPHIC_REGION]' derivation='None' name='[none:GEOGRAPHIC_REGION:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Total_Revenue]' derivation='User' name='[usr:Total_Revenue:qk]' pivot='key' type='quantitative' />
-          </datasource-dependencies>
-          <aggregation value='true' />
-        </view>
-        <style />
-        <panes>
-          <pane selection-relaxation-option='selection-relaxation-allow'>
-            <view>
-              <breakdown value='auto' />
-            </view>
-            <mark class='Square' />
-            <mark-sizing mark-sizing-setting='marks-scaling-off' />
-            <encodings>
-              <color column='[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[usr:Total_Revenue:qk]' />
-              <size column='[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[usr:Total_Revenue:qk]' />
-              <text column='[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[none:GEOGRAPHIC_REGION:nk]' />
-              <text column='[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[usr:Total_Revenue:qk]' />
+              <text field='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[LICENSE_TYPE]' />
+              <text field='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[EFFECTIVE_END_DATE]' />
+              <text field='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[COMPANY]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -305,14 +359,57 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[none:GEOGRAPHIC_REGION:nk]</rows>
-        <cols>[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[none:GEOGRAPHIC_REGION:nk]</cols>
+        <rows>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[LICENSE_TYPE]</rows>
+        <rows>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[EFFECTIVE_END_DATE]</rows>
+        <cols>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[COMPANY]</cols>
       </table>
-      <simple-id uuid='{E7F8A9B0-C1D2-E3F4-A5B6-C7D8E9F0A1B2}' />
+      <simple-id uuid='{C5D6E7F8-A9B0-1C2D-3E4F-5A6B7C8D9E0F}' />
+    </worksheet>
+    <worksheet name='Geographic_Revenue_Heatmap'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Revenue_License_Analysis_DS' name='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f' />
+          </datasources>
+          <datasource-dependencies datasource='federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f'>
+            <column caption='Geographic Region' datatype='string' name='[GEOGRAPHIC_REGION]' role='dimension' type='nominal' />
+            <column caption='Total Revenue' datatype='real' name='[Total_Revenue]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM([AMOUNT])' />
+            </column>
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <encoding attr='space' class='0' field='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[GEOGRAPHIC_REGION]' field-type='nominal' max='1.0' min='0.0' range-type='fixed' scope='rows' type='space' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Square' />
+            <encodings>
+              <color field='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[Total_Revenue]' />
+              <size field='[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[Total_Revenue]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[GEOGRAPHIC_REGION]</rows>
+        <cols>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[Total_Revenue]</cols>
+      </table>
+      <simple-id uuid='{D6E7F8A9-B0C1-2D3E-4F5A-6B7C8D9E0F1A}' />
     </worksheet>
   </worksheets>
   <windows source-height='30'>
-    <window class='worksheet' maximized='true' name='MRR Trends Over Time'>
+    <window class='worksheet' maximized='true' name='MRR_Trends_Over_Time'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -336,11 +433,13 @@
       <viewpoint>
         <highlight>
           <color-one-way>
-            <field>[federated.3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F].[none:TRANSACTION_DATE:ok]</field>
+            <field>[federated.3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f].[DATE_VALUE]</field>
           </color-one-way>
         </highlight>
       </viewpoint>
-      <simple-id uuid='{F8A9B0C1-D2E3-F4A5-B6C7-D8E9F0A1B2C3}' />
+      <simple-id uuid='{E7F8A9B0-C1D2-3E4F-5A6B-7C8D9E0F1A2B}' />
     </window>
   </windows>
-</workbook>
+  <thumbnails>
+    <thumbnail height='192' name='MRR_Trends_Over_Time' width='192'>
+      iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAgAElEQVR4nO2dd3gU1frHP7ObTUIgCSGhBEKHUKX3XhQQFRULKmJBsaFe9V69Xq/X3p+9d1GxoKKCBRsqvffeS+i9hRBCCiGkbXZ+f8xkM5vdJJtks5vkfJ5nn52ZM2fOe2b2fc+c957zHo1SSikKhcJNcTi7AQqFwpkoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0
