@@ -29,7 +29,7 @@ trends and areas for improvement.
 -   Meeting Activity \--\>Users (via Date Key)
 -   Meeting Activity \--\>Meeting (via Meeting ID)
 -   Meeting Activity \--\>Users (via User Key)
--   Feature Usage \--\>Dim Feature (via Feature Key)'
+-   Feature Usage \--\>Dim Feature (via Feature Key)
 -   Feature Usage \--\>Dim Date (via Date Key)
 
 **Data Attributes in the Report**
@@ -73,48 +73,25 @@ service quality and reduce ticket volume.
 
 **Uses of the Report**
 
--   Identify products or features that generate the most support
-    tickets.
 
--   Track ticket resolution times and patterns.
-
--   Correlate meeting issues with ticket types.
-
--   Assess the efficiency of the support team.
+- Number of users by Support Category, Sub category
+- Number of Support Activities by Resolution Status
+- Number of Support Activities by Priority
 
 **Data Relationships Used**
 
--   Support_Tickets \--\> Users (via User_ID)
-
--   Support_Tickets \--\> Meetings (implied link, not direct FK)
+-   Fact Support Activity  \--\> Dim Date (via date key)
+-   Fact Support Activity  \--\> Dim Support Category (via support category key)
+-   Fact Support Activity  \--\> Dim User (via user key)
 
 **Data Attributes in the Report**
 
--   User information (User_ID, Company)
-
--   Calculated metrics (Average_Resolution_Time, Ticket_Volume_by_Type)
+-   User information (User_ID, Category, Sub Category, Resolution Status, Priority Level)
 
 **KPIs and Metrics in the Report**
 
--   Number of tickets opened per day.
-
--   Average ticket resolution time.
-
--   First-contact resolution rate.
-
--   Tickets opened per 1,000 active users.
-
-**Calculations in the Report**
-
--   The ticket volume by type shows how many tickets were created for
-    each type of issue.
-
--   The average resolution time is calculated by determining the average
-    time taken to close a ticket after it was opened.
-
--   The user-to-ticket ratio compares the total number of tickets raised
-    to the number of active users during the same period.
-
+- Number of Users
+- 
 **Data Constraints**
 
 -   Type and Resolution_Status must be from a predefined list of values.
@@ -125,118 +102,6 @@ service quality and reduce ticket volume.
 
 **Visualizations**
 
--   Bar chart showing ticket volume by Meeting_Type.
-
--   Line chart tracking average resolution time over time.
-
-**3. REVENUE AND LICENSE ANALYSIS REPORT**
-
-**Business Objective**
-
-Monitor billing events and license utilization to understand revenue
-streams and customer value.
-
-**Uses of the Report**
-
--   Track revenue trends by License type.
-
--   Analyze license assignment and expiration.
-
--   Identify opportunities for upselling or cross-selling to users.
-
--   Forecast future revenue based on license data.
-
-**Data Relationships Used**
-
--   Billing_Events \--\> Users (via User_ID)
-
--   Licenses \--\> Users (via Assigned_To_User_ID)
-
--   Meetings \--\> Users (via Host_ID)
-
-**Data Attributes in the Report**
-
--   Billing information (Event_Type, Amount)
-
--   License information (License_Type, Start_Date, End_Date)
-
--   User information (User_ID, License_Type, Company)
-
--   Meeting details (Host_ID, Duration_Minutes)
-
-**KPIs and Metrics in the Report**
-
--   Monthly Recurring Revenue (MRR).
-
--   Revenue by License_Type.
-
--   License utilization rate.
-
--   License expiration trends.
-
--   Usage correlation with billing events (e.g., users who upgrade after
-    a certain usage threshold).
-
-**Calculations in the Report**
-
--   Total revenue is calculated by summing up all monetary amounts from
-    billing events.
-
--   The license utilization rate is the proportion of licenses that are
-    currently assigned to users, out of the total number of licenses
-    available.
-
--   The churn rate measures the fraction of users who have stopped using
-    the platform, compared to the total number of users.
-
-**Data Constraints**
-
--   Amount must be a positive number.
-
--   License_Type must be a predefined value.
-
--   Start_Date must be before End_Date.
-
-**Visualizations**
-
--   Line chart showing MRR trends over time.
-
--   Stacked bar chart showing revenue distribution by License_Type.
-
--   Table showing upcoming license expirations.
-
--   Heat map showing geographic revenue distribution.
-
-**Security**
-
--   Anonymize or mask sensitive user data (Email, User_Name) for
-    non-authorized users.
-
-**TECHNICAL REQUIREMENTS**
-
-**Data Integration**
-
--   Ensure all foreign key relationships are correctly implemented for
-    accurate joins.
-
--   Data must be validated against schema constraints (e.g., valid
-    dates, non-negative numbers).
-
-**Performance**
-
--   Optimize queries that aggregate data over large time periods.
-
--   Create indices on frequently used columns like User_ID, Meeting_ID,
-    and date fields.
-
--   Implement data caching for frequently accessed reports to improve
-    dashboard load times.
-
-**Report Delivery**
-
--   Automate daily and weekly report generation for key stakeholders.
-
--   Create an alert system to notify sales teams of expiring licenses or
-    users nearing a plan\'s usage limits.
-
--   Ensure all dashboards are mobile-responsive for on-the-go access.
+-   Bar chart showing Number of users by Support Category, Sub category
+-   Bar chart showing  Number of Support Activities by Rsolution Status
+-   Bar chart showing Number of Support Activities by Rsolution Status
