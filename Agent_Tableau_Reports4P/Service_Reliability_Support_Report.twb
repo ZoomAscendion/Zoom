@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8' ?>
 
+<!-- build 20233.23.1017.0948 -->
 <workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
   <document-format-change-manifest>
     <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
@@ -16,84 +17,168 @@
     <preference name='ui.encoding.shelf.height' value='24' />
     <preference name='ui.shelf.height' value='26' />
   </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
   <datasources>
-    <datasource caption='ServiceReliabilitySupport_DS' inline='true' name='federated.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E' version='18.1'>
+    <datasource caption='Service_Reliability_Support_DS' inline='true' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' version='18.1'>
       <connection class='federated'>
         <named-connections>
-          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E'>
-            <connection authentication='username-password' class='snowflake' dbname='DB_POC_ZOOM' instanceurl='https://a8977680256071-ascendion_partner.snowflakecomputing.com' odbc-connect-string-extras='' one-time-sql='' role='FR__POC__ADMIN__ZOOM' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' server-oauth='' service='FR__POC__ADMIN__ZOOM' username='SATHYANARAYANAP' password='Sathyasnowflake@20' warehouse='WH_POC_ZOOM_DEV_XSMALL' />
+          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e'>
+            <connection authentication='oauth' class='snowflake' dbname='DB_POC_ZOOM' instanceurl='https://a8977680256071-ascendion_partner.snowflakecomputing.com' odbc-connect-string-extras='' one-time-sql='' role='FR__POC__ADMIN__ZOOM' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' server-oauth='' service='FR__POC__ADMIN__ZOOM' username='SATHYANARAYANAP' warehouse='WH_POC_ZOOM_DEV_XSMALL' />
           </named-connection>
         </named-connections>
         <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='collection'>
-          <relation connection='snowflake.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
-          <relation connection='snowflake.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E' name='DIM_DATE' table='[DB_POC_ZOOM].[GOLD].[DIM_DATE]' type='table' />
-          <relation connection='snowflake.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E' name='DIM_USER' table='[DB_POC_ZOOM].[GOLD].[DIM_USER]' type='table' />
-          <relation connection='snowflake.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_ZOOM].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
-          <relation connection='snowflake.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E' name='FACT_MEETING_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
-          <relation connection='snowflake.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E' name='DIM_MEETING' table='[DB_POC_ZOOM].[GOLD].[DIM_MEETING]' type='table' />
+          <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
+          <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='DIM_DATE' table='[DB_POC_ZOOM].[GOLD].[DIM_DATE]' type='table' />
+          <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='DIM_USER' table='[DB_POC_ZOOM].[GOLD].[DIM_USER]' type='table' />
+          <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_ZOOM].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
+          <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='FACT_MEETING_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
+          <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='DIM_MEETING' table='[DB_POC_ZOOM].[GOLD].[DIM_MEETING]' type='table' />
         </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+          <objects>
+            <object caption='FACT_SUPPORT_ACTIVITY' id='FACT_SUPPORT_ACTIVITY_A2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7'>
+              <properties context=''>
+                <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
+              </properties>
+            </object>
+            <object caption='DIM_DATE' id='DIM_DATE_B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8'>
+              <properties context=''>
+                <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='DIM_DATE' table='[DB_POC_ZOOM].[GOLD].[DIM_DATE]' type='table' />
+              </properties>
+            </object>
+            <object caption='DIM_USER' id='DIM_USER_C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F9'>
+              <properties context=''>
+                <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='DIM_USER' table='[DB_POC_ZOOM].[GOLD].[DIM_USER]' type='table' />
+              </properties>
+            </object>
+            <object caption='DIM_SUPPORT_CATEGORY' id='DIM_SUPPORT_CATEGORY_D5E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0'>
+              <properties context=''>
+                <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_ZOOM].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
+              </properties>
+            </object>
+            <object caption='FACT_MEETING_ACTIVITY' id='FACT_MEETING_ACTIVITY_E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1'>
+              <properties context=''>
+                <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='FACT_MEETING_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
+              </properties>
+            </object>
+            <object caption='DIM_MEETING' id='DIM_MEETING_F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1C2'>
+              <properties context=''>
+                <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='DIM_MEETING' table='[DB_POC_ZOOM].[GOLD].[DIM_MEETING]' type='table' />
+              </properties>
+            </object>
+          </objects>
+          <relationships>
+            <relationship id='1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D'>
+              <expression op='='>
+                <expression op='[FACT_SUPPORT_ACTIVITY].[DATE_KEY]' />
+                <expression op='[DIM_DATE].[DATE_KEY]' />
+              </expression>
+            </relationship>
+            <relationship id='2B3C4D5E-6F7A-8B9C-0D1E-2F3A4B5C6D7E'>
+              <expression op='='>
+                <expression op='[FACT_SUPPORT_ACTIVITY].[USER_KEY]' />
+                <expression op='[DIM_USER].[USER_KEY]' />
+              </expression>
+            </relationship>
+            <relationship id='3C4D5E6F-7A8B-9C0D-1E2F-3A4B5C6D7E8F'>
+              <expression op='='>
+                <expression op='[FACT_SUPPORT_ACTIVITY].[SUPPORT_CATEGORY_KEY]' />
+                <expression op='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY_KEY]' />
+              </expression>
+            </relationship>
+            <relationship id='4D5E6F7A-8B9C-0D1E-2F3A-4B5C6D7E8F9A'>
+              <expression op='='>
+                <expression op='[FACT_MEETING_ACTIVITY].[DATE_KEY]' />
+                <expression op='[DIM_DATE].[DATE_KEY]' />
+              </expression>
+            </relationship>
+            <relationship id='5E6F7A8B-9C0D-1E2F-3A4B-5C6D7E8F9A0B'>
+              <expression op='='>
+                <expression op='[FACT_MEETING_ACTIVITY].[MEETING_KEY]' />
+                <expression op='[DIM_MEETING].[MEETING_KEY]' />
+              </expression>
+            </relationship>
+          </relationships>
+        </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
         <cols>
-          <map key='[USER_KEY]' value='[FACT_SUPPORT_ACTIVITY].[USER_KEY]' />
-          <map key='[DATE_KEY]' value='[FACT_SUPPORT_ACTIVITY].[DATE_KEY]' />
-          <map key='[SUPPORT_CATEGORY_KEY]' value='[FACT_SUPPORT_ACTIVITY].[SUPPORT_CATEGORY_KEY]' />
-          <map key='[TICKET_OPEN_DATE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_OPEN_DATE]' />
-          <map key='[TICKET_CLOSE_DATE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_CLOSE_DATE]' />
-          <map key='[TICKET_TYPE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_TYPE]' />
-          <map key='[RESOLUTION_STATUS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_STATUS]' />
-          <map key='[PRIORITY_LEVEL]' value='[FACT_SUPPORT_ACTIVITY].[PRIORITY_LEVEL]' />
-          <map key='[RESOLUTION_TIME_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_TIME_HOURS]' />
-          <map key='[ESCALATION_COUNT]' value='[FACT_SUPPORT_ACTIVITY].[ESCALATION_COUNT]' />
-          <map key='[CUSTOMER_SATISFACTION_SCORE]' value='[FACT_SUPPORT_ACTIVITY].[CUSTOMER_SATISFACTION_SCORE]' />
-          <map key='[FIRST_CONTACT_RESOLUTION_FLAG]' value='[FACT_SUPPORT_ACTIVITY].[FIRST_CONTACT_RESOLUTION_FLAG]' />
-          <map key='[FIRST_RESPONSE_TIME_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[FIRST_RESPONSE_TIME_HOURS]' />
+          <map key='[DATE_KEY]' value='[DIM_DATE].[DATE_KEY]' />
           <map key='[DATE_VALUE]' value='[DIM_DATE].[DATE_VALUE]' />
           <map key='[YEAR]' value='[DIM_DATE].[YEAR]' />
           <map key='[MONTH]' value='[DIM_DATE].[MONTH]' />
           <map key='[MONTH_NAME]' value='[DIM_DATE].[MONTH_NAME]' />
           <map key='[DAY_NAME]' value='[DIM_DATE].[DAY_NAME]' />
+          <map key='[USER_KEY]' value='[DIM_USER].[USER_KEY]' />
+          <map key='[USER_ID]' value='[DIM_USER].[USER_ID]' />
           <map key='[USER_NAME]' value='[DIM_USER].[USER_NAME]' />
-          <map key='[COMPANY]' value='[DIM_USER].[COMPANY]' />
           <map key='[EMAIL_DOMAIN]' value='[DIM_USER].[EMAIL_DOMAIN]' />
+          <map key='[COMPANY]' value='[DIM_USER].[COMPANY]' />
           <map key='[SUPPORT_CATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY]' />
           <map key='[SUPPORT_SUBCATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_SUBCATEGORY]' />
+          <map key='[PRIORITY_LEVEL]' value='[DIM_SUPPORT_CATEGORY].[PRIORITY_LEVEL]' />
           <map key='[EXPECTED_RESOLUTION_TIME_HOURS]' value='[DIM_SUPPORT_CATEGORY].[EXPECTED_RESOLUTION_TIME_HOURS]' />
           <map key='[MEETING_TYPE]' value='[DIM_MEETING].[MEETING_TYPE]' />
           <map key='[MEETING_CATEGORY]' value='[DIM_MEETING].[MEETING_CATEGORY]' />
+          <map key='[SUPPORT_ACTIVITY_ID]' value='[FACT_SUPPORT_ACTIVITY].[SUPPORT_ACTIVITY_ID]' />
+          <map key='[TICKET_OPEN_DATE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_OPEN_DATE]' />
+          <map key='[TICKET_CLOSE_DATE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_CLOSE_DATE]' />
+          <map key='[TICKET_TYPE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_TYPE]' />
+          <map key='[RESOLUTION_STATUS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_STATUS]' />
+          <map key='[RESOLUTION_TIME_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_TIME_HOURS]' />
+          <map key='[ESCALATION_COUNT]' value='[FACT_SUPPORT_ACTIVITY].[ESCALATION_COUNT]' />
+          <map key='[CUSTOMER_SATISFACTION_SCORE]' value='[FACT_SUPPORT_ACTIVITY].[CUSTOMER_SATISFACTION_SCORE]' />
+          <map key='[FIRST_CONTACT_RESOLUTION_FLAG]' value='[FACT_SUPPORT_ACTIVITY].[FIRST_CONTACT_RESOLUTION_FLAG]' />
+          <map key='[FIRST_RESPONSE_TIME_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[FIRST_RESPONSE_TIME_HOURS]' />
         </cols>
         <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='context'>0</attribute>
+              <attribute datatype='string' name='gridOrigin'>A1:Z1000:no:A1:Z1000:0</attribute>
+              <attribute datatype='boolean' name='header'>true</attribute>
+              <attribute datatype='integer' name='outcome'>2</attribute>
+            </attributes>
+          </metadata-record>
         </metadata-records>
       </connection>
       <aliases enabled='yes' />
-      <column caption='User Key' datatype='string' name='[USER_KEY]' role='dimension' type='nominal' />
       <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
-      <column caption='Support Category Key' datatype='string' name='[SUPPORT_CATEGORY_KEY]' role='dimension' type='nominal' />
-      <column caption='Ticket Open Date' datatype='date' name='[TICKET_OPEN_DATE]' role='dimension' type='ordinal' />
-      <column caption='Ticket Close Date' datatype='date' name='[TICKET_CLOSE_DATE]' role='dimension' type='ordinal' />
-      <column caption='Ticket Type' datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
-      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
-      <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
-      <column caption='Resolution Time Hours' datatype='integer' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
-      <column caption='Escalation Count' datatype='integer' name='[ESCALATION_COUNT]' role='measure' type='quantitative' />
-      <column caption='Customer Satisfaction Score' datatype='integer' name='[CUSTOMER_SATISFACTION_SCORE]' role='measure' type='quantitative' />
-      <column caption='First Contact Resolution Flag' datatype='boolean' name='[FIRST_CONTACT_RESOLUTION_FLAG]' role='dimension' type='nominal' />
-      <column caption='First Response Time Hours' datatype='integer' name='[FIRST_RESPONSE_TIME_HOURS]' role='measure' type='quantitative' />
       <column caption='Date Value' datatype='date' name='[DATE_VALUE]' role='dimension' type='ordinal' />
       <column caption='Year' datatype='integer' name='[YEAR]' role='dimension' type='quantitative' />
       <column caption='Month' datatype='integer' name='[MONTH]' role='dimension' type='quantitative' />
       <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
       <column caption='Day Name' datatype='string' name='[DAY_NAME]' role='dimension' type='nominal' />
+      <column caption='User ID' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
       <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
-      <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
       <column caption='Email Domain' datatype='string' name='[EMAIL_DOMAIN]' role='dimension' type='nominal' />
+      <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
       <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
       <column caption='Support Subcategory' datatype='string' name='[SUPPORT_SUBCATEGORY]' role='dimension' type='nominal' />
-      <column caption='Expected Resolution Time Hours' datatype='integer' name='[EXPECTED_RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
       <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
       <column caption='Meeting Category' datatype='string' name='[MEETING_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Ticket Open Date' datatype='date' name='[TICKET_OPEN_DATE]' role='dimension' type='ordinal' />
+      <column caption='Ticket Close Date' datatype='date' name='[TICKET_CLOSE_DATE]' role='dimension' type='ordinal' />
+      <column caption='Ticket Type' datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
+      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+      <column caption='Resolution Time Hours' datatype='integer' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='Escalation Count' datatype='integer' name='[ESCALATION_COUNT]' role='measure' type='quantitative' />
+      <column caption='Customer Satisfaction Score' datatype='integer' name='[CUSTOMER_SATISFACTION_SCORE]' role='measure' type='quantitative' />
+      <column caption='First Contact Resolution Flag' datatype='boolean' name='[FIRST_CONTACT_RESOLUTION_FLAG]' role='dimension' type='nominal' />
+      <column caption='First Response Time Hours' datatype='integer' name='[FIRST_RESPONSE_TIME_HOURS]' role='measure' type='quantitative' />
       
       <!-- Calculated Fields for KPIs -->
       <column caption='Tickets Opened Per Day' datatype='integer' name='[Tickets_Opened_Per_Day]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNTD(IF DATEPART(&quot;day&quot;,[TICKET_OPEN_DATE]) = DATEPART(&quot;day&quot;,TODAY()) AND DATEPART(&quot;month&quot;,[TICKET_OPEN_DATE]) = DATEPART(&quot;month&quot;,TODAY()) AND DATEPART(&quot;year&quot;,[TICKET_OPEN_DATE]) = DATEPART(&quot;year&quot;,TODAY()) THEN [SUPPORT_CATEGORY_KEY] END)' />
+        <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
       </column>
       
       <column caption='Average Ticket Resolution Time' datatype='real' name='[Average_Ticket_Resolution_Time]' role='measure' type='quantitative'>
@@ -101,19 +186,27 @@
       </column>
       
       <column caption='First Contact Resolution Rate' datatype='real' name='[First_Contact_Resolution_Rate]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='SUM(IF [FIRST_CONTACT_RESOLUTION_FLAG] = TRUE THEN 1 ELSE 0 END) / COUNT([FIRST_CONTACT_RESOLUTION_FLAG])' />
+        <calculation class='tableau' formula='SUM(IF [FIRST_CONTACT_RESOLUTION_FLAG] = TRUE THEN 1 ELSE 0 END) / COUNT([SUPPORT_ACTIVITY_ID])' />
       </column>
       
       <column caption='Tickets Per 1000 Active Users' datatype='real' name='[Tickets_Per_1000_Active_Users]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='(COUNTD([SUPPORT_CATEGORY_KEY]) / COUNTD([USER_KEY])) * 1000' />
+        <calculation class='tableau' formula='(COUNT([SUPPORT_ACTIVITY_ID]) / COUNTD([USER_KEY])) * 1000' />
       </column>
       
       <column caption='Ticket Volume By Type' datatype='integer' name='[Ticket_Volume_By_Type]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNTD([SUPPORT_CATEGORY_KEY])' />
+        <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
       </column>
       
       <column caption='User To Ticket Ratio' datatype='real' name='[User_To_Ticket_Ratio]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNTD([SUPPORT_CATEGORY_KEY]) / COUNTD([USER_KEY])' />
+        <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID]) / COUNTD([USER_KEY])' />
+      </column>
+      
+      <column caption='Average Customer Satisfaction' datatype='real' name='[Average_Customer_Satisfaction]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([CUSTOMER_SATISFACTION_SCORE])' />
+      </column>
+      
+      <column caption='Escalation Rate' datatype='real' name='[Escalation_Rate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [ESCALATION_COUNT] &gt; 0 THEN 1 ELSE 0 END) / COUNT([SUPPORT_ACTIVITY_ID])' />
       </column>
       
       <column caption='Masked Email' datatype='string' name='[Masked_Email]' role='dimension' type='nominal'>
@@ -121,33 +214,41 @@
       </column>
       
       <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[ServiceReliabilitySupport_DS_2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
     </datasource>
   </datasources>
   <worksheets>
-    <worksheet name='Ticket Volume by Meeting Type'>
+    <worksheet name='Ticket_Volume_By_Meeting_Type'>
       <table>
         <view>
           <datasources>
-            <datasource caption='ServiceReliabilitySupport_DS' name='federated.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E' />
+            <datasource caption='Service_Reliability_Support_DS' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' />
           </datasources>
-          <datasource-dependencies datasource='federated.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E'>
-            <column caption='Ticket Volume By Type' datatype='integer' name='[Ticket_Volume_By_Type]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='COUNTD([SUPPORT_CATEGORY_KEY])' />
-            </column>
+          <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e'>
             <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
-            <column-instance column='[MEETING_TYPE]' derivation='None' name='[none:MEETING_TYPE:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Ticket_Volume_By_Type]' derivation='User' name='[usr:Ticket_Volume_By_Type:qk]' pivot='key' type='quantitative' />
+            <column caption='Ticket Volume By Type' datatype='integer' name='[Ticket_Volume_By_Type]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
+            </column>
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
-        <style />
+        <style>
+          <style-rule element='axis'>
+            <encoding attr='space' class='0' field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[MEETING_TYPE]' field-type='nominal' max='1.0' min='0.0' range-type='fixed' scope='rows' type='space' />
+          </style-rule>
+        </style>
         <panes>
           <pane selection-relaxation-option='selection-relaxation-allow'>
             <view>
               <breakdown value='auto' />
             </view>
             <mark class='Bar' />
-            <mark-sizing mark-sizing-setting='marks-scaling-off' />
+            <encodings>
+              <color field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[MEETING_TYPE]' />
+            </encodings>
             <style>
               <style-rule element='mark'>
                 <format attr='mark-labels-show' value='true' />
@@ -156,36 +257,39 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E].[usr:Ticket_Volume_By_Type:qk]</rows>
-        <cols>[federated.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E].[none:MEETING_TYPE:nk]</cols>
+        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[MEETING_TYPE]</rows>
+        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[Ticket_Volume_By_Type]</cols>
       </table>
-      <simple-id uuid='{E1F2A3B4-C5D6-E7F8-A9B0-C1D2E3F4A5B6}' />
+      <simple-id uuid='{A2B3C4D5-E6F7-8A9B-0C1D-2E3F4A5B6C7D}' />
     </worksheet>
-    
-    <worksheet name='Average Resolution Time Over Time'>
+    <worksheet name='Average_Resolution_Time_Trend'>
       <table>
         <view>
           <datasources>
-            <datasource caption='ServiceReliabilitySupport_DS' name='federated.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E' />
+            <datasource caption='Service_Reliability_Support_DS' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' />
           </datasources>
-          <datasource-dependencies datasource='federated.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E'>
+          <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e'>
+            <column caption='Date Value' datatype='date' name='[DATE_VALUE]' role='dimension' type='ordinal' />
             <column caption='Average Ticket Resolution Time' datatype='real' name='[Average_Ticket_Resolution_Time]' role='measure' type='quantitative'>
               <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
             </column>
-            <column caption='Ticket Open Date' datatype='date' name='[TICKET_OPEN_DATE]' role='dimension' type='ordinal' />
-            <column-instance column='[TICKET_OPEN_DATE]' derivation='None' name='[none:TICKET_OPEN_DATE:ok]' pivot='key' type='ordinal' />
-            <column-instance column='[Average_Ticket_Resolution_Time]' derivation='User' name='[usr:Average_Ticket_Resolution_Time:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
-        <style />
+        <style>
+          <style-rule element='axis'>
+            <encoding attr='space' class='0' field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[DATE_VALUE]' field-type='ordinal' max='1.0' min='0.0' range-type='fixed' scope='rows' type='space' />
+          </style-rule>
+        </style>
         <panes>
           <pane selection-relaxation-option='selection-relaxation-allow'>
             <view>
               <breakdown value='auto' />
             </view>
             <mark class='Line' />
-            <mark-sizing mark-sizing-setting='marks-scaling-off' />
+            <encodings>
+              <color field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[Average_Ticket_Resolution_Time]' />
+            </encodings>
             <style>
               <style-rule element='mark'>
                 <format attr='mark-labels-show' value='true' />
@@ -194,14 +298,63 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E].[usr:Average_Ticket_Resolution_Time:qk]</rows>
-        <cols>[federated.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E].[none:TICKET_OPEN_DATE:ok]</cols>
+        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[Average_Ticket_Resolution_Time]</rows>
+        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[DATE_VALUE]</cols>
       </table>
-      <simple-id uuid='{F2A3B4C5-D6E7-F8A9-B0C1-D2E3F4A5B6C7}' />
+      <simple-id uuid='{B3C4D5E6-F7A8-9B0C-1D2E-3F4A5B6C7D8E}' />
+    </worksheet>
+    <worksheet name='Support_KPIs_Dashboard'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service_Reliability_Support_DS' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' />
+          </datasources>
+          <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e'>
+            <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
+            <column caption='Tickets Opened Per Day' datatype='integer' name='[Tickets_Opened_Per_Day]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
+            </column>
+            <column caption='First Contact Resolution Rate' datatype='real' name='[First_Contact_Resolution_Rate]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM(IF [FIRST_CONTACT_RESOLUTION_FLAG] = TRUE THEN 1 ELSE 0 END) / COUNT([SUPPORT_ACTIVITY_ID])' />
+            </column>
+            <column caption='Average Customer Satisfaction' datatype='real' name='[Average_Customer_Satisfaction]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([CUSTOMER_SATISFACTION_SCORE])' />
+            </column>
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <encoding attr='space' class='0' field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[SUPPORT_CATEGORY]' field-type='nominal' max='1.0' min='0.0' range-type='fixed' scope='rows' type='space' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Text' />
+            <encodings>
+              <text field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[Tickets_Opened_Per_Day]' />
+              <text field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[First_Contact_Resolution_Rate]' />
+              <text field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[Average_Customer_Satisfaction]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[SUPPORT_CATEGORY]</rows>
+        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[Multiple Values]</cols>
+      </table>
+      <simple-id uuid='{C4D5E6F7-A8B9-0C1D-2E3F-4A5B6C7D8E9F}' />
     </worksheet>
   </worksheets>
   <windows source-height='30'>
-    <window class='worksheet' maximized='true' name='Ticket Volume by Meeting Type'>
+    <window class='worksheet' maximized='true' name='Ticket_Volume_By_Meeting_Type'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -225,11 +378,13 @@
       <viewpoint>
         <highlight>
           <color-one-way>
-            <field>[federated.2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E].[none:MEETING_TYPE:nk]</field>
+            <field>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[MEETING_TYPE]</field>
           </color-one-way>
         </highlight>
       </viewpoint>
-      <simple-id uuid='{A3B4C5D6-E7F8-A9B0-C1D2-E3F4A5B6C7D8}' />
+      <simple-id uuid='{D5E6F7A8-B9C0-1D2E-3F4A-5B6C7D8E9F0A}' />
     </window>
   </windows>
-</workbook>
+  <thumbnails>
+    <thumbnail height='192' name='Ticket_Volume_By_Meeting_Type' width='192'>
+      iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAgAElEQVR4nO2dd3gU1frHP7ObTUIgCSGhBEKHUKX3XhQQFRULKmJBsaFe9V69Xq/X3p+9d1GxoKKCBRsqvffeS+i9hRBCCiGkbXZ+f8xkM5vdJJtks5vkfJ5nn52ZM2fOe2b2fc+c857zHo1SSikKhcJNcTi7AQqFwpkoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4dYoASgUbo0SgELh1igBKBRujRKAQuHWKAEoFG6NEoBC4
