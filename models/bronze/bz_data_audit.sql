@@ -10,9 +10,9 @@
 
 SELECT 
     ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP()) AS record_id,
-    'AUDIT_INITIALIZATION' AS source_table,
+    CAST('AUDIT_INIT' AS VARCHAR(255)) AS source_table,
     CURRENT_TIMESTAMP() AS load_timestamp,
-    'DBT_SYSTEM' AS processed_by,
+    CAST('DBT' AS VARCHAR(255)) AS processed_by,
     0.0 AS processing_time,
-    'SUCCESS' AS status
+    CAST('SUCCESS' AS VARCHAR(255)) AS status
 WHERE FALSE -- This ensures no actual data is inserted during initial creation
