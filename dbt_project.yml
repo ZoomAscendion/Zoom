@@ -1,9 +1,9 @@
-name: 'zoom_bronze_layer'
+name: 'zoom_gold_layer'
 version: '1.0.0'
 config-version: 2
 
 # This setting configures which "profile" dbt uses for this project.
-profile: 'zoom_bronze_layer'
+profile: 'zoom_gold_layer'
 
 # These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
@@ -13,34 +13,51 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
 # Configuring models
 models:
-  zoom_bronze_layer:
-    # Config indicated by + and applies to all files under models/bronze/
-    bronze:
+  zoom_gold_layer:
+    # Config indicated by + and applies to all files under models/gold/
+    gold:
       +materialized: table
-      +tags: ["bronze"]
+      +schema: gold
+      # Audit log must run first
+      go_audit_log:
+        +pre_hook: ""
+        +post_hook: ""
+      # Dimension tables
+      dimension:
+        +materialized: table
+        +schema: gold
+      # Fact tables  
+      fact:
+        +materialized: table
+        +schema: gold
 
 # Global configurations
 vars:
   # The `start_date` variable will be accessible in all resources
   start_date: '2020-01-01'
+  # The `end_date` variable will be accessible in all resources  
+  end_date: '2030-12-31'
 
-# Seeds configuration
-seeds:
-  zoom_bronze_layer:
-    +enabled: true
-
-# Tests configuration
-tests:
-  +store_failures: true
-  +severity: warn
-
-# Snapshots configuration
+# Snapshot configurations
 snapshots:
-  zoom_bronze_layer:
+  zoom_gold_layer:
     +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: updated_at
+
+# Seeds configurations
+seeds:
+  zoom_gold_layer:
+    +schema: seeds
+
+# Test configurations
+tests:
+  zoom_gold_layer:
+    +severity: warn
