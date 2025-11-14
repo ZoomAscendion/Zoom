@@ -5,17 +5,7 @@
 
 {{ config(
     materialized='table',
-    tags=['bronze', 'feature_usage'],
-    pre_hook=[
-        "{% if this.name != 'bz_data_audit' %}",
-        "INSERT INTO {{ target.database }}.{{ target.schema }}.bz_data_audit (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) VALUES ('BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT', 'STARTED')",
-        "{% endif %}"
-    ],
-    post_hook=[
-        "{% if this.name != 'bz_data_audit' %}",
-        "INSERT INTO {{ target.database }}.{{ target.schema }}.bz_data_audit (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) VALUES ('BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT', 10, 'SUCCESS')",
-        "{% endif %}"
-    ]
+    tags=['bronze', 'feature_usage']
 ) }}
 
 -- Raw data extraction and deduplication
