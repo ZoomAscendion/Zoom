@@ -1,0 +1,180 @@
+version: 2
+
+models:
+  - name: go_audit_log
+    description: "Gold layer process audit log for tracking all ETL executions"
+    columns:
+      - name: audit_log_id
+        description: "Unique identifier for each audit log entry"
+      - name: process_name
+        description: "Name of the process being executed"
+      - name: process_type
+        description: "Type of process (DIMENSION_LOAD, FACT_LOAD, etc.)"
+      - name: execution_status
+        description: "Status of the process execution"
+      - name: source_table_name
+        description: "Name of the source table"
+      - name: target_table_name
+        description: "Name of the target table"
+        
+  - name: go_dim_user
+    description: "User dimension table with SCD Type 2 implementation"
+    columns:
+      - name: user_key
+        description: "Surrogate key for user dimension"
+      - name: user_id
+        description: "Business key - unique identifier for each user"
+      - name: user_name
+        description: "Display name of the user"
+      - name: email_domain
+        description: "Email domain extracted from user email"
+      - name: company
+        description: "Company or organization name"
+      - name: plan_type
+        description: "Standardized subscription plan type"
+      - name: is_current_record
+        description: "Flag indicating if this is the current active record"
+        
+  - name: go_dim_date
+    description: "Standard date dimension for time-based analysis"
+    columns:
+      - name: date_key
+        description: "Primary key - date value"
+      - name: year
+        description: "Year component"
+      - name: quarter
+        description: "Quarter component"
+      - name: month
+        description: "Month component"
+      - name: day_of_week
+        description: "Day of week (1=Sunday, 7=Saturday)"
+      - name: is_weekend
+        description: "Flag indicating if date is weekend"
+        
+  - name: go_dim_feature
+    description: "Feature dimension containing platform features and characteristics"
+    columns:
+      - name: feature_key
+        description: "Surrogate key for feature dimension"
+      - name: feature_name
+        description: "Name of the platform feature"
+      - name: feature_category
+        description: "Category classification of the feature"
+      - name: feature_type
+        description: "Type classification of the feature"
+      - name: is_premium_feature
+        description: "Flag indicating if feature requires premium subscription"
+        
+  - name: go_dim_license
+    description: "License dimension containing license types and entitlements"
+    columns:
+      - name: license_key
+        description: "Surrogate key for license dimension"
+      - name: license_type
+        description: "Type of license"
+      - name: license_category
+        description: "Category classification of the license"
+      - name: max_participants
+        description: "Maximum number of participants allowed"
+      - name: monthly_price
+        description: "Monthly subscription price"
+      - name: is_current_record
+        description: "Flag indicating if this is the current active record"
+        
+  - name: go_dim_meeting
+    description: "Meeting dimension containing meeting characteristics"
+    columns:
+      - name: meeting_key
+        description: "Surrogate key for meeting dimension"
+      - name: meeting_type
+        description: "Type of meeting"
+      - name: duration_category
+        description: "Duration category (SHORT, MEDIUM, LONG, EXTENDED)"
+      - name: time_of_day_category
+        description: "Time of day category (MORNING, AFTERNOON, EVENING, NIGHT)"
+      - name: is_weekend
+        description: "Flag indicating if meeting occurred on weekend"
+        
+  - name: go_dim_support_category
+    description: "Support category dimension with SLA and resolution characteristics"
+    columns:
+      - name: support_category_key
+        description: "Surrogate key for support category dimension"
+      - name: support_category
+        description: "Support ticket category"
+      - name: priority_level
+        description: "Priority level (HIGH, MEDIUM, LOW)"
+      - name: expected_resolution_time_hours
+        description: "Expected time to resolve in hours"
+      - name: sla_target_hours
+        description: "SLA target resolution time in hours"
+        
+  - name: go_fact_meeting_activity
+    description: "Meeting activity fact table capturing meeting metrics"
+    columns:
+      - name: user_key
+        description: "Foreign key to user dimension"
+      - name: meeting_key
+        description: "Foreign key to meeting dimension"
+      - name: date_key
+        description: "Foreign key to date dimension"
+      - name: feature_key
+        description: "Foreign key to feature dimension"
+      - name: duration_minutes
+        description: "Meeting duration in minutes"
+      - name: participant_count
+        description: "Number of participants in the meeting"
+      - name: features_used_count
+        description: "Number of distinct features used"
+        
+  - name: go_fact_support_activity
+    description: "Support activity fact table capturing support metrics"
+    columns:
+      - name: user_key
+        description: "Foreign key to user dimension"
+      - name: date_key
+        description: "Foreign key to date dimension"
+      - name: support_category_key
+        description: "Foreign key to support category dimension"
+      - name: resolution_time_hours
+        description: "Time taken to resolve the ticket in hours"
+      - name: sla_met
+        description: "Flag indicating if SLA was met"
+      - name: customer_satisfaction_score
+        description: "Customer satisfaction rating"
+        
+  - name: go_fact_revenue_activity
+    description: "Revenue activity fact table capturing financial metrics"
+    columns:
+      - name: user_key
+        description: "Foreign key to user dimension"
+      - name: license_key
+        description: "Foreign key to license dimension"
+      - name: date_key
+        description: "Foreign key to date dimension"
+      - name: amount
+        description: "Transaction amount"
+      - name: net_revenue_amount
+        description: "Net revenue after refunds"
+      - name: mrr_impact
+        description: "Monthly recurring revenue impact"
+      - name: arr_impact
+        description: "Annual recurring revenue impact"
+        
+  - name: go_fact_feature_usage
+    description: "Feature usage fact table capturing usage patterns"
+    columns:
+      - name: date_key
+        description: "Foreign key to date dimension"
+      - name: feature_key
+        description: "Foreign key to feature dimension"
+      - name: user_key
+        description: "Foreign key to user dimension"
+      - name: meeting_key
+        description: "Foreign key to meeting dimension"
+      - name: usage_count
+        description: "Number of times feature was used"
+      - name: feature_adoption_score
+        description: "Calculated adoption score for the feature"
+      - name: success_rate
+        description: "Success rate percentage for feature usage"
