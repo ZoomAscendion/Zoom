@@ -1,7 +1,7 @@
 _____________________________________________
 ## *Author*: AAVA
 ## *Created on*:   
-## *Description*: Gold layer dimension table transformation recommendations for Zoom Platform Analytics System
+## *Description*: Gold layer dimension table transformation recommendations for Zoom Platform Analytics System ensuring unique row values
 ## *Version*: 1
 ## *Updated on*:   
 _____________________________________________
@@ -10,41 +10,21 @@ _____________________________________________
 
 ## Overview
 
-This document provides comprehensive transformation rules for converting Silver layer dimension tables to Gold layer dimension tables in the Zoom Platform Analytics System. The transformations ensure data integrity, standardization, and consistency while optimizing for analytics and reporting requirements.
+This document provides comprehensive transformation rules for converting Silver layer data into Gold layer dimension tables for the Zoom Platform Analytics System. The primary focus is ensuring each dimension table contains unique row values for every unique combination of defining attributes, supporting optimal analytical performance and data integrity.
 
 ## Transformation Rules for Dimension Tables
 
 ### 1. GO_DIM_USER - User Dimension Transformation
 
-**Source Table**: SILVER.SI_USERS
+**Rationale**: Transform Silver layer user data into a comprehensive user dimension with unique records per user, incorporating slowly changing dimension (SCD) Type 2 logic to track historical changes while ensuring current active records are unique.
 
-**Rationale**: Transform user data from Silver layer to create a comprehensive user dimension with enhanced attributes for analytics, including derived fields for segmentation and standardized naming conventions.
-
-**Transformation Rules**:
-
-1. **Surrogate Key Generation**
-   - Generate USER_KEY as MD5 hash of USER_ID for consistent dimensional modeling
-   - Create USER_DIM_ID as auto-increment surrogate key for BI tools
-
-2. **Data Type Standardization**
-   - Standardize USER_NAME to proper case format
-   - Extract EMAIL_DOMAIN from email address for domain-based analysis
-   - Standardize COMPANY names using lookup tables
-
-3. **Plan Type Categorization**
-   - Map PLAN_TYPE to standardized categories (Free, Basic, Pro, Enterprise)
-   - Create PLAN_CATEGORY for high-level grouping (Free, Paid)
-   - Derive ACCOUNT_TYPE based on plan characteristics
-
-4. **Derived Attributes**
-   - Calculate USER_STATUS based on activity and license status
-   - Derive GEOGRAPHIC_REGION from email domain or company information
-   - Create INDUSTRY_SECTOR classification
+**Uniqueness Strategy**: Implement composite uniqueness based on USER_ID + IS_CURRENT_RECORD flag to ensure only one active record per user exists.
 
 **SQL Example**:
 ```sql
 INSERT INTO GOLD.GO_DIM_USER (
     USER_KEY,
+    USER_DIM_ID,
     USER_ID,
     USER_NAME,
     EMAIL_DOMAIN,
@@ -55,7 +35,9 @@ INSERT INTO GOLD.GO_DIM_USER (
     USER_STATUS,
     GEOGRAPHIC_REGION,
     INDUSTRY_SECTOR,
+    USER_ROLE,
     ACCOUNT_TYPE,
+    LANGUAGE_PREFERENCE,
     EFFECTIVE_START_DATE,
     EFFECTIVE_END_DATE,
     IS_CURRENT_RECORD,
@@ -63,68 +45,54 @@ INSERT INTO GOLD.GO_DIM_USER (
     UPDATE_DATE,
     SOURCE_SYSTEM
 )
-SELECT 
-    MD5(USER_ID) AS USER_KEY,
+SELECT DISTINCT
+    CONCAT('USR_', USER_ID, '_', ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY LOAD_TIMESTAMP DESC)) AS USER_KEY,
+    NULL AS USER_DIM_ID, -- Auto-increment
     USER_ID,
-    INITCAP(TRIM(USER_NAME)) AS USER_NAME,
-    UPPER(SUBSTRING(EMAIL, POSITION('@' IN EMAIL) + 1)) AS EMAIL_DOMAIN,
-    INITCAP(TRIM(COMPANY)) AS COMPANY,
+    UPPER(TRIM(USER_NAME)) AS USER_NAME,
+    UPPER(SPLIT_PART(EMAIL, '@', 2)) AS EMAIL_DOMAIN,
+    UPPER(TRIM(COMPANY)) AS COMPANY,
     CASE 
-        WHEN UPPER(PLAN_TYPE) IN ('FREE', 'BASIC') THEN 'Basic'
-        WHEN UPPER(PLAN_TYPE) IN ('PRO', 'PROFESSIONAL') THEN 'Pro'
-        WHEN UPPER(PLAN_TYPE) IN ('BUSINESS', 'ENTERPRISE') THEN 'Enterprise'
-        ELSE 'Unknown'
+        WHEN UPPER(PLAN_TYPE) IN ('FREE', 'BASIC') THEN 'BASIC'
+        WHEN UPPER(PLAN_TYPE) IN ('PRO', 'PROFESSIONAL') THEN 'PRO'
+        WHEN UPPER(PLAN_TYPE) IN ('BUSINESS', 'ENTERPRISE') THEN 'ENTERPRISE'
+        ELSE 'OTHER'
     END AS PLAN_TYPE,
     CASE 
-        WHEN UPPER(PLAN_TYPE) = 'FREE' THEN 'Free'
-        ELSE 'Paid'
+        WHEN UPPER(PLAN_TYPE) IN ('FREE') THEN 'FREE_TIER'
+        WHEN UPPER(PLAN_TYPE) IN ('BASIC', 'PRO', 'PROFESSIONAL') THEN 'PAID_INDIVIDUAL'
+        WHEN UPPER(PLAN_TYPE) IN ('BUSINESS', 'ENTERPRISE') THEN 'PAID_ORGANIZATION'
+        ELSE 'UNKNOWN'
     END AS PLAN_CATEGORY,
-    LOAD_DATE AS REGISTRATION_DATE,
-    CASE 
-        WHEN VALIDATION_STATUS = 'PASSED' THEN 'Active'
-        ELSE 'Inactive'
-    END AS USER_STATUS,
-    'Unknown' AS GEOGRAPHIC_REGION,
-    'Unknown' AS INDUSTRY_SECTOR,
-    CASE 
-        WHEN UPPER(PLAN_TYPE) = 'FREE' THEN 'Individual'
-        ELSE 'Business'
-    END AS ACCOUNT_TYPE,
-    CURRENT_DATE AS EFFECTIVE_START_DATE,
-    '9999-12-31'::DATE AS EFFECTIVE_END_DATE,
+    DATE(LOAD_TIMESTAMP) AS REGISTRATION_DATE,
+    'ACTIVE' AS USER_STATUS,
+    'UNKNOWN' AS GEOGRAPHIC_REGION,
+    'UNKNOWN' AS INDUSTRY_SECTOR,
+    'STANDARD_USER' AS USER_ROLE,
+    'INDIVIDUAL' AS ACCOUNT_TYPE,
+    'ENGLISH' AS LANGUAGE_PREFERENCE,
+    DATE(LOAD_TIMESTAMP) AS EFFECTIVE_START_DATE,
+    DATE('9999-12-31') AS EFFECTIVE_END_DATE,
     TRUE AS IS_CURRENT_RECORD,
-    CURRENT_DATE AS LOAD_DATE,
-    CURRENT_DATE AS UPDATE_DATE,
+    CURRENT_DATE() AS LOAD_DATE,
+    CURRENT_DATE() AS UPDATE_DATE,
     SOURCE_SYSTEM
 FROM SILVER.SI_USERS
-WHERE VALIDATION_STATUS = 'PASSED';
+WHERE VALIDATION_STATUS = 'PASSED'
+QUALIFY ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY LOAD_TIMESTAMP DESC) = 1;
 ```
 
 ### 2. GO_DIM_DATE - Date Dimension Transformation
 
-**Source**: Generated dimension (not from Silver layer)
+**Rationale**: Create a comprehensive date dimension covering the full range of dates needed for analysis, ensuring each date appears only once with complete temporal attributes.
 
-**Rationale**: Create a comprehensive date dimension to support time-based analysis across all fact tables with standard calendar and fiscal year attributes.
-
-**Transformation Rules**:
-
-1. **Date Range Generation**
-   - Generate dates from 2020-01-01 to 2030-12-31
-   - Include all calendar days within the range
-
-2. **Calendar Attributes**
-   - Extract year, quarter, month, day components
-   - Calculate week of year and day of week
-   - Identify weekends and holidays
-
-3. **Fiscal Year Calculations**
-   - Define fiscal year starting April 1st
-   - Calculate fiscal quarter and fiscal year
+**Uniqueness Strategy**: Single unique record per calendar date with DATE_KEY as the primary identifier.
 
 **SQL Example**:
 ```sql
 INSERT INTO GOLD.GO_DIM_DATE (
     DATE_KEY,
+    DATE_ID,
     DATE_VALUE,
     YEAR,
     QUARTER,
@@ -142,12 +110,14 @@ INSERT INTO GOLD.GO_DIM_DATE (
     UPDATE_DATE,
     SOURCE_SYSTEM
 )
-WITH date_series AS (
-    SELECT DATEADD(day, ROW_NUMBER() OVER (ORDER BY 1) - 1, '2020-01-01'::DATE) AS date_value
-    FROM TABLE(GENERATOR(ROWCOUNT => 4018)) -- 11 years of dates
+WITH date_range AS (
+    SELECT 
+        DATEADD(DAY, ROW_NUMBER() OVER (ORDER BY NULL) - 1, '2020-01-01'::DATE) AS date_value
+    FROM TABLE(GENERATOR(ROWCOUNT => 3653)) -- 10 years of dates
 )
-SELECT 
+SELECT DISTINCT
     date_value AS DATE_KEY,
+    NULL AS DATE_ID, -- Auto-increment
     date_value AS DATE_VALUE,
     YEAR(date_value) AS YEAR,
     QUARTER(date_value) AS QUARTER,
@@ -158,50 +128,33 @@ SELECT
     DAYNAME(date_value) AS DAY_NAME,
     CASE WHEN DAYOFWEEK(date_value) IN (1, 7) THEN TRUE ELSE FALSE END AS IS_WEEKEND,
     FALSE AS IS_HOLIDAY, -- To be updated with holiday logic
-    CASE 
-        WHEN MONTH(date_value) >= 4 THEN YEAR(date_value)
-        ELSE YEAR(date_value) - 1
-    END AS FISCAL_YEAR,
-    CASE 
-        WHEN MONTH(date_value) IN (4, 5, 6) THEN 1
-        WHEN MONTH(date_value) IN (7, 8, 9) THEN 2
-        WHEN MONTH(date_value) IN (10, 11, 12) THEN 3
-        ELSE 4
-    END AS FISCAL_QUARTER,
+    CASE WHEN MONTH(date_value) >= 4 THEN YEAR(date_value) ELSE YEAR(date_value) - 1 END AS FISCAL_YEAR,
+    CASE WHEN MONTH(date_value) >= 4 THEN QUARTER(date_value) ELSE QUARTER(date_value) + 4 END AS FISCAL_QUARTER,
     WEEKOFYEAR(date_value) AS WEEK_OF_YEAR,
-    CURRENT_DATE AS LOAD_DATE,
-    CURRENT_DATE AS UPDATE_DATE,
+    CURRENT_DATE() AS LOAD_DATE,
+    CURRENT_DATE() AS UPDATE_DATE,
     'SYSTEM_GENERATED' AS SOURCE_SYSTEM
-FROM date_series;
+FROM date_range
+WHERE date_value <= CURRENT_DATE() + INTERVAL '2 years';
 ```
 
 ### 3. GO_DIM_FEATURE - Feature Dimension Transformation
 
-**Source Table**: SILVER.SI_FEATURE_USAGE (distinct features)
+**Rationale**: Transform feature usage data into a standardized feature dimension with unique records per feature, including feature categorization and characteristics.
 
-**Rationale**: Create a comprehensive feature dimension with enhanced categorization and characteristics to support feature adoption and usage analysis.
-
-**Transformation Rules**:
-
-1. **Feature Categorization**
-   - Standardize FEATURE_NAME using lookup tables
-   - Classify features into categories (Communication, Collaboration, Security, etc.)
-   - Determine feature complexity levels
-
-2. **Feature Characteristics**
-   - Identify premium vs. standard features
-   - Set usage frequency categories
-   - Define target user segments
+**Uniqueness Strategy**: One unique record per FEATURE_NAME with standardized naming and categorization.
 
 **SQL Example**:
 ```sql
 INSERT INTO GOLD.GO_DIM_FEATURE (
     FEATURE_KEY,
+    FEATURE_ID,
     FEATURE_NAME,
     FEATURE_CATEGORY,
     FEATURE_TYPE,
     FEATURE_COMPLEXITY,
     IS_PREMIUM_FEATURE,
+    FEATURE_RELEASE_DATE,
     FEATURE_STATUS,
     USAGE_FREQUENCY_CATEGORY,
     FEATURE_DESCRIPTION,
@@ -211,63 +164,61 @@ INSERT INTO GOLD.GO_DIM_FEATURE (
     SOURCE_SYSTEM
 )
 SELECT DISTINCT
-    MD5(UPPER(TRIM(FEATURE_NAME))) AS FEATURE_KEY,
-    INITCAP(TRIM(FEATURE_NAME)) AS FEATURE_NAME,
+    CONCAT('FTR_', UPPER(REPLACE(REPLACE(FEATURE_NAME, ' ', '_'), '-', '_'))) AS FEATURE_KEY,
+    NULL AS FEATURE_ID, -- Auto-increment
+    UPPER(TRIM(FEATURE_NAME)) AS FEATURE_NAME,
     CASE 
-        WHEN UPPER(FEATURE_NAME) LIKE '%SCREEN%SHARE%' THEN 'Collaboration'
-        WHEN UPPER(FEATURE_NAME) LIKE '%RECORD%' THEN 'Recording'
-        WHEN UPPER(FEATURE_NAME) LIKE '%CHAT%' THEN 'Communication'
-        WHEN UPPER(FEATURE_NAME) LIKE '%BREAKOUT%' THEN 'Advanced Meeting'
-        WHEN UPPER(FEATURE_NAME) LIKE '%POLL%' THEN 'Engagement'
-        ELSE 'General'
+        WHEN UPPER(FEATURE_NAME) LIKE '%SCREEN%SHARE%' THEN 'COLLABORATION'
+        WHEN UPPER(FEATURE_NAME) LIKE '%RECORD%' THEN 'RECORDING'
+        WHEN UPPER(FEATURE_NAME) LIKE '%CHAT%' THEN 'COMMUNICATION'
+        WHEN UPPER(FEATURE_NAME) LIKE '%POLL%' THEN 'ENGAGEMENT'
+        WHEN UPPER(FEATURE_NAME) LIKE '%BREAKOUT%' THEN 'MEETING_MANAGEMENT'
+        ELSE 'OTHER'
     END AS FEATURE_CATEGORY,
     CASE 
-        WHEN UPPER(FEATURE_NAME) LIKE '%BASIC%' THEN 'Core'
-        WHEN UPPER(FEATURE_NAME) LIKE '%ADVANCED%' THEN 'Advanced'
-        ELSE 'Standard'
+        WHEN UPPER(FEATURE_NAME) LIKE '%BASIC%' THEN 'BASIC'
+        WHEN UPPER(FEATURE_NAME) LIKE '%ADVANCED%' THEN 'ADVANCED'
+        ELSE 'STANDARD'
     END AS FEATURE_TYPE,
     CASE 
-        WHEN UPPER(FEATURE_NAME) LIKE '%BREAKOUT%' OR UPPER(FEATURE_NAME) LIKE '%POLL%' THEN 'High'
-        WHEN UPPER(FEATURE_NAME) LIKE '%RECORD%' THEN 'Medium'
-        ELSE 'Low'
+        WHEN UPPER(FEATURE_NAME) LIKE '%BREAKOUT%' OR UPPER(FEATURE_NAME) LIKE '%POLL%' THEN 'HIGH'
+        WHEN UPPER(FEATURE_NAME) LIKE '%RECORD%' THEN 'MEDIUM'
+        ELSE 'LOW'
     END AS FEATURE_COMPLEXITY,
     CASE 
         WHEN UPPER(FEATURE_NAME) LIKE '%RECORD%' OR UPPER(FEATURE_NAME) LIKE '%BREAKOUT%' THEN TRUE
         ELSE FALSE
     END AS IS_PREMIUM_FEATURE,
-    'Active' AS FEATURE_STATUS,
-    'Medium' AS USAGE_FREQUENCY_CATEGORY,
-    'Feature usage tracking for ' || FEATURE_NAME AS FEATURE_DESCRIPTION,
-    'All Users' AS TARGET_USER_SEGMENT,
-    CURRENT_DATE AS LOAD_DATE,
-    CURRENT_DATE AS UPDATE_DATE,
+    DATE('2020-01-01') AS FEATURE_RELEASE_DATE, -- Default, to be updated
+    'ACTIVE' AS FEATURE_STATUS,
+    'MEDIUM' AS USAGE_FREQUENCY_CATEGORY, -- To be calculated from usage data
+    CONCAT('Feature for ', FEATURE_NAME) AS FEATURE_DESCRIPTION,
+    'ALL_USERS' AS TARGET_USER_SEGMENT,
+    CURRENT_DATE() AS LOAD_DATE,
+    CURRENT_DATE() AS UPDATE_DATE,
     SOURCE_SYSTEM
-FROM SILVER.SI_FEATURE_USAGE
-WHERE VALIDATION_STATUS = 'PASSED'
-  AND FEATURE_NAME IS NOT NULL;
+FROM (
+    SELECT DISTINCT 
+        FEATURE_NAME,
+        SOURCE_SYSTEM
+    FROM SILVER.SI_FEATURE_USAGE
+    WHERE VALIDATION_STATUS = 'PASSED'
+      AND FEATURE_NAME IS NOT NULL
+      AND TRIM(FEATURE_NAME) != ''
+);
 ```
 
 ### 4. GO_DIM_LICENSE - License Dimension Transformation
 
-**Source Table**: SILVER.SI_LICENSES
+**Rationale**: Create a comprehensive license dimension with unique records per license type, including pricing and entitlement information.
 
-**Rationale**: Transform license data to create a comprehensive license dimension with enhanced attributes for license utilization and revenue analysis.
-
-**Transformation Rules**:
-
-1. **License Categorization**
-   - Standardize LICENSE_TYPE values
-   - Create LICENSE_CATEGORY and LICENSE_TIER hierarchies
-   - Define license characteristics and limits
-
-2. **Pricing Information**
-   - Add monthly and annual pricing based on license type
-   - Include feature entitlements
+**Uniqueness Strategy**: One unique record per LICENSE_TYPE with current record flag for SCD Type 2 implementation.
 
 **SQL Example**:
 ```sql
 INSERT INTO GOLD.GO_DIM_LICENSE (
     LICENSE_KEY,
+    LICENSE_ID,
     LICENSE_TYPE,
     LICENSE_CATEGORY,
     LICENSE_TIER,
@@ -288,44 +239,54 @@ INSERT INTO GOLD.GO_DIM_LICENSE (
     SOURCE_SYSTEM
 )
 SELECT DISTINCT
-    MD5(UPPER(TRIM(LICENSE_TYPE))) AS LICENSE_KEY,
-    INITCAP(TRIM(LICENSE_TYPE)) AS LICENSE_TYPE,
+    CONCAT('LIC_', UPPER(REPLACE(LICENSE_TYPE, ' ', '_'))) AS LICENSE_KEY,
+    NULL AS LICENSE_ID, -- Auto-increment
+    UPPER(TRIM(LICENSE_TYPE)) AS LICENSE_TYPE,
     CASE 
-        WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 'Standard'
-        WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 'Professional'
-        WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 'Enterprise'
-        ELSE 'Other'
+        WHEN UPPER(LICENSE_TYPE) LIKE '%FREE%' THEN 'FREE'
+        WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 'BASIC'
+        WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 'PROFESSIONAL'
+        WHEN UPPER(LICENSE_TYPE) LIKE '%BUSINESS%' OR UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 'ENTERPRISE'
+        ELSE 'OTHER'
     END AS LICENSE_CATEGORY,
     CASE 
-        WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 'Tier 1'
-        WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 'Tier 2'
-        WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 'Tier 3'
-        ELSE 'Tier 0'
+        WHEN UPPER(LICENSE_TYPE) LIKE '%FREE%' THEN 'TIER_0'
+        WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 'TIER_1'
+        WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 'TIER_2'
+        WHEN UPPER(LICENSE_TYPE) LIKE '%BUSINESS%' THEN 'TIER_3'
+        WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 'TIER_4'
+        ELSE 'TIER_UNKNOWN'
     END AS LICENSE_TIER,
     CASE 
+        WHEN UPPER(LICENSE_TYPE) LIKE '%FREE%' THEN 100
         WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 100
         WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 500
-        WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 1000
-        ELSE 50
+        WHEN UPPER(LICENSE_TYPE) LIKE '%BUSINESS%' THEN 1000
+        WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 10000
+        ELSE 100
     END AS MAX_PARTICIPANTS,
     CASE 
-        WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 5
+        WHEN UPPER(LICENSE_TYPE) LIKE '%FREE%' THEN 5
+        WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 10
         WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 100
-        WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 1000
-        ELSE 1
+        WHEN UPPER(LICENSE_TYPE) LIKE '%BUSINESS%' THEN 1000
+        WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 10000
+        ELSE 5
     END AS STORAGE_LIMIT_GB,
     CASE 
-        WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 40
+        WHEN UPPER(LICENSE_TYPE) LIKE '%FREE%' THEN 0
+        WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 10
         WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 100
-        WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 500
+        WHEN UPPER(LICENSE_TYPE) LIKE '%BUSINESS%' THEN 1000
+        WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 10000
         ELSE 0
     END AS RECORDING_LIMIT_HOURS,
     CASE 
-        WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN TRUE
+        WHEN UPPER(LICENSE_TYPE) LIKE '%BUSINESS%' OR UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN TRUE
         ELSE FALSE
     END AS ADMIN_FEATURES_INCLUDED,
     CASE 
-        WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' OR UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN TRUE
+        WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' OR UPPER(LICENSE_TYPE) LIKE '%BUSINESS%' OR UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN TRUE
         ELSE FALSE
     END AS API_ACCESS_INCLUDED,
     CASE 
@@ -333,50 +294,46 @@ SELECT DISTINCT
         ELSE FALSE
     END AS SSO_SUPPORT_INCLUDED,
     CASE 
+        WHEN UPPER(LICENSE_TYPE) LIKE '%FREE%' THEN 0.00
         WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 14.99
         WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 19.99
-        WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 39.99
+        WHEN UPPER(LICENSE_TYPE) LIKE '%BUSINESS%' THEN 29.99
+        WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 49.99
         ELSE 0.00
     END AS MONTHLY_PRICE,
     CASE 
+        WHEN UPPER(LICENSE_TYPE) LIKE '%FREE%' THEN 0.00
         WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 149.90
         WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 199.90
-        WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 399.90
+        WHEN UPPER(LICENSE_TYPE) LIKE '%BUSINESS%' THEN 299.90
+        WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 499.90
         ELSE 0.00
     END AS ANNUAL_PRICE,
-    'Standard license benefits for ' || LICENSE_TYPE AS LICENSE_BENEFITS,
-    START_DATE AS EFFECTIVE_START_DATE,
-    END_DATE AS EFFECTIVE_END_DATE,
+    CONCAT('Benefits for ', LICENSE_TYPE, ' license') AS LICENSE_BENEFITS,
+    MIN(START_DATE) AS EFFECTIVE_START_DATE,
+    DATE('9999-12-31') AS EFFECTIVE_END_DATE,
     TRUE AS IS_CURRENT_RECORD,
-    CURRENT_DATE AS LOAD_DATE,
-    CURRENT_DATE AS UPDATE_DATE,
+    CURRENT_DATE() AS LOAD_DATE,
+    CURRENT_DATE() AS UPDATE_DATE,
     SOURCE_SYSTEM
 FROM SILVER.SI_LICENSES
-WHERE VALIDATION_STATUS = 'PASSED';
+WHERE VALIDATION_STATUS = 'PASSED'
+  AND LICENSE_TYPE IS NOT NULL
+  AND TRIM(LICENSE_TYPE) != ''
+GROUP BY LICENSE_TYPE, SOURCE_SYSTEM;
 ```
 
 ### 5. GO_DIM_MEETING - Meeting Dimension Transformation
 
-**Source Table**: SILVER.SI_MEETINGS
+**Rationale**: Transform meeting data into a meeting dimension focusing on meeting characteristics and categorization, ensuring unique records per meeting type combination.
 
-**Rationale**: Create a meeting dimension with enhanced categorization and derived attributes to support meeting pattern analysis and usage insights.
-
-**Transformation Rules**:
-
-1. **Meeting Categorization**
-   - Classify meetings by duration (Brief, Standard, Extended)
-   - Categorize by time of day and day of week
-   - Identify recurring vs. one-time meetings
-
-2. **Derived Attributes**
-   - Calculate meeting quality scores
-   - Determine typical features used
-   - Classify business purpose
+**Uniqueness Strategy**: Unique records based on meeting characteristic combinations rather than individual meeting instances.
 
 **SQL Example**:
 ```sql
 INSERT INTO GOLD.GO_DIM_MEETING (
     MEETING_KEY,
+    MEETING_ID,
     MEETING_TYPE,
     MEETING_CATEGORY,
     DURATION_CATEGORY,
@@ -386,72 +343,78 @@ INSERT INTO GOLD.GO_DIM_MEETING (
     IS_WEEKEND,
     IS_RECURRING,
     MEETING_QUALITY_SCORE,
+    TYPICAL_FEATURES_USED,
     BUSINESS_PURPOSE,
     LOAD_DATE,
     UPDATE_DATE,
     SOURCE_SYSTEM
 )
-SELECT 
-    MD5(MEETING_ID) AS MEETING_KEY,
-    'Standard Meeting' AS MEETING_TYPE,
-    CASE 
-        WHEN DURATION_MINUTES <= 15 THEN 'Quick Sync'
-        WHEN DURATION_MINUTES <= 60 THEN 'Standard Meeting'
-        WHEN DURATION_MINUTES <= 120 THEN 'Extended Meeting'
-        ELSE 'Long Session'
-    END AS MEETING_CATEGORY,
-    CASE 
-        WHEN DURATION_MINUTES <= 15 THEN 'Brief'
-        WHEN DURATION_MINUTES <= 60 THEN 'Standard'
-        WHEN DURATION_MINUTES <= 120 THEN 'Extended'
-        ELSE 'Long'
-    END AS DURATION_CATEGORY,
-    'Unknown' AS PARTICIPANT_SIZE_CATEGORY,
-    CASE 
-        WHEN HOUR(START_TIME) BETWEEN 6 AND 11 THEN 'Morning'
-        WHEN HOUR(START_TIME) BETWEEN 12 AND 17 THEN 'Afternoon'
-        WHEN HOUR(START_TIME) BETWEEN 18 AND 21 THEN 'Evening'
-        ELSE 'Night'
-    END AS TIME_OF_DAY_CATEGORY,
-    DAYNAME(START_TIME) AS DAY_OF_WEEK,
-    CASE WHEN DAYOFWEEK(START_TIME) IN (1, 7) THEN TRUE ELSE FALSE END AS IS_WEEKEND,
-    FALSE AS IS_RECURRING, -- To be enhanced with recurring meeting logic
-    CASE 
-        WHEN DATA_QUALITY_SCORE >= 90 THEN 9.0
-        WHEN DATA_QUALITY_SCORE >= 80 THEN 8.0
-        WHEN DATA_QUALITY_SCORE >= 70 THEN 7.0
-        ELSE 6.0
-    END AS MEETING_QUALITY_SCORE,
-    'Business Meeting' AS BUSINESS_PURPOSE,
-    CURRENT_DATE AS LOAD_DATE,
-    CURRENT_DATE AS UPDATE_DATE,
+WITH meeting_characteristics AS (
+    SELECT DISTINCT
+        'STANDARD' AS MEETING_TYPE,
+        'BUSINESS' AS MEETING_CATEGORY,
+        CASE 
+            WHEN DURATION_MINUTES <= 15 THEN 'SHORT'
+            WHEN DURATION_MINUTES <= 60 THEN 'MEDIUM'
+            WHEN DURATION_MINUTES <= 180 THEN 'LONG'
+            ELSE 'EXTENDED'
+        END AS DURATION_CATEGORY,
+        'SMALL' AS PARTICIPANT_SIZE_CATEGORY, -- To be enhanced with actual participant data
+        CASE 
+            WHEN HOUR(START_TIME) BETWEEN 6 AND 11 THEN 'MORNING'
+            WHEN HOUR(START_TIME) BETWEEN 12 AND 17 THEN 'AFTERNOON'
+            WHEN HOUR(START_TIME) BETWEEN 18 AND 22 THEN 'EVENING'
+            ELSE 'NIGHT'
+        END AS TIME_OF_DAY_CATEGORY,
+        DAYNAME(START_TIME) AS DAY_OF_WEEK,
+        CASE WHEN DAYOFWEEK(START_TIME) IN (1, 7) THEN TRUE ELSE FALSE END AS IS_WEEKEND,
+        FALSE AS IS_RECURRING, -- Default value
+        8.5 AS MEETING_QUALITY_SCORE, -- Default value
+        'SCREEN_SHARE,CHAT' AS TYPICAL_FEATURES_USED,
+        'GENERAL_MEETING' AS BUSINESS_PURPOSE,
+        SOURCE_SYSTEM
+    FROM SILVER.SI_MEETINGS
+    WHERE VALIDATION_STATUS = 'PASSED'
+      AND DURATION_MINUTES > 0
+      AND START_TIME IS NOT NULL
+)
+SELECT DISTINCT
+    CONCAT('MTG_', 
+           REPLACE(MEETING_TYPE, ' ', '_'), '_',
+           REPLACE(MEETING_CATEGORY, ' ', '_'), '_',
+           DURATION_CATEGORY, '_',
+           PARTICIPANT_SIZE_CATEGORY, '_',
+           TIME_OF_DAY_CATEGORY
+    ) AS MEETING_KEY,
+    NULL AS MEETING_ID, -- Auto-increment
+    MEETING_TYPE,
+    MEETING_CATEGORY,
+    DURATION_CATEGORY,
+    PARTICIPANT_SIZE_CATEGORY,
+    TIME_OF_DAY_CATEGORY,
+    DAY_OF_WEEK,
+    IS_WEEKEND,
+    IS_RECURRING,
+    MEETING_QUALITY_SCORE,
+    TYPICAL_FEATURES_USED,
+    BUSINESS_PURPOSE,
+    CURRENT_DATE() AS LOAD_DATE,
+    CURRENT_DATE() AS UPDATE_DATE,
     SOURCE_SYSTEM
-FROM SILVER.SI_MEETINGS
-WHERE VALIDATION_STATUS = 'PASSED';
+FROM meeting_characteristics;
 ```
 
 ### 6. GO_DIM_SUPPORT_CATEGORY - Support Category Dimension Transformation
 
-**Source Table**: SILVER.SI_SUPPORT_TICKETS (distinct categories)
+**Rationale**: Create a comprehensive support category dimension with unique records per support category, including SLA and resolution characteristics.
 
-**Rationale**: Create a comprehensive support category dimension with enhanced attributes for support performance analysis and SLA management.
-
-**Transformation Rules**:
-
-1. **Category Standardization**
-   - Standardize TICKET_TYPE values
-   - Create category hierarchies
-   - Define priority levels and SLA targets
-
-2. **Support Characteristics**
-   - Set expected resolution times
-   - Identify escalation requirements
-   - Define self-service availability
+**Uniqueness Strategy**: One unique record per SUPPORT_CATEGORY and SUPPORT_SUBCATEGORY combination.
 
 **SQL Example**:
 ```sql
 INSERT INTO GOLD.GO_DIM_SUPPORT_CATEGORY (
     SUPPORT_CATEGORY_KEY,
+    SUPPORT_CATEGORY_ID,
     SUPPORT_CATEGORY,
     SUPPORT_SUBCATEGORY,
     PRIORITY_LEVEL,
@@ -459,6 +422,7 @@ INSERT INTO GOLD.GO_DIM_SUPPORT_CATEGORY (
     REQUIRES_ESCALATION,
     SELF_SERVICE_AVAILABLE,
     KNOWLEDGE_BASE_ARTICLES,
+    COMMON_RESOLUTION_STEPS,
     CUSTOMER_IMPACT_LEVEL,
     DEPARTMENT_RESPONSIBLE,
     SLA_TARGET_HOURS,
@@ -467,156 +431,187 @@ INSERT INTO GOLD.GO_DIM_SUPPORT_CATEGORY (
     SOURCE_SYSTEM
 )
 SELECT DISTINCT
-    MD5(UPPER(TRIM(TICKET_TYPE))) AS SUPPORT_CATEGORY_KEY,
-    INITCAP(TRIM(TICKET_TYPE)) AS SUPPORT_CATEGORY,
+    CONCAT('SUP_', UPPER(REPLACE(TICKET_TYPE, ' ', '_'))) AS SUPPORT_CATEGORY_KEY,
+    NULL AS SUPPORT_CATEGORY_ID, -- Auto-increment
+    UPPER(TRIM(TICKET_TYPE)) AS SUPPORT_CATEGORY,
     CASE 
-        WHEN UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN 'Technical Issue'
-        WHEN UPPER(TICKET_TYPE) LIKE '%BILLING%' THEN 'Billing Inquiry'
-        WHEN UPPER(TICKET_TYPE) LIKE '%FEATURE%' THEN 'Feature Request'
-        ELSE 'General Support'
+        WHEN UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN 'TECHNICAL_ISSUE'
+        WHEN UPPER(TICKET_TYPE) LIKE '%BILLING%' THEN 'BILLING_INQUIRY'
+        WHEN UPPER(TICKET_TYPE) LIKE '%FEATURE%' THEN 'FEATURE_REQUEST'
+        WHEN UPPER(TICKET_TYPE) LIKE '%ACCOUNT%' THEN 'ACCOUNT_MANAGEMENT'
+        ELSE 'GENERAL_INQUIRY'
     END AS SUPPORT_SUBCATEGORY,
     CASE 
-        WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' THEN 'Critical'
-        WHEN UPPER(TICKET_TYPE) LIKE '%URGENT%' THEN 'High'
-        WHEN UPPER(TICKET_TYPE) LIKE '%BILLING%' THEN 'Medium'
-        ELSE 'Low'
+        WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' OR UPPER(TICKET_TYPE) LIKE '%URGENT%' THEN 'HIGH'
+        WHEN UPPER(TICKET_TYPE) LIKE '%BILLING%' THEN 'MEDIUM'
+        ELSE 'LOW'
     END AS PRIORITY_LEVEL,
     CASE 
         WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' THEN 4.0
-        WHEN UPPER(TICKET_TYPE) LIKE '%URGENT%' THEN 24.0
+        WHEN UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN 24.0
         WHEN UPPER(TICKET_TYPE) LIKE '%BILLING%' THEN 48.0
         ELSE 72.0
     END AS EXPECTED_RESOLUTION_TIME_HOURS,
     CASE 
-        WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' THEN TRUE
+        WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' OR UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN TRUE
         ELSE FALSE
     END AS REQUIRES_ESCALATION,
     CASE 
-        WHEN UPPER(TICKET_TYPE) LIKE '%BILLING%' OR UPPER(TICKET_TYPE) LIKE '%FEATURE%' THEN TRUE
+        WHEN UPPER(TICKET_TYPE) LIKE '%BILLING%' OR UPPER(TICKET_TYPE) LIKE '%ACCOUNT%' THEN TRUE
         ELSE FALSE
     END AS SELF_SERVICE_AVAILABLE,
     CASE 
-        WHEN UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN 15
-        WHEN UPPER(TICKET_TYPE) LIKE '%BILLING%' THEN 10
+        WHEN UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN 25
+        WHEN UPPER(TICKET_TYPE) LIKE '%BILLING%' THEN 15
+        WHEN UPPER(TICKET_TYPE) LIKE '%FEATURE%' THEN 10
         ELSE 5
     END AS KNOWLEDGE_BASE_ARTICLES,
+    CONCAT('Standard resolution steps for ', TICKET_TYPE) AS COMMON_RESOLUTION_STEPS,
     CASE 
-        WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' THEN 'High'
-        WHEN UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN 'Medium'
-        ELSE 'Low'
+        WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' THEN 'HIGH'
+        WHEN UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN 'MEDIUM'
+        ELSE 'LOW'
     END AS CUSTOMER_IMPACT_LEVEL,
     CASE 
-        WHEN UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN 'Technical Support'
-        WHEN UPPER(TICKET_TYPE) LIKE '%BILLING%' THEN 'Billing Department'
-        ELSE 'Customer Success'
+        WHEN UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN 'TECHNICAL_SUPPORT'
+        WHEN UPPER(TICKET_TYPE) LIKE '%BILLING%' THEN 'BILLING_DEPARTMENT'
+        WHEN UPPER(TICKET_TYPE) LIKE '%FEATURE%' THEN 'PRODUCT_MANAGEMENT'
+        ELSE 'CUSTOMER_SUCCESS'
     END AS DEPARTMENT_RESPONSIBLE,
     CASE 
         WHEN UPPER(TICKET_TYPE) LIKE '%CRITICAL%' THEN 4.0
-        WHEN UPPER(TICKET_TYPE) LIKE '%URGENT%' THEN 24.0
+        WHEN UPPER(TICKET_TYPE) LIKE '%TECHNICAL%' THEN 24.0
         WHEN UPPER(TICKET_TYPE) LIKE '%BILLING%' THEN 48.0
         ELSE 72.0
     END AS SLA_TARGET_HOURS,
-    CURRENT_DATE AS LOAD_DATE,
-    CURRENT_DATE AS UPDATE_DATE,
+    CURRENT_DATE() AS LOAD_DATE,
+    CURRENT_DATE() AS UPDATE_DATE,
     SOURCE_SYSTEM
-FROM SILVER.SI_SUPPORT_TICKETS
-WHERE VALIDATION_STATUS = 'PASSED'
-  AND TICKET_TYPE IS NOT NULL;
+FROM (
+    SELECT DISTINCT 
+        TICKET_TYPE,
+        SOURCE_SYSTEM
+    FROM SILVER.SI_SUPPORT_TICKETS
+    WHERE VALIDATION_STATUS = 'PASSED'
+      AND TICKET_TYPE IS NOT NULL
+      AND TRIM(TICKET_TYPE) != ''
+);
 ```
 
-## Data Quality and Validation Rules
+## Data Quality and Uniqueness Validation Rules
 
-### 1. Data Integrity Checks
+### 1. Duplicate Detection and Prevention
 
-1. **Null Value Handling**
-   - Replace NULL values with appropriate defaults
-   - Flag records with critical missing data
-   - Implement data quality scoring
+**Rule**: Implement QUALIFY clauses with ROW_NUMBER() window functions to ensure only the most recent or relevant record is selected for each unique combination of dimension attributes.
 
-2. **Data Type Validation**
-   - Ensure proper data type conversions
-   - Validate date formats and ranges
-   - Check numeric precision and scale
+**SQL Pattern**:
+```sql
+QUALIFY ROW_NUMBER() OVER (PARTITION BY [unique_key_columns] ORDER BY [priority_columns] DESC) = 1
+```
 
-3. **Business Rule Validation**
-   - Validate plan type against allowed values
-   - Check date logical consistency
-   - Ensure referential integrity
+### 2. Data Standardization Rules
 
-### 2. Standardization Rules
+1. **String Standardization**: Apply UPPER() and TRIM() functions to ensure consistent casing and remove leading/trailing spaces
+2. **Date Standardization**: Convert all timestamps to consistent date formats using DATE() function
+3. **Categorical Standardization**: Use CASE statements to map variations to standard category values
+4. **Null Handling**: Replace NULL values with appropriate defaults or 'UNKNOWN' placeholders
 
-1. **Text Standardization**
-   - Apply consistent casing (INITCAP for names)
-   - Trim whitespace and remove special characters
-   - Standardize company names using lookup tables
+### 3. Referential Integrity Validation
 
-2. **Code Standardization**
-   - Map legacy codes to standard values
-   - Implement consistent categorization
-   - Apply business rule-based transformations
+**Rule**: Validate that all foreign key references exist in their respective dimension tables before inserting fact records.
 
-### 3. Enrichment Rules
+**SQL Example**:
+```sql
+-- Validate user references before fact table insert
+WHERE EXISTS (
+    SELECT 1 FROM GOLD.GO_DIM_USER u 
+    WHERE u.USER_KEY = source.USER_KEY 
+    AND u.IS_CURRENT_RECORD = TRUE
+)
+```
 
-1. **Derived Attributes**
-   - Calculate age and tenure fields
-   - Create segmentation categories
-   - Generate composite keys and flags
+### 4. Slowly Changing Dimension (SCD) Implementation
 
-2. **Lookup Enrichment**
-   - Add geographic information
-   - Include industry classifications
-   - Append pricing and feature details
+**Type 1 SCD**: For attributes that should be updated in place (e.g., user status, contact information)
+**Type 2 SCD**: For attributes that require historical tracking (e.g., plan changes, company changes)
 
-## Performance Optimization
+**SQL Pattern for SCD Type 2**:
+```sql
+-- Close existing record
+UPDATE GOLD.GO_DIM_USER 
+SET EFFECTIVE_END_DATE = CURRENT_DATE() - 1,
+    IS_CURRENT_RECORD = FALSE
+WHERE USER_ID = :user_id 
+  AND IS_CURRENT_RECORD = TRUE;
 
-### 1. Indexing Strategy
+-- Insert new record
+INSERT INTO GOLD.GO_DIM_USER (...)
+VALUES (..., CURRENT_DATE(), '9999-12-31', TRUE, ...);
+```
 
-1. **Primary Keys**
-   - Create unique indexes on surrogate keys
-   - Implement clustering on frequently joined columns
+## Performance Optimization Recommendations
 
-2. **Foreign Key Optimization**
-   - Index foreign key columns in fact tables
-   - Optimize join performance with proper clustering
+### 1. Clustering Keys
 
-### 2. Partitioning Strategy
+**Recommendation**: Implement clustering on frequently queried columns to improve query performance.
 
-1. **Date-based Partitioning**
-   - Partition large dimensions by effective date
-   - Implement time-based data retention
+**SQL Examples**:
+```sql
+ALTER TABLE GOLD.GO_DIM_USER CLUSTER BY (USER_KEY, IS_CURRENT_RECORD);
+ALTER TABLE GOLD.GO_DIM_DATE CLUSTER BY (DATE_KEY);
+ALTER TABLE GOLD.GO_DIM_FEATURE CLUSTER BY (FEATURE_KEY, FEATURE_CATEGORY);
+```
 
-2. **Category-based Partitioning**
-   - Partition by major category attributes
-   - Optimize query performance for common filters
+### 2. Incremental Loading Strategy
 
-## Monitoring and Maintenance
+**Recommendation**: Implement incremental loading using MERGE statements to handle both inserts and updates efficiently.
 
-### 1. Data Quality Monitoring
+**SQL Pattern**:
+```sql
+MERGE INTO GOLD.GO_DIM_USER AS target
+USING (
+    -- Source query with transformation logic
+) AS source
+ON target.USER_ID = source.USER_ID 
+   AND target.IS_CURRENT_RECORD = TRUE
+WHEN MATCHED AND (target.PLAN_TYPE != source.PLAN_TYPE OR target.COMPANY != source.COMPANY) THEN
+    UPDATE SET 
+        EFFECTIVE_END_DATE = CURRENT_DATE() - 1,
+        IS_CURRENT_RECORD = FALSE
+WHEN NOT MATCHED THEN
+    INSERT (...) VALUES (...);
+```
 
-1. **Quality Metrics**
-   - Track completeness, accuracy, and consistency
-   - Monitor transformation success rates
-   - Alert on data quality degradation
+## Monitoring and Validation
 
-2. **Validation Reporting**
-   - Generate daily data quality reports
-   - Track transformation performance metrics
-   - Monitor SLA compliance
+### 1. Data Quality Checks
 
-### 2. Dimension Maintenance
+**Daily Validation Queries**:
+```sql
+-- Check for duplicate records in dimension tables
+SELECT 
+    'GO_DIM_USER' AS table_name,
+    COUNT(*) AS total_records,
+    COUNT(DISTINCT USER_KEY) AS unique_keys,
+    COUNT(*) - COUNT(DISTINCT USER_KEY) AS duplicate_count
+FROM GOLD.GO_DIM_USER
+WHERE IS_CURRENT_RECORD = TRUE;
 
-1. **Slowly Changing Dimensions**
-   - Implement Type 1 and Type 2 SCD logic
-   - Maintain historical accuracy
-   - Manage effective date ranges
+-- Validate referential integrity
+SELECT COUNT(*) AS orphaned_records
+FROM GOLD.GO_FACT_MEETING_ACTIVITY f
+LEFT JOIN GOLD.GO_DIM_USER u ON f.USER_KEY = u.USER_KEY AND u.IS_CURRENT_RECORD = TRUE
+WHERE u.USER_KEY IS NULL;
+```
 
-2. **Reference Data Management**
-   - Update lookup tables regularly
-   - Maintain code mappings
-   - Synchronize with source systems
+### 2. Automated Alerts
+
+**Set up alerts for**:
+1. Duplicate key violations
+2. Referential integrity failures
+3. Unexpected data volume changes
+4. Data quality score degradation
 
 ## Conclusion
 
-These transformation rules ensure that Gold layer dimension tables are optimized for analytics and reporting while maintaining data integrity and consistency. The rules support both initial data loading and ongoing incremental updates, providing a robust foundation for the Zoom Platform Analytics System.
-
-All transformations include comprehensive error handling, data quality validation, and performance optimization to ensure reliable and efficient data processing in the Gold layer.
+These transformation rules ensure that each Gold layer dimension table maintains unique row values for every unique combination of defining attributes while supporting comprehensive analytics and reporting requirements. The implementation focuses on data quality, performance optimization, and maintainability to support the Zoom Platform Analytics System's analytical needs.
