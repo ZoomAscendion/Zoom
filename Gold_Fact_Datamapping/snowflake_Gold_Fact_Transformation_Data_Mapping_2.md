@@ -2,7 +2,7 @@ _____________________________________________
 ## *Author*: AAVA
 ## *Created on*: 2024-12-19
 ## *Description*: Comprehensive data mapping for Fact tables in Gold Layer with unique row constraints and data integrity validation
-## *Version*: 1
+## *Version*: 2
 ## *Updated on*: 2024-12-19
 ## *Changes*: Initial creation with comprehensive uniqueness validation rules and constraints to ensure every fact table row has unique values based on defining attributes
 _____________________________________________
