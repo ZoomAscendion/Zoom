@@ -1,0 +1,90 @@
+# packages.yml for Zoom Platform Analytics Gold Layer
+# Author: Data Engineering Team
+# Created: 2024-12-19
+# Description: DBT packages configuration for enhanced functionality and utilities
+
+packages:
+  # dbt-utils: Essential utilities for data transformations
+  - package: dbt-labs/dbt_utils
+    version: [">=1.0.0", "<2.0.0"]
+    
+  # dbt-expectations: Data quality testing framework
+  - package: calogica/dbt_expectations
+    version: [">=0.10.0", "<1.0.0"]
+    
+  # dbt-audit-helper: Audit and data comparison utilities
+  - package: dbt-labs/audit_helper
+    version: [">=0.9.0", "<1.0.0"]
+    
+  # dbt-codegen: Code generation utilities
+  - package: dbt-labs/codegen
+    version: [">=0.12.0", "<1.0.0"]
+    
+  # dbt-date: Date manipulation utilities
+  - package: calogica/dbt_date
+    version: [">=0.9.0", "<1.0.0"]
+    
+  # dbt-snowflake-utils: Snowflake-specific utilities
+  - package: dbt-labs/snowflake_utils
+    version: [">=0.3.0", "<1.0.0"]
+    
+  # dbt-meta-testing: Enhanced testing capabilities
+  - package: tnightengale/dbt_meta_testing
+    version: [">=0.3.0", "<1.0.0"]
+    
+  # dbt-external-tables: External table management
+  - package: dbt-labs/dbt_external_tables
+    version: [">=0.8.0", "<1.0.0"]
+    
+  # dbt-project-evaluator: Project health and best practices
+  - package: dbt-labs/dbt_project_evaluator
+    version: [">=0.8.0", "<1.0.0"]
+    
+  # re-data: Data reliability and monitoring
+  - package: re-data/re_data
+    version: [">=1.4.0", "<2.0.0"]
+
+# Package-specific configurations
+vars:
+  # dbt-utils configurations
+  dbt_utils:
+    dispatch_list: ['dbt_utils']
+    
+  # dbt-expectations configurations
+  dbt_expectations:
+    test_store_failures: true
+    test_warn_if: ">0"
+    test_error_if: ">10"
+    
+  # dbt-date configurations
+  dbt_date:
+    time_zone: 'UTC'
+    
+  # dbt-audit-helper configurations
+  audit_helper:
+    store_test_results: true
+    
+  # re-data configurations
+  re_data:
+    monitoring_schema: 'gold_monitoring'
+    anomaly_detection: true
+    
+  # dbt-project-evaluator configurations
+  dbt_project_evaluator:
+    exclude_packages_from_project_evaluator: false
+    exclude_paths_from_project_evaluator: ['target/', 'dbt_packages/']
+    
+  # Snowflake-utils configurations
+  snowflake_utils:
+    warehouse: 'WH_POC_ZOOM_DEV_XSMALL'
+    database: 'DB_POC_ZOOM'
+    
+  # External tables configurations
+  dbt_external_tables:
+    file_format: 'parquet'
+    location: 's3://zoom-analytics-data/'
+    
+  # Meta testing configurations
+  dbt_meta_testing:
+    test_coverage_target: 80
+    documentation_coverage_target: 90
