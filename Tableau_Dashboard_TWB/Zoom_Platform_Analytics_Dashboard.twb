@@ -237,29 +237,23 @@
       <aliases enabled='yes' />
       <column caption='Activity Month' datatype='date' name='[ACTIVITY_MONTH]' role='dimension' type='ordinal' />
       <column caption='Average Meeting Quality' datatype='real' name='[AVERAGE_MEETING_QUALITY]' role='measure' type='quantitative' />
-      <column caption='Total Users KPI' datatype='integer' name='[Calculation_Total_Users]' role='measure' type='quantitative'>
+      <column caption='Total Number of Users' datatype='integer' name='[Calculation_A1B2C3D4E5F6A7B8]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='COUNTD([USER_ID])' />
       </column>
-      <column caption='Average Meeting Duration' datatype='real' name='[Calculation_Avg_Duration]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='AVG([TOTAL_HOSTING_MINUTES])' />
+      <column caption='Average Meeting Duration' datatype='real' name='[Calculation_B2C3D4E5F6A7B8C9]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([TOTAL_HOSTING_MINUTES] + [TOTAL_ATTENDANCE_MINUTES])' />
       </column>
-      <column caption='Meeting Duration Bands' datatype='string' name='[Calculation_Duration_Bands]' role='dimension' type='nominal'>
-        <calculation class='tableau' formula='IF [TOTAL_HOSTING_MINUTES] &lt;= 30 THEN &quot;Short (≤30 min)&quot; ELSEIF [TOTAL_HOSTING_MINUTES] &lt;= 60 THEN &quot;Medium (31-60 min)&quot; ELSE &quot;Long (&gt;60 min)&quot; END' />
-      </column>
-      <column caption='User Engagement Score' datatype='real' name='[Calculation_Engagement_Score]' role='measure' type='quantitative'>
+      <column caption='User Engagement Score' datatype='real' name='[Calculation_C3D4E5F6A7B8C9D0]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='AVG([AVERAGE_MEETING_QUALITY]) * LOG(SUM([MEETINGS_HOSTED]) + 1)' />
       </column>
-      <column caption='Meetings per User' datatype='integer' name='[Calculation_Meetings_Per_User]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='{FIXED [USER_ID]: SUM([MEETINGS_HOSTED])}' />
+      <column caption='Meeting Frequency per User' datatype='real' name='[Calculation_D4E5F6A7B8C9D0E1]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='{FIXED [USER_ID]: SUM([MEETINGS_HOSTED]) + SUM([MEETINGS_ATTENDED])}' />
       </column>
-      <column caption='User Segments' datatype='string' name='[Calculation_User_Segments]' role='dimension' type='nominal'>
-        <calculation class='tableau' formula='IF [Calculation_Meetings_Per_User] &lt;= 5 THEN &quot;Light Users&quot; ELSEIF [Calculation_Meetings_Per_User] &lt;= 20 THEN &quot;Regular Users&quot; ELSE &quot;Power Users&quot; END' />
+      <column caption='User Activity Ratio' datatype='real' name='[Calculation_E5F6A7B8C9D0E1F2]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([MEETINGS_HOSTED]) / NULLIF(SUM([MEETINGS_ATTENDED]), 0)' />
       </column>
-      <column caption='Feature Adoption Rate' datatype='real' name='[Calculation_Feature_Adoption]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNTD([USER_ID]) / TOTAL(COUNTD([USER_ID]))' />
-      </column>
-      <column caption='7-Day Moving Average' datatype='real' name='[Calculation_Moving_Avg]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='WINDOW_AVG(SUM([MEETINGS_HOSTED]),-6,0)' />
+      <column caption='Department Engagement Level' datatype='string' name='[Calculation_F6A7B8C9D0E1F2A3]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='IF AVG([AVERAGE_MEETING_QUALITY]) &gt;= 4.0 THEN &quot;High Engagement&quot; ELSEIF AVG([AVERAGE_MEETING_QUALITY]) &gt;= 3.0 THEN &quot;Medium Engagement&quot; ELSE &quot;Low Engagement&quot; END' />
       </column>
       <column caption='Department Name' datatype='string' name='[DEPARTMENT_NAME]' role='dimension' type='nominal' />
       <column caption='Email Address' datatype='string' name='[EMAIL_ADDRESS]' role='dimension' type='nominal' />
@@ -301,11 +295,11 @@
             <datasource caption='VW_USER_ACTIVITY (DB_POC_ZOOM.VW_USER_ACTIVITY) (GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
           </datasources>
           <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
-            <column caption='Total Users KPI' datatype='integer' name='[Calculation_Total_Users]' role='measure' type='quantitative'>
+            <column caption='Total Number of Users' datatype='integer' name='[Calculation_A1B2C3D4E5F6A7B8]' role='measure' type='quantitative'>
               <calculation class='tableau' formula='COUNTD([USER_ID])' />
             </column>
             <column caption='User Id' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
-            <column-instance column='[Calculation_Total_Users]' derivation='User' name='[usr:Calculation_Total_Users:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_A1B2C3D4E5F6A7B8]' derivation='User' name='[usr:Calculation_A1B2C3D4E5F6A7B8:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
@@ -316,7 +310,7 @@
           </style-rule>
           <style-rule element='mark'>
             <format attr='mark-labels-show' value='true' />
-            <format attr='mark-labels-cull' value='false' />
+            <format attr='mark-labels-cull' value='true' />
             <format attr='font-size' value='24' />
             <format attr='font-weight' value='bold' />
           </style-rule>
@@ -328,14 +322,14 @@
             </view>
             <mark class='Text' />
             <encodings>
-              <text column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[usr:Calculation_Total_Users:qk]' />
+              <text column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[usr:Calculation_A1B2C3D4E5F6A7B8:qk]' />
             </encodings>
           </pane>
         </panes>
         <rows />
         <cols />
       </table>
-      <simple-id uuid='{A1B2C3D4-E5F6-4A7B-8C9D-0E1F2A3B4C5D}' />
+      <simple-id uuid='{A1B2C3D4-E5F6-A7B8-C9D0-E1F2A3B4C5D6}' />
     </worksheet>
     <worksheet name='Average Meeting Duration by Department'>
       <layout-options>
@@ -351,19 +345,21 @@
             <datasource caption='VW_USER_ACTIVITY (DB_POC_ZOOM.VW_USER_ACTIVITY) (GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
           </datasources>
           <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
-            <column caption='Average Meeting Duration' datatype='real' name='[Calculation_Avg_Duration]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='AVG([TOTAL_HOSTING_MINUTES])' />
+            <column caption='Average Meeting Duration' datatype='real' name='[Calculation_B2C3D4E5F6A7B8C9]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([TOTAL_HOSTING_MINUTES] + [TOTAL_ATTENDANCE_MINUTES])' />
             </column>
             <column caption='Department Name' datatype='string' name='[DEPARTMENT_NAME]' role='dimension' type='nominal' />
+            <column caption='Total Attendance Minutes' datatype='integer' name='[TOTAL_ATTENDANCE_MINUTES]' role='measure' type='quantitative' />
             <column caption='Total Hosting Minutes' datatype='integer' name='[TOTAL_HOSTING_MINUTES]' role='measure' type='quantitative' />
-            <column-instance column='[Calculation_Avg_Duration]' derivation='User' name='[usr:Calculation_Avg_Duration:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_B2C3D4E5F6A7B8C9]' derivation='User' name='[usr:Calculation_B2C3D4E5F6A7B8C9:qk]' pivot='key' type='quantitative' />
             <column-instance column='[DEPARTMENT_NAME]' derivation='None' name='[none:DEPARTMENT_NAME:nk]' pivot='key' type='nominal' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
         <style>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[usr:Calculation_Avg_Duration:qk]' palette='blue_10_0' type='interpolated' />
+            <format attr='mark-labels-show' value='true' />
+            <format attr='mark-labels-cull' value='true' />
           </style-rule>
         </style>
         <panes>
@@ -373,26 +369,20 @@
             </view>
             <mark class='Bar' />
             <encodings>
-              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[usr:Calculation_Avg_Duration:qk]' />
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:DEPARTMENT_NAME:nk]' />
             </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
           </pane>
         </panes>
         <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:DEPARTMENT_NAME:nk]</rows>
-        <cols>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[usr:Calculation_Avg_Duration:qk]</cols>
+        <cols>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[usr:Calculation_B2C3D4E5F6A7B8C9:qk]</cols>
       </table>
-      <simple-id uuid='{B2C3D4E5-F6A7-4B8C-9D0E-1F2A3B4C5D6E}' />
+      <simple-id uuid='{B2C3D4E5-F6A7-B8C9-D0E1-F2A3B4C5D6A7}' />
     </worksheet>
-    <worksheet name='Users by Organization'>
+    <worksheet name='User Distribution by Organization'>
       <layout-options>
         <title>
           <formatted-text>
-            <run>Number of Users by Organization</run>
+            <run>User Distribution by Organization</run>
           </formatted-text>
         </title>
       </layout-options>
@@ -404,14 +394,15 @@
           <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
             <column caption='Organization Name' datatype='string' name='[ORGANIZATION_NAME]' role='dimension' type='nominal' />
             <column caption='User Id' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
-            <column-instance column='[ORGANIZATION_NAME]' derivation='None' name='[none:ORGANIZATION_NAME:nk]' pivot='key' type='nominal' />
             <column-instance column='[USER_ID]' derivation='CountD' name='[ctd:USER_ID:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[ORGANIZATION_NAME]' derivation='None' name='[none:ORGANIZATION_NAME:nk]' pivot='key' type='nominal' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
         <style>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[ctd:USER_ID:qk]' palette='orange_10_0' type='interpolated' />
+            <format attr='mark-labels-show' value='true' />
+            <format attr='mark-labels-cull' value='true' />
           </style-rule>
         </style>
         <panes>
@@ -421,27 +412,22 @@
             </view>
             <mark class='Square' />
             <encodings>
-              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[ctd:USER_ID:qk]' />
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[ctd:USER_ID:qk]' palette='blue_10_0' type='interpolated' />
               <size column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[ctd:USER_ID:qk]' />
+              <text column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:ORGANIZATION_NAME:nk]' />
             </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
           </pane>
         </panes>
-        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:ORGANIZATION_NAME:nk]</rows>
+        <rows />
         <cols />
       </table>
-      <simple-id uuid='{C3D4E5F6-A7B8-4C9D-0E1F-2A3B4C5D6E7F}' />
+      <simple-id uuid='{C3D4E5F6-A7B8-C9D0-E1F2-A3B4C5D6A7B8}' />
     </worksheet>
-    <worksheet name='Meetings per User Distribution'>
+    <worksheet name='Meeting Frequency Distribution'>
       <layout-options>
         <title>
           <formatted-text>
-            <run>Number of Meetings per User</run>
+            <run>Meeting Frequency per User Distribution</run>
           </formatted-text>
         </title>
       </layout-options>
@@ -451,21 +437,20 @@
             <datasource caption='VW_USER_ACTIVITY (DB_POC_ZOOM.VW_USER_ACTIVITY) (GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
           </datasources>
           <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
-            <column caption='Meetings per User' datatype='integer' name='[Calculation_Meetings_Per_User]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='{FIXED [USER_ID]: SUM([MEETINGS_HOSTED])}' />
+            <column caption='Meeting Frequency per User' datatype='real' name='[Calculation_D4E5F6A7B8C9D0E1]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='{FIXED [USER_ID]: SUM([MEETINGS_HOSTED]) + SUM([MEETINGS_ATTENDED])}' />
             </column>
-            <column caption='User Segments' datatype='string' name='[Calculation_User_Segments]' role='dimension' type='nominal'>
-              <calculation class='tableau' formula='IF [Calculation_Meetings_Per_User] &lt;= 5 THEN &quot;Light Users&quot; ELSEIF [Calculation_Meetings_Per_User] &lt;= 20 THEN &quot;Regular Users&quot; ELSE &quot;Power Users&quot; END' />
-            </column>
+            <column caption='Meetings Attended' datatype='integer' name='[MEETINGS_ATTENDED]' role='measure' type='quantitative' />
+            <column caption='Meetings Hosted' datatype='integer' name='[MEETINGS_HOSTED]' role='measure' type='quantitative' />
             <column caption='User Id' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
-            <column-instance column='[Calculation_User_Segments]' derivation='None' name='[none:Calculation_User_Segments:nk]' pivot='key' type='nominal' />
-            <column-instance column='[USER_ID]' derivation='CountD' name='[ctd:USER_ID:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_D4E5F6A7B8C9D0E1]' derivation='User' name='[usr:Calculation_D4E5F6A7B8C9D0E1:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
         <style>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:Calculation_User_Segments:nk]' palette='tableau_10_medium_0' type='ordinal' />
+            <format attr='mark-labels-show' value='true' />
+            <format attr='mark-labels-cull' value='true' />
           </style-rule>
         </style>
         <panes>
@@ -475,71 +460,14 @@
             </view>
             <mark class='Bar' />
             <encodings>
-              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:Calculation_User_Segments:nk]' />
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[usr:Calculation_D4E5F6A7B8C9D0E1:qk]' palette='orange_10_0' type='interpolated' />
             </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
           </pane>
         </panes>
-        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[ctd:USER_ID:qk]</rows>
-        <cols>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:Calculation_User_Segments:nk]</cols>
-      </table>
-      <simple-id uuid='{D4E5F6A7-B8C9-4D0E-1F2A-3B4C5D6E7F8A}' />
-    </worksheet>
-    <worksheet name='Feature Usage Analysis'>
-      <layout-options>
-        <title>
-          <formatted-text>
-            <run>Feature Usage Distribution</run>
-          </formatted-text>
-        </title>
-      </layout-options>
-      <table>
-        <view>
-          <datasources>
-            <datasource caption='VW_USER_ACTIVITY (DB_POC_ZOOM.VW_USER_ACTIVITY) (GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
-          </datasources>
-          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
-            <column caption='Average Meeting Quality' datatype='real' name='[AVERAGE_MEETING_QUALITY]' role='measure' type='quantitative' />
-            <column caption='Department Name' datatype='string' name='[DEPARTMENT_NAME]' role='dimension' type='nominal' />
-            <column caption='Total Hosting Minutes' datatype='integer' name='[TOTAL_HOSTING_MINUTES]' role='measure' type='quantitative' />
-            <column-instance column='[AVERAGE_MEETING_QUALITY]' derivation='Avg' name='[avg:AVERAGE_MEETING_QUALITY:qk]' pivot='key' type='quantitative' />
-            <column-instance column='[DEPARTMENT_NAME]' derivation='None' name='[none:DEPARTMENT_NAME:nk]' pivot='key' type='nominal' />
-            <column-instance column='[TOTAL_HOSTING_MINUTES]' derivation='Sum' name='[sum:TOTAL_HOSTING_MINUTES:qk]' pivot='key' type='quantitative' />
-          </datasource-dependencies>
-          <aggregation value='true' />
-        </view>
-        <style>
-          <style-rule element='mark'>
-            <encoding attr='color' field='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[avg:AVERAGE_MEETING_QUALITY:qk]' palette='green_10_0' type='interpolated' />
-          </style-rule>
-        </style>
-        <panes>
-          <pane selection-relaxation-option='selection-relaxation-allow'>
-            <view>
-              <breakdown value='auto' />
-            </view>
-            <mark class='Circle' />
-            <encodings>
-              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[avg:AVERAGE_MEETING_QUALITY:qk]' />
-              <size column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:TOTAL_HOSTING_MINUTES:qk]' />
-            </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
-          </pane>
-        </panes>
-        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:DEPARTMENT_NAME:nk]</rows>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[usr:Calculation_D4E5F6A7B8C9D0E1:qk]</rows>
         <cols />
       </table>
-      <simple-id uuid='{E5F6A7B8-C9D0-4E1F-2A3B-4C5D6E7F8A9B}' />
+      <simple-id uuid='{D4E5F6A7-B8C9-D0E1-F2A3-B4C5D6A7B8C9}' />
     </worksheet>
     <worksheet name='Meeting Activity Trend'>
       <layout-options>
@@ -556,20 +484,20 @@
           </datasources>
           <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
             <column caption='Activity Month' datatype='date' name='[ACTIVITY_MONTH]' role='dimension' type='ordinal' />
-            <column caption='7-Day Moving Average' datatype='real' name='[Calculation_Moving_Avg]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='WINDOW_AVG(SUM([MEETINGS_HOSTED]),-6,0)' />
-            </column>
+            <column caption='Meetings Attended' datatype='integer' name='[MEETINGS_ATTENDED]' role='measure' type='quantitative' />
             <column caption='Meetings Hosted' datatype='integer' name='[MEETINGS_HOSTED]' role='measure' type='quantitative' />
             <column caption='Total Hosting Minutes' datatype='integer' name='[TOTAL_HOSTING_MINUTES]' role='measure' type='quantitative' />
-            <column-instance column='[ACTIVITY_MONTH]' derivation='Month-Trunc' name='[tmn:ACTIVITY_MONTH:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[MEETINGS_ATTENDED]' derivation='Sum' name='[sum:MEETINGS_ATTENDED:qk]' pivot='key' type='quantitative' />
             <column-instance column='[MEETINGS_HOSTED]' derivation='Sum' name='[sum:MEETINGS_HOSTED:qk]' pivot='key' type='quantitative' />
             <column-instance column='[TOTAL_HOSTING_MINUTES]' derivation='Sum' name='[sum:TOTAL_HOSTING_MINUTES:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[ACTIVITY_MONTH]' derivation='Month-Trunc' name='[tmn:ACTIVITY_MONTH:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
         <style>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:MEETINGS_HOSTED:qk]' palette='blue_10_0' type='interpolated' />
+            <format attr='mark-labels-show' value='true' />
+            <format attr='mark-labels-cull' value='true' />
           </style-rule>
         </style>
         <panes>
@@ -579,35 +507,76 @@
             </view>
             <mark class='Line' />
             <encodings>
-              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:MEETINGS_HOSTED:qk]' />
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:MEETINGS_HOSTED:qk]' palette='blue_10_0' type='interpolated' />
             </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
           </pane>
-          <pane id='1' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:TOTAL_HOSTING_MINUTES:qk]'>
+          <pane id='1' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:MEETINGS_ATTENDED:qk]'>
             <view>
               <breakdown value='auto' />
             </view>
             <mark class='Line' />
             <encodings>
-              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:TOTAL_HOSTING_MINUTES:qk]' />
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:MEETINGS_ATTENDED:qk]' palette='green_10_0' type='interpolated' />
             </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
           </pane>
         </panes>
-        <rows>([federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:MEETINGS_HOSTED:qk] + [federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:TOTAL_HOSTING_MINUTES:qk])</rows>
+        <rows>([federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:MEETINGS_HOSTED:qk] + [federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:MEETINGS_ATTENDED:qk])</rows>
         <cols>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[tmn:ACTIVITY_MONTH:qk]</cols>
       </table>
-      <simple-id uuid='{F6A7B8C9-D0E1-4F2A-3B4C-5D6E7F8A9B0C}' />
+      <simple-id uuid='{E5F6A7B8-C9D0-E1F2-A3B4-C5D6A7B8C9D0}' />
+    </worksheet>
+    <worksheet name='User Engagement Analysis'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>User Engagement Analysis by Department</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='VW_USER_ACTIVITY (DB_POC_ZOOM.VW_USER_ACTIVITY) (GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
+            <column caption='Average Meeting Quality' datatype='real' name='[AVERAGE_MEETING_QUALITY]' role='measure' type='quantitative' />
+            <column caption='User Engagement Score' datatype='real' name='[Calculation_C3D4E5F6A7B8C9D0]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([AVERAGE_MEETING_QUALITY]) * LOG(SUM([MEETINGS_HOSTED]) + 1)' />
+            </column>
+            <column caption='Department Engagement Level' datatype='string' name='[Calculation_F6A7B8C9D0E1F2A3]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF AVG([AVERAGE_MEETING_QUALITY]) &gt;= 4.0 THEN &quot;High Engagement&quot; ELSEIF AVG([AVERAGE_MEETING_QUALITY]) &gt;= 3.0 THEN &quot;Medium Engagement&quot; ELSE &quot;Low Engagement&quot; END' />
+            </column>
+            <column caption='Department Name' datatype='string' name='[DEPARTMENT_NAME]' role='dimension' type='nominal' />
+            <column caption='Meetings Hosted' datatype='integer' name='[MEETINGS_HOSTED]' role='measure' type='quantitative' />
+            <column-instance column='[AVERAGE_MEETING_QUALITY]' derivation='Avg' name='[avg:AVERAGE_MEETING_QUALITY:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_C3D4E5F6A7B8C9D0]' derivation='User' name='[usr:Calculation_C3D4E5F6A7B8C9D0:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_F6A7B8C9D0E1F2A3]' derivation='None' name='[none:Calculation_F6A7B8C9D0E1F2A3:nk]' pivot='key' type='nominal' />
+            <column-instance column='[DEPARTMENT_NAME]' derivation='None' name='[none:DEPARTMENT_NAME:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <format attr='mark-labels-show' value='true' />
+            <format attr='mark-labels-cull' value='true' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Circle' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:Calculation_F6A7B8C9D0E1F2A3:nk]' />
+              <size column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[usr:Calculation_C3D4E5F6A7B8C9D0:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[avg:AVERAGE_MEETING_QUALITY:qk]</rows>
+        <cols>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:DEPARTMENT_NAME:nk]</cols>
+      </table>
+      <simple-id uuid='{F6A7B8C9-D0E1-F2A3-B4C5-D6A7B8C9D0E1}' />
     </worksheet>
   </worksheets>
   <dashboards>
@@ -618,56 +587,41 @@
         <zone h='100000' id='1' type='layout-basic' w='100000' x='0' y='0'>
           <zone h='15000' id='2' type='layout-basic' w='100000' x='0' y='0'>
             <zone h='15000' id='3' name='Total Users KPI' w='25000' x='0' y='0' />
-            <zone h='15000' id='4' name='Average Meeting Duration by Department' w='25000' x='25000' y='0' />
-            <zone h='15000' id='5' name='Users by Organization' w='25000' x='50000' y='0' />
-            <zone h='15000' id='6' name='Feature Usage Analysis' w='25000' x='75000' y='0' />
+            <zone h='15000' id='4' name='Average Meeting Duration by Department' w='75000' x='25000' y='0' />
           </zone>
-          <zone h='42500' id='7' name='Meeting Activity Trend' w='70000' x='0' y='15000' />
-          <zone h='42500' id='8' name='Meetings per User Distribution' w='30000' x='70000' y='15000' />
+          <zone h='42500' id='5' type='layout-basic' w='100000' x='0' y='15000'>
+            <zone h='42500' id='6' name='Meeting Activity Trend' w='70000' x='0' y='0' />
+            <zone h='42500' id='7' name='User Distribution by Organization' w='30000' x='70000' y='0' />
+          </zone>
+          <zone h='42500' id='8' type='layout-basic' w='100000' x='0' y='57500'>
+            <zone h='42500' id='9' name='Meeting Frequency Distribution' w='50000' x='0' y='0' />
+            <zone h='42500' id='10' name='User Engagement Analysis' w='50000' x='50000' y='0' />
+          </zone>
         </zone>
       </zones>
       <devicelayouts>
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='9' type='layout-basic' w='100000' x='0' y='0'>
-              <zone h='16667' id='10' name='Total Users KPI' w='100000' x='0' y='0' />
-              <zone h='16667' id='11' name='Average Meeting Duration by Department' w='100000' x='0' y='16667' />
-              <zone h='16667' id='12' name='Users by Organization' w='100000' x='0' y='33333' />
-              <zone h='16667' id='13' name='Feature Usage Analysis' w='100000' x='0' y='50000' />
-              <zone h='16667' id='14' name='Meeting Activity Trend' w='100000' x='0' y='66667' />
-              <zone h='16667' id='15' name='Meetings per User Distribution' w='100000' x='0' y='83333' />
+            <zone h='100000' id='11' type='layout-basic' w='100000' x='0' y='0'>
+              <zone h='16667' id='12' name='Total Users KPI' w='100000' x='0' y='0' />
+              <zone h='16667' id='13' name='Average Meeting Duration by Department' w='100000' x='0' y='16667' />
+              <zone h='16667' id='14' name='Meeting Activity Trend' w='100000' x='0' y='33333' />
+              <zone h='16667' id='15' name='User Distribution by Organization' w='100000' x='0' y='50000' />
+              <zone h='16667' id='16' name='Meeting Frequency Distribution' w='100000' x='0' y='66667' />
+              <zone h='16667' id='17' name='User Engagement Analysis' w='100000' x='0' y='83333' />
             </zone>
           </zones>
         </devicelayout>
       </devicelayouts>
-      <simple-id uuid='{A0B1C2D3-E4F5-4A6B-7C8D-9E0F1A2B3C4D}' />
+      <simple-id uuid='{1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D}' />
     </dashboard>
   </dashboards>
   <windows saved-dpi-scale-factor='1.5' source-height='44'>
     <window class='dashboard' maximized='true' name='Zoom Platform Analytics Dashboard'>
-      <viewpoints>
-        <viewpoint name='Total Users KPI'>
-          <zoom type='entire-view' />
-        </viewpoint>
-        <viewpoint name='Average Meeting Duration by Department'>
-          <zoom type='entire-view' />
-        </viewpoint>
-        <viewpoint name='Users by Organization'>
-          <zoom type='entire-view' />
-        </viewpoint>
-        <viewpoint name='Meetings per User Distribution'>
-          <zoom type='entire-view' />
-        </viewpoint>
-        <viewpoint name='Feature Usage Analysis'>
-          <zoom type='entire-view' />
-        </viewpoint>
-        <viewpoint name='Meeting Activity Trend'>
-          <zoom type='entire-view' />
-        </viewpoint>
-      </viewpoints>
+      <viewpoints />
       <active id='-1' />
-      <simple-id uuid='{B1C2D3E4-F5A6-4B7C-8D9E-0F1A2B3C4D5E}' />
+      <simple-id uuid='{2B3C4D5E-6F7A-8B9C-0D1E-2F3A4B5C6D7A}' />
     </window>
   </windows>
 </workbook>
