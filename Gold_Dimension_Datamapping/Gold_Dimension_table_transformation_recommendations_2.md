@@ -2,7 +2,7 @@ _____________________________________________
 ## *Author*: AAVA
 ## *Created on*:   
 ## *Description*: Gold layer dimension table transformation recommendations for Zoom Platform Analytics System ensuring unique row values
-## *Version*: 1
+## *Version*: 2
 ## *Updated on*:   
 _____________________________________________
 
