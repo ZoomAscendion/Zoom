@@ -18,26 +18,18 @@ WITH bronze_meetings AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM {{ source('bronze', 'BZ_MEETINGS') }}
+    WHERE MEETING_ID IS NOT NULL
 ),
 
 timestamp_cleaning AS (
     SELECT 
         *,
-        /* Clean EST timezone from timestamps */
-        CASE 
-            WHEN START_TIME::STRING LIKE '%EST%' THEN 
-                TRY_TO_TIMESTAMP(REGEXP_REPLACE(START_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS')
-            ELSE START_TIME
-        END AS CLEAN_START_TIME,
+        /* Clean EST timezone from timestamps using macro */
+        {{ safe_to_timestamp('START_TIME') }} AS CLEAN_START_TIME,
+        {{ safe_to_timestamp('END_TIME') }} AS CLEAN_END_TIME,
         
-        CASE 
-            WHEN END_TIME::STRING LIKE '%EST%' THEN 
-                TRY_TO_TIMESTAMP(REGEXP_REPLACE(END_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS')
-            ELSE END_TIME
-        END AS CLEAN_END_TIME,
-        
-        /* Critical P1: Clean text units from DURATION_MINUTES field */
-        TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', '')) AS CLEAN_DURATION_MINUTES
+        /* Critical P1: Clean text units from DURATION_MINUTES field using macro */
+        {{ safe_to_number('DURATION_MINUTES') }} AS CLEAN_DURATION_MINUTES
     FROM bronze_meetings
 ),
 
@@ -75,7 +67,6 @@ deduplication AS (
     SELECT *,
         ROW_NUMBER() OVER (PARTITION BY MEETING_ID ORDER BY UPDATE_TIMESTAMP DESC NULLS LAST, LOAD_TIMESTAMP DESC) AS rn
     FROM data_quality_checks
-    WHERE MEETING_ID IS NOT NULL
 )
 
 SELECT 
