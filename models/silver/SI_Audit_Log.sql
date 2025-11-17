@@ -5,7 +5,6 @@
 
 -- Silver Layer Audit Log Table
 -- This table tracks all pipeline executions and data processing activities
--- No pre-hook or post-hook logic included as per requirements
 
 SELECT 
     CAST(NULL AS VARCHAR(255)) as EXECUTION_ID,
