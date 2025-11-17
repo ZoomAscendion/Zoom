@@ -24,49 +24,11 @@ models:
     # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (TABLE_NAME, STATUS, PROCESS_START_TIME, PROCESSED_BY, CREATED_AT) 
-          SELECT '{{ this.name }}', 'STARTED', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE', CURRENT_TIMESTAMP()
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (TABLE_NAME, STATUS, PROCESS_END_TIME, PROCESSED_BY, RECORDS_PROCESSED, UPDATED_AT) 
-          SELECT '{{ this.name }}', 'COMPLETED', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE', (SELECT COUNT(*) FROM {{ this }}), CURRENT_TIMESTAMP()
-        {% endif %}
-
-# Specify the order of model execution
-model-ordering:
-  - "SI_Audit_Log"  # Must run first
-  - "SI_USERS"
-  - "SI_MEETINGS"
-  - "SI_PARTICIPANTS"
-  - "SI_FEATURE_USAGE"
-  - "SI_SUPPORT_TICKETS"
-  - "SI_BILLING_EVENTS"
-  - "SI_LICENSES"
 
 # Configure tests
 tests:
   +store_failures: true
   +severity: warn
-
-# Configure snapshots
-snapshots:
-  zoom_silver_pipeline:
-    +target_schema: snapshots
-    +strategy: timestamp
-    +updated_at: updated_at
-
-# Configure seeds
-seeds:
-  zoom_silver_pipeline:
-    +schema: seeds
-
-# Configure macros
-macros:
-  zoom_silver_pipeline:
-    +schema: macros
 
 # Configure variables
 vars:
@@ -86,17 +48,6 @@ vars:
 # Configure on-run-start and on-run-end hooks
 on-run-start:
   - "{{ log('Starting Silver Layer Pipeline Execution', info=True) }}"
-  - "CREATE SCHEMA IF NOT EXISTS {{ target.schema }}"
 
 on-run-end:
   - "{{ log('Silver Layer Pipeline Execution Completed', info=True) }}"
-  - |
-    {% if target.name == 'prod' %}
-      INSERT INTO {{ ref('SI_Audit_Log') }} (TABLE_NAME, STATUS, PROCESS_END_TIME, PROCESSED_BY, CREATED_AT) 
-      SELECT 'PIPELINE_COMPLETE', 'SUCCESS', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE', CURRENT_TIMESTAMP()
-    {% endif %}
-
-# Configure dispatch
-dispatch:
-  - macro_namespace: dbt_utils
-    search_order: ['zoom_silver_pipeline', 'dbt_utils']
