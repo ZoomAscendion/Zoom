@@ -1,0 +1,86 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (TABLE_NAME, PROCESS_STATUS, PROCESS_START_TIME, AUDIT_TIMESTAMP) SELECT 'SI_PARTICIPANTS', 'STARTED', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'SI_Audit_Log'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (TABLE_NAME, PROCESS_STATUS, PROCESS_END_TIME, RECORDS_PROCESSED, RECORDS_SUCCESS, AUDIT_TIMESTAMP) SELECT 'SI_PARTICIPANTS', 'COMPLETED', CURRENT_TIMESTAMP(), (SELECT COUNT(*) FROM {{ this }}), (SELECT COUNT(*) FROM {{ this }} WHERE VALIDATION_STATUS = 'PASSED'), CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+) }}
+
+-- Silver Layer Participants Table
+-- Transforms and cleanses participant data from Bronze layer with MM/DD/YYYY format handling
+
+WITH bronze_participants AS (
+    SELECT 
+        PARTICIPANT_ID,
+        MEETING_ID,
+        USER_ID,
+        JOIN_TIME,
+        LEAVE_TIME,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        ROW_NUMBER() OVER (PARTITION BY PARTICIPANT_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM {{ source('bronze', 'BZ_PARTICIPANTS') }}
+    WHERE PARTICIPANT_ID IS NOT NULL
+),
+
+cleaned_participants AS (
+    SELECT 
+        *,
+        -- Handle MM/DD/YYYY HH:MM format in timestamps
+        CASE 
+            WHEN JOIN_TIME::STRING REGEXP '^\\d{1,2}/\\d{1,2}/\\d{4} \\d{1,2}:\\d{2}$' THEN 
+                TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'MM/DD/YYYY HH24:MI')
+            WHEN JOIN_TIME::STRING LIKE '%EST%' THEN 
+                TRY_TO_TIMESTAMP(REPLACE(JOIN_TIME::STRING, ' EST', ''), 'YYYY-MM-DD HH24:MI:SS')
+            ELSE JOIN_TIME
+        END AS CLEAN_JOIN_TIME,
+        
+        CASE 
+            WHEN LEAVE_TIME::STRING REGEXP '^\\d{1,2}/\\d{1,2}/\\d{4} \\d{1,2}:\\d{2}$' THEN 
+                TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'MM/DD/YYYY HH24:MI')
+            WHEN LEAVE_TIME::STRING LIKE '%EST%' THEN 
+                TRY_TO_TIMESTAMP(REPLACE(LEAVE_TIME::STRING, ' EST', ''), 'YYYY-MM-DD HH24:MI:SS')
+            ELSE LEAVE_TIME
+        END AS CLEAN_LEAVE_TIME
+    FROM bronze_participants
+    WHERE rn = 1
+),
+
+data_quality_checks AS (
+    SELECT 
+        bp.*,
+        -- Data quality scoring
+        CASE 
+            WHEN bp.PARTICIPANT_ID IS NULL THEN 0
+            WHEN bp.MEETING_ID IS NULL THEN 10
+            WHEN bp.USER_ID IS NULL THEN 20
+            WHEN bp.CLEAN_JOIN_TIME IS NULL THEN 30
+            WHEN bp.CLEAN_LEAVE_TIME IS NULL THEN 40
+            WHEN bp.CLEAN_LEAVE_TIME <= bp.CLEAN_JOIN_TIME THEN 50
+            ELSE 100
+        END AS DATA_QUALITY_SCORE,
+        
+        CASE 
+            WHEN bp.PARTICIPANT_ID IS NULL OR bp.MEETING_ID IS NULL THEN 'FAILED'
+            WHEN bp.CLEAN_JOIN_TIME IS NULL OR bp.CLEAN_LEAVE_TIME IS NULL THEN 'FAILED'
+            WHEN bp.CLEAN_LEAVE_TIME <= bp.CLEAN_JOIN_TIME THEN 'FAILED'
+            WHEN bp.USER_ID IS NULL THEN 'WARNING'
+            ELSE 'PASSED'
+        END AS VALIDATION_STATUS
+    FROM cleaned_participants bp
+)
+
+SELECT 
+    PARTICIPANT_ID,
+    MEETING_ID,
+    USER_ID,
+    CLEAN_JOIN_TIME AS JOIN_TIME,
+    CLEAN_LEAVE_TIME AS LEAVE_TIME,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    CURRENT_DATE() AS LOAD_DATE,
+    CURRENT_DATE() AS UPDATE_DATE,
+    DATA_QUALITY_SCORE,
+    VALIDATION_STATUS
+FROM data_quality_checks
+WHERE VALIDATION_STATUS IN ('PASSED', 'WARNING')
