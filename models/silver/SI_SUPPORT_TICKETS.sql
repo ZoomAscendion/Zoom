@@ -17,6 +17,7 @@ WITH bronze_support_tickets AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM {{ source('bronze', 'BZ_SUPPORT_TICKETS') }}
+    WHERE TICKET_ID IS NOT NULL
 ),
 
 data_quality_checks AS (
@@ -59,7 +60,6 @@ deduplication AS (
     SELECT *,
         ROW_NUMBER() OVER (PARTITION BY TICKET_ID ORDER BY UPDATE_TIMESTAMP DESC NULLS LAST, LOAD_TIMESTAMP DESC) AS rn
     FROM validation_checks
-    WHERE TICKET_ID IS NOT NULL
 )
 
 SELECT 
