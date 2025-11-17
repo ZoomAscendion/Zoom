@@ -2,10 +2,8 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_silver_pipeline'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -18,70 +16,13 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-          INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
-            AUDIT_ID, 
-            TABLE_NAME, 
-            OPERATION_TYPE, 
-            AUDIT_TIMESTAMP, 
-            PROCESSED_BY,
-            SOURCE_SYSTEM
-          ) 
-          SELECT 
-            REPLACE(UUID_STRING(), '-', ''), 
-            '{{ this.name }}', 
-            'PROCESS_START', 
-            CURRENT_TIMESTAMP(), 
-            'DBT_SILVER_PIPELINE',
-            'SILVER_LAYER'
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-          INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
-            AUDIT_ID, 
-            TABLE_NAME, 
-            OPERATION_TYPE, 
-            AUDIT_TIMESTAMP, 
-            PROCESSED_BY,
-            SOURCE_SYSTEM
-          ) 
-          SELECT 
-            REPLACE(UUID_STRING(), '-', ''), 
-            '{{ this.name }}', 
-            'PROCESS_END', 
-            CURRENT_TIMESTAMP(), 
-            'DBT_SILVER_PIPELINE',
-            'SILVER_LAYER'
-        {% endif %}
-
-# Model execution order - ensure SI_AUDIT_LOG runs first
-model-ordering:
-  - "SI_AUDIT_LOG"
-  - "SI_USERS"
-  - "SI_MEETINGS"
-  - "SI_PARTICIPANTS"
-  - "SI_FEATURE_USAGE"
-  - "SI_SUPPORT_TICKETS"
-  - "SI_BILLING_EVENTS"
-  - "SI_LICENSES"
 
 vars:
-  # dbt Cloud environment variables
   start_date: '2020-01-01'
   end_date: '2030-12-31'
-  
-# Require dbt version to be at least 1.0.0
+
 require-dbt-version: ">=1.0.0"
-
-# Configure logging
-log-path: "logs"
-
-# Configure packages
-packages-install-path: "dbt_packages"
