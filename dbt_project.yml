@@ -2,12 +2,14 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_silver'
+# This setting configures which "profile" dbt uses for this project.
+profile: 'zoom_silver_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
-analysis-paths: ["analysis"]
+analysis-paths: ["analyses"]
 test-paths: ["tests"]
-seed-paths: ["data"]
+seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
@@ -16,53 +18,70 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
   zoom_silver_pipeline:
-    +materialized: table
+    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
-      +on_schema_change: sync_all_columns
-      si_audit_log:
-        +pre_hook: []
-        +post_hook: []
-      +pre_hook: |
-        {% if this.name != 'si_audit_log' %}
-          INSERT INTO {{ ref('si_audit_log') }} (
-            AUDIT_ID, TABLE_NAME, COLUMN_NAME, RECORD_ID, ERROR_TYPE, 
-            ERROR_DESCRIPTION, ORIGINAL_VALUE, AUDIT_TIMESTAMP, 
-            OPERATION_TYPE, PROCESSED_BY, SOURCE_SYSTEM
-          )
+      +pre-hook: |
+        {% if this.name != 'SI_AUDIT_LOG' %}
+          INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
+            AUDIT_ID, 
+            TABLE_NAME, 
+            OPERATION_TYPE, 
+            AUDIT_TIMESTAMP, 
+            PROCESSED_BY,
+            SOURCE_SYSTEM
+          ) 
           SELECT 
-            UUID_STRING() as AUDIT_ID,
-            '{{ this.name }}' as TABLE_NAME,
-            'PIPELINE_START' as COLUMN_NAME,
-            'N/A' as RECORD_ID,
-            'PIPELINE_EXECUTION' as ERROR_TYPE,
-            'Pipeline execution started for {{ this.name }}' as ERROR_DESCRIPTION,
-            'N/A' as ORIGINAL_VALUE,
-            CURRENT_TIMESTAMP() as AUDIT_TIMESTAMP,
-            'INSERT' as OPERATION_TYPE,
-            'DBT_SILVER_PIPELINE' as PROCESSED_BY,
-            'ZOOM_PLATFORM' as SOURCE_SYSTEM;
+            REPLACE(UUID_STRING(), '-', ''), 
+            '{{ this.name }}', 
+            'PROCESS_START', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_SILVER_PIPELINE',
+            'SILVER_LAYER'
         {% endif %}
-      +post_hook: |
-        {% if this.name != 'si_audit_log' %}
-          INSERT INTO {{ ref('si_audit_log') }} (
-            AUDIT_ID, TABLE_NAME, COLUMN_NAME, RECORD_ID, ERROR_TYPE, 
-            ERROR_DESCRIPTION, ORIGINAL_VALUE, AUDIT_TIMESTAMP, 
-            OPERATION_TYPE, PROCESSED_BY, SOURCE_SYSTEM
-          )
+      +post-hook: |
+        {% if this.name != 'SI_AUDIT_LOG' %}
+          INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
+            AUDIT_ID, 
+            TABLE_NAME, 
+            OPERATION_TYPE, 
+            AUDIT_TIMESTAMP, 
+            PROCESSED_BY,
+            SOURCE_SYSTEM
+          ) 
           SELECT 
-            UUID_STRING() as AUDIT_ID,
-            '{{ this.name }}' as TABLE_NAME,
-            'PIPELINE_END' as COLUMN_NAME,
-            COUNT(*)::STRING as RECORD_ID,
-            'PIPELINE_EXECUTION' as ERROR_TYPE,
-            'Pipeline execution completed for {{ this.name }} with ' || COUNT(*) || ' records processed' as ERROR_DESCRIPTION,
-            'N/A' as ORIGINAL_VALUE,
-            CURRENT_TIMESTAMP() as AUDIT_TIMESTAMP,
-            'INSERT' as OPERATION_TYPE,
-            'DBT_SILVER_PIPELINE' as PROCESSED_BY,
-            'ZOOM_PLATFORM' as SOURCE_SYSTEM
-          FROM {{ this }};
+            REPLACE(UUID_STRING(), '-', ''), 
+            '{{ this.name }}', 
+            'PROCESS_END', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_SILVER_PIPELINE',
+            'SILVER_LAYER'
         {% endif %}
+
+# Model execution order - ensure SI_AUDIT_LOG runs first
+model-ordering:
+  - "SI_AUDIT_LOG"
+  - "SI_USERS"
+  - "SI_MEETINGS"
+  - "SI_PARTICIPANTS"
+  - "SI_FEATURE_USAGE"
+  - "SI_SUPPORT_TICKETS"
+  - "SI_BILLING_EVENTS"
+  - "SI_LICENSES"
+
+vars:
+  # dbt Cloud environment variables
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
+  
+# Require dbt version to be at least 1.0.0
+require-dbt-version: ">=1.0.0"
+
+# Configure logging
+log-path: "logs"
+
+# Configure packages
+packages-install-path: "dbt_packages"
