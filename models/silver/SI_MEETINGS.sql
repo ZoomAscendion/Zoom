@@ -18,7 +18,7 @@ WITH bronze_meetings AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_MEETINGS') }}
+    FROM BRONZE.BZ_MEETINGS
 ),
 
 -- Enhanced timestamp format validation and conversion
@@ -35,7 +35,7 @@ timestamp_processed AS (
                     WHEN REGEXP_LIKE(START_TIME::STRING, '^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(\\.\\d{3})? EST$') THEN
                         CONVERT_TIMEZONE('America/New_York', 'UTC', 
                             TRY_TO_TIMESTAMP(REPLACE(START_TIME::STRING, ' EST', ''), 'YYYY-MM-DD HH24:MI:SS'))
-                    ELSE NULL -- Invalid EST format
+                    ELSE START_TIME -- Keep original if EST format is invalid
                 END
             ELSE START_TIME
         END AS START_TIME,
@@ -47,7 +47,7 @@ timestamp_processed AS (
                     WHEN REGEXP_LIKE(END_TIME::STRING, '^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(\\.\\d{3})? EST$') THEN
                         CONVERT_TIMEZONE('America/New_York', 'UTC', 
                             TRY_TO_TIMESTAMP(REPLACE(END_TIME::STRING, ' EST', ''), 'YYYY-MM-DD HH24:MI:SS'))
-                    ELSE NULL -- Invalid EST format
+                    ELSE END_TIME -- Keep original if EST format is invalid
                 END
             ELSE END_TIME
         END AS END_TIME,
@@ -70,7 +70,7 @@ cleansed_meetings AS (
         
         -- Validate and recalculate duration if needed
         CASE 
-            WHEN START_TIME IS NOT NULL AND END_TIME IS NOT NULL THEN
+            WHEN START_TIME IS NOT NULL AND END_TIME IS NOT NULL AND END_TIME > START_TIME THEN
                 DATEDIFF('minute', START_TIME, END_TIME)
             ELSE DURATION_MINUTES
         END AS DURATION_MINUTES,
