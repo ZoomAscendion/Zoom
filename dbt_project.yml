@@ -2,96 +2,64 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
-profile: 'zoom_silver_pipeline'
+profile: 'zoom_silver'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
-analysis-paths: ["analyses"]
+analysis-paths: ["analysis"]
 test-paths: ["tests"]
-seed-paths: ["seeds"]
+seed-paths: ["data"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
   zoom_silver_pipeline:
-    # Audit log model should run first
-    SI_AUDIT_LOG:
-      +materialized: table
-      +pre-hook: []
-      +post-hook: []
-    
-    # Silver layer models
     +materialized: table
-    +on_schema_change: "sync_all_columns"
-    
-    # Model execution order
     silver:
       +materialized: table
-      +tags: ["silver"]
-      
-      # Ensure audit log runs first
-      SI_AUDIT_LOG:
-        +pre-hook: []
-        +post-hook: []
-      
-      # Core silver models
-      SI_USERS:
-        +tags: ["silver", "users"]
-      
-      SI_MEETINGS:
-        +tags: ["silver", "meetings"]
-      
-      SI_PARTICIPANTS:
-        +tags: ["silver", "participants"]
-      
-      SI_FEATURE_USAGE:
-        +tags: ["silver", "features"]
-      
-      SI_SUPPORT_TICKETS:
-        +tags: ["silver", "support"]
-      
-      SI_BILLING_EVENTS:
-        +tags: ["silver", "billing"]
-      
-      SI_LICENSES:
-        +tags: ["silver", "licenses"]
-
-# Global configurations
-vars:
-  # Data quality thresholds
-  dq_score_threshold: 70
-  
-  # Date range for processing
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
-  
-  # Audit settings
-  enable_audit_logging: true
-  audit_table_name: 'SI_AUDIT_LOG'
-  
-  # Error handling
-  fail_on_dq_errors: false
-  log_dq_errors: true
-
-# Test configurations
-tests:
-  +store_failures: true
-  +severity: warn
-
-# Snapshot configurations
-snapshots:
-  zoom_silver_pipeline:
-    +target_schema: snapshots
-    +strategy: timestamp
-    +updated_at: updated_timestamp
-
-# Seeds configurations
-seeds:
-  zoom_silver_pipeline:
-    +schema: reference_data
+      +on_schema_change: sync_all_columns
+      +pre_hook: |
+        {% if this.name != 'si_audit_log' %}
+          INSERT INTO {{ ref('si_audit_log') }} (
+            AUDIT_ID, TABLE_NAME, COLUMN_NAME, RECORD_ID, ERROR_TYPE, 
+            ERROR_DESCRIPTION, ORIGINAL_VALUE, AUDIT_TIMESTAMP, 
+            OPERATION_TYPE, PROCESSED_BY, SOURCE_SYSTEM
+          )
+          SELECT 
+            UUID_STRING() as AUDIT_ID,
+            '{{ this.name }}' as TABLE_NAME,
+            'PIPELINE_START' as COLUMN_NAME,
+            'N/A' as RECORD_ID,
+            'PIPELINE_EXECUTION' as ERROR_TYPE,
+            'Pipeline execution started for {{ this.name }}' as ERROR_DESCRIPTION,
+            'N/A' as ORIGINAL_VALUE,
+            CURRENT_TIMESTAMP() as AUDIT_TIMESTAMP,
+            'INSERT' as OPERATION_TYPE,
+            'DBT_SILVER_PIPELINE' as PROCESSED_BY,
+            'ZOOM_PLATFORM' as SOURCE_SYSTEM;
+        {% endif %}
+      +post_hook: |
+        {% if this.name != 'si_audit_log' %}
+          INSERT INTO {{ ref('si_audit_log') }} (
+            AUDIT_ID, TABLE_NAME, COLUMN_NAME, RECORD_ID, ERROR_TYPE, 
+            ERROR_DESCRIPTION, ORIGINAL_VALUE, AUDIT_TIMESTAMP, 
+            OPERATION_TYPE, PROCESSED_BY, SOURCE_SYSTEM
+          )
+          SELECT 
+            UUID_STRING() as AUDIT_ID,
+            '{{ this.name }}' as TABLE_NAME,
+            'PIPELINE_END' as COLUMN_NAME,
+            COUNT(*)::STRING as RECORD_ID,
+            'PIPELINE_EXECUTION' as ERROR_TYPE,
+            'Pipeline execution completed for {{ this.name }} with ' || COUNT(*) || ' records processed' as ERROR_DESCRIPTION,
+            'N/A' as ORIGINAL_VALUE,
+            CURRENT_TIMESTAMP() as AUDIT_TIMESTAMP,
+            'INSERT' as OPERATION_TYPE,
+            'DBT_SILVER_PIPELINE' as PROCESSED_BY,
+            'ZOOM_PLATFORM' as SOURCE_SYSTEM
+          FROM {{ this }};
+        {% endif %}
