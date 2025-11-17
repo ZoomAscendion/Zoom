@@ -16,7 +16,7 @@ WITH source_data AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_SUPPORT_TICKETS') }}
+    FROM BRONZE.BZ_SUPPORT_TICKETS
     WHERE TICKET_ID IS NOT NULL  -- Exclude records with null TICKET_ID
 ),
 
