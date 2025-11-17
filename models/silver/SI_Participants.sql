@@ -1,0 +1,108 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_START_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP) SELECT UUID_STRING(), 'BRONZE_TO_SILVER_PARTICIPANTS', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'RUNNING', 'BZ_PARTICIPANTS', 'SI_PARTICIPANTS', 'DBT_PIPELINE', CURRENT_TIMESTAMP() WHERE EXISTS (SELECT 1 FROM {{ ref('SI_Audit_Log') }})",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_END_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, UPDATE_TIMESTAMP) SELECT UUID_STRING(), 'BRONZE_TO_SILVER_PARTICIPANTS', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'SUCCESS', 'BZ_PARTICIPANTS', 'SI_PARTICIPANTS', 'DBT_PIPELINE', CURRENT_TIMESTAMP() WHERE EXISTS (SELECT 1 FROM {{ ref('SI_Audit_Log') }})"
+) }}
+
+-- Silver Layer Participants Table Transformation
+-- Transforms Bronze BZ_PARTICIPANTS to Silver SI_PARTICIPANTS with MM/DD/YYYY HH:MM format handling
+
+WITH bronze_participants AS (
+    SELECT 
+        PARTICIPANT_ID,
+        MEETING_ID,
+        USER_ID,
+        JOIN_TIME,
+        LEAVE_TIME,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_PARTICIPANTS') }}
+),
+
+validated_participants AS (
+    SELECT 
+        PARTICIPANT_ID,
+        MEETING_ID,
+        USER_ID,
+        
+        -- Handle MM/DD/YYYY HH:MM format conversion
+        CASE 
+            WHEN JOIN_TIME::STRING REGEXP '^\\d{1,2}/\\d{1,2}/\\d{4} \\d{1,2}:\\d{2}$' THEN 
+                TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'MM/DD/YYYY HH24:MI')
+            ELSE JOIN_TIME
+        END as JOIN_TIME,
+        
+        CASE 
+            WHEN LEAVE_TIME::STRING REGEXP '^\\d{1,2}/\\d{1,2}/\\d{4} \\d{1,2}:\\d{2}$' THEN 
+                TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'MM/DD/YYYY HH24:MI')
+            ELSE LEAVE_TIME
+        END as LEAVE_TIME,
+        
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM bronze_participants
+),
+
+quality_checked_participants AS (
+    SELECT 
+        vp.*,
+        
+        -- Data Quality Score Calculation
+        CASE 
+            WHEN vp.PARTICIPANT_ID IS NULL THEN 0
+            WHEN vp.MEETING_ID IS NULL THEN 20
+            WHEN vp.USER_ID IS NULL THEN 30
+            WHEN vp.JOIN_TIME IS NULL OR vp.LEAVE_TIME IS NULL THEN 40
+            WHEN vp.LEAVE_TIME <= vp.JOIN_TIME THEN 50
+            ELSE 100
+        END as DATA_QUALITY_SCORE,
+        
+        -- Validation Status
+        CASE 
+            WHEN vp.PARTICIPANT_ID IS NULL OR vp.MEETING_ID IS NULL OR vp.USER_ID IS NULL THEN 'FAILED'
+            WHEN vp.JOIN_TIME IS NULL OR vp.LEAVE_TIME IS NULL THEN 'FAILED'
+            WHEN vp.LEAVE_TIME <= vp.JOIN_TIME THEN 'FAILED'
+            ELSE 'PASSED'
+        END as VALIDATION_STATUS
+    FROM validated_participants vp
+),
+
+deduped_participants AS (
+    SELECT 
+        PARTICIPANT_ID,
+        MEETING_ID,
+        USER_ID,
+        JOIN_TIME,
+        LEAVE_TIME,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        DATA_QUALITY_SCORE,
+        VALIDATION_STATUS,
+        ROW_NUMBER() OVER (PARTITION BY PARTICIPANT_ID ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC) as rn
+    FROM quality_checked_participants
+    WHERE PARTICIPANT_ID IS NOT NULL
+      AND MEETING_ID IS NOT NULL
+      AND USER_ID IS NOT NULL
+      AND JOIN_TIME IS NOT NULL
+      AND LEAVE_TIME IS NOT NULL
+      AND LEAVE_TIME > JOIN_TIME
+)
+
+SELECT 
+    PARTICIPANT_ID,
+    MEETING_ID,
+    USER_ID,
+    JOIN_TIME,
+    LEAVE_TIME,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    DATE(LOAD_TIMESTAMP) as LOAD_DATE,
+    DATE(UPDATE_TIMESTAMP) as UPDATE_DATE,
+    DATA_QUALITY_SCORE,
+    VALIDATION_STATUS
+FROM deduped_participants
+WHERE rn = 1
