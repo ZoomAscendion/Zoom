@@ -202,14 +202,22 @@ models:
     columns:
       - name: USER_ID
         description: "Unique identifier for each user account"
+        tests:
+          - not_null
+          - unique
       - name: USER_NAME
         description: "Display name of the user (cleaned and standardized)"
       - name: EMAIL
         description: "Email address of the user (validated and standardized)"
+        tests:
+          - not_null
       - name: COMPANY
         description: "Company or organization name (cleaned)"
       - name: PLAN_TYPE
         description: "Subscription plan type (standardized values)"
+        tests:
+          - accepted_values:
+              values: ['Free', 'Basic', 'Pro', 'Enterprise']
       - name: LOAD_TIMESTAMP
         description: "Timestamp when record was processed into Silver layer"
       - name: UPDATE_TIMESTAMP
@@ -222,24 +230,44 @@ models:
         description: "Date when record was last updated"
       - name: DATA_QUALITY_SCORE
         description: "Quality score from validation process (0-100)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
       - name: VALIDATION_STATUS
         description: "Status of data validation (PASSED, FAILED, WARNING)"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'FAILED', 'WARNING']
 
   - name: SI_MEETINGS
     description: "Silver layer table storing cleaned and standardized meeting information with timestamp format handling"
     columns:
       - name: MEETING_ID
         description: "Unique identifier for each meeting"
+        tests:
+          - not_null
+          - unique
       - name: HOST_ID
         description: "User ID of the meeting host"
+        tests:
+          - not_null
       - name: MEETING_TOPIC
         description: "Topic or title of the meeting (cleaned)"
       - name: START_TIME
         description: "Meeting start timestamp (standardized timezone)"
+        tests:
+          - not_null
       - name: END_TIME
         description: "Meeting end timestamp (standardized timezone)"
+        tests:
+          - not_null
       - name: DURATION_MINUTES
         description: "Meeting duration in minutes (validated and calculated)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1440
       - name: LOAD_TIMESTAMP
         description: "Timestamp when record was processed into Silver layer"
       - name: UPDATE_TIMESTAMP
@@ -260,14 +288,25 @@ models:
     columns:
       - name: PARTICIPANT_ID
         description: "Unique identifier for each meeting participant"
+        tests:
+          - not_null
+          - unique
       - name: MEETING_ID
         description: "Reference to meeting"
+        tests:
+          - not_null
       - name: USER_ID
         description: "Reference to user who participated"
+        tests:
+          - not_null
       - name: JOIN_TIME
         description: "Timestamp when participant joined meeting (standardized format)"
+        tests:
+          - not_null
       - name: LEAVE_TIME
         description: "Timestamp when participant left meeting (standardized format)"
+        tests:
+          - not_null
       - name: LOAD_TIMESTAMP
         description: "Timestamp when record was processed into Silver layer"
       - name: UPDATE_TIMESTAMP
@@ -288,14 +327,26 @@ models:
     columns:
       - name: USAGE_ID
         description: "Unique identifier for each feature usage record"
+        tests:
+          - not_null
+          - unique
       - name: MEETING_ID
         description: "Reference to meeting where feature was used"
+        tests:
+          - not_null
       - name: FEATURE_NAME
         description: "Name of the feature being tracked (standardized)"
+        tests:
+          - not_null
       - name: USAGE_COUNT
         description: "Number of times feature was used (validated)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
       - name: USAGE_DATE
         description: "Date when feature usage occurred"
+        tests:
+          - not_null
       - name: LOAD_TIMESTAMP
         description: "Timestamp when record was processed into Silver layer"
       - name: UPDATE_TIMESTAMP
@@ -316,14 +367,26 @@ models:
     columns:
       - name: TICKET_ID
         description: "Unique identifier for each support ticket"
+        tests:
+          - not_null
+          - unique
       - name: USER_ID
         description: "Reference to user who created the ticket"
+        tests:
+          - not_null
       - name: TICKET_TYPE
         description: "Type of support ticket (standardized)"
+        tests:
+          - not_null
       - name: RESOLUTION_STATUS
         description: "Current status of ticket resolution (standardized)"
+        tests:
+          - accepted_values:
+              values: ['Open', 'In Progress', 'Resolved', 'Closed']
       - name: OPEN_DATE
         description: "Date when ticket was opened"
+        tests:
+          - not_null
       - name: LOAD_TIMESTAMP
         description: "Timestamp when record was processed into Silver layer"
       - name: UPDATE_TIMESTAMP
@@ -344,14 +407,26 @@ models:
     columns:
       - name: EVENT_ID
         description: "Unique identifier for each billing event"
+        tests:
+          - not_null
+          - unique
       - name: USER_ID
         description: "Reference to user associated with billing event"
+        tests:
+          - not_null
       - name: EVENT_TYPE
         description: "Type of billing event (standardized)"
+        tests:
+          - not_null
       - name: AMOUNT
         description: "Monetary amount for the billing event (validated)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
       - name: EVENT_DATE
         description: "Date when the billing event occurred"
+        tests:
+          - not_null
       - name: LOAD_TIMESTAMP
         description: "Timestamp when record was processed into Silver layer"
       - name: UPDATE_TIMESTAMP
@@ -372,14 +447,25 @@ models:
     columns:
       - name: LICENSE_ID
         description: "Unique identifier for each license"
+        tests:
+          - not_null
+          - unique
       - name: LICENSE_TYPE
         description: "Type of license (standardized)"
+        tests:
+          - not_null
       - name: ASSIGNED_TO_USER_ID
         description: "User ID to whom license is assigned"
+        tests:
+          - not_null
       - name: START_DATE
         description: "License validity start date"
+        tests:
+          - not_null
       - name: END_DATE
         description: "License validity end date"
+        tests:
+          - not_null
       - name: LOAD_TIMESTAMP
         description: "Timestamp when record was processed into Silver layer"
       - name: UPDATE_TIMESTAMP
