@@ -26,11 +26,11 @@ trends and areas for improvement.
 
 **Data Relationships Used**
 
--   Meeting Activity \--\>Users (via Date Key)
--   Meeting Activity \--\>Meeting (via Meeting ID)
--   Meeting Activity \--\>Users (via User Key)
--   Feature Usage \--\>Dim Feature (via Feature Key)
--   Feature Usage \--\>Dim Date (via Date Key)
+-   Meeting Activity \--\>Users
+-   Meeting Activity \--\>Meeting
+-   Meeting Activity \--\>Users
+-   Feature Usage \--\>Dim Feature
+-   Feature Usage \--\>Dim Date
 
 **Data Attributes in the Report**
 
@@ -80,9 +80,9 @@ service quality and reduce ticket volume.
 
 **Data Relationships Used**
 
--   Fact Support Activity  \--\> Dim Date (via date key)
--   Fact Support Activity  \--\> Dim Support Category (via support category key)
--   Fact Support Activity  \--\> Dim User (via user key)
+-   Fact Support Activity  \--\> Dim Date
+-   Fact Support Activity  \--\> Dim Support Category
+-   Fact Support Activity  \--\> Dim User
 
 **Data Attributes in the Report**
 
