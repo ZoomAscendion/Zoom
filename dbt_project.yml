@@ -2,12 +2,12 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'user'
+profile: 'zoom_silver_pipeline'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
-seed-paths: ["seeds"]
+seed-paths: ["data"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
@@ -18,37 +18,32 @@ clean-targets:
 
 models:
   zoom_silver_pipeline:
-    +materialized: table
-    +on_schema_change: sync_all_columns
     silver:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-          INSERT INTO {{ ref('SI_AUDIT_LOG') }} 
-          (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) 
-          SELECT UUID_STRING(), '{{ this.name }}', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'
+      +on_schema_change: sync_all_columns
+      +pre_hook: |
+        {% if this.name != 'si_audit_log' %}
+        INSERT INTO {{ ref('si_audit_log') }} (
+          AUDIT_ID, TABLE_NAME, COLUMN_NAME, RECORD_ID, ERROR_TYPE, 
+          ERROR_DESCRIPTION, ORIGINAL_VALUE, AUDIT_TIMESTAMP, 
+          OPERATION_TYPE, PROCESSED_BY, SOURCE_SYSTEM
+        )
+        VALUES (
+          GENERATE_UUID(), '{{ this.name }}', 'PIPELINE_START', 'N/A', 'PIPELINE_EXECUTION',
+          'Pipeline execution started for {{ this.name }}', 'N/A', CURRENT_TIMESTAMP(),
+          'INSERT', 'DBT_SILVER_PIPELINE', 'ZOOM_SYSTEM'
+        )
         {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-          INSERT INTO {{ ref('SI_AUDIT_LOG') }} 
-          (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) 
-          SELECT UUID_STRING(), '{{ this.name }}', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'
+      +post_hook: |
+        {% if this.name != 'si_audit_log' %}
+        INSERT INTO {{ ref('si_audit_log') }} (
+          AUDIT_ID, TABLE_NAME, COLUMN_NAME, RECORD_ID, ERROR_TYPE, 
+          ERROR_DESCRIPTION, ORIGINAL_VALUE, AUDIT_TIMESTAMP, 
+          OPERATION_TYPE, PROCESSED_BY, SOURCE_SYSTEM
+        )
+        VALUES (
+          GENERATE_UUID(), '{{ this.name }}', 'PIPELINE_END', 'N/A', 'PIPELINE_EXECUTION',
+          'Pipeline execution completed for {{ this.name }}', 'N/A', CURRENT_TIMESTAMP(),
+          'INSERT', 'DBT_SILVER_PIPELINE', 'ZOOM_SYSTEM'
+        )
         {% endif %}
-
-vars:
-  # Data quality thresholds
-  dq_score_threshold: 70
-  # Date range for processing
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
-
-# Model execution order
-model-order:
-  - SI_AUDIT_LOG
-  - SI_USERS
-  - SI_MEETINGS
-  - SI_PARTICIPANTS
-  - SI_FEATURE_USAGE
-  - SI_SUPPORT_TICKETS
-  - SI_BILLING_EVENTS
-  - SI_LICENSES
