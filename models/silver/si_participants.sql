@@ -18,7 +18,7 @@ WITH bronze_participants AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_PARTICIPANTS') }}
+    FROM BRONZE.BZ_PARTICIPANTS
     WHERE PARTICIPANT_ID IS NOT NULL
 ),
 
@@ -64,8 +64,6 @@ validated_participants AS (
         CASE 
             WHEN p.JOIN_TIME IS NOT NULL AND p.LEAVE_TIME IS NOT NULL 
                  AND p.LEAVE_TIME > p.JOIN_TIME
-                 AND m.MEETING_ID IS NOT NULL
-                 AND u.USER_ID IS NOT NULL
             THEN 100
             WHEN p.JOIN_TIME IS NOT NULL AND p.LEAVE_TIME IS NOT NULL AND p.LEAVE_TIME > p.JOIN_TIME
             THEN 80
@@ -74,16 +72,12 @@ validated_participants AS (
         CASE 
             WHEN p.JOIN_TIME IS NOT NULL AND p.LEAVE_TIME IS NOT NULL 
                  AND p.LEAVE_TIME > p.JOIN_TIME
-                 AND m.MEETING_ID IS NOT NULL
-                 AND u.USER_ID IS NOT NULL
             THEN 'PASSED'
             WHEN p.JOIN_TIME IS NULL OR p.LEAVE_TIME IS NULL OR p.LEAVE_TIME <= p.JOIN_TIME
             THEN 'FAILED'
             ELSE 'WARNING'
         END AS VALIDATION_STATUS
     FROM cleansed_participants p
-    LEFT JOIN {{ ref('si_meetings') }} m ON p.MEETING_ID = m.MEETING_ID
-    LEFT JOIN {{ ref('si_users') }} u ON p.USER_ID = u.USER_ID
 ),
 
 -- Remove Duplicates (Keep latest record)
