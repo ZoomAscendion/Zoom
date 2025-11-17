@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8' ?>
 
-<!-- build 20233.23.1017.0948 -->
+<!-- build 20233.23.1017.0948                               -->
 <workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
   <document-format-change-manifest>
     <SheetIdentifierTracking />
@@ -11,10 +11,10 @@
     <preference name='ui.shelf.height' value='26' />
   </preferences>
   <datasources>
-    <datasource caption='Zoom Platform Usage Analytics (DB_POC_ZOOM.GOLD)' inline='true' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' version='18.1'>
+    <datasource caption='Zoom Platform Analytics (DB_POC_ZOOM.GOLD)' inline='true' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' version='18.1'>
       <connection class='federated'>
         <named-connections>
-          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
+          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
             <connection authentication='oauth' class='snowflake' dbname='DB_POC_ZOOM' instanceurl='https://a8977680256071-ascendion_partner.snowflakecomputing.com' odbc-connect-string-extras='' one-time-sql='' role='FR__POC__ADMIN__ZOOM' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' server-oauth='' service='FR__POC__ADMIN__ZOOM' username='SATHYANARAYANAP' warehouse='WH_POC_ZOOM_DEV_XSMALL' />
           </named-connection>
         </named-connections>
@@ -24,10 +24,10 @@
               <left>
                 <relation type='join' join-type='inner'>
                   <left>
-                    <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='FACT_MEETING_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
+                    <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='FACT_MEETING_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
                   </left>
                   <right>
-                    <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_USER' table='[DB_POC_ZOOM].[GOLD].[DIM_USER]' type='table' />
+                    <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='DIM_USER' table='[DB_POC_ZOOM].[GOLD].[DIM_USER]' type='table' />
                   </right>
                   <clause>
                     <left>[FACT_MEETING_ACTIVITY].[USER_KEY]</left>
@@ -36,7 +36,7 @@
                 </relation>
               </left>
               <right>
-                <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_MEETING' table='[DB_POC_ZOOM].[GOLD].[DIM_MEETING]' type='table' />
+                <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='DIM_MEETING' table='[DB_POC_ZOOM].[GOLD].[DIM_MEETING]' type='table' />
               </right>
               <clause>
                 <left>[FACT_MEETING_ACTIVITY].[MEETING_KEY]</left>
@@ -47,10 +47,10 @@
           <right>
             <relation type='join' join-type='inner'>
               <left>
-                <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_DATE' table='[DB_POC_ZOOM].[GOLD].[DIM_DATE]' type='table' />
+                <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='DIM_DATE' table='[DB_POC_ZOOM].[GOLD].[DIM_DATE]' type='table' />
               </left>
               <right>
-                <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='FACT_FEATURE_USAGE' table='[DB_POC_ZOOM].[GOLD].[FACT_FEATURE_USAGE]' type='table' />
+                <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='FACT_FEATURE_USAGE' table='[DB_POC_ZOOM].[GOLD].[FACT_FEATURE_USAGE]' type='table' />
               </right>
               <clause>
                 <left>[DIM_DATE].[DATE_KEY]</left>
@@ -65,10 +65,10 @@
         </relation>
         <relation type='join' join-type='inner'>
           <left>
-            <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='FACT_FEATURE_USAGE' table='[DB_POC_ZOOM].[GOLD].[FACT_FEATURE_USAGE]' type='table' />
+            <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='FACT_FEATURE_USAGE' table='[DB_POC_ZOOM].[GOLD].[FACT_FEATURE_USAGE]' type='table' />
           </left>
           <right>
-            <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_FEATURE' table='[DB_POC_ZOOM].[GOLD].[DIM_FEATURE]' type='table' />
+            <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='DIM_FEATURE' table='[DB_POC_ZOOM].[GOLD].[DIM_FEATURE]' type='table' />
           </right>
           <clause>
             <left>[FACT_FEATURE_USAGE].[FEATURE_KEY]</left>
@@ -76,54 +76,51 @@
           </clause>
         </relation>
         <cols>
-          <map key='[USER_KEY]' value='[DIM_USER].[USER_KEY]' />
           <map key='[USER_NAME]' value='[DIM_USER].[USER_NAME]' />
-          <map key='[COMPANY]' value='[DIM_USER].[COMPANY]' />
-          <map key='[PLAN_TYPE]' value='[DIM_USER].[PLAN_TYPE]' />
-          <map key='[MEETING_KEY]' value='[DIM_MEETING].[MEETING_KEY]' />
-          <map key='[MEETING_TYPE]' value='[DIM_MEETING].[MEETING_TYPE]' />
-          <map key='[MEETING_CATEGORY]' value='[DIM_MEETING].[MEETING_CATEGORY]' />
           <map key='[MEETING_TOPIC]' value='[FACT_MEETING_ACTIVITY].[MEETING_TOPIC]' />
           <map key='[DURATION_MINUTES]' value='[FACT_MEETING_ACTIVITY].[DURATION_MINUTES]' />
-          <map key='[PARTICIPANT_COUNT]' value='[FACT_MEETING_ACTIVITY].[PARTICIPANT_COUNT]' />
+          <map key='[MEETING_TYPE]' value='[DIM_MEETING].[MEETING_TYPE]' />
+          <map key='[MEETING_CATEGORY]' value='[DIM_MEETING].[MEETING_CATEGORY]' />
           <map key='[FEATURE_NAME]' value='[DIM_FEATURE].[FEATURE_NAME]' />
           <map key='[USAGE_COUNT]' value='[FACT_FEATURE_USAGE].[USAGE_COUNT]' />
-          <map key='[DATE_VALUE]' value='[DIM_DATE].[DATE_VALUE]' />
-          <map key='[YEAR]' value='[DIM_DATE].[YEAR]' />
-          <map key='[MONTH]' value='[DIM_DATE].[MONTH]' />
+          <map key='[PARTICIPANT_COUNT]' value='[FACT_MEETING_ACTIVITY].[PARTICIPANT_COUNT]' />
+          <map key='[MEETING_DATE]' value='[FACT_MEETING_ACTIVITY].[MEETING_DATE]' />
+          <map key='[USER_KEY]' value='[DIM_USER].[USER_KEY]' />
         </cols>
         <metadata-records>
-          <metadata-record class='column'>
-            <remote-name>USER_KEY</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[USER_KEY]</local-name>
-            <parent-name>[DIM_USER]</parent-name>
-            <remote-alias>USER_KEY</remote-alias>
-            <ordinal>1</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <contains-null>true</contains-null>
-          </metadata-record>
           <metadata-record class='column'>
             <remote-name>USER_NAME</remote-name>
             <remote-type>129</remote-type>
             <local-name>[USER_NAME]</local-name>
             <parent-name>[DIM_USER]</parent-name>
             <remote-alias>USER_NAME</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MEETING_TOPIC</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MEETING_TOPIC]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>MEETING_TOPIC</remote-alias>
             <ordinal>2</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
           </metadata-record>
           <metadata-record class='column'>
-            <remote-name>COMPANY</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[COMPANY]</local-name>
-            <parent-name>[DIM_USER]</parent-name>
-            <remote-alias>COMPANY</remote-alias>
+            <remote-name>DURATION_MINUTES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[DURATION_MINUTES]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>DURATION_MINUTES</remote-alias>
             <ordinal>3</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
             <contains-null>true</contains-null>
           </metadata-record>
           <metadata-record class='column'>
@@ -136,6 +133,7 @@
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>MEETING_CATEGORY</remote-name>
@@ -147,24 +145,26 @@
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
           </metadata-record>
           <metadata-record class='column'>
-            <remote-name>MEETING_TOPIC</remote-name>
+            <remote-name>FEATURE_NAME</remote-name>
             <remote-type>129</remote-type>
-            <local-name>[MEETING_TOPIC]</local-name>
-            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
-            <remote-alias>MEETING_TOPIC</remote-alias>
+            <local-name>[FEATURE_NAME]</local-name>
+            <parent-name>[DIM_FEATURE]</parent-name>
+            <remote-alias>FEATURE_NAME</remote-alias>
             <ordinal>6</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
           </metadata-record>
           <metadata-record class='column'>
-            <remote-name>DURATION_MINUTES</remote-name>
+            <remote-name>USAGE_COUNT</remote-name>
             <remote-type>131</remote-type>
-            <local-name>[DURATION_MINUTES]</local-name>
-            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
-            <remote-alias>DURATION_MINUTES</remote-alias>
+            <local-name>[USAGE_COUNT]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>USAGE_COUNT</remote-alias>
             <ordinal>7</ordinal>
             <local-type>integer</local-type>
             <aggregation>Sum</aggregation>
@@ -182,43 +182,41 @@
             <contains-null>true</contains-null>
           </metadata-record>
           <metadata-record class='column'>
-            <remote-name>FEATURE_NAME</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[FEATURE_NAME]</local-name>
-            <parent-name>[DIM_FEATURE]</parent-name>
-            <remote-alias>FEATURE_NAME</remote-alias>
+            <remote-name>MEETING_DATE</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[MEETING_DATE]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>MEETING_DATE</remote-alias>
             <ordinal>9</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
             <contains-null>true</contains-null>
           </metadata-record>
           <metadata-record class='column'>
-            <remote-name>USAGE_COUNT</remote-name>
-            <remote-type>131</remote-type>
-            <local-name>[USAGE_COUNT]</local-name>
-            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
-            <remote-alias>USAGE_COUNT</remote-alias>
+            <remote-name>USER_KEY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_KEY]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>USER_KEY</remote-alias>
             <ordinal>10</ordinal>
-            <local-type>integer</local-type>
-            <aggregation>Sum</aggregation>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
           </metadata-record>
         </metadata-records>
       </connection>
       <aliases enabled='yes' />
-      <column caption='User Key' datatype='string' name='[USER_KEY]' role='dimension' type='nominal' />
       <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
-      <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
-      <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
-      <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
-      <column caption='Meeting Category' datatype='string' name='[MEETING_CATEGORY]' role='dimension' type='nominal' />
       <column caption='Meeting Topic' datatype='string' name='[MEETING_TOPIC]' role='dimension' type='nominal' />
       <column caption='Duration Minutes' datatype='integer' name='[DURATION_MINUTES]' role='measure' type='quantitative' />
-      <column caption='Participant Count' datatype='integer' name='[PARTICIPANT_COUNT]' role='measure' type='quantitative' />
+      <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
+      <column caption='Meeting Category' datatype='string' name='[MEETING_CATEGORY]' role='dimension' type='nominal' />
       <column caption='Feature Name' datatype='string' name='[FEATURE_NAME]' role='dimension' type='nominal' />
       <column caption='Usage Count' datatype='integer' name='[USAGE_COUNT]' role='measure' type='quantitative' />
-      
-      <!-- Calculated Fields for KPIs -->
+      <column caption='Participant Count' datatype='integer' name='[PARTICIPANT_COUNT]' role='measure' type='quantitative' />
+      <column caption='Meeting Date' datatype='date' name='[MEETING_DATE]' role='dimension' type='ordinal' />
+      <column caption='User Key' datatype='string' name='[USER_KEY]' role='dimension' type='nominal' />
       <column caption='Total Number of Users' datatype='integer' name='[Calculation_Total_Users]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='COUNTD([USER_KEY])' />
       </column>
@@ -226,72 +224,15 @@
         <calculation class='tableau' formula='AVG([DURATION_MINUTES])' />
       </column>
       <column caption='Meetings Per User' datatype='real' name='[Calculation_Meetings_Per_User]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNT([MEETING_KEY]) / COUNTD([USER_KEY])' />
+        <calculation class='tableau' formula='COUNT([MEETING_TOPIC]) / COUNTD([USER_KEY])' />
       </column>
-      <column caption='Feature Usage Distribution' datatype='integer' name='[Calculation_Feature_Distribution]' role='measure' type='quantitative'>
+      <column caption='Feature Usage Distribution' datatype='integer' name='[Calculation_Feature_Usage_Dist]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='SUM([USAGE_COUNT])' />
       </column>
-      <column caption='Average Duration by Type Category' datatype='real' name='[Calculation_Avg_Duration_Type_Cat]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='AVG([DURATION_MINUTES])' />
-      </column>
-      
       <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
-      <semantic-values>
-        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
-      </semantic-values>
     </datasource>
   </datasources>
   <worksheets>
-    <worksheet name='Total Users KPI'>
-      <layout-options>
-        <title>
-          <formatted-text>
-            <run>Total Number of Users</run>
-          </formatted-text>
-        </title>
-      </layout-options>
-      <table>
-        <view>
-          <datasources>
-            <datasource caption='Zoom Platform Usage Analytics (DB_POC_ZOOM.GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
-          </datasources>
-          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
-            <column caption='Total Number of Users' datatype='integer' name='[Calculation_Total_Users]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='COUNTD([USER_KEY])' />
-            </column>
-            <column-instance column='[Calculation_Total_Users]' derivation='User' name='[usr:Calculation_Total_Users:qk]' pivot='key' type='quantitative' />
-          </datasource-dependencies>
-          <aggregation value='true' />
-        </view>
-        <style>
-          <style-rule element='cell'>
-            <format attr='width' value='200' />
-            <format attr='height' value='100' />
-          </style-rule>
-          <style-rule element='mark'>
-            <format attr='mark-labels-show' value='true' />
-            <format attr='mark-labels-cull' value='true' />
-            <format attr='font-size' value='24' />
-            <format attr='font-weight' value='bold' />
-          </style-rule>
-        </style>
-        <panes>
-          <pane selection-relaxation-option='selection-relaxation-allow'>
-            <view>
-              <breakdown value='auto' />
-            </view>
-            <mark class='Text' />
-            <encodings>
-              <text column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[usr:Calculation_Total_Users:qk]' />
-            </encodings>
-          </pane>
-        </panes>
-        <rows />
-        <cols />
-      </table>
-      <simple-id uuid='{A1B2C3D4-E5F6-7A8B-9C0D-1E2F3A4B5C6D}' />
-    </worksheet>
-    
     <worksheet name='Number of Meetings per User'>
       <layout-options>
         <title>
@@ -303,24 +244,19 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='Zoom Platform Usage Analytics (DB_POC_ZOOM.GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
+            <datasource caption='Zoom Platform Analytics (DB_POC_ZOOM.GOLD)' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
           </datasources>
-          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
             <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
             <column caption='Meetings Per User' datatype='real' name='[Calculation_Meetings_Per_User]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='COUNT([MEETING_KEY]) / COUNTD([USER_KEY])' />
+              <calculation class='tableau' formula='COUNT([MEETING_TOPIC]) / COUNTD([USER_KEY])' />
             </column>
             <column-instance column='[USER_NAME]' derivation='None' name='[none:USER_NAME:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calculation_Meetings_Per_User]' derivation='User' name='[usr:Calculation_Meetings_Per_User:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_Meetings_Per_User]' derivation='Sum' name='[sum:Calculation_Meetings_Per_User:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
-        <style>
-          <style-rule element='mark'>
-            <format attr='mark-labels-show' value='true' />
-            <format attr='mark-labels-cull' value='true' />
-          </style-rule>
-        </style>
+        <style />
         <panes>
           <pane selection-relaxation-option='selection-relaxation-allow'>
             <view>
@@ -328,47 +264,47 @@
             </view>
             <mark class='Bar' />
             <encodings>
-              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:USER_NAME:nk]' />
+              <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:USER_NAME:nk]' />
             </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
           </pane>
         </panes>
-        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[usr:Calculation_Meetings_Per_User:qk]</rows>
-        <cols>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:USER_NAME:nk]</cols>
+        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[sum:Calculation_Meetings_Per_User:qk]</rows>
+        <cols>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:USER_NAME:nk]</cols>
       </table>
-      <simple-id uuid='{B2C3D4E5-F6A7-8B9C-0D1E-2F3A4B5C6D7E}' />
+      <simple-id uuid='{A1B2C3D4-E5F6-7G8H-9I0J-K1L2M3N4O5P6}' />
     </worksheet>
-    
-    <worksheet name='Average Duration by Type Category'>
+    <worksheet name='Average Duration by Meeting Type'>
       <layout-options>
         <title>
           <formatted-text>
-            <run>Average Meeting Duration by Type &amp; Category</run>
+            <run>Average Duration by Meeting Type and Category</run>
           </formatted-text>
         </title>
       </layout-options>
       <table>
         <view>
           <datasources>
-            <datasource caption='Zoom Platform Usage Analytics (DB_POC_ZOOM.GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
+            <datasource caption='Zoom Platform Analytics (DB_POC_ZOOM.GOLD)' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
           </datasources>
-          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
             <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
             <column caption='Meeting Category' datatype='string' name='[MEETING_CATEGORY]' role='dimension' type='nominal' />
-            <column caption='Average Duration by Type Category' datatype='real' name='[Calculation_Avg_Duration_Type_Cat]' role='measure' type='quantitative'>
+            <column caption='Average Meeting Duration' datatype='real' name='[Calculation_Avg_Duration]' role='measure' type='quantitative'>
               <calculation class='tableau' formula='AVG([DURATION_MINUTES])' />
             </column>
             <column-instance column='[MEETING_TYPE]' derivation='None' name='[none:MEETING_TYPE:nk]' pivot='key' type='nominal' />
             <column-instance column='[MEETING_CATEGORY]' derivation='None' name='[none:MEETING_CATEGORY:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calculation_Avg_Duration_Type_Cat]' derivation='User' name='[usr:Calculation_Avg_Duration_Type_Cat:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_Avg_Duration]' derivation='Sum' name='[sum:Calculation_Avg_Duration:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
-        <style>
-          <style-rule element='mark'>
-            <format attr='mark-labels-show' value='true' />
-            <format attr='mark-labels-cull' value='true' />
-          </style-rule>
-        </style>
+        <style />
         <panes>
           <pane selection-relaxation-option='selection-relaxation-allow'>
             <view>
@@ -376,16 +312,21 @@
             </view>
             <mark class='Bar' />
             <encodings>
-              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:MEETING_CATEGORY:nk]' />
+              <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:MEETING_CATEGORY:nk]' />
             </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
           </pane>
         </panes>
-        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[usr:Calculation_Avg_Duration_Type_Cat:qk]</rows>
-        <cols>([federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:MEETING_TYPE:nk] / [federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:MEETING_CATEGORY:nk])</cols>
+        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[sum:Calculation_Avg_Duration:qk]</rows>
+        <cols>([federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:MEETING_TYPE:nk] / [federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:MEETING_CATEGORY:nk])</cols>
       </table>
-      <simple-id uuid='{C3D4E5F6-A7B8-9C0D-1E2F-3A4B5C6D7E8F}' />
+      <simple-id uuid='{B2C3D4E5-F6G7-8H9I-0J1K-L2M3N4O5P6Q7}' />
     </worksheet>
-    
     <worksheet name='Feature Usage Distribution'>
       <layout-options>
         <title>
@@ -397,24 +338,19 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='Zoom Platform Usage Analytics (DB_POC_ZOOM.GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
+            <datasource caption='Zoom Platform Analytics (DB_POC_ZOOM.GOLD)' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
           </datasources>
-          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
             <column caption='Feature Name' datatype='string' name='[FEATURE_NAME]' role='dimension' type='nominal' />
-            <column caption='Feature Usage Distribution' datatype='integer' name='[Calculation_Feature_Distribution]' role='measure' type='quantitative'>
+            <column caption='Feature Usage Distribution' datatype='integer' name='[Calculation_Feature_Usage_Dist]' role='measure' type='quantitative'>
               <calculation class='tableau' formula='SUM([USAGE_COUNT])' />
             </column>
             <column-instance column='[FEATURE_NAME]' derivation='None' name='[none:FEATURE_NAME:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calculation_Feature_Distribution]' derivation='User' name='[usr:Calculation_Feature_Distribution:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_Feature_Usage_Dist]' derivation='Sum' name='[sum:Calculation_Feature_Usage_Dist:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
-        <style>
-          <style-rule element='mark'>
-            <format attr='mark-labels-show' value='true' />
-            <format attr='mark-labels-cull' value='true' />
-          </style-rule>
-        </style>
+        <style />
         <panes>
           <pane selection-relaxation-option='selection-relaxation-allow'>
             <view>
@@ -422,19 +358,71 @@
             </view>
             <mark class='Pie' />
             <encodings>
-              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:FEATURE_NAME:nk]' />
-              <size column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[usr:Calculation_Feature_Distribution:qk]' />
+              <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:FEATURE_NAME:nk]' />
+              <size column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[sum:Calculation_Feature_Usage_Dist:qk]' />
             </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
           </pane>
         </panes>
         <rows />
         <cols />
       </table>
-      <simple-id uuid='{D4E5F6A7-B8C9-0D1E-2F3A-4B5C6D7E8F9A}' />
+      <simple-id uuid='{C3D4E5F6-G7H8-9I0J-1K2L-M3N4O5P6Q7R8}' />
+    </worksheet>
+    <worksheet name='Total Users by Meeting Topics'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Number of Users by Meeting Topics</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Zoom Platform Analytics (DB_POC_ZOOM.GOLD)' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
+            <column caption='Meeting Topic' datatype='string' name='[MEETING_TOPIC]' role='dimension' type='nominal' />
+            <column caption='Total Number of Users' datatype='integer' name='[Calculation_Total_Users]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD([USER_KEY])' />
+            </column>
+            <column-instance column='[MEETING_TOPIC]' derivation='None' name='[none:MEETING_TOPIC:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_Total_Users]' derivation='Sum' name='[sum:Calculation_Total_Users:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:MEETING_TOPIC:nk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[sum:Calculation_Total_Users:qk]</rows>
+        <cols>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:MEETING_TOPIC:nk]</cols>
+      </table>
+      <simple-id uuid='{D4E5F6G7-H8I9-0J1K-2L3M-N4O5P6Q7R8S9}' />
     </worksheet>
   </worksheets>
   <windows saved-dpi-scale-factor='1.5' source-height='44'>
-    <window class='worksheet' maximized='true' name='Total Users KPI'>
+    <window class='worksheet' maximized='true' name='Number of Meetings per User'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -455,9 +443,9 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{E5F6A7B8-C9D0-1E2F-3A4B-5C6D7E8F9A0B}' />
+      <simple-id uuid='{E5F6G7H8-I9J0-1K2L-3M4N-O5P6Q7R8S9T0}' />
     </window>
-    <window class='worksheet' name='Number of Meetings per User'>
+    <window class='worksheet' name='Average Duration by Meeting Type'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -478,30 +466,7 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{F6A7B8C9-D0E1-2F3A-4B5C-6D7E8F9A0B1C}' />
-    </window>
-    <window class='worksheet' name='Average Duration by Type Category'>
-      <cards>
-        <edge name='left'>
-          <strip size='160'>
-            <card type='pages' />
-            <card type='filters' />
-            <card type='marks' />
-          </strip>
-        </edge>
-        <edge name='top'>
-          <strip size='2147483647'>
-            <card type='columns' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='rows' />
-          </strip>
-          <strip size='30'>
-            <card type='title' />
-          </strip>
-        </edge>
-      </cards>
-      <simple-id uuid='{A7B8C9D0-E1F2-3A4B-5C6D-7E8F9A0B1C2D}' />
+      <simple-id uuid='{F6G7H8I9-J0K1-2L3M-4N5O-P6Q7R8S9T0U1}' />
     </window>
     <window class='worksheet' name='Feature Usage Distribution'>
       <cards>
@@ -524,7 +489,30 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{B8C9D0E1-F2A3-4B5C-6D7E-8F9A0B1C2D3E}' />
+      <simple-id uuid='{A7B8C9D0-E1F2-3G4H-5I6J-K7L8M9N0O1P2}' />
+    </window>
+    <window class='worksheet' name='Total Users by Meeting Topics'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{B8C9D0E1-F2G3-4H5I-6J7K-L8M9N0O1P2Q3}' />
     </window>
   </windows>
 </workbook>
