@@ -2,12 +2,14 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_silver'
+# This setting configures which "profile" dbt uses for this project.
+profile: 'zoom_silver_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
-analysis-paths: ["analysis"]
+analysis-paths: ["analyses"]
 test-paths: ["tests"]
-seed-paths: ["data"]
+seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
@@ -16,28 +18,66 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
   zoom_silver_pipeline:
+    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
-      +pre_hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (EXECUTION_ID, PIPELINE_NAME, EXECUTION_START_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP)
-        VALUES (UUID_STRING(), '{{ this.name }}', CURRENT_TIMESTAMP(), 'STARTED', 'BRONZE.BZ_{{ this.name[3:] }}', '{{ this.schema }}.{{ this.name }}', 'DBT_PIPELINE', CURRENT_TIMESTAMP())
-        {% endif %}
-      +post_hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-        UPDATE {{ ref('SI_AUDIT_LOG') }} 
-        SET EXECUTION_END_TIME = CURRENT_TIMESTAMP(), 
-            EXECUTION_STATUS = 'SUCCESS',
-            RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
-            UPDATE_TIMESTAMP = CURRENT_TIMESTAMP()
-        WHERE TARGET_TABLE = '{{ this.schema }}.{{ this.name }}' 
-        AND EXECUTION_STATUS = 'STARTED'
-        AND EXECUTION_START_TIME >= CURRENT_TIMESTAMP() - INTERVAL '1 HOUR'
-        {% endif %}
+      # Ensure audit log runs first
+      SI_Audit_Log:
+        +pre_hook: []
+        +post_hook: []
+      # All other models depend on audit log
+      SI_USERS:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_MEETINGS:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_PARTICIPANTS:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_FEATURE_USAGE:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_SUPPORT_TICKETS:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_BILLING_EVENTS:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_LICENSES:
+        +depends_on:
+          - ref('SI_Audit_Log')
 
+# Configure seeds
+seeds:
+  zoom_silver_pipeline:
+    +quote_columns: false
+
+# Configure snapshots
+snapshots:
+  zoom_silver_pipeline:
+    +target_schema: snapshots
+
+# Configure tests
+tests:
+  zoom_silver_pipeline:
+    +store_failures: true
+
+# Configure vars
 vars:
+  # The `start_date` variable will be accessible in all resources
   start_date: '2020-01-01'
-  end_date: '2030-12-31'
+  # The `timezone` variable for timestamp standardization
+  timezone: 'UTC'
+  # Data quality thresholds
+  dq_threshold_critical: 90
+  dq_threshold_warning: 70
+
+# Configure dispatch
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['zoom_silver_pipeline', 'dbt_utils']
