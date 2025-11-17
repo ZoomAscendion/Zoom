@@ -18,7 +18,7 @@ WITH bronze_licenses AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_LICENSES') }}
+    FROM BRONZE.BZ_LICENSES
     WHERE LICENSE_ID IS NOT NULL
 ),
 
@@ -61,7 +61,6 @@ validated_licenses AS (
             WHEN l.START_DATE IS NOT NULL AND l.END_DATE IS NOT NULL
                  AND l.END_DATE > l.START_DATE
                  AND l.LICENSE_TYPE IS NOT NULL
-                 AND u.USER_ID IS NOT NULL
             THEN 100
             WHEN l.START_DATE IS NOT NULL AND l.END_DATE IS NOT NULL
                  AND l.END_DATE > l.START_DATE
@@ -72,14 +71,12 @@ validated_licenses AS (
             WHEN l.START_DATE IS NOT NULL AND l.END_DATE IS NOT NULL
                  AND l.END_DATE > l.START_DATE
                  AND l.LICENSE_TYPE IS NOT NULL
-                 AND u.USER_ID IS NOT NULL
             THEN 'PASSED'
             WHEN l.START_DATE IS NULL OR l.END_DATE IS NULL OR l.END_DATE <= l.START_DATE
             THEN 'FAILED'
             ELSE 'WARNING'
         END AS VALIDATION_STATUS
     FROM cleansed_licenses l
-    LEFT JOIN {{ ref('si_users') }} u ON l.ASSIGNED_TO_USER_ID = u.USER_ID
 ),
 
 -- Remove Duplicates
