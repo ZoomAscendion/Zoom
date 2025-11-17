@@ -13,71 +13,48 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"
-clean-targets:
+target-path: "target"  # directory which will store compiled SQL files
+clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
 # Configuring models
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/silver/
+    # Config indicated by + and applies to all files under models/example/
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
       # Ensure audit log runs first
-      SI_Audit_Log:
+      SI_AUDIT_LOG:
         +pre_hook: []
         +post_hook: []
       # All other models depend on audit log
-      SI_USERS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_MEETINGS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_PARTICIPANTS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_FEATURE_USAGE:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_SUPPORT_TICKETS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_BILLING_EVENTS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_LICENSES:
-        +depends_on:
-          - ref('SI_Audit_Log')
+      +pre_hook: |
+        {% if this.name != 'SI_AUDIT_LOG' %}
+          INSERT INTO {{ ref('SI_AUDIT_LOG') }} 
+          (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_START_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTION_TRIGGER, EXECUTED_BY, LOAD_TIMESTAMP) 
+          SELECT UUID_STRING(), '{{ this.name }}', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'RUNNING', 'BZ_{{ this.name[3:] }}', '{{ this.name }}', 'DBT_SCHEDULED', 'DBT_CLOUD', CURRENT_TIMESTAMP()
+        {% endif %}
+      +post_hook: |
+        {% if this.name != 'SI_AUDIT_LOG' %}
+          INSERT INTO {{ ref('SI_AUDIT_LOG') }} 
+          (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_END_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, RECORDS_PROCESSED, RECORDS_SUCCESS, EXECUTION_TRIGGER, EXECUTED_BY, UPDATE_TIMESTAMP) 
+          SELECT UUID_STRING(), '{{ this.name }}', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'SUCCESS', 'BZ_{{ this.name[3:] }}', '{{ this.name }}', (SELECT COUNT(*) FROM {{ this }}), (SELECT COUNT(*) FROM {{ this }}), 'DBT_SCHEDULED', 'DBT_CLOUD', CURRENT_TIMESTAMP()
+        {% endif %}
 
-# Configure seeds
-seeds:
-  zoom_silver_pipeline:
-    +quote_columns: false
+# Set the order of model execution
+model-ordering:
+  - "SI_AUDIT_LOG"  # Run first
+  - "SI_USERS"
+  - "SI_MEETINGS"
+  - "SI_PARTICIPANTS"
+  - "SI_FEATURE_USAGE"
+  - "SI_SUPPORT_TICKETS"
+  - "SI_BILLING_EVENTS"
+  - "SI_LICENSES"
 
-# Configure snapshots
-snapshots:
-  zoom_silver_pipeline:
-    +target_schema: snapshots
-
-# Configure tests
-tests:
-  zoom_silver_pipeline:
-    +store_failures: true
-
-# Configure vars
 vars:
-  # The `start_date` variable will be accessible in all resources
+  # dbt project variables
   start_date: '2020-01-01'
-  # The `timezone` variable for timestamp standardization
-  timezone: 'UTC'
-  # Data quality thresholds
-  dq_threshold_critical: 90
-  dq_threshold_warning: 70
-
-# Configure dispatch
-dispatch:
-  - macro_namespace: dbt_utils
-    search_order: ['zoom_silver_pipeline', 'dbt_utils']
+  end_date: '2030-12-31'
