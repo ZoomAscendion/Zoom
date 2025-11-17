@@ -5,9 +5,9 @@ config-version: 2
 profile: 'zoom_silver'
 
 model-paths: ["models"]
-analysis-paths: ["analysis"]
+analysis-paths: ["analyses"]
 test-paths: ["tests"]
-seed-paths: ["data"]
+seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
@@ -18,10 +18,48 @@ clean-targets:
 
 models:
   zoom_silver_pipeline:
-    +materialized: table
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
       SI_Audit_Log:
         +pre_hook: []
         +post_hook: []
+      +pre_hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+        INSERT INTO {{ ref('SI_Audit_Log') }} (
+          EXECUTION_ID,
+          PIPELINE_NAME,
+          PIPELINE_TYPE,
+          EXECUTION_START_TIME,
+          EXECUTION_STATUS,
+          SOURCE_TABLE,
+          TARGET_TABLE,
+          EXECUTED_BY,
+          LOAD_TIMESTAMP
+        )
+        VALUES (
+          '{{ invocation_id }}',
+          '{{ this.name }}',
+          'SILVER_TRANSFORMATION',
+          CURRENT_TIMESTAMP(),
+          'STARTED',
+          'BRONZE.BZ_{{ this.name[3:] }}',
+          '{{ this }}',
+          'DBT_PIPELINE',
+          CURRENT_TIMESTAMP()
+        )
+        {% endif %}
+      +post_hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+        UPDATE {{ ref('SI_Audit_Log') }}
+        SET 
+          EXECUTION_END_TIME = CURRENT_TIMESTAMP(),
+          EXECUTION_DURATION_SECONDS = DATEDIFF('second', EXECUTION_START_TIME, CURRENT_TIMESTAMP()),
+          EXECUTION_STATUS = 'COMPLETED',
+          RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
+          RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}),
+          UPDATE_TIMESTAMP = CURRENT_TIMESTAMP()
+        WHERE EXECUTION_ID = '{{ invocation_id }}'
+        AND TARGET_TABLE = '{{ this }}'
+        AND EXECUTION_STATUS = 'STARTED'
+        {% endif %}
