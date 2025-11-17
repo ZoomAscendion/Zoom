@@ -17,25 +17,15 @@ WITH bronze_participants AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM {{ source('bronze', 'BZ_PARTICIPANTS') }}
+    WHERE PARTICIPANT_ID IS NOT NULL
 ),
 
 timestamp_cleaning AS (
     SELECT 
         *,
-        /* Handle MM/DD/YYYY HH:MM format conversion */
-        COALESCE(
-            TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
-            TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
-            TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
-            JOIN_TIME
-        ) AS CLEAN_JOIN_TIME,
-        
-        COALESCE(
-            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
-            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
-            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
-            LEAVE_TIME
-        ) AS CLEAN_LEAVE_TIME
+        /* Handle MM/DD/YYYY HH:MM format conversion using macro */
+        {{ safe_to_timestamp('JOIN_TIME') }} AS CLEAN_JOIN_TIME,
+        {{ safe_to_timestamp('LEAVE_TIME') }} AS CLEAN_LEAVE_TIME
     FROM bronze_participants
 ),
 
@@ -66,7 +56,6 @@ deduplication AS (
     SELECT *,
         ROW_NUMBER() OVER (PARTITION BY PARTICIPANT_ID ORDER BY UPDATE_TIMESTAMP DESC NULLS LAST, LOAD_TIMESTAMP DESC) AS rn
     FROM data_quality_checks
-    WHERE PARTICIPANT_ID IS NOT NULL
 )
 
 SELECT 
