@@ -29,7 +29,7 @@ models:
           OPERATION_TYPE, PROCESSED_BY, SOURCE_SYSTEM
         )
         VALUES (
-          GENERATE_UUID(), '{{ this.name }}', 'PIPELINE_START', 'N/A', 'PIPELINE_EXECUTION',
+          UUID_STRING(), '{{ this.name }}', 'PIPELINE_START', 'N/A', 'PIPELINE_EXECUTION',
           'Pipeline execution started for {{ this.name }}', 'N/A', CURRENT_TIMESTAMP(),
           'INSERT', 'DBT_SILVER_PIPELINE', 'ZOOM_SYSTEM'
         )
@@ -42,7 +42,7 @@ models:
           OPERATION_TYPE, PROCESSED_BY, SOURCE_SYSTEM
         )
         VALUES (
-          GENERATE_UUID(), '{{ this.name }}', 'PIPELINE_END', 'N/A', 'PIPELINE_EXECUTION',
+          UUID_STRING(), '{{ this.name }}', 'PIPELINE_END', 'N/A', 'PIPELINE_EXECUTION',
           'Pipeline execution completed for {{ this.name }}', 'N/A', CURRENT_TIMESTAMP(),
           'INSERT', 'DBT_SILVER_PIPELINE', 'ZOOM_SYSTEM'
         )
