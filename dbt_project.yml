@@ -21,30 +21,9 @@ clean-targets:
 # Configuring models
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/example/
+    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'si_audit_log' %}
-          INSERT INTO {{ ref('si_audit_log') }} (TABLE_NAME, STATUS, AUDIT_TIMESTAMP, LOAD_TIMESTAMP) 
-          SELECT '{{ this.name | upper }}', 'PROCESSING_STARTED', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'si_audit_log' %}
-          INSERT INTO {{ ref('si_audit_log') }} (TABLE_NAME, STATUS, AUDIT_TIMESTAMP, LOAD_TIMESTAMP) 
-          SELECT '{{ this.name | upper }}', 'PROCESSING_COMPLETED', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
-        {% endif %}
-
-# Model execution order - audit log must run first
-model-ordering:
-  - si_audit_log
-  - si_users
-  - si_meetings
-  - si_participants
-  - si_feature_usage
-  - si_support_tickets
-  - si_billing_events
-  - si_licenses
 
 # Snowflake-specific configurations
 vars:
