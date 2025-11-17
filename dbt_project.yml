@@ -13,60 +13,53 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+target-path: "target"
+clean-targets:
   - "target"
   - "dbt_packages"
 
 # Configuring models
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/silver/
+    # Config indicated by + and applies to all files under models/example/
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
-      # Ensure audit log runs first
-      SI_Audit_Log:
-        +pre_hook: []
-        +post_hook: []
-      # All other models depend on audit log
-      SI_USERS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_MEETINGS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_PARTICIPANTS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_FEATURE_USAGE:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_SUPPORT_TICKETS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_BILLING_EVENTS:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_LICENSES:
-        +depends_on:
-          - ref('SI_Audit_Log')
-
-# Global configurations
-vars:
-  # Data quality thresholds
-  dq_threshold_passed: 90
-  dq_threshold_warning: 70
-  
-  # Timezone settings
-  default_timezone: 'UTC'
-  source_timezone_est: 'America/New_York'
-  
-  # Business rule configurations
-  valid_plan_types: ['Free', 'Basic', 'Pro', 'Enterprise']
-  valid_resolution_statuses: ['Open', 'In Progress', 'Resolved', 'Closed']
-  max_meeting_duration_minutes: 1440
-  
-  # Error handling configurations
-  enable_error_logging: true
-  enable_audit_logging: true
+      +pre_hook: |
+        {% if this.name != 'SI_AUDIT_LOG' %}
+        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
+          EXECUTION_ID,
+          PIPELINE_NAME,
+          PIPELINE_TYPE,
+          EXECUTION_START_TIME,
+          EXECUTION_STATUS,
+          SOURCE_TABLE,
+          TARGET_TABLE,
+          EXECUTED_BY,
+          LOAD_TIMESTAMP
+        )
+        VALUES (
+          '{{ invocation_id }}',
+          '{{ this.name }}',
+          'BRONZE_TO_SILVER',
+          CURRENT_TIMESTAMP(),
+          'RUNNING',
+          'BRONZE.{{ this.name | replace("SI_", "BZ_") }}',
+          '{{ this }}',
+          'DBT_PIPELINE',
+          CURRENT_TIMESTAMP()
+        )
+        {% endif %}
+      +post_hook: |
+        {% if this.name != 'SI_AUDIT_LOG' %}
+        UPDATE {{ ref('SI_AUDIT_LOG') }}
+        SET 
+          EXECUTION_END_TIME = CURRENT_TIMESTAMP(),
+          EXECUTION_STATUS = 'SUCCESS',
+          RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
+          RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}),
+          UPDATE_TIMESTAMP = CURRENT_TIMESTAMP()
+        WHERE EXECUTION_ID = '{{ invocation_id }}'
+        AND TARGET_TABLE = '{{ this }}'
+        AND EXECUTION_STATUS = 'RUNNING'
+        {% endif %}
