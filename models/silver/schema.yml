@@ -1,0 +1,184 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "Bronze layer tables containing raw data from source systems"
+    tables:
+      - name: BZ_USERS
+        description: "Raw user profile and subscription information"
+        columns:
+          - name: USER_ID
+            description: "Unique identifier for each user account"
+          - name: USER_NAME
+            description: "Display name of the user"
+          - name: EMAIL
+            description: "Email address of the user"
+          - name: COMPANY
+            description: "Company or organization name"
+          - name: PLAN_TYPE
+            description: "Subscription plan type"
+      
+      - name: BZ_MEETINGS
+        description: "Raw meeting information and session details"
+        columns:
+          - name: MEETING_ID
+            description: "Unique identifier for each meeting"
+          - name: HOST_ID
+            description: "User ID of the meeting host"
+          - name: DURATION_MINUTES
+            description: "Meeting duration in minutes (may contain text units)"
+      
+      - name: BZ_PARTICIPANTS
+        description: "Raw meeting participants and session details"
+        columns:
+          - name: PARTICIPANT_ID
+            description: "Unique identifier for each meeting participant"
+          - name: JOIN_TIME
+            description: "Timestamp when participant joined (various formats)"
+          - name: LEAVE_TIME
+            description: "Timestamp when participant left (various formats)"
+      
+      - name: BZ_FEATURE_USAGE
+        description: "Raw platform feature usage during meetings"
+      
+      - name: BZ_SUPPORT_TICKETS
+        description: "Raw customer support requests and resolution tracking"
+      
+      - name: BZ_BILLING_EVENTS
+        description: "Raw financial transactions and billing activities"
+      
+      - name: BZ_LICENSES
+        description: "Raw license assignments and entitlements"
+        columns:
+          - name: START_DATE
+            description: "License start date (may be in DD/MM/YYYY format)"
+          - name: END_DATE
+            description: "License end date (may be in DD/MM/YYYY format)"
+
+models:
+  - name: si_audit_log
+    description: "Audit table for Silver layer pipeline execution tracking"
+    columns:
+      - name: TABLE_NAME
+        description: "Name of the table being processed"
+      - name: STATUS
+        description: "Processing status (PROCESSING_STARTED, PROCESSING_COMPLETED, etc.)"
+      - name: AUDIT_TIMESTAMP
+        description: "Timestamp of the audit event"
+
+  - name: si_users
+    description: "Cleaned and standardized user profile and subscription information"
+    columns:
+      - name: USER_ID
+        description: "Unique identifier for each user account"
+        tests:
+          - unique
+          - not_null
+      - name: EMAIL
+        description: "Validated and standardized email address"
+        tests:
+          - not_null
+      - name: PLAN_TYPE
+        description: "Standardized subscription plan type"
+        tests:
+          - accepted_values:
+              values: ['FREE', 'BASIC', 'PRO', 'ENTERPRISE', 'UNKNOWN']
+      - name: DATA_QUALITY_SCORE
+        description: "Quality score from validation process (0-100)"
+      - name: VALIDATION_STATUS
+        description: "Status of data validation (PASSED, FAILED, WARNING)"
+
+  - name: si_meetings
+    description: "Cleaned and standardized meeting information with duration text cleaning"
+    columns:
+      - name: MEETING_ID
+        description: "Unique identifier for each meeting"
+        tests:
+          - unique
+          - not_null
+      - name: DURATION_MINUTES
+        description: "Cleaned meeting duration in minutes (text units removed)"
+        tests:
+          - not_null
+      - name: START_TIME
+        description: "Standardized meeting start timestamp"
+        tests:
+          - not_null
+      - name: END_TIME
+        description: "Standardized meeting end timestamp"
+        tests:
+          - not_null
+
+  - name: si_participants
+    description: "Cleaned and standardized meeting participants with timestamp format conversion"
+    columns:
+      - name: PARTICIPANT_ID
+        description: "Unique identifier for each meeting participant"
+        tests:
+          - unique
+          - not_null
+      - name: JOIN_TIME
+        description: "Standardized participant join timestamp"
+        tests:
+          - not_null
+      - name: LEAVE_TIME
+        description: "Standardized participant leave timestamp"
+        tests:
+          - not_null
+
+  - name: si_feature_usage
+    description: "Cleaned and standardized platform feature usage"
+    columns:
+      - name: USAGE_ID
+        description: "Unique identifier for each feature usage record"
+        tests:
+          - unique
+          - not_null
+      - name: USAGE_COUNT
+        description: "Validated number of times feature was used"
+        tests:
+          - not_null
+
+  - name: si_support_tickets
+    description: "Cleaned and standardized customer support requests"
+    columns:
+      - name: TICKET_ID
+        description: "Unique identifier for each support ticket"
+        tests:
+          - unique
+          - not_null
+      - name: RESOLUTION_STATUS
+        description: "Standardized ticket resolution status"
+        tests:
+          - accepted_values:
+              values: ['OPEN', 'IN PROGRESS', 'RESOLVED', 'CLOSED', 'UNKNOWN']
+
+  - name: si_billing_events
+    description: "Cleaned and standardized financial transactions"
+    columns:
+      - name: EVENT_ID
+        description: "Unique identifier for each billing event"
+        tests:
+          - unique
+          - not_null
+      - name: AMOUNT
+        description: "Validated monetary amount"
+        tests:
+          - not_null
+
+  - name: si_licenses
+    description: "Cleaned and standardized license assignments with DD/MM/YYYY date conversion"
+    columns:
+      - name: LICENSE_ID
+        description: "Unique identifier for each license"
+        tests:
+          - unique
+          - not_null
+      - name: START_DATE
+        description: "Converted and validated license start date"
+        tests:
+          - not_null
+      - name: END_DATE
+        description: "Converted and validated license end date"
+        tests:
+          - not_null
