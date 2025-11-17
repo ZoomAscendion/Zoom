@@ -202,14 +202,22 @@ models:
     columns:
       - name: USER_ID
         description: "Unique identifier for each user account"
+        tests:
+          - not_null
+          - unique
       - name: USER_NAME
         description: "Display name of the user (cleaned and standardized format)"
       - name: EMAIL
         description: "Email address of the user (validated and standardized)"
+        tests:
+          - not_null
       - name: COMPANY
         description: "Company or organization name (cleaned and standardized)"
       - name: PLAN_TYPE
         description: "Subscription plan type (standardized values: Free, Basic, Pro, Enterprise)"
+        tests:
+          - accepted_values:
+              values: ['Free', 'Basic', 'Pro', 'Enterprise']
       - name: LOAD_TIMESTAMP
         description: "Timestamp when record was processed into Silver layer"
       - name: UPDATE_TIMESTAMP
@@ -222,24 +230,44 @@ models:
         description: "Date when record was last updated"
       - name: DATA_QUALITY_SCORE
         description: "Quality score from validation process (0-100)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
       - name: VALIDATION_STATUS
         description: "Status of data validation (PASSED, FAILED, WARNING)"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'FAILED', 'WARNING']
   
   - name: SI_MEETINGS
-    description: "Silver layer table storing cleaned and standardized meeting information and session details"
+    description: "Silver layer table storing cleaned and standardized meeting information and session details with EST timezone handling"
     columns:
       - name: MEETING_ID
         description: "Unique identifier for each meeting"
+        tests:
+          - not_null
+          - unique
       - name: HOST_ID
         description: "User ID of the meeting host"
+        tests:
+          - not_null
       - name: MEETING_TOPIC
         description: "Topic or title of the meeting (cleaned and standardized)"
       - name: START_TIME
-        description: "Meeting start timestamp (standardized timezone)"
+        description: "Meeting start timestamp (standardized timezone - EST converted to UTC)"
+        tests:
+          - not_null
       - name: END_TIME
-        description: "Meeting end timestamp (standardized timezone)"
+        description: "Meeting end timestamp (standardized timezone - EST converted to UTC)"
+        tests:
+          - not_null
       - name: DURATION_MINUTES
         description: "Meeting duration in minutes (validated and calculated)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1440
       - name: LOAD_TIMESTAMP
         description: "Timestamp when record was processed into Silver layer"
       - name: UPDATE_TIMESTAMP
@@ -252,5 +280,244 @@ models:
         description: "Date when record was last updated"
       - name: DATA_QUALITY_SCORE
         description: "Quality score from validation process (0-100)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
       - name: VALIDATION_STATUS
         description: "Status of data validation (PASSED, FAILED, WARNING)"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'FAILED', 'WARNING']
+  
+  - name: SI_PARTICIPANTS
+    description: "Silver layer table storing cleaned and standardized meeting participants with MM/DD/YYYY HH:MM format handling"
+    columns:
+      - name: PARTICIPANT_ID
+        description: "Unique identifier for each meeting participant"
+        tests:
+          - not_null
+          - unique
+      - name: MEETING_ID
+        description: "Reference to meeting"
+        tests:
+          - not_null
+      - name: USER_ID
+        description: "Reference to user who participated"
+        tests:
+          - not_null
+      - name: JOIN_TIME
+        description: "Timestamp when participant joined meeting (standardized from MM/DD/YYYY HH:MM format)"
+        tests:
+          - not_null
+      - name: LEAVE_TIME
+        description: "Timestamp when participant left meeting (standardized from MM/DD/YYYY HH:MM format)"
+        tests:
+          - not_null
+      - name: LOAD_TIMESTAMP
+        description: "Timestamp when record was processed into Silver layer"
+      - name: UPDATE_TIMESTAMP
+        description: "Timestamp when record was last updated"
+      - name: SOURCE_SYSTEM
+        description: "Source system from which data originated"
+      - name: LOAD_DATE
+        description: "Date when record was processed into Silver layer"
+      - name: UPDATE_DATE
+        description: "Date when record was last updated"
+      - name: DATA_QUALITY_SCORE
+        description: "Quality score from validation process (0-100)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: VALIDATION_STATUS
+        description: "Status of data validation (PASSED, FAILED, WARNING)"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'FAILED', 'WARNING']
+  
+  - name: SI_FEATURE_USAGE
+    description: "Silver layer table storing cleaned and standardized platform feature usage during meetings"
+    columns:
+      - name: USAGE_ID
+        description: "Unique identifier for each feature usage record"
+        tests:
+          - not_null
+          - unique
+      - name: MEETING_ID
+        description: "Reference to meeting where feature was used"
+        tests:
+          - not_null
+      - name: FEATURE_NAME
+        description: "Name of the feature being tracked (standardized naming)"
+        tests:
+          - not_null
+      - name: USAGE_COUNT
+        description: "Number of times feature was used (validated)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: USAGE_DATE
+        description: "Date when feature usage occurred (standardized format)"
+      - name: LOAD_TIMESTAMP
+        description: "Timestamp when record was processed into Silver layer"
+      - name: UPDATE_TIMESTAMP
+        description: "Timestamp when record was last updated"
+      - name: SOURCE_SYSTEM
+        description: "Source system from which data originated"
+      - name: LOAD_DATE
+        description: "Date when record was processed into Silver layer"
+      - name: UPDATE_DATE
+        description: "Date when record was last updated"
+      - name: DATA_QUALITY_SCORE
+        description: "Quality score from validation process (0-100)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: VALIDATION_STATUS
+        description: "Status of data validation (PASSED, FAILED, WARNING)"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'FAILED', 'WARNING']
+  
+  - name: SI_SUPPORT_TICKETS
+    description: "Silver layer table storing cleaned and standardized customer support requests and resolution tracking"
+    columns:
+      - name: TICKET_ID
+        description: "Unique identifier for each support ticket"
+        tests:
+          - not_null
+          - unique
+      - name: USER_ID
+        description: "Reference to user who created the ticket"
+        tests:
+          - not_null
+      - name: TICKET_TYPE
+        description: "Type of support ticket (standardized categories)"
+        tests:
+          - not_null
+      - name: RESOLUTION_STATUS
+        description: "Current status of ticket resolution (standardized values)"
+        tests:
+          - accepted_values:
+              values: ['Open', 'In Progress', 'Resolved', 'Closed']
+      - name: OPEN_DATE
+        description: "Date when ticket was opened (standardized format)"
+        tests:
+          - not_null
+      - name: LOAD_TIMESTAMP
+        description: "Timestamp when record was processed into Silver layer"
+      - name: UPDATE_TIMESTAMP
+        description: "Timestamp when record was last updated"
+      - name: SOURCE_SYSTEM
+        description: "Source system from which data originated"
+      - name: LOAD_DATE
+        description: "Date when record was processed into Silver layer"
+      - name: UPDATE_DATE
+        description: "Date when record was last updated"
+      - name: DATA_QUALITY_SCORE
+        description: "Quality score from validation process (0-100)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: VALIDATION_STATUS
+        description: "Status of data validation (PASSED, FAILED, WARNING)"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'FAILED', 'WARNING']
+  
+  - name: SI_BILLING_EVENTS
+    description: "Silver layer table storing cleaned and standardized financial transactions and billing activities"
+    columns:
+      - name: EVENT_ID
+        description: "Unique identifier for each billing event"
+        tests:
+          - not_null
+          - unique
+      - name: USER_ID
+        description: "Reference to user associated with billing event"
+        tests:
+          - not_null
+      - name: EVENT_TYPE
+        description: "Type of billing event (standardized categories)"
+        tests:
+          - not_null
+      - name: AMOUNT
+        description: "Monetary amount for the billing event (validated and standardized)"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: EVENT_DATE
+        description: "Date when the billing event occurred (standardized format)"
+        tests:
+          - not_null
+      - name: LOAD_TIMESTAMP
+        description: "Timestamp when record was processed into Silver layer"
+      - name: UPDATE_TIMESTAMP
+        description: "Timestamp when record was last updated"
+      - name: SOURCE_SYSTEM
+        description: "Source system from which data originated"
+      - name: LOAD_DATE
+        description: "Date when record was processed into Silver layer"
+      - name: UPDATE_DATE
+        description: "Date when record was last updated"
+      - name: DATA_QUALITY_SCORE
+        description: "Quality score from validation process (0-100)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: VALIDATION_STATUS
+        description: "Status of data validation (PASSED, FAILED, WARNING)"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'FAILED', 'WARNING']
+  
+  - name: SI_LICENSES
+    description: "Silver layer table storing cleaned and standardized license assignments and entitlements"
+    columns:
+      - name: LICENSE_ID
+        description: "Unique identifier for each license"
+        tests:
+          - not_null
+          - unique
+      - name: LICENSE_TYPE
+        description: "Type of license (standardized categories)"
+        tests:
+          - not_null
+      - name: ASSIGNED_TO_USER_ID
+        description: "User ID to whom license is assigned"
+        tests:
+          - not_null
+      - name: START_DATE
+        description: "License validity start date (standardized format)"
+        tests:
+          - not_null
+      - name: END_DATE
+        description: "License validity end date (standardized format)"
+        tests:
+          - not_null
+      - name: LOAD_TIMESTAMP
+        description: "Timestamp when record was processed into Silver layer"
+      - name: UPDATE_TIMESTAMP
+        description: "Timestamp when record was last updated"
+      - name: SOURCE_SYSTEM
+        description: "Source system from which data originated"
+      - name: LOAD_DATE
+        description: "Date when record was processed into Silver layer"
+      - name: UPDATE_DATE
+        description: "Date when record was last updated"
+      - name: DATA_QUALITY_SCORE
+        description: "Quality score from validation process (0-100)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: VALIDATION_STATUS
+        description: "Status of data validation (PASSED, FAILED, WARNING)"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'FAILED', 'WARNING']
