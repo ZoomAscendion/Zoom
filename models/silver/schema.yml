@@ -1,0 +1,372 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "Bronze layer tables containing raw data from source systems"
+    tables:
+      - name: bz_users
+        description: "Raw user profile and subscription information"
+        columns:
+          - name: user_id
+            description: "Unique identifier for each user account"
+          - name: user_name
+            description: "Display name of the user"
+          - name: email
+            description: "Email address of the user"
+          - name: company
+            description: "Company or organization name"
+          - name: plan_type
+            description: "Subscription plan type"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded into Bronze layer"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+      
+      - name: bz_meetings
+        description: "Raw meeting information and session details"
+        columns:
+          - name: meeting_id
+            description: "Unique identifier for each meeting"
+          - name: host_id
+            description: "User ID of the meeting host"
+          - name: meeting_topic
+            description: "Topic or title of the meeting"
+          - name: start_time
+            description: "Meeting start timestamp"
+          - name: end_time
+            description: "Meeting end timestamp"
+          - name: duration_minutes
+            description: "Meeting duration in minutes"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded into Bronze layer"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+      
+      - name: bz_participants
+        description: "Raw meeting participants and their session details"
+        columns:
+          - name: participant_id
+            description: "Unique identifier for each meeting participant"
+          - name: meeting_id
+            description: "Reference to meeting"
+          - name: user_id
+            description: "Reference to user who participated"
+          - name: join_time
+            description: "Timestamp when participant joined meeting"
+          - name: leave_time
+            description: "Timestamp when participant left meeting"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded into Bronze layer"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+      
+      - name: bz_feature_usage
+        description: "Raw usage of platform features during meetings"
+        columns:
+          - name: usage_id
+            description: "Unique identifier for each feature usage record"
+          - name: meeting_id
+            description: "Reference to meeting where feature was used"
+          - name: feature_name
+            description: "Name of the feature being tracked"
+          - name: usage_count
+            description: "Number of times feature was used"
+          - name: usage_date
+            description: "Date when feature usage occurred"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded into Bronze layer"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+      
+      - name: bz_support_tickets
+        description: "Raw customer support requests and resolution tracking"
+        columns:
+          - name: ticket_id
+            description: "Unique identifier for each support ticket"
+          - name: user_id
+            description: "Reference to user who created the ticket"
+          - name: ticket_type
+            description: "Type of support ticket"
+          - name: resolution_status
+            description: "Current status of ticket resolution"
+          - name: open_date
+            description: "Date when ticket was opened"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded into Bronze layer"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+      
+      - name: bz_billing_events
+        description: "Raw financial transactions and billing activities"
+        columns:
+          - name: event_id
+            description: "Unique identifier for each billing event"
+          - name: user_id
+            description: "Reference to user associated with billing event"
+          - name: event_type
+            description: "Type of billing event"
+          - name: amount
+            description: "Monetary amount for the billing event"
+          - name: event_date
+            description: "Date when the billing event occurred"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded into Bronze layer"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+      
+      - name: bz_licenses
+        description: "Raw license assignments and entitlements"
+        columns:
+          - name: license_id
+            description: "Unique identifier for each license"
+          - name: license_type
+            description: "Type of license"
+          - name: assigned_to_user_id
+            description: "User ID to whom license is assigned"
+          - name: start_date
+            description: "License validity start date"
+          - name: end_date
+            description: "License validity end date"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded into Bronze layer"
+          - name: update_timestamp
+            description: "Timestamp when record was last updated"
+          - name: source_system
+            description: "Source system from which data originated"
+
+models:
+  - name: si_audit_log
+    description: "Silver audit log table for tracking all Silver layer operations and format conversion errors"
+    columns:
+      - name: audit_id
+        description: "Unique identifier for each audit record"
+      - name: table_name
+        description: "Name of the Silver table where operation occurred"
+      - name: column_name
+        description: "Name of the column where operation occurred"
+      - name: record_id
+        description: "Primary key value of the affected record"
+      - name: error_type
+        description: "Type of error or operation (e.g., FORMAT_CONVERSION_FAILURE)"
+      - name: error_description
+        description: "Detailed description of the operation or error"
+      - name: original_value
+        description: "Original value before transformation"
+      - name: audit_timestamp
+        description: "Timestamp when audit record was created"
+      - name: operation_type
+        description: "Type of operation (INSERT, UPDATE, DELETE, VALIDATION)"
+      - name: processed_by
+        description: "User or system that performed the operation"
+      - name: source_system
+        description: "Source system identifier"
+  
+  - name: si_users
+    description: "Silver layer table storing cleaned and standardized user profile and subscription information"
+    columns:
+      - name: user_id
+        description: "Unique identifier for each user account"
+      - name: user_name
+        description: "Display name of the user (cleaned and standardized)"
+      - name: email
+        description: "Email address of the user (validated and standardized)"
+      - name: company
+        description: "Company or organization name (cleaned and standardized)"
+      - name: plan_type
+        description: "Subscription plan type (standardized values)"
+      - name: load_timestamp
+        description: "Timestamp when record was processed into Silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: load_date
+        description: "Date when record was processed into Silver layer"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: data_quality_score
+        description: "Quality score from validation process (0-100)"
+      - name: validation_status
+        description: "Status of data validation (PASSED, FAILED, WARNING)"
+  
+  - name: si_meetings
+    description: "Silver layer table storing cleaned and standardized meeting information with enhanced format validation"
+    columns:
+      - name: meeting_id
+        description: "Unique identifier for each meeting"
+      - name: host_id
+        description: "User ID of the meeting host"
+      - name: meeting_topic
+        description: "Topic or title of the meeting (cleaned and standardized)"
+      - name: start_time
+        description: "Meeting start timestamp (standardized timezone and format)"
+      - name: end_time
+        description: "Meeting end timestamp (standardized timezone and format)"
+      - name: duration_minutes
+        description: "Meeting duration in minutes (cleaned from text units)"
+      - name: load_timestamp
+        description: "Timestamp when record was processed into Silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: load_date
+        description: "Date when record was processed into Silver layer"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: data_quality_score
+        description: "Quality score from validation process (0-100)"
+      - name: validation_status
+        description: "Status of data validation (PASSED, FAILED, WARNING)"
+  
+  - name: si_participants
+    description: "Silver layer table storing cleaned and standardized meeting participants with enhanced timestamp format validation"
+    columns:
+      - name: participant_id
+        description: "Unique identifier for each meeting participant"
+      - name: meeting_id
+        description: "Reference to meeting"
+      - name: user_id
+        description: "Reference to user who participated"
+      - name: join_time
+        description: "Timestamp when participant joined meeting (standardized format)"
+      - name: leave_time
+        description: "Timestamp when participant left meeting (standardized format)"
+      - name: load_timestamp
+        description: "Timestamp when record was processed into Silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: load_date
+        description: "Date when record was processed into Silver layer"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: data_quality_score
+        description: "Quality score from validation process (0-100)"
+      - name: validation_status
+        description: "Status of data validation (PASSED, FAILED, WARNING)"
+  
+  - name: si_feature_usage
+    description: "Silver layer table storing cleaned and standardized platform feature usage"
+    columns:
+      - name: usage_id
+        description: "Unique identifier for each feature usage record"
+      - name: meeting_id
+        description: "Reference to meeting where feature was used"
+      - name: feature_name
+        description: "Name of the feature being tracked (standardized naming)"
+      - name: usage_count
+        description: "Number of times feature was used (validated)"
+      - name: usage_date
+        description: "Date when feature usage occurred (standardized format)"
+      - name: load_timestamp
+        description: "Timestamp when record was processed into Silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: load_date
+        description: "Date when record was processed into Silver layer"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: data_quality_score
+        description: "Quality score from validation process (0-100)"
+      - name: validation_status
+        description: "Status of data validation (PASSED, FAILED, WARNING)"
+  
+  - name: si_support_tickets
+    description: "Silver layer table storing cleaned and standardized customer support requests"
+    columns:
+      - name: ticket_id
+        description: "Unique identifier for each support ticket"
+      - name: user_id
+        description: "Reference to user who created the ticket"
+      - name: ticket_type
+        description: "Type of support ticket (standardized categories)"
+      - name: resolution_status
+        description: "Current status of ticket resolution (standardized values)"
+      - name: open_date
+        description: "Date when ticket was opened (standardized format)"
+      - name: load_timestamp
+        description: "Timestamp when record was processed into Silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: load_date
+        description: "Date when record was processed into Silver layer"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: data_quality_score
+        description: "Quality score from validation process (0-100)"
+      - name: validation_status
+        description: "Status of data validation (PASSED, FAILED, WARNING)"
+  
+  - name: si_billing_events
+    description: "Silver layer table storing cleaned and standardized financial transactions"
+    columns:
+      - name: event_id
+        description: "Unique identifier for each billing event"
+      - name: user_id
+        description: "Reference to user associated with billing event"
+      - name: event_type
+        description: "Type of billing event (standardized categories)"
+      - name: amount
+        description: "Monetary amount for the billing event (validated and standardized)"
+      - name: event_date
+        description: "Date when the billing event occurred (standardized format)"
+      - name: load_timestamp
+        description: "Timestamp when record was processed into Silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: load_date
+        description: "Date when record was processed into Silver layer"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: data_quality_score
+        description: "Quality score from validation process (0-100)"
+      - name: validation_status
+        description: "Status of data validation (PASSED, FAILED, WARNING)"
+  
+  - name: si_licenses
+    description: "Silver layer table storing cleaned and standardized license assignments with enhanced date format conversion"
+    columns:
+      - name: license_id
+        description: "Unique identifier for each license"
+      - name: license_type
+        description: "Type of license (standardized categories)"
+      - name: assigned_to_user_id
+        description: "User ID to whom license is assigned"
+      - name: start_date
+        description: "License validity start date (converted from DD/MM/YYYY format)"
+      - name: end_date
+        description: "License validity end date (converted from DD/MM/YYYY format)"
+      - name: load_timestamp
+        description: "Timestamp when record was processed into Silver layer"
+      - name: update_timestamp
+        description: "Timestamp when record was last updated"
+      - name: source_system
+        description: "Source system from which data originated"
+      - name: load_date
+        description: "Date when record was processed into Silver layer"
+      - name: update_date
+        description: "Date when record was last updated"
+      - name: data_quality_score
+        description: "Quality score from validation process (0-100)"
+      - name: validation_status
+        description: "Status of data validation (PASSED, FAILED, WARNING)"
