@@ -8,9 +8,7 @@
 -- =====================================================
 
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ this.schema }}.BZ_DATA_AUDIT (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED'",
-    post_hook="INSERT INTO {{ this.schema }}.BZ_DATA_AUDIT (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 1.0, 'COMPLETED'"
+    materialized='table'
 ) }}
 
 WITH source_data AS (
