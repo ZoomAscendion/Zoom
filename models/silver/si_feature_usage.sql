@@ -17,7 +17,7 @@ WITH bronze_feature_usage AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_FEATURE_USAGE') }}
+    FROM BRONZE.BZ_FEATURE_USAGE
     WHERE USAGE_ID IS NOT NULL
 ),
 
@@ -51,7 +51,6 @@ validated_feature_usage AS (
         CASE 
             WHEN f.FEATURE_NAME IS NOT NULL AND LENGTH(f.FEATURE_NAME) <= 100
                  AND f.USAGE_COUNT >= 0
-                 AND m.MEETING_ID IS NOT NULL
             THEN 100
             WHEN f.FEATURE_NAME IS NOT NULL AND f.USAGE_COUNT >= 0
             THEN 80
@@ -60,14 +59,12 @@ validated_feature_usage AS (
         CASE 
             WHEN f.FEATURE_NAME IS NOT NULL AND LENGTH(f.FEATURE_NAME) <= 100
                  AND f.USAGE_COUNT >= 0
-                 AND m.MEETING_ID IS NOT NULL
             THEN 'PASSED'
             WHEN f.FEATURE_NAME IS NULL OR f.USAGE_COUNT < 0
             THEN 'FAILED'
             ELSE 'WARNING'
         END AS VALIDATION_STATUS
     FROM cleansed_feature_usage f
-    LEFT JOIN {{ ref('si_meetings') }} m ON f.MEETING_ID = m.MEETING_ID
 ),
 
 -- Remove Duplicates
