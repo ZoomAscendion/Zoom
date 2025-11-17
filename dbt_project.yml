@@ -25,63 +25,6 @@ models:
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
-      +pre-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            EXECUTION_ID, 
-            PIPELINE_NAME, 
-            EXECUTION_START_TIME, 
-            EXECUTION_STATUS, 
-            SOURCE_TABLE, 
-            TARGET_TABLE, 
-            EXECUTED_BY, 
-            LOAD_TIMESTAMP
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            'BRONZE_TO_SILVER_{{ this.name }}', 
-            CURRENT_TIMESTAMP(), 
-            'STARTED', 
-            'BZ_{{ this.name | replace("SI_", "") }}', 
-            '{{ this.name }}', 
-            'DBT_PIPELINE', 
-            CURRENT_TIMESTAMP()
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            EXECUTION_ID, 
-            PIPELINE_NAME, 
-            EXECUTION_END_TIME, 
-            EXECUTION_STATUS, 
-            SOURCE_TABLE, 
-            TARGET_TABLE, 
-            RECORDS_SUCCESS, 
-            EXECUTED_BY, 
-            LOAD_TIMESTAMP
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            'BRONZE_TO_SILVER_{{ this.name }}', 
-            CURRENT_TIMESTAMP(), 
-            'COMPLETED', 
-            'BZ_{{ this.name | replace("SI_", "") }}', 
-            '{{ this.name }}', 
-            (SELECT COUNT(*) FROM {{ this }}), 
-            'DBT_PIPELINE', 
-            CURRENT_TIMESTAMP()
-        {% endif %}
-
-# Specify the order of model execution
-model-ordering:
-  - "SI_Audit_Log"  # Must run first
-  - "SI_USERS"
-  - "SI_MEETINGS"
-  - "SI_PARTICIPANTS"
-  - "SI_FEATURE_USAGE"
-  - "SI_SUPPORT_TICKETS"
-  - "SI_BILLING_EVENTS"
-  - "SI_LICENSES"
 
 vars:
   # dbt Cloud environment variables
