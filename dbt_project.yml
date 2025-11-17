@@ -2,7 +2,7 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_silver_pipeline'
+profile: 'user'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -18,11 +18,37 @@ clean-targets:
 
 models:
   zoom_silver_pipeline:
+    +materialized: table
+    +on_schema_change: sync_all_columns
     silver:
       +materialized: table
+      +pre-hook: |
+        {% if this.name != 'SI_AUDIT_LOG' %}
+          INSERT INTO {{ ref('SI_AUDIT_LOG') }} 
+          (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) 
+          SELECT UUID_STRING(), '{{ this.name }}', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'SI_AUDIT_LOG' %}
+          INSERT INTO {{ ref('SI_AUDIT_LOG') }} 
+          (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) 
+          SELECT UUID_STRING(), '{{ this.name }}', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'
+        {% endif %}
 
 vars:
+  # Data quality thresholds
+  dq_score_threshold: 70
+  # Date range for processing
   start_date: '2020-01-01'
   end_date: '2030-12-31'
 
-require-dbt-version: ">=1.0.0"
+# Model execution order
+model-order:
+  - SI_AUDIT_LOG
+  - SI_USERS
+  - SI_MEETINGS
+  - SI_PARTICIPANTS
+  - SI_FEATURE_USAGE
+  - SI_SUPPORT_TICKETS
+  - SI_BILLING_EVENTS
+  - SI_LICENSES
