@@ -2,8 +2,10 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
+# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_silver_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -16,9 +18,50 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Model configurations
 models:
   zoom_silver_pipeline:
+    # Configurations for models in the silver folder
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
-      +order_by: ['LOAD_TIMESTAMP']
+      # Ensure audit log runs first
+      SI_AUDIT_LOG:
+        +pre-hook: []
+        +post-hook: []
+      # All other models depend on audit log
+      SI_USERS:
+        +depends_on:
+          - ref('SI_AUDIT_LOG')
+      SI_MEETINGS:
+        +depends_on:
+          - ref('SI_AUDIT_LOG')
+      SI_PARTICIPANTS:
+        +depends_on:
+          - ref('SI_AUDIT_LOG')
+      SI_FEATURE_USAGE:
+        +depends_on:
+          - ref('SI_AUDIT_LOG')
+      SI_SUPPORT_TICKETS:
+        +depends_on:
+          - ref('SI_AUDIT_LOG')
+      SI_BILLING_EVENTS:
+        +depends_on:
+          - ref('SI_AUDIT_LOG')
+      SI_LICENSES:
+        +depends_on:
+          - ref('SI_AUDIT_LOG')
+
+# Global configurations
+vars:
+  # Data quality thresholds
+  dq_score_threshold: 70
+  # Timezone settings
+  default_timezone: 'UTC'
+  # Error handling
+  max_error_threshold: 100
+
+# Dispatch configurations for cross-database compatibility
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['zoom_silver_pipeline', 'dbt_utils']
