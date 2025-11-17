@@ -17,7 +17,7 @@ WITH bronze_billing_events AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_BILLING_EVENTS') }}
+    FROM BRONZE.BZ_BILLING_EVENTS
     WHERE EVENT_ID IS NOT NULL
 ),
 
@@ -52,7 +52,6 @@ validated_billing_events AS (
         CASE 
             WHEN b.AMOUNT > 0 AND b.EVENT_DATE <= CURRENT_DATE()
                  AND b.EVENT_TYPE IS NOT NULL AND LENGTH(TRIM(b.EVENT_TYPE)) > 0
-                 AND u.USER_ID IS NOT NULL
             THEN 100
             WHEN b.AMOUNT > 0 AND b.EVENT_DATE <= CURRENT_DATE()
                  AND b.EVENT_TYPE IS NOT NULL
@@ -62,14 +61,12 @@ validated_billing_events AS (
         CASE 
             WHEN b.AMOUNT > 0 AND b.EVENT_DATE <= CURRENT_DATE()
                  AND b.EVENT_TYPE IS NOT NULL AND LENGTH(TRIM(b.EVENT_TYPE)) > 0
-                 AND u.USER_ID IS NOT NULL
             THEN 'PASSED'
             WHEN b.AMOUNT <= 0 OR b.EVENT_DATE > CURRENT_DATE()
             THEN 'FAILED'
             ELSE 'WARNING'
         END AS VALIDATION_STATUS
     FROM cleansed_billing_events b
-    LEFT JOIN {{ ref('si_users') }} u ON b.USER_ID = u.USER_ID
 ),
 
 -- Remove Duplicates
