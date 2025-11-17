@@ -16,7 +16,7 @@ WITH source_data AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_FEATURE_USAGE') }}
+    FROM BRONZE.BZ_FEATURE_USAGE
     WHERE USAGE_ID IS NOT NULL  -- Exclude records with null USAGE_ID
 ),
 
