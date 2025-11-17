@@ -16,7 +16,7 @@ WITH source_data AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_LICENSES') }}
+    FROM BRONZE.BZ_LICENSES
     WHERE LICENSE_ID IS NOT NULL  -- Exclude records with null LICENSE_ID
 ),
 
