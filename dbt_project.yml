@@ -20,37 +20,6 @@ models:
   zoom_silver_pipeline:
     silver:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'si_audit_log' %}
-          INSERT INTO {{ ref('si_audit_log') }} (MODEL_NAME, TABLE_NAME, PROCESS_STATUS, LOAD_TIMESTAMP) 
-          SELECT '{{ this.name }}', '{{ this.name | upper }}', 'STARTED', CURRENT_TIMESTAMP()
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'si_audit_log' %}
-          INSERT INTO {{ ref('si_audit_log') }} (MODEL_NAME, TABLE_NAME, PROCESS_STATUS, LOAD_TIMESTAMP) 
-          SELECT '{{ this.name }}', '{{ this.name | upper }}', 'COMPLETED', CURRENT_TIMESTAMP()
-        {% endif %}
-
-# Model execution order
-model-order:
-  - si_audit_log
-  - si_users
-  - si_meetings
-  - si_participants
-  - si_feature_usage
-  - si_support_tickets
-  - si_billing_events
-  - si_licenses
-
-vars:
-  # Data quality thresholds
-  min_data_quality_score: 50
-  
-  # Date format patterns
-  est_timezone_pattern: '%EST%'
-  mmddyyyy_pattern: '^\\d{1,2}/\\d{1,2}/\\d{4} \\d{1,2}:\\d{2}$'
-  ddmmyyyy_pattern: '^\\d{1,2}/\\d{1,2}/\\d{4}$'
-  
-  # Text cleaning patterns
-  duration_text_pattern: '[^0-9.]'
-  amount_quote_pattern: '"'
+      si_audit_log:
+        +pre-hook: []
+        +post-hook: []
