@@ -24,39 +24,6 @@ models:
     # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (TABLE_NAME, PROCESS_STATUS, PROCESS_START_TIME, AUDIT_TIMESTAMP) 
-          SELECT '{{ this.name }}', 'STARTED', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (TABLE_NAME, PROCESS_STATUS, PROCESS_END_TIME, RECORDS_PROCESSED, RECORDS_SUCCESS, AUDIT_TIMESTAMP) 
-          SELECT '{{ this.name }}', 'COMPLETED', CURRENT_TIMESTAMP(), 
-                 (SELECT COUNT(*) FROM {{ this }}), 
-                 (SELECT COUNT(*) FROM {{ this }} WHERE VALIDATION_STATUS = 'PASSED'), 
-                 CURRENT_TIMESTAMP()
-        {% endif %}
-
-# Specify the order of model execution
-# SI_Audit_Log must run first, then all other models can run in parallel
-model-ordering:
-  - name: SI_Audit_Log
-    depends_on: []
-  - name: SI_USERS
-    depends_on: [SI_Audit_Log]
-  - name: SI_MEETINGS
-    depends_on: [SI_Audit_Log]
-  - name: SI_PARTICIPANTS
-    depends_on: [SI_Audit_Log]
-  - name: SI_FEATURE_USAGE
-    depends_on: [SI_Audit_Log]
-  - name: SI_SUPPORT_TICKETS
-    depends_on: [SI_Audit_Log]
-  - name: SI_BILLING_EVENTS
-    depends_on: [SI_Audit_Log]
-  - name: SI_LICENSES
-    depends_on: [SI_Audit_Log]
 
 # Snowflake-specific configurations
 vars:
