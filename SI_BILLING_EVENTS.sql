@@ -1,4 +1,8 @@
-{{ config(materialized='table') }}
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_BILLING_EVENTS', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_AUDIT_LOG'",
+    post_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_BILLING_EVENTS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_AUDIT_LOG'"
+) }}
 
 /* Transform Bronze Billing Events to Silver Billing Events with data quality checks */
 WITH bronze_billing_events AS (
@@ -11,7 +15,7 @@ WITH bronze_billing_events AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM BRONZE.BZ_BILLING_EVENTS
+    FROM {{ source('bronze', 'BZ_BILLING_EVENTS') }}
 ),
 
 cleaned_billing_events AS (
@@ -19,12 +23,7 @@ cleaned_billing_events AS (
         EVENT_ID,
         USER_ID,
         UPPER(TRIM(EVENT_TYPE)) AS EVENT_TYPE,
-        /* Enhanced numeric field cleaning for AMOUNT */
-        CASE 
-            WHEN TRY_TO_NUMBER(REPLACE(AMOUNT::STRING, '"', '')) IS NOT NULL THEN
-                TRY_TO_NUMBER(REPLACE(AMOUNT::STRING, '"', ''))
-            ELSE TRY_TO_NUMBER(AMOUNT::STRING)
-        END AS AMOUNT,
+        AMOUNT,
         EVENT_DATE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
