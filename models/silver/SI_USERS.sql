@@ -17,6 +17,7 @@ WITH bronze_users AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM {{ source('bronze', 'BZ_USERS') }}
+    WHERE USER_ID IS NOT NULL
 ),
 
 data_quality_checks AS (
@@ -45,7 +46,6 @@ deduplication AS (
     SELECT *,
         ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY UPDATE_TIMESTAMP DESC NULLS LAST, LOAD_TIMESTAMP DESC) AS rn
     FROM data_quality_checks
-    WHERE USER_ID IS NOT NULL
 )
 
 SELECT 
