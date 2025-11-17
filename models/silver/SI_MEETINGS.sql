@@ -1,0 +1,118 @@
+{{ config(
+    materialized='table',
+    on_schema_change='sync_all_columns',
+    pre_hook="
+        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (EXECUTION_ID, PIPELINE_NAME, EXECUTION_START_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP)
+        VALUES (UUID_STRING(), 'SI_MEETINGS', CURRENT_TIMESTAMP(), 'STARTED', 'BRONZE.BZ_MEETINGS', '{{ this.schema }}.SI_MEETINGS', 'DBT_PIPELINE', CURRENT_TIMESTAMP())
+    ",
+    post_hook="
+        UPDATE {{ ref('SI_AUDIT_LOG') }} 
+        SET EXECUTION_END_TIME = CURRENT_TIMESTAMP(), 
+            EXECUTION_STATUS = 'SUCCESS',
+            RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
+            UPDATE_TIMESTAMP = CURRENT_TIMESTAMP()
+        WHERE TARGET_TABLE = '{{ this.schema }}.SI_MEETINGS' 
+        AND EXECUTION_STATUS = 'STARTED'
+        AND EXECUTION_START_TIME >= CURRENT_TIMESTAMP() - INTERVAL '1 HOUR'
+    "
+) }}
+
+-- Silver Layer Meetings Table
+-- Purpose: Clean and standardized meeting information with EST timezone handling
+-- Transformation: Bronze to Silver with timestamp format validation
+
+WITH bronze_meetings AS (
+    SELECT 
+        MEETING_ID,
+        HOST_ID,
+        MEETING_TOPIC,
+        START_TIME,
+        END_TIME,
+        DURATION_MINUTES,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_MEETINGS') }}
+    WHERE MEETING_ID IS NOT NULL
+),
+
+timestamp_standardization AS (
+    SELECT 
+        *,
+        -- Enhanced EST timezone handling with multi-format parsing
+        COALESCE(
+            TRY_TO_TIMESTAMP(START_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(REPLACE(START_TIME::STRING, ' EST', ''), 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(START_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(START_TIME::STRING, 'MM/DD/YYYY HH24:MI')
+        ) AS STANDARDIZED_START_TIME,
+        
+        COALESCE(
+            TRY_TO_TIMESTAMP(END_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(REPLACE(END_TIME::STRING, ' EST', ''), 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(END_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(END_TIME::STRING, 'MM/DD/YYYY HH24:MI')
+        ) AS STANDARDIZED_END_TIME
+    FROM bronze_meetings
+),
+
+data_quality_checks AS (
+    SELECT 
+        *,
+        -- Calculate actual duration from standardized timestamps
+        CASE 
+            WHEN STANDARDIZED_START_TIME IS NOT NULL AND STANDARDIZED_END_TIME IS NOT NULL THEN
+                DATEDIFF('minute', STANDARDIZED_START_TIME, STANDARDIZED_END_TIME)
+            ELSE DURATION_MINUTES
+        END AS CALCULATED_DURATION,
+        
+        -- Data Quality Score Calculation
+        CASE 
+            WHEN MEETING_ID IS NOT NULL THEN 20 ELSE 0 END +
+            CASE WHEN HOST_ID IS NOT NULL THEN 20 ELSE 0 END +
+            CASE WHEN STANDARDIZED_START_TIME IS NOT NULL THEN 20 ELSE 0 END +
+            CASE WHEN STANDARDIZED_END_TIME IS NOT NULL THEN 20 ELSE 0 END +
+            CASE WHEN STANDARDIZED_END_TIME > STANDARDIZED_START_TIME THEN 10 ELSE 0 END +
+            CASE WHEN DURATION_MINUTES >= 0 AND DURATION_MINUTES <= 1440 THEN 10 ELSE 0 END
+        AS DATA_QUALITY_SCORE,
+        
+        -- Validation Status
+        CASE 
+            WHEN MEETING_ID IS NULL OR HOST_ID IS NULL OR STANDARDIZED_START_TIME IS NULL OR STANDARDIZED_END_TIME IS NULL THEN 'FAILED'
+            WHEN STANDARDIZED_END_TIME <= STANDARDIZED_START_TIME OR DURATION_MINUTES < 0 OR DURATION_MINUTES > 1440 THEN 'FAILED'
+            WHEN ABS(COALESCE(DURATION_MINUTES, 0) - DATEDIFF('minute', STANDARDIZED_START_TIME, STANDARDIZED_END_TIME)) > 5 THEN 'WARNING'
+            ELSE 'PASSED'
+        END AS VALIDATION_STATUS
+    FROM timestamp_standardization
+),
+
+deduplication AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY MEETING_ID ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC) as rn
+    FROM data_quality_checks
+),
+
+final_transformation AS (
+    SELECT 
+        MEETING_ID,
+        HOST_ID,
+        TRIM(MEETING_TOPIC) AS MEETING_TOPIC,
+        STANDARDIZED_START_TIME AS START_TIME,
+        STANDARDIZED_END_TIME AS END_TIME,
+        CALCULATED_DURATION AS DURATION_MINUTES,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        -- Additional Silver layer metadata columns
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        DATA_QUALITY_SCORE,
+        VALIDATION_STATUS
+    FROM deduplication
+    WHERE rn = 1
+    AND VALIDATION_STATUS IN ('PASSED', 'WARNING') -- Exclude FAILED records
+    AND STANDARDIZED_START_TIME IS NOT NULL
+    AND STANDARDIZED_END_TIME IS NOT NULL
+)
+
+SELECT * FROM final_transformation
