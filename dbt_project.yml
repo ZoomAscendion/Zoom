@@ -13,55 +13,85 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
-# Model configurations
+# Configuring models
 models:
   zoom_silver_pipeline:
-    # Configurations for models in the silver folder
+    # Audit log model should run first
+    SI_AUDIT_LOG:
+      +materialized: table
+      +pre-hook: []
+      +post-hook: []
+    
+    # Silver layer models
+    +materialized: table
+    +on_schema_change: "sync_all_columns"
+    
+    # Model execution order
     silver:
       +materialized: table
-      +on_schema_change: sync_all_columns
+      +tags: ["silver"]
+      
       # Ensure audit log runs first
       SI_AUDIT_LOG:
         +pre-hook: []
         +post-hook: []
-      # All other models depend on audit log
+      
+      # Core silver models
       SI_USERS:
-        +depends_on:
-          - ref('SI_AUDIT_LOG')
+        +tags: ["silver", "users"]
+      
       SI_MEETINGS:
-        +depends_on:
-          - ref('SI_AUDIT_LOG')
+        +tags: ["silver", "meetings"]
+      
       SI_PARTICIPANTS:
-        +depends_on:
-          - ref('SI_AUDIT_LOG')
+        +tags: ["silver", "participants"]
+      
       SI_FEATURE_USAGE:
-        +depends_on:
-          - ref('SI_AUDIT_LOG')
+        +tags: ["silver", "features"]
+      
       SI_SUPPORT_TICKETS:
-        +depends_on:
-          - ref('SI_AUDIT_LOG')
+        +tags: ["silver", "support"]
+      
       SI_BILLING_EVENTS:
-        +depends_on:
-          - ref('SI_AUDIT_LOG')
+        +tags: ["silver", "billing"]
+      
       SI_LICENSES:
-        +depends_on:
-          - ref('SI_AUDIT_LOG')
+        +tags: ["silver", "licenses"]
 
 # Global configurations
 vars:
   # Data quality thresholds
   dq_score_threshold: 70
-  # Timezone settings
-  default_timezone: 'UTC'
+  
+  # Date range for processing
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
+  
+  # Audit settings
+  enable_audit_logging: true
+  audit_table_name: 'SI_AUDIT_LOG'
+  
   # Error handling
-  max_error_threshold: 100
+  fail_on_dq_errors: false
+  log_dq_errors: true
 
-# Dispatch configurations for cross-database compatibility
-dispatch:
-  - macro_namespace: dbt_utils
-    search_order: ['zoom_silver_pipeline', 'dbt_utils']
+# Test configurations
+tests:
+  +store_failures: true
+  +severity: warn
+
+# Snapshot configurations
+snapshots:
+  zoom_silver_pipeline:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: updated_timestamp
+
+# Seeds configurations
+seeds:
+  zoom_silver_pipeline:
+    +schema: reference_data
