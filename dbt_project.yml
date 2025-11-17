@@ -24,44 +24,8 @@ models:
     # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} 
-          (TABLE_NAME, PROCESS_STATUS, PROCESS_START_TIME, EXECUTED_BY, AUDIT_TIMESTAMP) 
-          SELECT '{{ this.name }}', 'STARTED', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE', CURRENT_TIMESTAMP()
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} 
-          (TABLE_NAME, PROCESS_STATUS, PROCESS_END_TIME, RECORDS_PROCESSED, RECORDS_SUCCESS, EXECUTED_BY, AUDIT_TIMESTAMP) 
-          SELECT '{{ this.name }}', 'COMPLETED', CURRENT_TIMESTAMP(), 
-          (SELECT COUNT(*) FROM {{ this }}), 
-          (SELECT COUNT(*) FROM {{ this }} WHERE VALIDATION_STATUS = 'PASSED'), 
-          'DBT_SILVER_PIPELINE', CURRENT_TIMESTAMP()
-        {% endif %}
-
-# Model execution order - Audit log must run first
-model-ordering:
-  - "SI_Audit_Log"
-  - "SI_USERS"
-  - "SI_MEETINGS"
-  - "SI_PARTICIPANTS"
-  - "SI_FEATURE_USAGE"
-  - "SI_SUPPORT_TICKETS"
-  - "SI_BILLING_EVENTS"
-  - "SI_LICENSES"
 
 # Snowflake-specific configurations
 vars:
   # Data quality thresholds
   min_data_quality_score: 70
-  
-  # Date format patterns
-  dd_mm_yyyy_pattern: '^\\d{1,2}/\\d{1,2}/\\d{4}$'
-  mm_dd_yyyy_pattern: '^\\d{1,2}/\\d{1,2}/\\d{4} \\d{1,2}:\\d{2}$'
-  
-  # Text cleaning patterns
-  duration_text_pattern: '[^0-9.]'
-  
-  # Timezone handling
-  est_timezone_pattern: '%EST%'
