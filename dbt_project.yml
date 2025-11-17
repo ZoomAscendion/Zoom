@@ -24,30 +24,44 @@ models:
     # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
+      +pre-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} 
+          (TABLE_NAME, PROCESS_STATUS, PROCESS_START_TIME, EXECUTED_BY, AUDIT_TIMESTAMP) 
+          SELECT '{{ this.name }}', 'STARTED', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE', CURRENT_TIMESTAMP()
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} 
+          (TABLE_NAME, PROCESS_STATUS, PROCESS_END_TIME, RECORDS_PROCESSED, RECORDS_SUCCESS, EXECUTED_BY, AUDIT_TIMESTAMP) 
+          SELECT '{{ this.name }}', 'COMPLETED', CURRENT_TIMESTAMP(), 
+          (SELECT COUNT(*) FROM {{ this }}), 
+          (SELECT COUNT(*) FROM {{ this }} WHERE VALIDATION_STATUS = 'PASSED'), 
+          'DBT_SILVER_PIPELINE', CURRENT_TIMESTAMP()
+        {% endif %}
 
-# Configure tests
-tests:
-  +store_failures: true
-  +severity: warn
+# Model execution order - Audit log must run first
+model-ordering:
+  - "SI_Audit_Log"
+  - "SI_USERS"
+  - "SI_MEETINGS"
+  - "SI_PARTICIPANTS"
+  - "SI_FEATURE_USAGE"
+  - "SI_SUPPORT_TICKETS"
+  - "SI_BILLING_EVENTS"
+  - "SI_LICENSES"
 
-# Configure variables
+# Snowflake-specific configurations
 vars:
-  # dbt Cloud environment variables
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
-  
   # Data quality thresholds
-  dq_score_threshold: 70
-  max_processing_time_minutes: 60
+  min_data_quality_score: 70
   
-  # Business rules
-  max_meeting_duration_minutes: 1440
-  valid_plan_types: ['FREE', 'BASIC', 'PRO', 'ENTERPRISE']
-  valid_resolution_statuses: ['OPEN', 'IN PROGRESS', 'RESOLVED', 'CLOSED']
-
-# Configure on-run-start and on-run-end hooks
-on-run-start:
-  - "{{ log('Starting Silver Layer Pipeline Execution', info=True) }}"
-
-on-run-end:
-  - "{{ log('Silver Layer Pipeline Execution Completed', info=True) }}"
+  # Date format patterns
+  dd_mm_yyyy_pattern: '^\\d{1,2}/\\d{1,2}/\\d{4}$'
+  mm_dd_yyyy_pattern: '^\\d{1,2}/\\d{1,2}/\\d{4} \\d{1,2}:\\d{2}$'
+  
+  # Text cleaning patterns
+  duration_text_pattern: '[^0-9.]'
+  
+  # Timezone handling
+  est_timezone_pattern: '%EST%'
