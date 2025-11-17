@@ -1,7 +1,7 @@
 {{ config(
     materialized='table',
-    pre_hook="INSERT INTO {{ ref('si_audit_log') }} (MODEL_NAME, TABLE_NAME, PROCESS_STATUS, LOAD_TIMESTAMP) SELECT '{{ this.name }}', 'SI_MEETINGS', 'STARTED', CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'si_audit_log'",
-    post_hook="INSERT INTO {{ ref('si_audit_log') }} (MODEL_NAME, TABLE_NAME, PROCESS_STATUS, LOAD_TIMESTAMP) SELECT '{{ this.name }}', 'SI_MEETINGS', 'COMPLETED', CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'si_audit_log'"
+    pre_hook="INSERT INTO {{ ref('si_audit_log') }} (MODEL_NAME, TABLE_NAME, PROCESS_STATUS, LOAD_TIMESTAMP) SELECT 'si_meetings', 'SI_MEETINGS', 'STARTED', CURRENT_TIMESTAMP()",
+    post_hook="INSERT INTO {{ ref('si_audit_log') }} (MODEL_NAME, TABLE_NAME, PROCESS_STATUS, LOAD_TIMESTAMP) SELECT 'si_meetings', 'SI_MEETINGS', 'COMPLETED', CURRENT_TIMESTAMP()"
 ) }}
 
 -- Silver Layer Meetings Table
