@@ -1,13 +1,8 @@
 <?xml version='1.0' encoding='utf-8' ?>
 
-<!-- build 20233.23.1017.0948                               -->
+<!-- build 20233.23.1017.0948 -->
 <workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
   <document-format-change-manifest>
-    <AnimationOnByDefault />
-    <MarkAnimation />
-    <ObjectModelEncapsulateLegacy />
-    <ObjectModelTableType />
-    <SchemaViewerObjectModel />
     <SheetIdentifierTracking />
     <WindowsPersistSimpleIdentifiers />
   </document-format-change-manifest>
@@ -16,10 +11,10 @@
     <preference name='ui.shelf.height' value='26' />
   </preferences>
   <datasources>
-    <datasource caption='Zoom Support Analytics' inline='true' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' version='18.1'>
+    <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' inline='true' name='federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7' version='18.1'>
       <connection class='federated'>
         <named-connections>
-          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e'>
+          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7'>
             <connection authentication='oauth' class='snowflake' dbname='DB_POC_ZOOM' instanceurl='https://a8977680256071-ascendion_partner.snowflakecomputing.com' odbc-connect-string-extras='' one-time-sql='' role='FR__POC__ADMIN__ZOOM' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' server-oauth='' service='FR__POC__ADMIN__ZOOM' username='SATHYANARAYANAP' warehouse='WH_POC_ZOOM_DEV_XSMALL' />
           </named-connection>
         </named-connections>
@@ -27,10 +22,10 @@
           <left>
             <relation type='join' join-type='inner'>
               <left>
-                <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
+                <relation connection='snowflake.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
               </left>
               <right>
-                <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='DIM_USER' table='[DB_POC_ZOOM].[GOLD].[DIM_USER]' type='table' />
+                <relation connection='snowflake.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7' name='DIM_USER' table='[DB_POC_ZOOM].[GOLD].[DIM_USER]' type='table' />
               </right>
               <clause>
                 <left>[FACT_SUPPORT_ACTIVITY].[USER_KEY]</left>
@@ -41,10 +36,10 @@
           <right>
             <relation type='join' join-type='inner'>
               <left>
-                <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='DIM_DATE' table='[DB_POC_ZOOM].[GOLD].[DIM_DATE]' type='table' />
+                <relation connection='snowflake.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7' name='DIM_DATE' table='[DB_POC_ZOOM].[GOLD].[DIM_DATE]' type='table' />
               </left>
               <right>
-                <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_ZOOM].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
+                <relation connection='snowflake.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_ZOOM].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
               </right>
               <clause>
                 <left>[DIM_DATE].[DATE_KEY]</left>
@@ -53,93 +48,36 @@
             </relation>
           </right>
           <clause>
-            <left>[FACT_SUPPORT_ACTIVITY].[DATE_KEY]</left>
-            <right>[DIM_DATE].[DATE_KEY]</right>
-          </clause>
-        </relation>
-        <relation type='join' join-type='inner'>
-          <left>
-            <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
-          </left>
-          <right>
-            <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_ZOOM].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
-          </right>
-          <clause>
             <left>[FACT_SUPPORT_ACTIVITY].[SUPPORT_CATEGORY_KEY]</left>
             <right>[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY_KEY]</right>
           </clause>
         </relation>
         <cols>
-          <map key='[USER_KEY]' value='[DIM_USER].[USER_KEY]' />
-          <map key='[USER_NAME]' value='[DIM_USER].[USER_NAME]' />
-          <map key='[COMPANY]' value='[DIM_USER].[COMPANY]' />
-          <map key='[SUPPORT_CATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY]' />
-          <map key='[SUPPORT_SUBCATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_SUBCATEGORY]' />
-          <map key='[PRIORITY_LEVEL]' value='[FACT_SUPPORT_ACTIVITY].[PRIORITY_LEVEL]' />
-          <map key='[RESOLUTION_STATUS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_STATUS]' />
           <map key='[TICKET_TYPE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_TYPE]' />
+          <map key='[RESOLUTION_STATUS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_STATUS]' />
+          <map key='[PRIORITY_LEVEL]' value='[FACT_SUPPORT_ACTIVITY].[PRIORITY_LEVEL]' />
           <map key='[RESOLUTION_TIME_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_TIME_HOURS]' />
           <map key='[CUSTOMER_SATISFACTION_SCORE]' value='[FACT_SUPPORT_ACTIVITY].[CUSTOMER_SATISFACTION_SCORE]' />
-          <map key='[ESCALATION_COUNT]' value='[FACT_SUPPORT_ACTIVITY].[ESCALATION_COUNT]' />
-          <map key='[DATE_VALUE]' value='[DIM_DATE].[DATE_VALUE]' />
+          <map key='[USER_NAME]' value='[DIM_USER].[USER_NAME]' />
+          <map key='[COMPANY]' value='[DIM_USER].[COMPANY]' />
+          <map key='[PLAN_TYPE]' value='[DIM_USER].[PLAN_TYPE]' />
+          <map key='[SUPPORT_CATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY]' />
+          <map key='[SUPPORT_SUBCATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_SUBCATEGORY]' />
           <map key='[YEAR]' value='[DIM_DATE].[YEAR]' />
           <map key='[MONTH]' value='[DIM_DATE].[MONTH]' />
         </cols>
         <metadata-records>
           <metadata-record class='column'>
-            <remote-name>USER_KEY</remote-name>
+            <remote-name>TICKET_TYPE</remote-name>
             <remote-type>129</remote-type>
-            <local-name>[USER_KEY]</local-name>
-            <parent-name>[DIM_USER]</parent-name>
-            <remote-alias>USER_KEY</remote-alias>
+            <local-name>[TICKET_TYPE]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>TICKET_TYPE</remote-alias>
             <ordinal>1</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>USER_NAME</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[USER_NAME]</local-name>
-            <parent-name>[DIM_USER]</parent-name>
-            <remote-alias>USER_NAME</remote-alias>
-            <ordinal>2</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <contains-null>true</contains-null>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>SUPPORT_CATEGORY</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[SUPPORT_CATEGORY]</local-name>
-            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
-            <remote-alias>SUPPORT_CATEGORY</remote-alias>
-            <ordinal>3</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <contains-null>true</contains-null>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>SUPPORT_SUBCATEGORY</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[SUPPORT_SUBCATEGORY]</local-name>
-            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
-            <remote-alias>SUPPORT_SUBCATEGORY</remote-alias>
-            <ordinal>4</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <contains-null>true</contains-null>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>PRIORITY_LEVEL</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[PRIORITY_LEVEL]</local-name>
-            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
-            <remote-alias>PRIORITY_LEVEL</remote-alias>
-            <ordinal>5</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>RESOLUTION_STATUS</remote-name>
@@ -147,10 +85,23 @@
             <local-name>[RESOLUTION_STATUS]</local-name>
             <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
             <remote-alias>RESOLUTION_STATUS</remote-alias>
-            <ordinal>6</ordinal>
+            <ordinal>2</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PRIORITY_LEVEL</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[PRIORITY_LEVEL]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>PRIORITY_LEVEL</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>RESOLUTION_TIME_HOURS</remote-name>
@@ -158,7 +109,7 @@
             <local-name>[RESOLUTION_TIME_HOURS]</local-name>
             <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
             <remote-alias>RESOLUTION_TIME_HOURS</remote-alias>
-            <ordinal>7</ordinal>
+            <ordinal>4</ordinal>
             <local-type>integer</local-type>
             <aggregation>Sum</aggregation>
             <contains-null>true</contains-null>
@@ -169,7 +120,89 @@
             <local-name>[CUSTOMER_SATISFACTION_SCORE]</local-name>
             <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
             <remote-alias>CUSTOMER_SATISFACTION_SCORE</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_NAME]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>USER_NAME</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COMPANY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[COMPANY]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>COMPANY</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PLAN_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[PLAN_TYPE]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>PLAN_TYPE</remote-alias>
             <ordinal>8</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SUPPORT_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[SUPPORT_CATEGORY]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>SUPPORT_CATEGORY</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SUPPORT_SUBCATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[SUPPORT_SUBCATEGORY]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>SUPPORT_SUBCATEGORY</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>YEAR</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[YEAR]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>YEAR</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MONTH</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[MONTH]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>MONTH</remote-alias>
+            <ordinal>12</ordinal>
             <local-type>integer</local-type>
             <aggregation>Sum</aggregation>
             <contains-null>true</contains-null>
@@ -177,35 +210,30 @@
         </metadata-records>
       </connection>
       <aliases enabled='yes' />
-      <column caption='User Key' datatype='string' name='[USER_KEY]' role='dimension' type='nominal' />
-      <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
-      <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
-      <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
-      <column caption='Support Subcategory' datatype='string' name='[SUPPORT_SUBCATEGORY]' role='dimension' type='nominal' />
-      <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
-      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
       <column caption='Ticket Type' datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
+      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+      <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
       <column caption='Resolution Time Hours' datatype='integer' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
       <column caption='Customer Satisfaction Score' datatype='integer' name='[CUSTOMER_SATISFACTION_SCORE]' role='measure' type='quantitative' />
-      <column caption='Escalation Count' datatype='integer' name='[ESCALATION_COUNT]' role='measure' type='quantitative' />
-      
-      <!-- Calculated Fields for Support KPIs -->
-      <column caption='Number of Users by Support Category' datatype='integer' name='[Calc_Users_By_Support_Cat]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNTD([USER_KEY])' />
+      <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+      <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
+      <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Support Subcategory' datatype='string' name='[SUPPORT_SUBCATEGORY]' role='dimension' type='nominal' />
+      <column caption='Year' datatype='integer' name='[YEAR]' role='dimension' type='quantitative' />
+      <column caption='Month' datatype='integer' name='[MONTH]' role='dimension' type='quantitative' />
+      <column caption='Number of Users' datatype='integer' name='[Calculation_User_Count]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([USER_NAME])' />
       </column>
-      <column caption='Number of Support Activities' datatype='integer' name='[Calc_Support_Activities_Count]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
+      <column caption='Number of Support Activities' datatype='integer' name='[Calculation_Support_Activities]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([TICKET_TYPE])' />
       </column>
-      <column caption='Average Resolution Time' datatype='real' name='[Calc_Avg_Resolution_Time]' role='measure' type='quantitative'>
+      <column caption='Average Resolution Time' datatype='real' name='[Calculation_Avg_Resolution_Time]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
       </column>
-      <column caption='Average Customer Satisfaction' datatype='real' name='[Calc_Avg_Customer_Satisfaction]' role='measure' type='quantitative'>
+      <column caption='Average Customer Satisfaction' datatype='real' name='[Calculation_Avg_Satisfaction]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='AVG([CUSTOMER_SATISFACTION_SCORE])' />
       </column>
-      <column caption='Total Escalations' datatype='integer' name='[Calc_Total_Escalations]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='SUM([ESCALATION_COUNT])' />
-      </column>
-      
       <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
       <semantic-values>
         <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
@@ -224,23 +252,24 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='Zoom Support Analytics' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' />
+            <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' name='federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7' />
           </datasources>
-          <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e'>
+          <datasource-dependencies datasource='federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7'>
             <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
             <column caption='Support Subcategory' datatype='string' name='[SUPPORT_SUBCATEGORY]' role='dimension' type='nominal' />
-            <column caption='Number of Users by Support Category' datatype='integer' name='[Calc_Users_By_Support_Cat]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='COUNTD([USER_KEY])' />
+            <column caption='Number of Users' datatype='integer' name='[Calculation_User_Count]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD([USER_NAME])' />
             </column>
             <column-instance column='[SUPPORT_CATEGORY]' derivation='None' name='[none:SUPPORT_CATEGORY:nk]' pivot='key' type='nominal' />
             <column-instance column='[SUPPORT_SUBCATEGORY]' derivation='None' name='[none:SUPPORT_SUBCATEGORY:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calc_Users_By_Support_Cat]' derivation='Sum' name='[sum:Calc_Users_By_Support_Cat:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_User_Count]' derivation='User' name='[usr:Calculation_User_Count:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
         <style>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[none:SUPPORT_SUBCATEGORY:nk]' palette='tableau_10_medium' type='ordinal' />
+            <format attr='mark-labels-show' value='true' />
+            <format attr='mark-labels-cull' value='true' />
           </style-rule>
         </style>
         <panes>
@@ -250,22 +279,15 @@
             </view>
             <mark class='Bar' />
             <encodings>
-              <color column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[none:SUPPORT_SUBCATEGORY:nk]' />
+              <color column='[federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[none:SUPPORT_SUBCATEGORY:nk]' />
             </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
           </pane>
         </panes>
-        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[sum:Calc_Users_By_Support_Cat:qk]</rows>
-        <cols>([federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[none:SUPPORT_CATEGORY:nk] / [federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[none:SUPPORT_SUBCATEGORY:nk])</cols>
+        <rows>[federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[usr:Calculation_User_Count:qk]</rows>
+        <cols>[federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[none:SUPPORT_CATEGORY:nk]</cols>
       </table>
-      <simple-id uuid='{1A2B3C4D-5E6F-7890-1234-567890ABCDEF}' />
+      <simple-id uuid='{1A2B3C4D-5E6F-7890-ABCD-123456789012}' />
     </worksheet>
-    
     <worksheet name='Support Activities by Resolution Status'>
       <layout-options>
         <title>
@@ -277,21 +299,22 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='Zoom Support Analytics' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' />
+            <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' name='federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7' />
           </datasources>
-          <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e'>
+          <datasource-dependencies datasource='federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7'>
             <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
-            <column caption='Number of Support Activities' datatype='integer' name='[Calc_Support_Activities_Count]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
+            <column caption='Number of Support Activities' datatype='integer' name='[Calculation_Support_Activities]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNT([TICKET_TYPE])' />
             </column>
             <column-instance column='[RESOLUTION_STATUS]' derivation='None' name='[none:RESOLUTION_STATUS:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calc_Support_Activities_Count]' derivation='Sum' name='[sum:Calc_Support_Activities_Count:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_Support_Activities]' derivation='User' name='[usr:Calculation_Support_Activities:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
         <style>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[none:RESOLUTION_STATUS:nk]' palette='red_green_gold_10_0' type='ordinal' />
+            <format attr='mark-labels-show' value='true' />
+            <format attr='mark-labels-cull' value='true' />
           </style-rule>
         </style>
         <panes>
@@ -301,22 +324,15 @@
             </view>
             <mark class='Bar' />
             <encodings>
-              <color column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[none:RESOLUTION_STATUS:nk]' />
+              <color column='[federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[none:RESOLUTION_STATUS:nk]' />
             </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
           </pane>
         </panes>
-        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[sum:Calc_Support_Activities_Count:qk]</rows>
-        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[none:RESOLUTION_STATUS:nk]</cols>
+        <rows>[federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[usr:Calculation_Support_Activities:qk]</rows>
+        <cols>[federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[none:RESOLUTION_STATUS:nk]</cols>
       </table>
-      <simple-id uuid='{2B3C4D5E-6F7A-8901-2345-678901BCDEFG}' />
+      <simple-id uuid='{2B3C4D5E-6F7A-8901-BCDE-234567890123}' />
     </worksheet>
-    
     <worksheet name='Support Activities by Priority'>
       <layout-options>
         <title>
@@ -328,21 +344,22 @@
       <table>
         <view>
           <datasources>
-            <datasource caption='Zoom Support Analytics' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' />
+            <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' name='federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7' />
           </datasources>
-          <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e'>
+          <datasource-dependencies datasource='federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7'>
             <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
-            <column caption='Number of Support Activities' datatype='integer' name='[Calc_Support_Activities_Count]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
+            <column caption='Number of Support Activities' datatype='integer' name='[Calculation_Support_Activities]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNT([TICKET_TYPE])' />
             </column>
             <column-instance column='[PRIORITY_LEVEL]' derivation='None' name='[none:PRIORITY_LEVEL:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calc_Support_Activities_Count]' derivation='Sum' name='[sum:Calc_Support_Activities_Count:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_Support_Activities]' derivation='User' name='[usr:Calculation_Support_Activities:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
         <style>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[none:PRIORITY_LEVEL:nk]' palette='orange_blue_diverging_10_0' type='ordinal' />
+            <format attr='mark-labels-show' value='true' />
+            <format attr='mark-labels-cull' value='true' />
           </style-rule>
         </style>
         <panes>
@@ -352,99 +369,54 @@
             </view>
             <mark class='Bar' />
             <encodings>
-              <color column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[none:PRIORITY_LEVEL:nk]' />
+              <color column='[federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[none:PRIORITY_LEVEL:nk]' />
             </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
           </pane>
         </panes>
-        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[sum:Calc_Support_Activities_Count:qk]</rows>
-        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[none:PRIORITY_LEVEL:nk]</cols>
+        <rows>[federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[usr:Calculation_Support_Activities:qk]</rows>
+        <cols>[federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[none:PRIORITY_LEVEL:nk]</cols>
       </table>
-      <simple-id uuid='{3C4D5E6F-7A8B-9012-3456-789012CDEFAB}' />
+      <simple-id uuid='{3C4D5E6F-7A8B-9012-CDEF-345678901234}' />
     </worksheet>
-    
-    <worksheet name='Resolution Time Analysis'>
+    <worksheet name='Support Performance Summary'>
       <layout-options>
         <title>
           <formatted-text>
-            <run>Average Resolution Time by Priority Level</run>
+            <run>Support Performance Summary</run>
           </formatted-text>
         </title>
       </layout-options>
       <table>
         <view>
           <datasources>
-            <datasource caption='Zoom Support Analytics' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' />
+            <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' name='federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7' />
           </datasources>
-          <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e'>
-            <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
-            <column caption='Average Resolution Time' datatype='real' name='[Calc_Avg_Resolution_Time]' role='measure' type='quantitative'>
+          <datasource-dependencies datasource='federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7'>
+            <column caption='Average Resolution Time' datatype='real' name='[Calculation_Avg_Resolution_Time]' role='measure' type='quantitative'>
               <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
             </column>
-            <column-instance column='[PRIORITY_LEVEL]' derivation='None' name='[none:PRIORITY_LEVEL:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calc_Avg_Resolution_Time]' derivation='Sum' name='[sum:Calc_Avg_Resolution_Time:qk]' pivot='key' type='quantitative' />
-          </datasource-dependencies>
-          <aggregation value='true' />
-        </view>
-        <style>
-          <style-rule element='mark'>
-            <encoding attr='color' field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[sum:Calc_Avg_Resolution_Time:qk]' palette='red_blue_diverging_10_0' type='interpolated' />
-          </style-rule>
-        </style>
-        <panes>
-          <pane selection-relaxation-option='selection-relaxation-allow'>
-            <view>
-              <breakdown value='auto' />
-            </view>
-            <mark class='Bar' />
-            <encodings>
-              <color column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[sum:Calc_Avg_Resolution_Time:qk]' />
-            </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
-          </pane>
-        </panes>
-        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[sum:Calc_Avg_Resolution_Time:qk]</rows>
-        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[none:PRIORITY_LEVEL:nk]</cols>
-      </table>
-      <simple-id uuid='{4D5E6F7A-8B9C-0123-4567-890123DEFABC}' />
-    </worksheet>
-    
-    <worksheet name='Customer Satisfaction Analysis'>
-      <layout-options>
-        <title>
-          <formatted-text>
-            <run>Average Customer Satisfaction by Support Category</run>
-          </formatted-text>
-        </title>
-      </layout-options>
-      <table>
-        <view>
-          <datasources>
-            <datasource caption='Zoom Support Analytics' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e' />
-          </datasources>
-          <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e'>
-            <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
-            <column caption='Average Customer Satisfaction' datatype='real' name='[Calc_Avg_Customer_Satisfaction]' role='measure' type='quantitative'>
+            <column caption='Average Customer Satisfaction' datatype='real' name='[Calculation_Avg_Satisfaction]' role='measure' type='quantitative'>
               <calculation class='tableau' formula='AVG([CUSTOMER_SATISFACTION_SCORE])' />
             </column>
-            <column-instance column='[SUPPORT_CATEGORY]' derivation='None' name='[none:SUPPORT_CATEGORY:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calc_Avg_Customer_Satisfaction]' derivation='Sum' name='[sum:Calc_Avg_Customer_Satisfaction:qk]' pivot='key' type='quantitative' />
+            <column caption='Number of Support Activities' datatype='integer' name='[Calculation_Support_Activities]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNT([TICKET_TYPE])' />
+            </column>
+            <column-instance column='[Calculation_Avg_Resolution_Time]' derivation='User' name='[usr:Calculation_Avg_Resolution_Time:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_Avg_Satisfaction]' derivation='User' name='[usr:Calculation_Avg_Satisfaction:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_Support_Activities]' derivation='User' name='[usr:Calculation_Support_Activities:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
         <style>
+          <style-rule element='cell'>
+            <format attr='width' value='150' />
+            <format attr='height' value='80' />
+          </style-rule>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[sum:Calc_Avg_Customer_Satisfaction:qk]' palette='green_gold_10_0' type='interpolated' />
+            <format attr='mark-labels-show' value='true' />
+            <format attr='mark-labels-cull' value='false' />
+            <format attr='font-size' value='18' />
+            <format attr='font-weight' value='bold' />
           </style-rule>
         </style>
         <panes>
@@ -452,23 +424,34 @@
             <view>
               <breakdown value='auto' />
             </view>
-            <mark class='Circle' />
+            <mark class='Text' />
             <encodings>
-              <color column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[sum:Calc_Avg_Customer_Satisfaction:qk]' />
-              <size column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[sum:Calc_Avg_Customer_Satisfaction:qk]' />
+              <text column='[federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[usr:Calculation_Support_Activities:qk]' />
             </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
+          </pane>
+          <pane id='1' selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Text' />
+            <encodings>
+              <text column='[federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[usr:Calculation_Avg_Resolution_Time:qk]' />
+            </encodings>
+          </pane>
+          <pane id='2' selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Text' />
+            <encodings>
+              <text column='[federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[usr:Calculation_Avg_Satisfaction:qk]' />
+            </encodings>
           </pane>
         </panes>
-        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[sum:Calc_Avg_Customer_Satisfaction:qk]</rows>
-        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e].[none:SUPPORT_CATEGORY:nk]</cols>
+        <rows>([federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[usr:Calculation_Support_Activities:qk] + ([federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[usr:Calculation_Avg_Resolution_Time:qk] + [federated.2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7].[usr:Calculation_Avg_Satisfaction:qk]))</rows>
+        <cols />
       </table>
-      <simple-id uuid='{5E6F7A8B-9C0D-1234-5678-901234EFABCD}' />
+      <simple-id uuid='{4D5E6F7A-8B9C-0123-DEFA-456789012345}' />
     </worksheet>
   </worksheets>
   <windows saved-dpi-scale-factor='1.5' source-height='44'>
@@ -493,7 +476,7 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{6F7A8B9C-0D1E-2345-6789-012345FABCDE}' />
+      <simple-id uuid='{5E6F7A8B-9C0D-1234-EFAB-567890123456}' />
     </window>
     <window class='worksheet' name='Support Activities by Resolution Status'>
       <cards>
@@ -516,7 +499,7 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{7A8B9C0D-1E2F-3456-789A-123456ABCDEF}' />
+      <simple-id uuid='{6F7A8B9C-0D1E-2345-FABC-678901234567}' />
     </window>
     <window class='worksheet' name='Support Activities by Priority'>
       <cards>
@@ -539,9 +522,9 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{8B9C0D1E-2F3A-4567-89AB-23456789CDEF}' />
+      <simple-id uuid='{7A8B9C0D-1E2F-3456-ABCD-789012345678}' />
     </window>
-    <window class='worksheet' name='Resolution Time Analysis'>
+    <window class='worksheet' name='Support Performance Summary'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -562,30 +545,7 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{9C0D1E2F-3A4B-5678-9ABC-3456789ADEF0}' />
-    </window>
-    <window class='worksheet' name='Customer Satisfaction Analysis'>
-      <cards>
-        <edge name='left'>
-          <strip size='160'>
-            <card type='pages' />
-            <card type='filters' />
-            <card type='marks' />
-          </strip>
-        </edge>
-        <edge name='top'>
-          <strip size='2147483647'>
-            <card type='columns' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='rows' />
-          </strip>
-          <strip size='30'>
-            <card type='title' />
-          </strip>
-        </edge>
-      </cards>
-      <simple-id uuid='{0D1E2F3A-4B5C-6789-ABCD-456789ABEF01}' />
+      <simple-id uuid='{8B9C0D1E-2F3A-4567-BCDE-890123456789}' />
     </window>
   </windows>
 </workbook>
