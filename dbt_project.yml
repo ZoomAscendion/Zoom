@@ -21,38 +21,10 @@ clean-targets:         # directories to be removed by `dbt clean`
 # Configuring models
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/example/
+    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
-      # Ensure audit log runs first
-      SI_AUDIT_LOG:
-        +pre_hook: []
-        +post_hook: []
-      # All other models depend on audit log
-      +pre_hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-          INSERT INTO {{ ref('SI_AUDIT_LOG') }} 
-          (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_START_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTION_TRIGGER, EXECUTED_BY, LOAD_TIMESTAMP) 
-          SELECT UUID_STRING(), '{{ this.name }}', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'RUNNING', 'BZ_{{ this.name[3:] }}', '{{ this.name }}', 'DBT_SCHEDULED', 'DBT_CLOUD', CURRENT_TIMESTAMP()
-        {% endif %}
-      +post_hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-          INSERT INTO {{ ref('SI_AUDIT_LOG') }} 
-          (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_END_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, RECORDS_PROCESSED, RECORDS_SUCCESS, EXECUTION_TRIGGER, EXECUTED_BY, UPDATE_TIMESTAMP) 
-          SELECT UUID_STRING(), '{{ this.name }}', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'SUCCESS', 'BZ_{{ this.name[3:] }}', '{{ this.name }}', (SELECT COUNT(*) FROM {{ this }}), (SELECT COUNT(*) FROM {{ this }}), 'DBT_SCHEDULED', 'DBT_CLOUD', CURRENT_TIMESTAMP()
-        {% endif %}
-
-# Set the order of model execution
-model-ordering:
-  - "SI_AUDIT_LOG"  # Run first
-  - "SI_USERS"
-  - "SI_MEETINGS"
-  - "SI_PARTICIPANTS"
-  - "SI_FEATURE_USAGE"
-  - "SI_SUPPORT_TICKETS"
-  - "SI_BILLING_EVENTS"
-  - "SI_LICENSES"
 
 vars:
   # dbt project variables
