@@ -24,53 +24,6 @@ models:
     # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_START_TIME, 
-            EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            'BRONZE_TO_SILVER_{{ this.name }}', 
-            'BRONZE_TO_SILVER', 
-            CURRENT_TIMESTAMP(), 
-            'RUNNING', 
-            'BZ_{{ this.name | replace("SI_", "") }}', 
-            '{{ this.name }}', 
-            'DBT_PIPELINE', 
-            CURRENT_TIMESTAMP() 
-          WHERE EXISTS (SELECT 1 FROM {{ ref('SI_Audit_Log') }})
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_END_TIME, 
-            EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, UPDATE_TIMESTAMP
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            'BRONZE_TO_SILVER_{{ this.name }}', 
-            'BRONZE_TO_SILVER', 
-            CURRENT_TIMESTAMP(), 
-            'SUCCESS', 
-            'BZ_{{ this.name | replace("SI_", "") }}', 
-            '{{ this.name }}', 
-            'DBT_PIPELINE', 
-            CURRENT_TIMESTAMP() 
-          WHERE EXISTS (SELECT 1 FROM {{ ref('SI_Audit_Log') }})
-        {% endif %}
-
-# Model execution order - ensure audit log runs first
-model-dependencies:
-  SI_Audit_Log: []
-  SI_Users: [SI_Audit_Log]
-  SI_Meetings: [SI_Audit_Log]
-  SI_Participants: [SI_Audit_Log, SI_Meetings, SI_Users]
-  SI_Feature_Usage: [SI_Audit_Log, SI_Meetings]
-  SI_Support_Tickets: [SI_Audit_Log, SI_Users]
-  SI_Billing_Events: [SI_Audit_Log, SI_Users]
-  SI_Licenses: [SI_Audit_Log, SI_Users]
 
 vars:
   # dbt project variables
