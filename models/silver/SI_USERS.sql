@@ -39,7 +39,14 @@ cleansed_users AS (
 
 validated_users AS (
     SELECT 
-        *,
+        USER_ID,
+        USER_NAME,
+        EMAIL,
+        COMPANY,
+        PLAN_TYPE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
         DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
         /* Calculate data quality score based on completeness and validation */
