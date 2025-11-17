@@ -6,145 +6,18 @@ sources:
     tables:
       - name: bz_users
         description: Raw user data from source systems
-        columns:
-          - name: user_id
-            description: Unique identifier for users
-          - name: user_name
-            description: Display name of the user
-          - name: email
-            description: Email address of the user
-          - name: company
-            description: Company or organization name
-          - name: plan_type
-            description: Subscription plan type
-          - name: load_timestamp
-            description: Timestamp when record was loaded
-          - name: update_timestamp
-            description: Timestamp when record was last updated
-          - name: source_system
-            description: Source system identifier
-      
       - name: bz_meetings
         description: Raw meeting data from source systems
-        columns:
-          - name: meeting_id
-            description: Unique identifier for meetings
-          - name: host_id
-            description: User ID of the meeting host
-          - name: meeting_topic
-            description: Topic or title of the meeting
-          - name: start_time
-            description: Meeting start timestamp
-          - name: end_time
-            description: Meeting end timestamp
-          - name: duration_minutes
-            description: Meeting duration in minutes
-          - name: load_timestamp
-            description: Timestamp when record was loaded
-          - name: update_timestamp
-            description: Timestamp when record was last updated
-          - name: source_system
-            description: Source system identifier
-      
       - name: bz_participants
         description: Raw participant data from source systems
-        columns:
-          - name: participant_id
-            description: Unique identifier for participants
-          - name: meeting_id
-            description: Reference to meeting
-          - name: user_id
-            description: Reference to user who participated
-          - name: join_time
-            description: Timestamp when participant joined
-          - name: leave_time
-            description: Timestamp when participant left
-          - name: load_timestamp
-            description: Timestamp when record was loaded
-          - name: update_timestamp
-            description: Timestamp when record was last updated
-          - name: source_system
-            description: Source system identifier
-      
       - name: bz_feature_usage
         description: Raw feature usage data from source systems
-        columns:
-          - name: usage_id
-            description: Unique identifier for feature usage records
-          - name: meeting_id
-            description: Reference to meeting where feature was used
-          - name: feature_name
-            description: Name of the feature being tracked
-          - name: usage_count
-            description: Number of times feature was used
-          - name: usage_date
-            description: Date when feature usage occurred
-          - name: load_timestamp
-            description: Timestamp when record was loaded
-          - name: update_timestamp
-            description: Timestamp when record was last updated
-          - name: source_system
-            description: Source system identifier
-      
       - name: bz_support_tickets
         description: Raw support ticket data from source systems
-        columns:
-          - name: ticket_id
-            description: Unique identifier for support tickets
-          - name: user_id
-            description: Reference to user who created the ticket
-          - name: ticket_type
-            description: Type of support ticket
-          - name: resolution_status
-            description: Current status of ticket resolution
-          - name: open_date
-            description: Date when ticket was opened
-          - name: load_timestamp
-            description: Timestamp when record was loaded
-          - name: update_timestamp
-            description: Timestamp when record was last updated
-          - name: source_system
-            description: Source system identifier
-      
       - name: bz_billing_events
         description: Raw billing event data from source systems
-        columns:
-          - name: event_id
-            description: Unique identifier for billing events
-          - name: user_id
-            description: Reference to user associated with billing event
-          - name: event_type
-            description: Type of billing event
-          - name: amount
-            description: Monetary amount for the billing event
-          - name: event_date
-            description: Date when the billing event occurred
-          - name: load_timestamp
-            description: Timestamp when record was loaded
-          - name: update_timestamp
-            description: Timestamp when record was last updated
-          - name: source_system
-            description: Source system identifier
-      
       - name: bz_licenses
         description: Raw license data from source systems
-        columns:
-          - name: license_id
-            description: Unique identifier for licenses
-          - name: license_type
-            description: Type of license
-          - name: assigned_to_user_id
-            description: User ID to whom license is assigned
-          - name: start_date
-            description: License validity start date
-          - name: end_date
-            description: License validity end date
-          - name: load_timestamp
-            description: Timestamp when record was loaded
-          - name: update_timestamp
-            description: Timestamp when record was last updated
-          - name: source_system
-            description: Source system identifier
 
 models:
   - name: si_audit_log
@@ -154,20 +27,6 @@ models:
         description: Name of the dbt model being processed
       - name: table_name
         description: Name of the table being processed
-      - name: column_name
-        description: Name of the column with issues (if applicable)
-      - name: invalid_value
-        description: Invalid value that caused an error
-      - name: error_type
-        description: Type of error encountered
-      - name: error_description
-        description: Detailed description of the error
-      - name: record_id
-        description: ID of the record that caused the error
-      - name: original_value
-        description: Original value before transformation
-      - name: audit_timestamp
-        description: Timestamp when the audit entry was created
       - name: process_status
         description: Status of the process (STARTED, COMPLETED, FAILED)
       - name: load_timestamp
@@ -181,14 +40,6 @@ models:
         tests:
           - unique
           - not_null
-      - name: user_name
-        description: Standardized display name of the user
-      - name: email
-        description: Validated and standardized email address
-      - name: company
-        description: Cleaned company or organization name
-      - name: plan_type
-        description: Standardized subscription plan type
       - name: data_quality_score
         description: Quality score from validation process (0-100)
       - name: validation_status
@@ -202,14 +53,6 @@ models:
         tests:
           - unique
           - not_null
-      - name: host_id
-        description: User ID of the meeting host
-      - name: meeting_topic
-        description: Cleaned topic or title of the meeting
-      - name: start_time
-        description: Standardized meeting start timestamp
-      - name: end_time
-        description: Standardized meeting end timestamp
       - name: duration_minutes
         description: Validated meeting duration in minutes
       - name: data_quality_score
@@ -225,14 +68,6 @@ models:
         tests:
           - unique
           - not_null
-      - name: meeting_id
-        description: Reference to meeting
-      - name: user_id
-        description: Reference to user who participated
-      - name: join_time
-        description: Standardized timestamp when participant joined
-      - name: leave_time
-        description: Standardized timestamp when participant left
       - name: data_quality_score
         description: Quality score from validation process (0-100)
       - name: validation_status
@@ -246,14 +81,6 @@ models:
         tests:
           - unique
           - not_null
-      - name: meeting_id
-        description: Reference to meeting where feature was used
-      - name: feature_name
-        description: Standardized name of the feature being tracked
-      - name: usage_count
-        description: Validated number of times feature was used
-      - name: usage_date
-        description: Date when feature usage occurred
       - name: data_quality_score
         description: Quality score from validation process (0-100)
       - name: validation_status
@@ -267,14 +94,6 @@ models:
         tests:
           - unique
           - not_null
-      - name: user_id
-        description: Reference to user who created the ticket
-      - name: ticket_type
-        description: Standardized type of support ticket
-      - name: resolution_status
-        description: Standardized current status of ticket resolution
-      - name: open_date
-        description: Date when ticket was opened
       - name: data_quality_score
         description: Quality score from validation process (0-100)
       - name: validation_status
@@ -288,14 +107,6 @@ models:
         tests:
           - unique
           - not_null
-      - name: user_id
-        description: Reference to user associated with billing event
-      - name: event_type
-        description: Standardized type of billing event
-      - name: amount
-        description: Validated monetary amount for the billing event
-      - name: event_date
-        description: Date when the billing event occurred
       - name: data_quality_score
         description: Quality score from validation process (0-100)
       - name: validation_status
@@ -309,14 +120,6 @@ models:
         tests:
           - unique
           - not_null
-      - name: license_type
-        description: Standardized type of license
-      - name: assigned_to_user_id
-        description: User ID to whom license is assigned
-      - name: start_date
-        description: Validated license validity start date
-      - name: end_date
-        description: Validated license validity end date
       - name: data_quality_score
         description: Quality score from validation process (0-100)
       - name: validation_status
