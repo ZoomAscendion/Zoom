@@ -4,16 +4,18 @@
 -- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table',
-    pre_hook=None,
-    post_hook=None
+    materialized='table'
 ) }}
 
-SELECT 
-    ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP()) AS RECORD_ID,
-    'BZ_DATA_AUDIT' AS SOURCE_TABLE,
-    CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
-    'DBT_BRONZE_PIPELINE' AS PROCESSED_BY,
-    0.001 AS PROCESSING_TIME,
-    'INITIALIZED' AS STATUS
-WHERE FALSE -- This creates the table structure without inserting any rows initially
+WITH audit_structure AS (
+    SELECT 
+        CAST(1 AS NUMBER) AS RECORD_ID,
+        CAST('INITIALIZATION' AS VARCHAR(255)) AS SOURCE_TABLE,
+        CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
+        CAST('DBT_BRONZE_PIPELINE' AS VARCHAR(255)) AS PROCESSED_BY,
+        CAST(0.001 AS NUMBER(38,3)) AS PROCESSING_TIME,
+        CAST('INITIALIZED' AS VARCHAR(255)) AS STATUS
+    WHERE FALSE -- This creates the table structure without inserting any rows initially
+)
+
+SELECT * FROM audit_structure
