@@ -21,15 +21,18 @@ clean-targets:
 # Configuring models
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/silver/
+    # Config indicated by + and applies to all files under models/example/
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
-
-vars:
-  # dbt Cloud environment variables
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
-  
-# Specify dbt version
-require-dbt-version: [">=1.0.0", "<2.0.0"]
+    
+# Specify the order of execution
+model-ordering:
+  - "models/silver/SI_Audit_Log.sql"
+  - "models/silver/SI_Users.sql"
+  - "models/silver/SI_Meetings.sql"
+  - "models/silver/SI_Participants.sql"
+  - "models/silver/SI_Feature_Usage.sql"
+  - "models/silver/SI_Support_Tickets.sql"
+  - "models/silver/SI_Billing_Events.sql"
+  - "models/silver/SI_Licenses.sql"
