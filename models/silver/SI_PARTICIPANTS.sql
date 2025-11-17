@@ -1,17 +1,7 @@
 {{ config(
     materialized='table',
-    pre_hook="
-        {% if this.name != 'SI_AUDIT_LOG' %}
-        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (MODEL_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, STATUS, LOAD_TIMESTAMP)
-        VALUES ('{{ this.name }}', 'BZ_PARTICIPANTS', 'SI_PARTICIPANTS', CURRENT_TIMESTAMP(), 'STARTED', CURRENT_TIMESTAMP())
-        {% endif %}
-    ",
-    post_hook="
-        {% if this.name != 'SI_AUDIT_LOG' %}
-        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (MODEL_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_END_TIME, STATUS, RECORDS_SUCCESS, LOAD_TIMESTAMP)
-        VALUES ('{{ this.name }}', 'BZ_PARTICIPANTS', 'SI_PARTICIPANTS', CURRENT_TIMESTAMP(), 'COMPLETED', (SELECT COUNT(*) FROM {{ this }}), CURRENT_TIMESTAMP())
-        {% endif %}
-    "
+    pre_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (MODEL_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, STATUS, LOAD_TIMESTAMP) VALUES ('SI_PARTICIPANTS', 'BZ_PARTICIPANTS', 'SI_PARTICIPANTS', CURRENT_TIMESTAMP(), 'STARTED', CURRENT_TIMESTAMP())",
+    post_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (MODEL_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_END_TIME, STATUS, RECORDS_SUCCESS, LOAD_TIMESTAMP) VALUES ('SI_PARTICIPANTS', 'BZ_PARTICIPANTS', 'SI_PARTICIPANTS', CURRENT_TIMESTAMP(), 'COMPLETED', (SELECT COUNT(*) FROM {{ this }}), CURRENT_TIMESTAMP())"
 ) }}
 
 -- Silver layer transformation for Participants table
@@ -37,20 +27,14 @@ timestamp_conversion AS (
         -- Handle MM/DD/YYYY HH:MM format conversion for JOIN_TIME
         CASE 
             WHEN REGEXP_LIKE(JOIN_TIME::STRING, '^\\d{1,2}/\\d{1,2}/\\d{4} \\d{1,2}:\\d{2}$') THEN 
-                COALESCE(
-                    TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
-                    TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'M/D/YYYY H:MI')
-                )
+                TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'MM/DD/YYYY HH24:MI')
             ELSE JOIN_TIME
         END AS CONVERTED_JOIN_TIME,
         
         -- Handle MM/DD/YYYY HH:MM format conversion for LEAVE_TIME
         CASE 
             WHEN REGEXP_LIKE(LEAVE_TIME::STRING, '^\\d{1,2}/\\d{1,2}/\\d{4} \\d{1,2}:\\d{2}$') THEN 
-                COALESCE(
-                    TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
-                    TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'M/D/YYYY H:MI')
-                )
+                TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'MM/DD/YYYY HH24:MI')
             ELSE LEAVE_TIME
         END AS CONVERTED_LEAVE_TIME
     FROM source_data
