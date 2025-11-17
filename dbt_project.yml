@@ -24,8 +24,56 @@ models:
     # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
+      +pre-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (
+            EXECUTION_ID, 
+            PIPELINE_NAME, 
+            PIPELINE_TYPE, 
+            EXECUTION_START_TIME, 
+            EXECUTION_STATUS, 
+            SOURCE_TABLE, 
+            TARGET_TABLE, 
+            EXECUTED_BY, 
+            LOAD_TIMESTAMP
+          ) 
+          SELECT 
+            UUID_STRING(), 
+            'BRONZE_TO_SILVER_{{ this.name }}', 
+            'BRONZE_TO_SILVER', 
+            CURRENT_TIMESTAMP(), 
+            'RUNNING', 
+            'BZ_{{ this.name | replace("SI_", "") }}', 
+            '{{ this.name }}', 
+            'DBT_PIPELINE', 
+            CURRENT_TIMESTAMP() 
+          WHERE EXISTS (SELECT 1 FROM {{ ref('SI_Audit_Log') }} LIMIT 1)
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          UPDATE {{ ref('SI_Audit_Log') }} 
+          SET 
+            EXECUTION_END_TIME = CURRENT_TIMESTAMP(), 
+            EXECUTION_STATUS = 'SUCCESS', 
+            EXECUTION_DURATION_SECONDS = DATEDIFF('second', EXECUTION_START_TIME, CURRENT_TIMESTAMP()) 
+          WHERE 
+            PIPELINE_NAME = 'BRONZE_TO_SILVER_{{ this.name }}' 
+            AND EXECUTION_STATUS = 'RUNNING' 
+            AND EXISTS (SELECT 1 FROM {{ ref('SI_Audit_Log') }} WHERE PIPELINE_NAME = 'BRONZE_TO_SILVER_{{ this.name }}')
+        {% endif %}
+
+# Specify the order of model execution
+model-ordering:
+  - "SI_Audit_Log"
+  - "SI_USERS"
+  - "SI_MEETINGS"
+  - "SI_PARTICIPANTS"
+  - "SI_FEATURE_USAGE"
+  - "SI_SUPPORT_TICKETS"
+  - "SI_BILLING_EVENTS"
+  - "SI_LICENSES"
 
 vars:
-  # dbt project variables
+  # dbt Cloud environment variables
   start_date: '2020-01-01'
   end_date: '2030-12-31'
