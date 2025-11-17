@@ -21,45 +21,72 @@ clean-targets:
 # Configuring models
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/example/
+    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
-      +pre_hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
-          EXECUTION_ID,
-          PIPELINE_NAME,
-          PIPELINE_TYPE,
-          EXECUTION_START_TIME,
-          EXECUTION_STATUS,
-          SOURCE_TABLE,
-          TARGET_TABLE,
-          EXECUTED_BY,
-          LOAD_TIMESTAMP
-        )
-        VALUES (
-          '{{ invocation_id }}',
-          '{{ this.name }}',
-          'BRONZE_TO_SILVER',
-          CURRENT_TIMESTAMP(),
-          'RUNNING',
-          'BRONZE.{{ this.name | replace("SI_", "BZ_") }}',
-          '{{ this }}',
-          'DBT_PIPELINE',
-          CURRENT_TIMESTAMP()
-        )
+      +pre-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (
+            EXECUTION_ID, 
+            PIPELINE_NAME, 
+            EXECUTION_START_TIME, 
+            EXECUTION_STATUS, 
+            SOURCE_TABLE, 
+            TARGET_TABLE, 
+            EXECUTED_BY, 
+            LOAD_TIMESTAMP
+          ) 
+          SELECT 
+            UUID_STRING(), 
+            'BRONZE_TO_SILVER_{{ this.name }}', 
+            CURRENT_TIMESTAMP(), 
+            'STARTED', 
+            'BZ_{{ this.name | replace("SI_", "") }}', 
+            '{{ this.name }}', 
+            'DBT_PIPELINE', 
+            CURRENT_TIMESTAMP()
         {% endif %}
-      +post_hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-        UPDATE {{ ref('SI_AUDIT_LOG') }}
-        SET 
-          EXECUTION_END_TIME = CURRENT_TIMESTAMP(),
-          EXECUTION_STATUS = 'SUCCESS',
-          RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
-          RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}),
-          UPDATE_TIMESTAMP = CURRENT_TIMESTAMP()
-        WHERE EXECUTION_ID = '{{ invocation_id }}'
-        AND TARGET_TABLE = '{{ this }}'
-        AND EXECUTION_STATUS = 'RUNNING'
+      +post-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (
+            EXECUTION_ID, 
+            PIPELINE_NAME, 
+            EXECUTION_END_TIME, 
+            EXECUTION_STATUS, 
+            SOURCE_TABLE, 
+            TARGET_TABLE, 
+            RECORDS_SUCCESS, 
+            EXECUTED_BY, 
+            LOAD_TIMESTAMP
+          ) 
+          SELECT 
+            UUID_STRING(), 
+            'BRONZE_TO_SILVER_{{ this.name }}', 
+            CURRENT_TIMESTAMP(), 
+            'COMPLETED', 
+            'BZ_{{ this.name | replace("SI_", "") }}', 
+            '{{ this.name }}', 
+            (SELECT COUNT(*) FROM {{ this }}), 
+            'DBT_PIPELINE', 
+            CURRENT_TIMESTAMP()
         {% endif %}
+
+# Specify the order of model execution
+model-ordering:
+  - "SI_Audit_Log"  # Must run first
+  - "SI_USERS"
+  - "SI_MEETINGS"
+  - "SI_PARTICIPANTS"
+  - "SI_FEATURE_USAGE"
+  - "SI_SUPPORT_TICKETS"
+  - "SI_BILLING_EVENTS"
+  - "SI_LICENSES"
+
+vars:
+  # dbt Cloud environment variables
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
+  
+# Specify dbt version
+require-dbt-version: [">=1.0.0", "<2.0.0"]
