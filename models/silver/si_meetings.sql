@@ -21,17 +21,21 @@ numeric_field_cleaning AS (
         END AS CLEAN_DURATION_MINUTES,
         
         /* Enhanced timestamp handling for EST timezone */
-        CASE 
-            WHEN bm.START_TIME::STRING LIKE '%EST%' THEN 
-                TRY_TO_TIMESTAMP(REGEXP_REPLACE(bm.START_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS')
-            ELSE bm.START_TIME
-        END AS CLEAN_START_TIME,
+        COALESCE(
+            TRY_TO_TIMESTAMP(bm.START_TIME, 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(REGEXP_REPLACE(bm.START_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(bm.START_TIME, 'DD/MM/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(bm.START_TIME, 'MM/DD/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(bm.START_TIME)
+        ) AS CLEAN_START_TIME,
         
-        CASE 
-            WHEN bm.END_TIME::STRING LIKE '%EST%' THEN 
-                TRY_TO_TIMESTAMP(REGEXP_REPLACE(bm.END_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS')
-            ELSE bm.END_TIME
-        END AS CLEAN_END_TIME
+        COALESCE(
+            TRY_TO_TIMESTAMP(bm.END_TIME, 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(REGEXP_REPLACE(bm.END_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(bm.END_TIME, 'DD/MM/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(bm.END_TIME, 'MM/DD/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(bm.END_TIME)
+        ) AS CLEAN_END_TIME
     FROM bronze_meetings bm
 ),
 
