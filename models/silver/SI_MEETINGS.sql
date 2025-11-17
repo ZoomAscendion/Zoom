@@ -1,17 +1,7 @@
 {{ config(
     materialized='table',
-    pre_hook="
-        {% if this.name != 'SI_AUDIT_LOG' %}
-        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (MODEL_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, STATUS, LOAD_TIMESTAMP)
-        VALUES ('{{ this.name }}', 'BZ_MEETINGS', 'SI_MEETINGS', CURRENT_TIMESTAMP(), 'STARTED', CURRENT_TIMESTAMP())
-        {% endif %}
-    ",
-    post_hook="
-        {% if this.name != 'SI_AUDIT_LOG' %}
-        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (MODEL_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_END_TIME, STATUS, RECORDS_SUCCESS, LOAD_TIMESTAMP)
-        VALUES ('{{ this.name }}', 'BZ_MEETINGS', 'SI_MEETINGS', CURRENT_TIMESTAMP(), 'COMPLETED', (SELECT COUNT(*) FROM {{ this }}), CURRENT_TIMESTAMP())
-        {% endif %}
-    "
+    pre_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (MODEL_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, STATUS, LOAD_TIMESTAMP) VALUES ('SI_MEETINGS', 'BZ_MEETINGS', 'SI_MEETINGS', CURRENT_TIMESTAMP(), 'STARTED', CURRENT_TIMESTAMP())",
+    post_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (MODEL_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_END_TIME, STATUS, RECORDS_SUCCESS, LOAD_TIMESTAMP) VALUES ('SI_MEETINGS', 'BZ_MEETINGS', 'SI_MEETINGS', CURRENT_TIMESTAMP(), 'COMPLETED', (SELECT COUNT(*) FROM {{ this }}), CURRENT_TIMESTAMP())"
 ) }}
 
 -- Silver layer transformation for Meetings table
@@ -38,22 +28,14 @@ timestamp_conversion AS (
         -- Handle EST timezone conversion for START_TIME
         CASE 
             WHEN START_TIME::STRING LIKE '%EST%' THEN 
-                CASE 
-                    WHEN TYPEOF(START_TIME) = 'VARCHAR' THEN
-                        TRY_TO_TIMESTAMP(REPLACE(START_TIME::STRING, ' EST', ''), 'YYYY-MM-DD HH24:MI:SS')
-                    ELSE START_TIME
-                END
+                TRY_TO_TIMESTAMP(REPLACE(START_TIME::STRING, ' EST', ''), 'YYYY-MM-DD HH24:MI:SS')
             ELSE START_TIME
         END AS CONVERTED_START_TIME,
         
         -- Handle EST timezone conversion for END_TIME
         CASE 
             WHEN END_TIME::STRING LIKE '%EST%' THEN 
-                CASE 
-                    WHEN TYPEOF(END_TIME) = 'VARCHAR' THEN
-                        TRY_TO_TIMESTAMP(REPLACE(END_TIME::STRING, ' EST', ''), 'YYYY-MM-DD HH24:MI:SS')
-                    ELSE END_TIME
-                END
+                TRY_TO_TIMESTAMP(REPLACE(END_TIME::STRING, ' EST', ''), 'YYYY-MM-DD HH24:MI:SS')
             ELSE END_TIME
         END AS CONVERTED_END_TIME
     FROM source_data
