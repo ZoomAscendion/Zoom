@@ -1,7 +1,7 @@
 {{ config(
     materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (TABLE_NAME, STATUS, PROCESS_START_TIME, PROCESSED_BY, CREATED_AT) SELECT 'SI_BILLING_EVENTS', 'STARTED', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE', CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (TABLE_NAME, STATUS, PROCESS_END_TIME, PROCESSED_BY, RECORDS_PROCESSED, UPDATED_AT) SELECT 'SI_BILLING_EVENTS', 'COMPLETED', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE', (SELECT COUNT(*) FROM {{ this }}), CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    pre_hook="{% if this.name != 'SI_Audit_Log' %}INSERT INTO {{ target.schema }}.SI_AUDIT_LOG (TABLE_NAME, STATUS, PROCESS_START_TIME, PROCESSED_BY, CREATED_AT) SELECT 'SI_BILLING_EVENTS', 'STARTED', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE', CURRENT_TIMESTAMP(){% endif %}",
+    post_hook="{% if this.name != 'SI_Audit_Log' %}INSERT INTO {{ target.schema }}.SI_AUDIT_LOG (TABLE_NAME, STATUS, PROCESS_END_TIME, PROCESSED_BY, RECORDS_PROCESSED, UPDATED_AT) SELECT 'SI_BILLING_EVENTS', 'COMPLETED', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE', (SELECT COUNT(*) FROM {{ this }}), CURRENT_TIMESTAMP(){% endif %}"
 ) }}
 
 -- Silver layer transformation for Billing Events table
@@ -17,7 +17,7 @@ WITH bronze_billing_events AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_BILLING_EVENTS') }}
+    FROM BRONZE.BZ_BILLING_EVENTS
     WHERE EVENT_ID IS NOT NULL  -- Remove null event IDs
 ),
 
