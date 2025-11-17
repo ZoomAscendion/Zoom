@@ -13,14 +13,52 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"
-clean-targets:
+target-path: "target"  # directory which will store compiled SQL files
+clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
 # Configuring models
 models:
   zoom_silver_pipeline:
+    # Config indicated by + and applies to all files under models/example/
     silver:
       +materialized: table
-      +on_schema_change: sync_all_columns
+      +pre-hook: |
+        {% if this.name != 'SI_AUDIT_LOG' %}
+        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (MODEL_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_START_TIME, STATUS, LOAD_TIMESTAMP)
+        VALUES ('{{ this.name }}', 'BZ_{{ this.name[3:] }}', '{{ this.name }}', CURRENT_TIMESTAMP(), 'STARTED', CURRENT_TIMESTAMP())
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'SI_AUDIT_LOG' %}
+        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (MODEL_NAME, SOURCE_TABLE, TARGET_TABLE, PROCESS_END_TIME, STATUS, RECORDS_SUCCESS, LOAD_TIMESTAMP)
+        VALUES ('{{ this.name }}', 'BZ_{{ this.name[3:] }}', '{{ this.name }}', CURRENT_TIMESTAMP(), 'COMPLETED', (SELECT COUNT(*) FROM {{ this }}), CURRENT_TIMESTAMP())
+        {% endif %}
+
+# Specify the order of model execution
+model-dependencies:
+  SI_AUDIT_LOG: []
+  SI_USERS: [SI_AUDIT_LOG]
+  SI_MEETINGS: [SI_AUDIT_LOG]
+  SI_PARTICIPANTS: [SI_AUDIT_LOG]
+  SI_FEATURE_USAGE: [SI_AUDIT_LOG]
+  SI_SUPPORT_TICKETS: [SI_AUDIT_LOG]
+  SI_BILLING_EVENTS: [SI_AUDIT_LOG]
+  SI_LICENSES: [SI_AUDIT_LOG]
+
+vars:
+  # dbt_utils variables
+  'dbt_utils:dispatch_list': ['dbt_utils']
+  
+# Seeds configuration
+seeds:
+  zoom_silver_pipeline:
+    +column_types:
+      id: varchar(50)
+      
+# Snapshots configuration
+snapshots:
+  zoom_silver_pipeline:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: updated_at
