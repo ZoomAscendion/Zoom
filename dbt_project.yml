@@ -5,9 +5,9 @@ config-version: 2
 profile: 'zoom_silver'
 
 model-paths: ["models"]
-analysis-paths: ["analyses"]
+analysis-paths: ["analysis"]
 test-paths: ["tests"]
-seed-paths: ["seeds"]
+seed-paths: ["data"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
@@ -22,29 +22,22 @@ models:
       +materialized: table
       +on_schema_change: sync_all_columns
       +pre_hook: |
-        {% if this.name != 'si_audit_log' %}
-        INSERT INTO {{ ref('si_audit_log') }} (
-          EXECUTION_ID, PIPELINE_NAME, EXECUTION_START_TIME, EXECUTION_STATUS, 
-          SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP
-        )
-        VALUES (
-          '{{ invocation_id }}', 
-          '{{ this.name }}', 
-          CURRENT_TIMESTAMP(), 
-          'RUNNING', 
-          'BRONZE.BZ_{{ this.name | replace("si_", "") | upper }}', 
-          '{{ this }}', 
-          'DBT_SILVER_PIPELINE', 
-          CURRENT_TIMESTAMP()
-        )
+        {% if this.name != 'SI_AUDIT_LOG' %}
+        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (EXECUTION_ID, PIPELINE_NAME, EXECUTION_START_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP)
+        VALUES (UUID_STRING(), '{{ this.name }}', CURRENT_TIMESTAMP(), 'STARTED', 'BRONZE.BZ_{{ this.name[3:] }}', '{{ this.schema }}.{{ this.name }}', 'DBT_PIPELINE', CURRENT_TIMESTAMP())
         {% endif %}
       +post_hook: |
-        {% if this.name != 'si_audit_log' %}
-        UPDATE {{ ref('si_audit_log') }} 
-        SET EXECUTION_END_TIME = CURRENT_TIMESTAMP(),
+        {% if this.name != 'SI_AUDIT_LOG' %}
+        UPDATE {{ ref('SI_AUDIT_LOG') }} 
+        SET EXECUTION_END_TIME = CURRENT_TIMESTAMP(), 
             EXECUTION_STATUS = 'SUCCESS',
             RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
-            RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }})
-        WHERE EXECUTION_ID = '{{ invocation_id }}' 
-        AND TARGET_TABLE = '{{ this }}'
+            UPDATE_TIMESTAMP = CURRENT_TIMESTAMP()
+        WHERE TARGET_TABLE = '{{ this.schema }}.{{ this.name }}' 
+        AND EXECUTION_STATUS = 'STARTED'
+        AND EXECUTION_START_TIME >= CURRENT_TIMESTAMP() - INTERVAL '1 HOUR'
         {% endif %}
+
+vars:
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
