@@ -17,7 +17,7 @@ WITH bronze_support_tickets AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_SUPPORT_TICKETS') }}
+    FROM BRONZE.BZ_SUPPORT_TICKETS
     WHERE TICKET_ID IS NOT NULL
 ),
 
@@ -55,7 +55,6 @@ validated_support_tickets AS (
         CASE 
             WHEN t.RESOLUTION_STATUS IN ('OPEN', 'IN PROGRESS', 'RESOLVED', 'CLOSED')
                  AND t.OPEN_DATE <= CURRENT_DATE()
-                 AND u.USER_ID IS NOT NULL
             THEN 100
             WHEN t.RESOLUTION_STATUS IN ('OPEN', 'IN PROGRESS', 'RESOLVED', 'CLOSED')
                  AND t.OPEN_DATE <= CURRENT_DATE()
@@ -65,14 +64,12 @@ validated_support_tickets AS (
         CASE 
             WHEN t.RESOLUTION_STATUS IN ('OPEN', 'IN PROGRESS', 'RESOLVED', 'CLOSED')
                  AND t.OPEN_DATE <= CURRENT_DATE()
-                 AND u.USER_ID IS NOT NULL
             THEN 'PASSED'
             WHEN t.OPEN_DATE > CURRENT_DATE()
             THEN 'FAILED'
             ELSE 'WARNING'
         END AS VALIDATION_STATUS
     FROM cleansed_support_tickets t
-    LEFT JOIN {{ ref('si_users') }} u ON t.USER_ID = u.USER_ID
 ),
 
 -- Remove Duplicates
