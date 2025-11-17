@@ -17,25 +17,15 @@ WITH bronze_licenses AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM {{ source('bronze', 'BZ_LICENSES') }}
+    WHERE LICENSE_ID IS NOT NULL
 ),
 
 date_cleaning AS (
     SELECT 
         *,
-        /* Critical P1: Handle DD/MM/YYYY date format conversion */
-        COALESCE(
-            TRY_TO_DATE(START_DATE::STRING, 'YYYY-MM-DD'),
-            TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY'),
-            TRY_TO_DATE(START_DATE::STRING, 'MM/DD/YYYY'),
-            START_DATE
-        ) AS CLEAN_START_DATE,
-        
-        COALESCE(
-            TRY_TO_DATE(END_DATE::STRING, 'YYYY-MM-DD'),
-            TRY_TO_DATE(END_DATE::STRING, 'DD/MM/YYYY'),
-            TRY_TO_DATE(END_DATE::STRING, 'MM/DD/YYYY'),
-            END_DATE
-        ) AS CLEAN_END_DATE
+        /* Critical P1: Handle DD/MM/YYYY date format conversion using macro */
+        {{ safe_to_date('START_DATE') }} AS CLEAN_START_DATE,
+        {{ safe_to_date('END_DATE') }} AS CLEAN_END_DATE
     FROM bronze_licenses
 ),
 
@@ -66,7 +56,6 @@ deduplication AS (
     SELECT *,
         ROW_NUMBER() OVER (PARTITION BY LICENSE_ID ORDER BY UPDATE_TIMESTAMP DESC NULLS LAST, LOAD_TIMESTAMP DESC) AS rn
     FROM data_quality_checks
-    WHERE LICENSE_ID IS NOT NULL
 )
 
 SELECT 
