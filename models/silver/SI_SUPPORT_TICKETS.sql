@@ -1,0 +1,63 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (TABLE_NAME, PROCESS_STATUS, PROCESS_START_TIME, AUDIT_TIMESTAMP) SELECT 'SI_SUPPORT_TICKETS', 'STARTED', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'SI_Audit_Log'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (TABLE_NAME, PROCESS_STATUS, PROCESS_END_TIME, RECORDS_PROCESSED, RECORDS_SUCCESS, AUDIT_TIMESTAMP) SELECT 'SI_SUPPORT_TICKETS', 'COMPLETED', CURRENT_TIMESTAMP(), (SELECT COUNT(*) FROM {{ this }}), (SELECT COUNT(*) FROM {{ this }} WHERE VALIDATION_STATUS = 'PASSED'), CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+) }}
+
+-- Silver Layer Support Tickets Table
+-- Transforms and cleanses support ticket data from Bronze layer
+
+WITH bronze_support_tickets AS (
+    SELECT 
+        TICKET_ID,
+        USER_ID,
+        TICKET_TYPE,
+        RESOLUTION_STATUS,
+        OPEN_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        ROW_NUMBER() OVER (PARTITION BY TICKET_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM {{ source('bronze', 'BZ_SUPPORT_TICKETS') }}
+    WHERE TICKET_ID IS NOT NULL
+),
+
+data_quality_checks AS (
+    SELECT 
+        *,
+        -- Data quality scoring
+        CASE 
+            WHEN TICKET_ID IS NULL THEN 0
+            WHEN USER_ID IS NULL THEN 20
+            WHEN TICKET_TYPE IS NULL OR LENGTH(TRIM(TICKET_TYPE)) = 0 THEN 30
+            WHEN RESOLUTION_STATUS IS NULL OR RESOLUTION_STATUS NOT IN ('Open', 'In Progress', 'Resolved', 'Closed') THEN 40
+            WHEN OPEN_DATE IS NULL OR OPEN_DATE > CURRENT_DATE() THEN 50
+            ELSE 100
+        END AS DATA_QUALITY_SCORE,
+        
+        CASE 
+            WHEN TICKET_ID IS NULL OR USER_ID IS NULL THEN 'FAILED'
+            WHEN TICKET_TYPE IS NULL OR LENGTH(TRIM(TICKET_TYPE)) = 0 THEN 'FAILED'
+            WHEN OPEN_DATE IS NULL OR OPEN_DATE > CURRENT_DATE() THEN 'FAILED'
+            WHEN RESOLUTION_STATUS NOT IN ('Open', 'In Progress', 'Resolved', 'Closed') THEN 'WARNING'
+            ELSE 'PASSED'
+        END AS VALIDATION_STATUS
+    FROM bronze_support_tickets
+    WHERE rn = 1
+)
+
+SELECT 
+    TICKET_ID,
+    USER_ID,
+    UPPER(TRIM(TICKET_TYPE)) AS TICKET_TYPE,
+    COALESCE(RESOLUTION_STATUS, 'Open') AS RESOLUTION_STATUS,
+    OPEN_DATE,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    CURRENT_DATE() AS LOAD_DATE,
+    CURRENT_DATE() AS UPDATE_DATE,
+    DATA_QUALITY_SCORE,
+    VALIDATION_STATUS
+FROM data_quality_checks
+WHERE VALIDATION_STATUS IN ('PASSED', 'WARNING')
