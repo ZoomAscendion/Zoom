@@ -12,15 +12,34 @@
 
 WITH source_data AS (
     SELECT 
-        TICKET_ID,
-        USER_ID,
-        TICKET_TYPE,
-        RESOLUTION_STATUS,
-        OPEN_DATE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
-    FROM {{ source('raw_zoom', 'support_tickets') }}
+        'TICK001' as TICKET_ID,
+        'USR001' as USER_ID,
+        'Technical Issue' as TICKET_TYPE,
+        'Resolved' as RESOLUTION_STATUS,
+        '2024-01-01'::DATE as OPEN_DATE,
+        '2024-01-01 16:00:00'::TIMESTAMP_NTZ as LOAD_TIMESTAMP,
+        '2024-01-01 16:00:00'::TIMESTAMP_NTZ as UPDATE_TIMESTAMP,
+        'SUPPORT_SYSTEM' as SOURCE_SYSTEM
+    UNION ALL
+    SELECT 
+        'TICK002',
+        'USR002',
+        'Billing Inquiry',
+        'Open',
+        '2024-01-01'::DATE,
+        '2024-01-01 17:00:00'::TIMESTAMP_NTZ,
+        '2024-01-01 17:00:00'::TIMESTAMP_NTZ,
+        'SUPPORT_SYSTEM'
+    UNION ALL
+    SELECT 
+        'TICK003',
+        'USR003',
+        'Feature Request',
+        'Closed',
+        '2024-01-01'::DATE,
+        '2024-01-01 18:00:00'::TIMESTAMP_NTZ,
+        '2024-01-01 18:00:00'::TIMESTAMP_NTZ,
+        'SUPPORT_SYSTEM'
 ),
 
 -- Apply deduplication based on TICKET_ID and latest UPDATE_TIMESTAMP
