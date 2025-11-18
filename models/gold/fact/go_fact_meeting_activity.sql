@@ -6,57 +6,48 @@
 -- Central fact table capturing meeting activities and usage metrics
 
 WITH source_meetings AS (
-    SELECT *
+    SELECT 
+        COALESCE(MEETING_ID, 'UNKNOWN_MEETING') AS MEETING_ID,
+        COALESCE(HOST_ID, 'UNKNOWN_HOST') AS HOST_ID,
+        COALESCE(MEETING_TOPIC, 'Unknown Topic') AS MEETING_TOPIC,
+        START_TIME,
+        END_TIME,
+        COALESCE(DURATION_MINUTES, 0) AS DURATION_MINUTES,
+        COALESCE(DATA_QUALITY_SCORE, 100) AS DATA_QUALITY_SCORE,
+        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
     FROM {{ source('silver', 'si_meetings') }}
     WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
 ),
 
 source_participants AS (
-    SELECT *
+    SELECT 
+        COALESCE(MEETING_ID, 'UNKNOWN_MEETING') AS MEETING_ID,
+        COALESCE(USER_ID, 'UNKNOWN_USER') AS USER_ID,
+        JOIN_TIME,
+        LEAVE_TIME
     FROM {{ source('silver', 'si_participants') }}
     WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
 ),
 
 source_features AS (
-    SELECT *
+    SELECT 
+        COALESCE(MEETING_ID, 'UNKNOWN_MEETING') AS MEETING_ID,
+        COALESCE(FEATURE_NAME, 'Unknown Feature') AS FEATURE_NAME,
+        COALESCE(USAGE_COUNT, 0) AS USAGE_COUNT
     FROM {{ source('silver', 'si_feature_usage') }}
     WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
 ),
 
-unique_users AS (
-    SELECT DISTINCT 
-        USER_ID, 
-        USER_KEY,
-        ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY UPDATE_DATE DESC) AS rn
-    FROM {{ ref('go_dim_user') }}
-    WHERE IS_CURRENT_RECORD = TRUE
-),
-
-unique_features AS (
-    SELECT DISTINCT 
-        FEATURE_NAME, 
-        FEATURE_KEY,
-        ROW_NUMBER() OVER (PARTITION BY FEATURE_NAME ORDER BY UPDATE_DATE DESC) AS rn
-    FROM {{ ref('go_dim_feature') }}
-),
-
-unique_meetings AS (
-    SELECT DISTINCT 
-        MEETING_KEY,
-        ROW_NUMBER() OVER (PARTITION BY MEETING_KEY ORDER BY UPDATE_DATE DESC) AS rn
-    FROM {{ ref('go_dim_meeting') }}
-),
-
 meeting_aggregations AS (
     SELECT 
-        COALESCE(sm.MEETING_ID, 'UNKNOWN_MEETING') AS MEETING_ID,
-        COALESCE(sm.HOST_ID, 'UNKNOWN_HOST') AS HOST_ID,
-        COALESCE(sm.MEETING_TOPIC, 'Unknown Topic') AS MEETING_TOPIC,
+        sm.MEETING_ID,
+        sm.HOST_ID,
+        sm.MEETING_TOPIC,
         sm.START_TIME,
         sm.END_TIME,
-        COALESCE(sm.DURATION_MINUTES, 0) AS DURATION_MINUTES,
-        COALESCE(sm.DATA_QUALITY_SCORE, 100) AS DATA_QUALITY_SCORE,
-        COALESCE(sm.SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM,
+        sm.DURATION_MINUTES,
+        sm.DATA_QUALITY_SCORE,
+        sm.SOURCE_SYSTEM,
         COUNT(DISTINCT sp.USER_ID) AS PARTICIPANT_COUNT,
         COALESCE(SUM(CASE 
             WHEN sp.JOIN_TIME IS NOT NULL AND sp.LEAVE_TIME IS NOT NULL 
@@ -69,9 +60,9 @@ meeting_aggregations AS (
             ELSE 0 
         END), 0) AS AVERAGE_PARTICIPATION_MINUTES,
         COUNT(DISTINCT sf.FEATURE_NAME) AS FEATURES_USED_COUNT,
-        SUM(CASE WHEN UPPER(COALESCE(sf.FEATURE_NAME, '')) LIKE '%SCREEN%SHARE%' THEN COALESCE(sf.USAGE_COUNT, 0) ELSE 0 END) AS SCREEN_SHARE_USAGE_COUNT,
-        SUM(CASE WHEN UPPER(COALESCE(sf.FEATURE_NAME, '')) LIKE '%RECORD%' THEN COALESCE(sf.USAGE_COUNT, 0) ELSE 0 END) AS RECORDING_USAGE_COUNT,
-        SUM(CASE WHEN UPPER(COALESCE(sf.FEATURE_NAME, '')) LIKE '%CHAT%' THEN COALESCE(sf.USAGE_COUNT, 0) ELSE 0 END) AS CHAT_USAGE_COUNT
+        SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%SCREEN%SHARE%' THEN sf.USAGE_COUNT ELSE 0 END) AS SCREEN_SHARE_USAGE_COUNT,
+        SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%RECORD%' THEN sf.USAGE_COUNT ELSE 0 END) AS RECORDING_USAGE_COUNT,
+        SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%CHAT%' THEN sf.USAGE_COUNT ELSE 0 END) AS CHAT_USAGE_COUNT
     FROM source_meetings sm
     LEFT JOIN source_participants sp ON sm.MEETING_ID = sp.MEETING_ID
     LEFT JOIN source_features sf ON sm.MEETING_ID = sf.MEETING_ID
@@ -87,7 +78,7 @@ fact_transformations AS (
         COALESCE(du.USER_KEY, 'UNKNOWN_USER') AS USER_KEY,
         COALESCE(dm.MEETING_KEY, ma.MEETING_ID) AS MEETING_KEY,
         COALESCE(dd.DATE_KEY, CURRENT_DATE()) AS DATE_KEY,
-        COALESCE(df.FEATURE_KEY, 'NO_FEATURE') AS FEATURE_KEY,
+        'NO_FEATURE' AS FEATURE_KEY,
         -- Fact Measures
         CASE 
             WHEN ma.START_TIME IS NOT NULL THEN DATE(ma.START_TIME)
@@ -124,15 +115,14 @@ fact_transformations AS (
         CURRENT_DATE() AS UPDATE_DATE,
         'SILVER_TO_GOLD_ETL' AS SOURCE_SYSTEM
     FROM meeting_aggregations ma
-    LEFT JOIN unique_users du ON ma.HOST_ID = du.USER_ID AND du.rn = 1
+    LEFT JOIN {{ ref('go_dim_user') }} du ON ma.HOST_ID = du.USER_ID AND du.IS_CURRENT_RECORD = TRUE
     LEFT JOIN {{ ref('go_dim_date') }} dd ON (
         CASE 
             WHEN ma.START_TIME IS NOT NULL THEN DATE(ma.START_TIME)
             ELSE CURRENT_DATE()
         END
     ) = dd.DATE_KEY
-    LEFT JOIN unique_meetings dm ON ma.MEETING_ID = dm.MEETING_KEY AND dm.rn = 1
-    LEFT JOIN unique_features df ON df.rn = 1 -- Default feature for meetings without specific feature usage
+    LEFT JOIN {{ ref('go_dim_meeting') }} dm ON ma.MEETING_ID = dm.MEETING_KEY
 )
 
 SELECT 
