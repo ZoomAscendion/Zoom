@@ -18,7 +18,7 @@ WITH bronze_users AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_USERS') }}
+    FROM BRONZE.BZ_USERS
     WHERE USER_ID IS NOT NULL
 ),
 
@@ -49,7 +49,7 @@ validated_users AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        -- Calculate data quality score
+        /* Calculate data quality score */
         CASE 
             WHEN USER_ID IS NOT NULL 
                 AND USER_NAME IS NOT NULL 
@@ -61,7 +61,7 @@ validated_users AS (
             THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
-        -- Set validation status
+        /* Set validation status */
         CASE 
             WHEN USER_ID IS NOT NULL 
                 AND USER_NAME IS NOT NULL 
