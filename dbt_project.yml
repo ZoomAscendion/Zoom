@@ -1,8 +1,8 @@
-name: 'zoom_silver_pipeline'
+name: 'zoom_bronze_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_silver_pipeline'
+profile: 'zoom_bronze_pipeline'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,45 +17,7 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_silver_pipeline:
-    silver:
+  zoom_bronze_pipeline:
+    bronze:
       +materialized: table
-      SI_Audit_Log:
-        +pre-hook: []
-        +post-hook: []
-      +pre-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            AUDIT_ID, 
-            TABLE_NAME, 
-            OPERATION_TYPE, 
-            AUDIT_TIMESTAMP, 
-            PROCESSED_BY
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            '{{ this.name }}', 
-            'PIPELINE_START', 
-            CURRENT_TIMESTAMP(), 
-            'DBT_SILVER_PIPELINE'
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            AUDIT_ID, 
-            TABLE_NAME, 
-            OPERATION_TYPE, 
-            AUDIT_TIMESTAMP, 
-            PROCESSED_BY
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            '{{ this.name }}', 
-            'PIPELINE_END', 
-            CURRENT_TIMESTAMP(), 
-            'DBT_SILVER_PIPELINE'
-        {% endif %}
-
-vars:
-  start_date: '2023-01-01'
-  end_date: '2024-12-31'
+      +on_schema_change: "fail"
