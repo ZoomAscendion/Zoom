@@ -1,0 +1,169 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "Bronze layer tables containing raw data"
+    tables:
+      - name: BZ_USERS
+        description: "Raw user data from source systems"
+      - name: BZ_MEETINGS
+        description: "Raw meeting data from source systems"
+      - name: BZ_PARTICIPANTS
+        description: "Raw participant data from source systems"
+      - name: BZ_FEATURE_USAGE
+        description: "Raw feature usage data from source systems"
+      - name: BZ_SUPPORT_TICKETS
+        description: "Raw support ticket data from source systems"
+      - name: BZ_BILLING_EVENTS
+        description: "Raw billing event data from source systems"
+      - name: BZ_LICENSES
+        description: "Raw license data from source systems"
+
+models:
+  - name: SI_AUDIT_LOG
+    description: "Audit log for Silver layer operations"
+    columns:
+      - name: AUDIT_ID
+        description: "Unique identifier for audit record"
+        tests:
+          - unique
+          - not_null
+      - name: TABLE_NAME
+        description: "Name of the table where operation occurred"
+        tests:
+          - not_null
+      - name: ERROR_TYPE
+        description: "Type of error or operation"
+        tests:
+          - not_null
+
+  - name: SI_USERS
+    description: "Cleaned and validated user data"
+    columns:
+      - name: USER_ID
+        description: "Unique identifier for each user"
+        tests:
+          - unique
+          - not_null
+      - name: EMAIL
+        description: "User email address"
+        tests:
+          - not_null
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - accepted_values:
+              values: [50, 75, 95]
+
+  - name: SI_MEETINGS
+    description: "Cleaned and validated meeting data"
+    columns:
+      - name: MEETING_ID
+        description: "Unique identifier for each meeting"
+        tests:
+          - unique
+          - not_null
+      - name: DURATION_MINUTES
+        description: "Meeting duration in minutes"
+        tests:
+          - not_null
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - accepted_values:
+              values: [50, 75, 95]
+
+  - name: SI_PARTICIPANTS
+    description: "Cleaned and validated participant data"
+    columns:
+      - name: PARTICIPANT_ID
+        description: "Unique identifier for each participant"
+        tests:
+          - unique
+          - not_null
+      - name: MEETING_ID
+        description: "Reference to meeting"
+        tests:
+          - not_null
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - accepted_values:
+              values: [50, 75, 95]
+
+  - name: SI_FEATURE_USAGE
+    description: "Cleaned and validated feature usage data"
+    columns:
+      - name: USAGE_ID
+        description: "Unique identifier for each usage record"
+        tests:
+          - unique
+          - not_null
+      - name: USAGE_COUNT
+        description: "Number of times feature was used"
+        tests:
+          - not_null
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - accepted_values:
+              values: [50, 75, 95]
+
+  - name: SI_SUPPORT_TICKETS
+    description: "Cleaned and validated support ticket data"
+    columns:
+      - name: TICKET_ID
+        description: "Unique identifier for each ticket"
+        tests:
+          - unique
+          - not_null
+      - name: RESOLUTION_STATUS
+        description: "Current status of ticket"
+        tests:
+          - accepted_values:
+              values: ['Open', 'In Progress', 'Resolved', 'Closed']
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - accepted_values:
+              values: [50, 75, 95]
+
+  - name: SI_BILLING_EVENTS
+    description: "Cleaned and validated billing event data"
+    columns:
+      - name: EVENT_ID
+        description: "Unique identifier for each billing event"
+        tests:
+          - unique
+          - not_null
+      - name: AMOUNT
+        description: "Billing amount"
+        tests:
+          - not_null
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - accepted_values:
+              values: [50, 75, 95]
+
+  - name: SI_LICENSES
+    description: "Cleaned and validated license data"
+    columns:
+      - name: LICENSE_ID
+        description: "Unique identifier for each license"
+        tests:
+          - unique
+          - not_null
+      - name: START_DATE
+        description: "License start date"
+        tests:
+          - not_null
+      - name: END_DATE
+        description: "License end date"
+        tests:
+          - not_null
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - accepted_values:
+              values: [50, 75, 95]
