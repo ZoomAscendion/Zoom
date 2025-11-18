@@ -18,34 +18,58 @@ clean-targets:
 
 models:
   zoom_silver_pipeline:
-    bronze:
-      +materialized: table
     silver:
       +materialized: table
       +pre-hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-          INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
-            SOURCE_TABLE, ERROR_TYPE, COLUMN_NAME, ERROR_VALUE, PROCESS_TIMESTAMP, PROCESS_STATUS, EXECUTION_ID, PIPELINE_NAME, RECORD_COUNT, ERROR_COUNT, WARNING_COUNT, PROCESSED_BY, SOURCE_SYSTEM
-          )
-          VALUES (
-            '{{ this.name }}', 'PROCESS_START', 'N/A', 'N/A', CURRENT_TIMESTAMP(), 'STARTED', 
-            '{{ invocation_id }}', 'BRONZE_TO_SILVER_{{ this.name }}', 0, 0, 0, 'DBT_SILVER_PIPELINE', 'BRONZE_LAYER'
-          )
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (
+            AUDIT_ID, 
+            TABLE_NAME, 
+            OPERATION_TYPE, 
+            AUDIT_TIMESTAMP, 
+            PROCESSED_BY
+          ) 
+          SELECT 
+            UUID_STRING(), 
+            '{{ this.name }}', 
+            'PIPELINE_START', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_SILVER_PIPELINE'
         {% endif %}
       +post-hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-          INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
-            SOURCE_TABLE, ERROR_TYPE, COLUMN_NAME, ERROR_VALUE, PROCESS_TIMESTAMP, PROCESS_STATUS, EXECUTION_ID, PIPELINE_NAME, RECORD_COUNT, ERROR_COUNT, WARNING_COUNT, PROCESSED_BY, SOURCE_SYSTEM
-          )
-          VALUES (
-            '{{ this.name }}', 'PROCESS_END', 'N/A', 'N/A', CURRENT_TIMESTAMP(), 'COMPLETED', 
-            '{{ invocation_id }}', 'BRONZE_TO_SILVER_{{ this.name }}', 
-            (SELECT COUNT(*) FROM {{ this }}), 0, 0, 'DBT_SILVER_PIPELINE', 'BRONZE_LAYER'
-          )
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (
+            AUDIT_ID, 
+            TABLE_NAME, 
+            OPERATION_TYPE, 
+            AUDIT_TIMESTAMP, 
+            PROCESSED_BY
+          ) 
+          SELECT 
+            UUID_STRING(), 
+            '{{ this.name }}', 
+            'PIPELINE_END', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_SILVER_PIPELINE'
         {% endif %}
-    gold:
-      +materialized: table
+
+# Ensure audit log runs first
+run-order:
+  - "SI_Audit_Log"
+  - "SI_Users"
+  - "SI_Meetings"
+  - "SI_Participants"
+  - "SI_Feature_Usage"
+  - "SI_Support_Tickets"
+  - "SI_Billing_Events"
+  - "SI_Licenses"
 
 vars:
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
+  # Set timezone for timestamp conversions
+  default_timezone: 'UTC'
+  # Data quality thresholds
+  dq_score_threshold: 70
+  # Enable/disable specific validations
+  enable_email_validation: true
+  enable_referential_integrity: true
+  enable_format_conversion: true
