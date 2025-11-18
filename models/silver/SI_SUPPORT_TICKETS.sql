@@ -1,0 +1,104 @@
+{{ config(
+    materialized='table',
+    unique_key='TICKET_ID'
+) }}
+
+WITH bronze_support_tickets AS (
+    SELECT 
+        TICKET_ID,
+        USER_ID,
+        TICKET_TYPE,
+        RESOLUTION_STATUS,
+        OPEN_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_SUPPORT_TICKETS') }}
+    WHERE TICKET_ID IS NOT NULL
+),
+
+cleaned_support_tickets AS (
+    SELECT 
+        TICKET_ID,
+        USER_ID,
+        UPPER(TRIM(TICKET_TYPE)) AS TICKET_TYPE,
+        CASE 
+            WHEN RESOLUTION_STATUS IN ('Open', 'In Progress', 'Resolved', 'Closed') THEN RESOLUTION_STATUS
+            ELSE 'Open'
+        END AS RESOLUTION_STATUS,
+        COALESCE(
+            TRY_TO_DATE(OPEN_DATE::STRING, 'YYYY-MM-DD'),
+            TRY_TO_DATE(OPEN_DATE::STRING, 'DD/MM/YYYY'),
+            TRY_TO_DATE(OPEN_DATE::STRING, 'MM/DD/YYYY'),
+            TRY_TO_DATE(OPEN_DATE::STRING)
+        ) AS CLEANED_OPEN_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM bronze_support_tickets
+),
+
+validated_support_tickets AS (
+    SELECT 
+        TICKET_ID,
+        USER_ID,
+        TICKET_TYPE,
+        RESOLUTION_STATUS,
+        COALESCE(CLEANED_OPEN_DATE, CURRENT_DATE()) AS OPEN_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        CASE 
+            WHEN USER_ID IS NOT NULL AND TICKET_TYPE IS NOT NULL AND CLEANED_OPEN_DATE IS NOT NULL THEN 100
+            WHEN USER_ID IS NOT NULL AND TICKET_TYPE IS NOT NULL THEN 85
+            WHEN USER_ID IS NOT NULL THEN 70
+            ELSE 50
+        END AS DATA_QUALITY_SCORE,
+        CASE 
+            WHEN USER_ID IS NOT NULL AND TICKET_TYPE IS NOT NULL AND CLEANED_OPEN_DATE IS NOT NULL THEN 'PASSED'
+            WHEN USER_ID IS NOT NULL AND TICKET_TYPE IS NOT NULL THEN 'WARNING'
+            ELSE 'FAILED'
+        END AS VALIDATION_STATUS
+    FROM cleaned_support_tickets
+),
+
+deduped_support_tickets AS (
+    SELECT 
+        TICKET_ID,
+        USER_ID,
+        TICKET_TYPE,
+        RESOLUTION_STATUS,
+        OPEN_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        LOAD_DATE,
+        UPDATE_DATE,
+        DATA_QUALITY_SCORE,
+        VALIDATION_STATUS,
+        CURRENT_TIMESTAMP() AS CREATED_AT,
+        CURRENT_TIMESTAMP() AS UPDATED_AT,
+        ROW_NUMBER() OVER (PARTITION BY TICKET_ID ORDER BY UPDATE_TIMESTAMP DESC) AS row_num
+    FROM validated_support_tickets
+    WHERE OPEN_DATE <= CURRENT_DATE()
+)
+
+SELECT 
+    TICKET_ID,
+    USER_ID,
+    TICKET_TYPE,
+    RESOLUTION_STATUS,
+    OPEN_DATE,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    LOAD_DATE,
+    UPDATE_DATE,
+    DATA_QUALITY_SCORE,
+    VALIDATION_STATUS,
+    CREATED_AT,
+    UPDATED_AT
+FROM deduped_support_tickets
+WHERE row_num = 1
