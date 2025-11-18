@@ -90,7 +90,7 @@ service quality and reduce ticket volume.
 
 **KPIs and Metrics in the Report**
 - Number of Users
-- 
+- Number of Tickets
 **Data Constraints**
 
 -   Type and Resolution_Status must be from a predefined list of values.
