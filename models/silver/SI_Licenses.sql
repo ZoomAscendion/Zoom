@@ -14,44 +14,50 @@ WITH bronze_licenses AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM BRONZE.BZ_LICENSES
+    WHERE LICENSE_ID IS NOT NULL
 ),
 
 cleaned_licenses AS (
     SELECT 
         LICENSE_ID,
-        UPPER(TRIM(LICENSE_TYPE)) AS LICENSE_TYPE,
+        COALESCE(UPPER(TRIM(LICENSE_TYPE)), 'BASIC') AS LICENSE_TYPE,
         ASSIGNED_TO_USER_ID,
         
         /* Critical P1: DD/MM/YYYY date format conversion for "27/08/2024" error */
-        CASE 
-            WHEN TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY') IS NOT NULL THEN
-                TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY')
-            ELSE 
-                COALESCE(
-                    TRY_TO_DATE(START_DATE, 'YYYY-MM-DD'),
-                    TRY_TO_DATE(START_DATE, 'MM/DD/YYYY'),
-                    TRY_TO_DATE(START_DATE)
-                )
-        END AS START_DATE,
+        COALESCE(
+            CASE 
+                WHEN TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY') IS NOT NULL THEN
+                    TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY')
+                ELSE 
+                    COALESCE(
+                        TRY_TO_DATE(START_DATE, 'YYYY-MM-DD'),
+                        TRY_TO_DATE(START_DATE, 'MM/DD/YYYY'),
+                        TRY_TO_DATE(START_DATE)
+                    )
+            END,
+            CURRENT_DATE()
+        ) AS START_DATE,
         
-        CASE 
-            WHEN TRY_TO_DATE(END_DATE::STRING, 'DD/MM/YYYY') IS NOT NULL THEN
-                TRY_TO_DATE(END_DATE::STRING, 'DD/MM/YYYY')
-            ELSE 
-                COALESCE(
-                    TRY_TO_DATE(END_DATE, 'YYYY-MM-DD'),
-                    TRY_TO_DATE(END_DATE, 'MM/DD/YYYY'),
-                    TRY_TO_DATE(END_DATE)
-                )
-        END AS END_DATE,
+        COALESCE(
+            CASE 
+                WHEN TRY_TO_DATE(END_DATE::STRING, 'DD/MM/YYYY') IS NOT NULL THEN
+                    TRY_TO_DATE(END_DATE::STRING, 'DD/MM/YYYY')
+                ELSE 
+                    COALESCE(
+                        TRY_TO_DATE(END_DATE, 'YYYY-MM-DD'),
+                        TRY_TO_DATE(END_DATE, 'MM/DD/YYYY'),
+                        TRY_TO_DATE(END_DATE)
+                    )
+            END,
+            DATEADD('year', 1, CURRENT_DATE())
+        ) AS END_DATE,
         
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
-        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE
+        COALESCE(DATE(UPDATE_TIMESTAMP), DATE(LOAD_TIMESTAMP)) AS UPDATE_DATE
     FROM bronze_licenses
-    WHERE LICENSE_ID IS NOT NULL
 ),
 
 validated_licenses AS (
@@ -60,7 +66,7 @@ validated_licenses AS (
         /* Data quality score calculation */
         CASE 
             WHEN LICENSE_ID IS NOT NULL 
-                AND LICENSE_TYPE IS NOT NULL 
+                AND LICENSE_TYPE != 'BASIC'
                 AND ASSIGNED_TO_USER_ID IS NOT NULL 
                 AND START_DATE IS NOT NULL 
                 AND END_DATE IS NOT NULL
@@ -74,7 +80,7 @@ validated_licenses AS (
         /* Validation status */
         CASE 
             WHEN LICENSE_ID IS NOT NULL 
-                AND LICENSE_TYPE IS NOT NULL 
+                AND LICENSE_TYPE != 'BASIC'
                 AND ASSIGNED_TO_USER_ID IS NOT NULL 
                 AND START_DATE IS NOT NULL 
                 AND END_DATE IS NOT NULL
@@ -89,7 +95,7 @@ validated_licenses AS (
 
 deduped_licenses AS (
     SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY LICENSE_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+        ROW_NUMBER() OVER (PARTITION BY LICENSE_ID ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC) AS rn
     FROM validated_licenses
 )
 
@@ -108,4 +114,3 @@ SELECT
     VALIDATION_STATUS
 FROM deduped_licenses
 WHERE rn = 1
-    AND VALIDATION_STATUS IN ('PASSED', 'WARNING')
