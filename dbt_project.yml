@@ -18,51 +18,7 @@ clean-targets:
 
 models:
   zoom_silver_pipeline:
-    silver:
-      +materialized: table
-      +pre-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            AUDIT_ID, 
-            TABLE_NAME, 
-            OPERATION_TYPE, 
-            AUDIT_TIMESTAMP, 
-            PROCESSED_BY
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            '{{ this.name }}', 
-            'PIPELINE_START', 
-            CURRENT_TIMESTAMP(), 
-            'DBT_SILVER_PIPELINE'
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            AUDIT_ID, 
-            TABLE_NAME, 
-            OPERATION_TYPE, 
-            AUDIT_TIMESTAMP, 
-            PROCESSED_BY
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            '{{ this.name }}', 
-            'PIPELINE_END', 
-            CURRENT_TIMESTAMP(), 
-            'DBT_SILVER_PIPELINE'
-        {% endif %}
-
-# Ensure audit log runs first
-run-order:
-  - "SI_Audit_Log"
-  - "SI_Users"
-  - "SI_Meetings"
-  - "SI_Participants"
-  - "SI_Feature_Usage"
-  - "SI_Support_Tickets"
-  - "SI_Billing_Events"
-  - "SI_Licenses"
+    +materialized: table
 
 vars:
   # Set timezone for timestamp conversions
