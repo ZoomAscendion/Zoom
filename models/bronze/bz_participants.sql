@@ -1,17 +1,19 @@
--- Bronze Layer Participants Table
--- Description: Tracks meeting participants and their session details
--- Author: Data Engineering Team
--- Created: {{ run_started_at }}
+/*
+  Author: Data Engineering Team
+  Created: 2024-12-19
+  Description: Bronze layer transformation for PARTICIPANTS table
+  Purpose: Clean and deduplicate raw participant data with audit trail
+*/
 
 {{ config(
     materialized='table',
     tags=['bronze', 'participants'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) VALUES ('BZ_PARTICIPANTS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'STARTED')",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) VALUES ('BZ_PARTICIPANTS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 1.0, 'SUCCESS')"
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) VALUES ('BZ_PARTICIPANTS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED')",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) VALUES ('BZ_PARTICIPANTS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'SUCCESS')"
 ) }}
 
--- CTE to select and filter raw data
-WITH raw_participants AS (
+WITH source_data AS (
+    -- Select raw data from source with null filtering for primary key
     SELECT 
         PARTICIPANT_ID,
         MEETING_ID,
@@ -22,24 +24,30 @@ WITH raw_participants AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM {{ source('raw', 'participants') }}
-    WHERE PARTICIPANT_ID IS NOT NULL  -- Filter out records with NULL primary key
+    WHERE PARTICIPANT_ID IS NOT NULL  -- Filter out records with null primary key
+      AND MEETING_ID IS NOT NULL      -- Filter out records with null foreign key
+      AND USER_ID IS NOT NULL         -- Filter out records with null foreign key
 ),
 
--- CTE for deduplication based on primary key and latest timestamp
-deduped_participants AS (
-    SELECT *
-    FROM (
-        SELECT *,
-               ROW_NUMBER() OVER (
-                   PARTITION BY PARTICIPANT_ID 
-                   ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
-               ) AS rn
-        FROM raw_participants
-    )
-    WHERE rn = 1
+deduped_data AS (
+    -- Apply deduplication logic based on primary key and latest timestamp
+    SELECT 
+        PARTICIPANT_ID,
+        MEETING_ID,
+        USER_ID,
+        JOIN_TIME,
+        LEAVE_TIME,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        ROW_NUMBER() OVER (
+            PARTITION BY PARTICIPANT_ID 
+            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
+        ) AS row_num
+    FROM source_data
 )
 
--- Final selection with 1-1 mapping from raw to bronze
+-- Final select with audit columns
 SELECT 
     PARTICIPANT_ID,
     MEETING_ID,
@@ -49,4 +57,5 @@ SELECT
     LOAD_TIMESTAMP,
     UPDATE_TIMESTAMP,
     SOURCE_SYSTEM
-FROM deduped_participants
+FROM deduped_data
+WHERE row_num = 1  -- Keep only the most recent record per PARTICIPANT_ID
