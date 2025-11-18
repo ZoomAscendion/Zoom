@@ -3,8 +3,10 @@
     on_schema_change='sync_all_columns'
 ) }}
 
--- SI_Audit_Log table for comprehensive audit trail
--- This table must be created first before other models run
+-- SI_AUDIT_LOG: Independent Silver Audit Table
+-- Description: Comprehensive audit trail for all Silver layer data operations
+-- No pre-hook or post-hook logic in this file
+
 SELECT 
     CAST(NULL AS VARCHAR(255)) AS AUDIT_ID,
     CAST(NULL AS VARCHAR(255)) AS TABLE_NAME,
