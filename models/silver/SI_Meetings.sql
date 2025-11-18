@@ -4,9 +4,9 @@
     post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY, ERROR_DESCRIPTION) SELECT UUID_STRING(), 'SI_MEETINGS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE', 'Completed SI_MEETINGS transformation with ' || (SELECT COUNT(*) FROM {{ this }}) || ' records' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
 ) }}
 
--- SI_MEETINGS: Silver layer transformation from Bronze BZ_MEETINGS
--- Description: Stores cleaned and standardized meeting information with enhanced timestamp and numeric field handling
--- Implements Critical P1 DQ checks for numeric field text unit cleaning and EST timezone conversion
+/* SI_MEETINGS: Silver layer transformation from Bronze BZ_MEETINGS */
+/* Description: Stores cleaned and standardized meeting information with enhanced timestamp and numeric field handling */
+/* Implements Critical P1 DQ checks for numeric field text unit cleaning and EST timezone conversion */
 
 WITH bronze_meetings AS (
     SELECT 
@@ -19,7 +19,7 @@ WITH bronze_meetings AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_MEETINGS') }}
+    FROM BRONZE.BZ_MEETINGS
     WHERE MEETING_ID IS NOT NULL
 ),
 
@@ -28,7 +28,7 @@ cleaned_meetings AS (
         MEETING_ID,
         HOST_ID,
         TRIM(MEETING_TOPIC) AS MEETING_TOPIC,
-        -- Enhanced timestamp handling for EST timezone
+        /* Enhanced timestamp handling for EST timezone */
         CASE 
             WHEN START_TIME::STRING LIKE '%EST%' THEN 
                 COALESCE(
@@ -45,7 +45,7 @@ cleaned_meetings AS (
                     TRY_TO_TIMESTAMP(START_TIME::STRING)
                 )
         END AS START_TIME,
-        -- Enhanced timestamp handling for EST timezone
+        /* Enhanced timestamp handling for EST timezone */
         CASE 
             WHEN END_TIME::STRING LIKE '%EST%' THEN 
                 COALESCE(
@@ -62,7 +62,7 @@ cleaned_meetings AS (
                     TRY_TO_TIMESTAMP(END_TIME::STRING)
                 )
         END AS END_TIME,
-        -- Critical P1 DQ Check: Clean text units from numeric fields ("108 mins" error fix)
+        /* Critical P1 DQ Check: Clean text units from numeric fields ("108 mins" error fix) */
         CASE 
             WHEN TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', '')) IS NOT NULL THEN
                 TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', ''))
@@ -88,7 +88,7 @@ validated_meetings AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        -- Calculate data quality score
+        /* Calculate data quality score */
         CASE 
             WHEN MEETING_ID IS NOT NULL 
                 AND HOST_ID IS NOT NULL 
@@ -103,7 +103,7 @@ validated_meetings AS (
             THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
-        -- Set validation status
+        /* Set validation status */
         CASE 
             WHEN MEETING_ID IS NOT NULL 
                 AND HOST_ID IS NOT NULL 
