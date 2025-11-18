@@ -2,12 +2,12 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_silver_pipeline'
+profile: 'zoom_silver'
 
 model-paths: ["models"]
-analysis-paths: ["analysis"]
+analysis-paths: ["analyses"]
 test-paths: ["tests"]
-seed-paths: ["data"]
+seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
@@ -18,7 +18,47 @@ clean-targets:
 
 models:
   zoom_silver_pipeline:
-    +materialized: table
     silver:
       +materialized: table
-      +schema: silver
+      +pre-hook: |
+        {% if this.name != 'SI_AUDIT_LOG' %}
+        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
+          AUDIT_ID, TABLE_NAME, COLUMN_NAME, RECORD_ID, ERROR_TYPE, 
+          ERROR_DESCRIPTION, ORIGINAL_VALUE, AUDIT_TIMESTAMP, 
+          OPERATION_TYPE, PROCESSED_BY, SOURCE_SYSTEM
+        )
+        SELECT 
+          CONCAT('{{ this.name }}', '_', TO_CHAR(CURRENT_TIMESTAMP(), 'YYYYMMDDHH24MISS'), '_', ROW_NUMBER() OVER (ORDER BY 1)) as AUDIT_ID,
+          '{{ this.name }}' as TABLE_NAME,
+          'PROCESSING_START' as COLUMN_NAME,
+          'N/A' as RECORD_ID,
+          'PROCESSING_START' as ERROR_TYPE,
+          'Starting {{ this.name }} processing' as ERROR_DESCRIPTION,
+          NULL as ORIGINAL_VALUE,
+          CURRENT_TIMESTAMP() as AUDIT_TIMESTAMP,
+          'INSERT' as OPERATION_TYPE,
+          'DBT_SILVER_PIPELINE' as PROCESSED_BY,
+          'BRONZE_LAYER' as SOURCE_SYSTEM
+        FROM (SELECT 1 as dummy_col)
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'SI_AUDIT_LOG' %}
+        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
+          AUDIT_ID, TABLE_NAME, COLUMN_NAME, RECORD_ID, ERROR_TYPE, 
+          ERROR_DESCRIPTION, ORIGINAL_VALUE, AUDIT_TIMESTAMP, 
+          OPERATION_TYPE, PROCESSED_BY, SOURCE_SYSTEM
+        )
+        SELECT 
+          CONCAT('{{ this.name }}', '_', TO_CHAR(CURRENT_TIMESTAMP(), 'YYYYMMDDHH24MISS'), '_', ROW_NUMBER() OVER (ORDER BY 1)) as AUDIT_ID,
+          '{{ this.name }}' as TABLE_NAME,
+          'PROCESSING_END' as COLUMN_NAME,
+          'N/A' as RECORD_ID,
+          'PROCESSING_END' as ERROR_TYPE,
+          'Completed {{ this.name }} processing' as ERROR_DESCRIPTION,
+          NULL as ORIGINAL_VALUE,
+          CURRENT_TIMESTAMP() as AUDIT_TIMESTAMP,
+          'INSERT' as OPERATION_TYPE,
+          'DBT_SILVER_PIPELINE' as PROCESSED_BY,
+          'BRONZE_LAYER' as SOURCE_SYSTEM
+        FROM (SELECT 1 as dummy_col)
+        {% endif %}
