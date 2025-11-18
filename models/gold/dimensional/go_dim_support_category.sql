@@ -72,15 +72,6 @@ support_transformations AS (
         CURRENT_DATE() AS UPDATE_DATE,
         SOURCE_SYSTEM
     FROM source_support
-),
-
-deduped_support AS (
-    SELECT *,
-        ROW_NUMBER() OVER (
-            PARTITION BY SUPPORT_CATEGORY 
-            ORDER BY LOAD_DATE DESC
-        ) AS rn
-    FROM support_transformations
 )
 
 SELECT 
@@ -100,5 +91,4 @@ SELECT
     LOAD_DATE,
     UPDATE_DATE,
     SOURCE_SYSTEM
-FROM deduped_support
-WHERE rn = 1
+FROM support_transformations
