@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    materialized='table'
 ) }}
 
 -- SI_Licenses table transformation from Bronze to Silver
@@ -17,7 +15,7 @@ WITH bronze_licenses AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_LICENSES') }}
+    FROM BRONZE.BZ_LICENSES
 ),
 
 cleaned_licenses AS (
@@ -25,7 +23,7 @@ cleaned_licenses AS (
         LICENSE_ID,
         UPPER(TRIM(LICENSE_TYPE)) AS LICENSE_TYPE,
         ASSIGNED_TO_USER_ID,
-        -- Critical P1 fix: Handle DD/MM/YYYY date format conversion
+        /* Critical P1 fix: Handle DD/MM/YYYY date format conversion */
         COALESCE(
             TRY_TO_DATE(START_DATE::STRING, 'YYYY-MM-DD'),
             TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY'),
@@ -33,7 +31,7 @@ cleaned_licenses AS (
             TRY_TO_DATE(START_DATE::STRING, 'MM/DD/YYYY'),
             TRY_TO_DATE(START_DATE::STRING)
         ) AS START_DATE,
-        -- Critical P1 fix: Handle DD/MM/YYYY date format conversion
+        /* Critical P1 fix: Handle DD/MM/YYYY date format conversion */
         COALESCE(
             TRY_TO_DATE(END_DATE::STRING, 'YYYY-MM-DD'),
             TRY_TO_DATE(END_DATE::STRING, 'DD/MM/YYYY'),
@@ -53,7 +51,7 @@ validated_licenses AS (
         *,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
         DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
-        -- Calculate data quality score
+        /* Calculate data quality score */
         CASE 
             WHEN LICENSE_ID IS NOT NULL 
                 AND LICENSE_TYPE IS NOT NULL 
@@ -66,7 +64,7 @@ validated_licenses AS (
             THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
-        -- Set validation status
+        /* Set validation status */
         CASE 
             WHEN LICENSE_ID IS NOT NULL 
                 AND LICENSE_TYPE IS NOT NULL 
