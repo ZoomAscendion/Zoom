@@ -1,68 +1,89 @@
 {{ config(
     materialized='table',
-    tags=['dimension', 'gold']
+    pre_hook="INSERT INTO {{ ref('go_process_audit') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) VALUES (UUID_STRING(), 'GO_DIM_MEETING_LOAD', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), 'STARTED', 'SI_MEETINGS', 'GO_DIM_MEETING', 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
+    post_hook="INSERT INTO {{ ref('go_process_audit') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_END_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, RECORDS_PROCESSED, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) VALUES (UUID_STRING(), 'GO_DIM_MEETING_LOAD', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 'COMPLETED', 'SI_MEETINGS', 'GO_DIM_MEETING', (SELECT COUNT(*) FROM {{ this }}), 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE')"
 ) }}
 
--- Meeting Dimension Transformation
--- Creates meeting dimension with enhanced categorization
+-- Meeting Dimension Table
+-- Creates meeting dimension with enhanced categorization and derived attributes
 
 WITH source_meetings AS (
     SELECT 
         MEETING_ID,
-        HOST_ID,
-        MEETING_TOPIC,
         START_TIME,
-        END_TIME,
         DURATION_MINUTES,
         DATA_QUALITY_SCORE,
-        SOURCE_SYSTEM,
-        ROW_NUMBER() OVER (
-            PARTITION BY MEETING_ID 
-            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
-        ) as rn
-    FROM DB_POC_ZOOM_1.GOLD.SI_MEETINGS
+        SOURCE_SYSTEM
+    FROM {{ source('silver', 'si_meetings') }}
     WHERE VALIDATION_STATUS = 'PASSED'
 ),
 
-transformed_meetings AS (
+meeting_transformations AS (
     SELECT 
-        MD5(MEETING_ID) as MEETING_KEY,
-        'Standard Meeting' as MEETING_TYPE,
+        MD5(MEETING_ID) AS MEETING_KEY,
+        ROW_NUMBER() OVER (ORDER BY MEETING_ID) AS MEETING_ID,
+        'Standard Meeting' AS MEETING_TYPE,
         CASE 
             WHEN DURATION_MINUTES <= 15 THEN 'Quick Sync'
             WHEN DURATION_MINUTES <= 60 THEN 'Standard Meeting'
             WHEN DURATION_MINUTES <= 120 THEN 'Extended Meeting'
             ELSE 'Long Session'
-        END as MEETING_CATEGORY,
+        END AS MEETING_CATEGORY,
         CASE 
             WHEN DURATION_MINUTES <= 15 THEN 'Brief'
             WHEN DURATION_MINUTES <= 60 THEN 'Standard'
             WHEN DURATION_MINUTES <= 120 THEN 'Extended'
             ELSE 'Long'
-        END as DURATION_CATEGORY,
-        'Unknown' as PARTICIPANT_SIZE_CATEGORY,
+        END AS DURATION_CATEGORY,
+        'Unknown' AS PARTICIPANT_SIZE_CATEGORY,
         CASE 
             WHEN HOUR(START_TIME) BETWEEN 6 AND 11 THEN 'Morning'
             WHEN HOUR(START_TIME) BETWEEN 12 AND 17 THEN 'Afternoon'
             WHEN HOUR(START_TIME) BETWEEN 18 AND 21 THEN 'Evening'
             ELSE 'Night'
-        END as TIME_OF_DAY_CATEGORY,
-        DAYNAME(START_TIME) as DAY_OF_WEEK,
-        CASE WHEN DAYOFWEEK(START_TIME) IN (1, 7) THEN TRUE ELSE FALSE END as IS_WEEKEND,
-        FALSE as IS_RECURRING,
+        END AS TIME_OF_DAY_CATEGORY,
+        DAYNAME(START_TIME) AS DAY_OF_WEEK,
+        CASE WHEN DAYOFWEEK(START_TIME) IN (1, 7) THEN TRUE ELSE FALSE END AS IS_WEEKEND,
+        FALSE AS IS_RECURRING, -- To be enhanced with recurring meeting logic
         CASE 
             WHEN DATA_QUALITY_SCORE >= 90 THEN 9.0
             WHEN DATA_QUALITY_SCORE >= 80 THEN 8.0
             WHEN DATA_QUALITY_SCORE >= 70 THEN 7.0
             ELSE 6.0
-        END as MEETING_QUALITY_SCORE,
-        'Standard Features' as TYPICAL_FEATURES_USED,
-        'Business Meeting' as BUSINESS_PURPOSE,
-        CURRENT_DATE() as LOAD_DATE,
-        CURRENT_DATE() as UPDATE_DATE,
+        END AS MEETING_QUALITY_SCORE,
+        'Screen Share, Chat, Recording' AS TYPICAL_FEATURES_USED,
+        'Business Meeting' AS BUSINESS_PURPOSE,
+        CURRENT_DATE() AS LOAD_DATE,
+        CURRENT_DATE() AS UPDATE_DATE,
         SOURCE_SYSTEM
     FROM source_meetings
-    WHERE rn = 1
+),
+
+deduped_meetings AS (
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY MEETING_KEY 
+            ORDER BY LOAD_DATE DESC
+        ) AS rn
+    FROM meeting_transformations
 )
 
-SELECT * FROM transformed_meetings
+SELECT 
+    MEETING_KEY,
+    MEETING_ID,
+    MEETING_TYPE,
+    MEETING_CATEGORY,
+    DURATION_CATEGORY,
+    PARTICIPANT_SIZE_CATEGORY,
+    TIME_OF_DAY_CATEGORY,
+    DAY_OF_WEEK,
+    IS_WEEKEND,
+    IS_RECURRING,
+    MEETING_QUALITY_SCORE,
+    TYPICAL_FEATURES_USED,
+    BUSINESS_PURPOSE,
+    LOAD_DATE,
+    UPDATE_DATE,
+    SOURCE_SYSTEM
+FROM deduped_meetings
+WHERE rn = 1
