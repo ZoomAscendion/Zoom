@@ -19,7 +19,7 @@ WITH raw_support_tickets_filtered AS (
         load_timestamp,
         update_timestamp,
         source_system
-    FROM {{ source('raw_schema', 'support_tickets') }}
+    FROM {{ source('raw_layer', 'support_tickets') }}
     WHERE ticket_id IS NOT NULL  -- Filter out null primary keys
 ),
 
