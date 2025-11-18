@@ -29,26 +29,3 @@ vars:
   # dbt Cloud environment variables
   start_date: '2020-01-01'
   end_date: '2030-12-31'
-
-# Snapshot configurations
-snapshots:
-  zoom_silver_pipeline:
-    +target_schema: snapshots
-    +strategy: timestamp
-    +updated_at: update_timestamp
-
-# Seeds configurations
-seeds:
-  zoom_silver_pipeline:
-    +schema: seeds
-
-# Test configurations
-tests:
-  zoom_silver_pipeline:
-    +store_failures: true
-    +schema: test_failures
-
-# Documentation
-docs:
-  zoom_silver_pipeline:
-    +generate: true
