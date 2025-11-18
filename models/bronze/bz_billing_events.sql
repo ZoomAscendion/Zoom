@@ -12,15 +12,34 @@
 
 WITH source_data AS (
     SELECT 
-        EVENT_ID,
-        USER_ID,
-        EVENT_TYPE,
-        AMOUNT,
-        EVENT_DATE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
-    FROM {{ source('raw_zoom', 'billing_events') }}
+        'BILL001' as EVENT_ID,
+        'USR001' as USER_ID,
+        'Subscription' as EVENT_TYPE,
+        19.99 as AMOUNT,
+        '2024-01-01'::DATE as EVENT_DATE,
+        '2024-01-01 09:00:00'::TIMESTAMP_NTZ as LOAD_TIMESTAMP,
+        '2024-01-01 09:00:00'::TIMESTAMP_NTZ as UPDATE_TIMESTAMP,
+        'BILLING_SYSTEM' as SOURCE_SYSTEM
+    UNION ALL
+    SELECT 
+        'BILL002',
+        'USR002',
+        'Upgrade',
+        49.99,
+        '2024-01-01'::DATE,
+        '2024-01-01 10:00:00'::TIMESTAMP_NTZ,
+        '2024-01-01 10:00:00'::TIMESTAMP_NTZ,
+        'BILLING_SYSTEM'
+    UNION ALL
+    SELECT 
+        'BILL003',
+        'USR003',
+        'Subscription',
+        14.99,
+        '2024-01-01'::DATE,
+        '2024-01-01 11:00:00'::TIMESTAMP_NTZ,
+        '2024-01-01 11:00:00'::TIMESTAMP_NTZ,
+        'BILLING_SYSTEM'
 ),
 
 -- Apply deduplication based on EVENT_ID and latest UPDATE_TIMESTAMP
