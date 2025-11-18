@@ -21,42 +21,59 @@ clean-targets:
 # Configuring models
 models:
   zoom_silver_pipeline:
+    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
-      +on_schema_change: sync_all_columns
-      # Ensure audit log runs first
-      SI_Audit_Log:
-        +pre_hook: []
-        +post_hook: []
-        +materialized: table
-        +tags: ["audit", "first"]
-      # All other silver models
-      SI_Users:
-        +materialized: table
-        +tags: ["silver", "users"]
-      SI_Meetings:
-        +materialized: table
-        +tags: ["silver", "meetings"]
-      SI_Participants:
-        +materialized: table
-        +tags: ["silver", "participants"]
-      SI_Feature_Usage:
-        +materialized: table
-        +tags: ["silver", "feature_usage"]
-      SI_Support_Tickets:
-        +materialized: table
-        +tags: ["silver", "support"]
-      SI_Billing_Events:
-        +materialized: table
-        +tags: ["silver", "billing"]
-      SI_Licenses:
-        +materialized: table
-        +tags: ["silver", "licenses"]
+      +pre-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (
+            AUDIT_ID, 
+            TABLE_NAME, 
+            OPERATION_TYPE, 
+            AUDIT_TIMESTAMP, 
+            PROCESSED_BY
+          ) 
+          SELECT 
+            UUID_STRING(), 
+            '{{ this.name }}', 
+            'PIPELINE_START', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_SILVER_PIPELINE'
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (
+            AUDIT_ID, 
+            TABLE_NAME, 
+            OPERATION_TYPE, 
+            AUDIT_TIMESTAMP, 
+            PROCESSED_BY
+          ) 
+          SELECT 
+            UUID_STRING(), 
+            '{{ this.name }}', 
+            'PIPELINE_END', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_SILVER_PIPELINE'
+        {% endif %}
 
+# Specify the order of model execution
+model-ordering:
+  - "SI_Audit_Log"
+  - "SI_Users"
+  - "SI_Meetings"
+  - "SI_Participants"
+  - "SI_Feature_Usage"
+  - "SI_Support_Tickets"
+  - "SI_Billing_Events"
+  - "SI_Licenses"
+
+# Require dbt version
+require-dbt-version: ">=1.0.0"
+
+# Vars for the project
 vars:
+  # The start date for the data pipeline
   start_date: '2020-01-01'
-  end_date: '2030-12-31'
-  
-dispatch:
-  - macro_namespace: dbt_utils
-    search_order: ['zoom_silver_pipeline', 'dbt_utils']
+  # The timezone for timestamp conversions
+  timezone: 'UTC'
