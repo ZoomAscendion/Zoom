@@ -8,15 +8,11 @@
     tags=['bronze', 'audit']
 ) }}
 
-WITH audit_base AS (
-    SELECT 
-        NULL::NUMBER AS record_id,  -- Will be auto-generated
-        NULL::VARCHAR(255) AS source_table,
-        NULL::TIMESTAMP_NTZ AS load_timestamp,
-        NULL::VARCHAR(255) AS processed_by,
-        NULL::NUMBER(38,3) AS processing_time,
-        NULL::VARCHAR(255) AS status
-    WHERE 1=0  -- Empty table structure
-)
-
-SELECT * FROM audit_base
+SELECT 
+    1 as record_id,
+    'INITIAL_SETUP' as source_table,
+    CURRENT_TIMESTAMP() as load_timestamp,
+    'DBT_BRONZE_PIPELINE' as processed_by,
+    0.0 as processing_time,
+    'SUCCESS' as status
+WHERE 1=0  -- Empty table to establish structure
