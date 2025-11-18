@@ -5,9 +5,7 @@
 
 {{ config(
     materialized='table',
-    tags=['bronze', 'users'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, status) SELECT 'BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_USERS' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    tags=['bronze', 'users']
 ) }}
 
 -- Bronze Pipeline Step 2.1: Select and filter raw data excluding null primary keys
@@ -30,7 +28,7 @@ deduped_users AS (
     SELECT *,
         ROW_NUMBER() OVER (
             PARTITION BY user_id 
-            ORDER BY update_timestamp DESC, load_timestamp DESC
+            ORDER BY COALESCE(update_timestamp, load_timestamp) DESC, load_timestamp DESC
         ) as rn
     FROM raw_users_filtered
 ),
