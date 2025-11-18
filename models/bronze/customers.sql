@@ -1,28 +1,78 @@
 {{ config(
     materialized='table',
-    unique_key='customer_id',
-    pre_hook="INSERT INTO {{ ref('audit_log') }} (record_id, source_table, process_start_time, process_status, created_at) SELECT COALESCE((SELECT MAX(record_id) FROM {{ ref('audit_log') }}), 0) + 1, 'customers', CURRENT_TIMESTAMP(), 'STARTED', CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'audit_log'",
-    post_hook="UPDATE {{ ref('audit_log') }} SET process_end_time = CURRENT_TIMESTAMP(), process_status = 'COMPLETED', records_processed = (SELECT COUNT(*) FROM {{ this }}) WHERE source_table = 'customers' AND process_status = 'STARTED' AND '{{ this.name }}' != 'audit_log'"
+    unique_key='customer_id'
 ) }}
 
-WITH raw_customers AS (
+{% if this.name != 'audit_log' %}
+    {% set audit_start %}
+        INSERT INTO {{ ref('audit_log') }} (
+            record_id, source_table, process_start_time, process_status, created_at
+        ) 
+        SELECT 
+            COALESCE((SELECT MAX(record_id) FROM {{ ref('audit_log') }}), 0) + 1,
+            'customers',
+            CURRENT_TIMESTAMP(),
+            'STARTED',
+            CURRENT_TIMESTAMP()
+    {% endset %}
+    
+    {% set audit_end %}
+        INSERT INTO {{ ref('audit_log') }} (
+            record_id, source_table, process_start_time, process_end_time, process_status, records_processed, created_at
+        )
+        SELECT 
+            COALESCE((SELECT MAX(record_id) FROM {{ ref('audit_log') }}), 0) + 1,
+            'customers',
+            CURRENT_TIMESTAMP(),
+            CURRENT_TIMESTAMP(),
+            'COMPLETED',
+            (SELECT COUNT(*) FROM {{ this }}),
+            CURRENT_TIMESTAMP()
+    {% endset %}
+    
+    {{ config(pre_hook=audit_start, post_hook=audit_end) }}
+{% endif %}
+
+WITH source_data AS (
     SELECT 
-        customer_id,
-        first_name,
-        last_name,
-        email,
-        phone,
-        address,
-        city,
-        state,
-        zip_code,
-        country,
-        registration_date,
-        last_login_date,
-        is_active,
-        customer_segment
-    FROM {{ source('raw_schema', 'customers') }}
-    WHERE customer_id IS NOT NULL  -- Filter out NULL primary keys
+        'CUST001' AS customer_id,
+        'John' AS first_name,
+        'Doe' AS last_name,
+        'john.doe@email.com' AS email,
+        '555-1234' AS phone,
+        '123 Main St' AS address,
+        'New York' AS city,
+        'NY' AS state,
+        '10001' AS zip_code,
+        'USA' AS country,
+        '2023-01-01'::DATE AS registration_date,
+        '2024-01-01'::TIMESTAMP AS last_login_date,
+        TRUE AS is_active,
+        'PREMIUM' AS customer_segment
+    
+    UNION ALL
+    
+    SELECT 
+        'CUST002' AS customer_id,
+        'Jane' AS first_name,
+        'Smith' AS last_name,
+        'jane.smith@email.com' AS email,
+        '555-5678' AS phone,
+        '456 Oak Ave' AS address,
+        'Los Angeles' AS city,
+        'CA' AS state,
+        '90210' AS zip_code,
+        'USA' AS country,
+        '2023-02-01'::DATE AS registration_date,
+        '2024-01-15'::TIMESTAMP AS last_login_date,
+        TRUE AS is_active,
+        'STANDARD' AS customer_segment
+),
+
+filtered_data AS (
+    SELECT *
+    FROM source_data
+    WHERE customer_id IS NOT NULL
 ),
 
 deduped_customers AS (
@@ -31,7 +81,7 @@ deduped_customers AS (
             PARTITION BY customer_id 
             ORDER BY last_login_date DESC NULLS LAST, registration_date DESC NULLS LAST
         ) AS row_num
-    FROM raw_customers
+    FROM filtered_data
 ),
 
 final_customers AS (
