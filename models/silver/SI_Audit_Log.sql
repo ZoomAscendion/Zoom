@@ -3,7 +3,7 @@
     on_schema_change='sync_all_columns'
 ) }}
 
-/* Audit log table for Silver layer - must be created first */
+-- Audit log table for Silver layer - must be created first
 SELECT 
     CAST(NULL AS VARCHAR(255)) AS AUDIT_ID,
     CAST(NULL AS VARCHAR(255)) AS TABLE_NAME,
