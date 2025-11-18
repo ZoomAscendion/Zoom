@@ -1,5 +1,7 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('go_process_audit') }} (AUDIT_LOG_ID, PROCESS_NAME, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) VALUES ('{{ invocation_id }}_fact_feature', 'go_fact_feature_usage', CURRENT_TIMESTAMP(), 'RUNNING', 'si_feature_usage', 'go_fact_feature_usage', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_ETL')",
+    post_hook="UPDATE {{ ref('go_process_audit') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), UPDATE_DATE = CURRENT_DATE() WHERE AUDIT_LOG_ID = '{{ invocation_id }}_fact_feature'"
 ) }}
 
 -- Feature usage fact table with adoption and performance metrics
@@ -38,12 +40,12 @@ SELECT
         WHEN fub.USAGE_COUNT >= 1 THEN 2.0
         ELSE 1.0
     END AS FEATURE_ADOPTION_SCORE,
-    4.5 AS USER_EXPERIENCE_RATING, -- Default value
+    4.5 AS USER_EXPERIENCE_RATING,
     CASE 
         WHEN fub.USAGE_COUNT > 0 THEN 5.0
         ELSE 1.0
     END AS FEATURE_PERFORMANCE_SCORE,
-    1 AS CONCURRENT_FEATURES_COUNT, -- Default value
+    1 AS CONCURRENT_FEATURES_COUNT,
     CASE 
         WHEN COALESCE(fub.SESSION_DURATION_MINUTES, 0) >= 60 THEN 'Extended Session'
         WHEN COALESCE(fub.SESSION_DURATION_MINUTES, 0) >= 30 THEN 'Standard Session'
@@ -51,9 +53,9 @@ SELECT
         WHEN COALESCE(fub.SESSION_DURATION_MINUTES, 0) >= 5 THEN 'Brief Session'
         ELSE 'Quick Access'
     END AS USAGE_CONTEXT,
-    'Desktop' AS DEVICE_TYPE, -- Default value
-    'Latest' AS PLATFORM_VERSION, -- Default value
-    0 AS ERROR_COUNT, -- Default value
+    'Desktop' AS DEVICE_TYPE,
+    'Latest' AS PLATFORM_VERSION,
+    0 AS ERROR_COUNT,
     CASE 
         WHEN fub.USAGE_COUNT > 0 THEN 100.0
         ELSE 0.0
