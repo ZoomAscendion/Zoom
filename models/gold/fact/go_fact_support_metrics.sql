@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, LOAD_DATE, SOURCE_SYSTEM) VALUES ('{{ invocation_id }}_FACT_SUPPORT', 'go_fact_support_metrics', 'SILVER.SI_SUPPORT_TICKETS', 'GOLD.GO_FACT_SUPPORT_METRICS', CURRENT_TIMESTAMP(), 'RUNNING', CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), UPDATE_DATE = CURRENT_DATE() WHERE AUDIT_LOG_ID = '{{ invocation_id }}_FACT_SUPPORT' AND PROCESS_NAME = 'go_fact_support_metrics'"
+    materialized='table'
 ) }}
 
 -- Support metrics fact table transformation from Silver to Gold layer
@@ -14,8 +12,7 @@ WITH support_base AS (
         st.OPEN_DATE,
         st.SOURCE_SYSTEM
     FROM {{ source('silver', 'si_support_tickets') }} st
-    WHERE COALESCE(st.VALIDATION_STATUS, 'PASSED') = 'PASSED'
-      AND st.TICKET_ID IS NOT NULL
+    WHERE st.TICKET_ID IS NOT NULL
 ),
 
 support_metrics_fact AS (
