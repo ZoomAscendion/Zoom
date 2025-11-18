@@ -18,9 +18,9 @@ WITH source_meetings AS (
         SOURCE_SYSTEM,
         ROW_NUMBER() OVER (
             PARTITION BY MEETING_ID 
-            ORDER BY UPDATE_TIMESTAMP DESC
+            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
         ) as rn
-    FROM {{ source('silver', 'si_meetings') }}
+    FROM DB_POC_ZOOM_1.GOLD.SI_MEETINGS
     WHERE VALIDATION_STATUS = 'PASSED'
 ),
 
