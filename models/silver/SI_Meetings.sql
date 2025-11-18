@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_MEETINGS', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_MEETINGS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    materialized='table'
 ) }}
 
 -- SI_Meetings table transformation from Bronze to Silver
@@ -19,7 +17,7 @@ WITH bronze_meetings AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_MEETINGS') }}
+    FROM BRONZE.BZ_MEETINGS
 ),
 
 cleaned_meetings AS (
@@ -27,7 +25,7 @@ cleaned_meetings AS (
         MEETING_ID,
         HOST_ID,
         TRIM(MEETING_TOPIC) AS MEETING_TOPIC,
-        -- Handle EST timezone format conversion
+        /* Handle EST timezone format conversion */
         CASE 
             WHEN START_TIME::STRING LIKE '%EST%' THEN 
                 TRY_TO_TIMESTAMP(REGEXP_REPLACE(START_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS')
@@ -40,7 +38,7 @@ cleaned_meetings AS (
                     TRY_TO_TIMESTAMP(START_TIME::STRING)
                 )
         END AS START_TIME,
-        -- Handle EST timezone format conversion for END_TIME
+        /* Handle EST timezone format conversion for END_TIME */
         CASE 
             WHEN END_TIME::STRING LIKE '%EST%' THEN 
                 TRY_TO_TIMESTAMP(REGEXP_REPLACE(END_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS')
@@ -53,7 +51,7 @@ cleaned_meetings AS (
                     TRY_TO_TIMESTAMP(END_TIME::STRING)
                 )
         END AS END_TIME,
-        -- Critical P1 fix: Clean text units from numeric fields
+        /* Critical P1 fix: Clean text units from numeric fields */
         CASE 
             WHEN TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', '')) IS NOT NULL THEN
                 TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', ''))
@@ -71,7 +69,7 @@ validated_meetings AS (
         *,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
         DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
-        -- Calculate data quality score
+        /* Calculate data quality score */
         CASE 
             WHEN MEETING_ID IS NOT NULL 
                 AND HOST_ID IS NOT NULL 
@@ -86,7 +84,7 @@ validated_meetings AS (
             THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
-        -- Set validation status
+        /* Set validation status */
         CASE 
             WHEN MEETING_ID IS NOT NULL 
                 AND HOST_ID IS NOT NULL 
