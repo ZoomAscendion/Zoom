@@ -1,10 +1,10 @@
 {{ config(
     materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_USERS', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_USERS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_USERS', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_USERS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'"
 ) }}
 
-/* Silver layer transformation for Users table with comprehensive data quality checks */
+-- Silver layer transformation for Users table with comprehensive data quality checks
 WITH bronze_users AS (
     SELECT *
     FROM {{ source('bronze', 'BZ_USERS') }}
@@ -13,7 +13,7 @@ WITH bronze_users AS (
 data_quality_checks AS (
     SELECT 
         *,
-        /* Data quality score calculation */
+        -- Data quality score calculation
         (
             CASE WHEN USER_ID IS NOT NULL THEN 20 ELSE 0 END +
             CASE WHEN EMAIL IS NOT NULL AND REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$') THEN 20 ELSE 0 END +
@@ -22,7 +22,7 @@ data_quality_checks AS (
             CASE WHEN COMPANY IS NOT NULL THEN 20 ELSE 0 END
         ) AS data_quality_score,
         
-        /* Validation status */
+        -- Validation status
         CASE 
             WHEN USER_ID IS NULL OR EMAIL IS NULL OR NOT REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$') THEN 'FAILED'
             WHEN PLAN_TYPE NOT IN ('Free', 'Basic', 'Pro', 'Enterprise') THEN 'WARNING'
@@ -35,7 +35,7 @@ deduplication AS (
     SELECT *,
         ROW_NUMBER() OVER (
             PARTITION BY USER_ID 
-            ORDER BY UPDATE_TIMESTAMP DESC NULLS LAST, LOAD_TIMESTAMP DESC
+            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC, LOAD_TIMESTAMP DESC
         ) AS row_num
     FROM data_quality_checks
     WHERE USER_ID IS NOT NULL
@@ -52,7 +52,7 @@ final_transformation AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
-        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        COALESCE(DATE(UPDATE_TIMESTAMP), DATE(LOAD_TIMESTAMP)) AS UPDATE_DATE,
         data_quality_score AS DATA_QUALITY_SCORE,
         validation_status AS VALIDATION_STATUS
     FROM deduplication
