@@ -1,9 +1,11 @@
-name: 'zoom_silver_pipeline'
+name: 'zoom_gold_layer'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_silver_pipeline'
+# This setting configures which "profile" dbt uses for this project.
+profile: 'zoom_gold_layer'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -16,47 +18,36 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
-  zoom_silver_pipeline:
-    silver:
+  zoom_gold_layer:
+    # Config indicated by + and applies to all files under models/gold/
+    gold:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            AUDIT_ID, 
-            TABLE_NAME, 
-            OPERATION_TYPE, 
-            AUDIT_TIMESTAMP, 
-            PROCESSED_BY
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            '{{ this.name }}', 
-            'PIPELINE_START', 
-            CURRENT_TIMESTAMP(), 
-            'DBT_SILVER_PIPELINE'
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            AUDIT_ID, 
-            TABLE_NAME, 
-            OPERATION_TYPE, 
-            AUDIT_TIMESTAMP, 
-            PROCESSED_BY
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            '{{ this.name }}', 
-            'PIPELINE_END', 
-            CURRENT_TIMESTAMP(), 
-            'DBT_SILVER_PIPELINE'
-        {% endif %}
+      +tags: ["gold"]
+      dimensional:
+        +materialized: table
+        +tags: ["dimension", "gold"]
+      fact:
+        +materialized: table
+        +tags: ["fact", "gold"]
 
+# Global configurations
 vars:
-  # Data quality thresholds
-  dq_score_threshold: 70
-  # Audit settings
-  enable_audit_logging: true
-  # Error handling
-  skip_failed_records: true
+  # The `start_date` variable will be accessible in all resources
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
+
+# Hooks that run before and after dbt operations
+on-run-start:
+  - "{{ log('Starting dbt run for Gold Layer transformation', info=True) }}"
+  
+on-run-end:
+  - "{{ log('Completed dbt run for Gold Layer transformation', info=True) }}"
+
+# Snapshot configurations
+snapshots:
+  zoom_gold_layer:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: updated_at
