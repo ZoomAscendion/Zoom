@@ -1,7 +1,7 @@
 -- Bronze Layer Participants Table
 -- Description: Tracks meeting participants and their session details
 -- Author: Data Engineering Team
--- Created: {{ run started_at }}
+-- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
