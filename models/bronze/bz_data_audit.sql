@@ -13,7 +13,7 @@ SELECT
     ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP()) AS RECORD_ID,
     
     -- Name of the Bronze layer table
-    CAST(NULL AS VARCHAR(255)) AS SOURCE_TABLE,
+    CAST('INITIAL_SETUP' AS VARCHAR(255)) AS SOURCE_TABLE,
     
     -- When the operation occurred
     CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
