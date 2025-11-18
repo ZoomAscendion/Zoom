@@ -1,75 +1,92 @@
 {{ config(
     materialized='table',
-    tags=['dimension', 'gold']
+    pre_hook="INSERT INTO {{ ref('go_process_audit') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) VALUES (UUID_STRING(), 'GO_DIM_USER_LOAD', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), 'STARTED', 'SI_USERS', 'GO_DIM_USER', 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
+    post_hook="INSERT INTO {{ ref('go_process_audit') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_END_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, RECORDS_PROCESSED, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) VALUES (UUID_STRING(), 'GO_DIM_USER_LOAD', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 'COMPLETED', 'SI_USERS', 'GO_DIM_USER', (SELECT COUNT(*) FROM {{ this }}), 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE')"
 ) }}
 
--- User Dimension Transformation
+-- User Dimension Table
 -- Transforms Silver layer user data into Gold dimension with enhanced attributes
 
 WITH source_users AS (
-    SELECT 
-        USER_ID,
-        USER_NAME,
-        EMAIL,
-        COMPANY,
-        PLAN_TYPE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM,
-        LOAD_DATE,
-        UPDATE_DATE,
-        DATA_QUALITY_SCORE,
-        VALIDATION_STATUS,
-        ROW_NUMBER() OVER (
-            PARTITION BY USER_ID 
-            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
-        ) as rn
-    FROM DB_POC_ZOOM_1.GOLD.SI_USERS
+    SELECT *
+    FROM {{ source('silver', 'si_users') }}
     WHERE VALIDATION_STATUS = 'PASSED'
 ),
 
-transformed_users AS (
+user_transformations AS (
     SELECT 
-        MD5(USER_ID) as USER_KEY,
+        MD5(USER_ID) AS USER_KEY,
+        ROW_NUMBER() OVER (ORDER BY USER_ID) AS USER_DIM_ID,
         USER_ID,
-        INITCAP(TRIM(COALESCE(USER_NAME, 'Unknown'))) as USER_NAME,
+        INITCAP(TRIM(USER_NAME)) AS USER_NAME,
         CASE 
-            WHEN EMAIL IS NOT NULL AND POSITION('@' IN EMAIL) > 0 
+            WHEN EMAIL IS NOT NULL AND POSITION('@' IN EMAIL) > 0
             THEN UPPER(SUBSTRING(EMAIL, POSITION('@' IN EMAIL) + 1))
-            ELSE 'unknown.com'
-        END as EMAIL_DOMAIN,
-        INITCAP(TRIM(COALESCE(COMPANY, 'Unknown'))) as COMPANY,
+            ELSE 'UNKNOWN_DOMAIN'
+        END AS EMAIL_DOMAIN,
+        INITCAP(TRIM(COALESCE(COMPANY, 'Unknown Company'))) AS COMPANY,
         CASE 
             WHEN UPPER(PLAN_TYPE) IN ('FREE', 'BASIC') THEN 'Basic'
             WHEN UPPER(PLAN_TYPE) IN ('PRO', 'PROFESSIONAL') THEN 'Pro'
             WHEN UPPER(PLAN_TYPE) IN ('BUSINESS', 'ENTERPRISE') THEN 'Enterprise'
             ELSE 'Unknown'
-        END as PLAN_TYPE,
+        END AS PLAN_TYPE,
         CASE 
             WHEN UPPER(PLAN_TYPE) = 'FREE' THEN 'Free'
             ELSE 'Paid'
-        END as PLAN_CATEGORY,
-        COALESCE(LOAD_DATE, CURRENT_DATE()) as REGISTRATION_DATE,
+        END AS PLAN_CATEGORY,
+        COALESCE(LOAD_DATE, CURRENT_DATE()) AS REGISTRATION_DATE,
         CASE 
             WHEN VALIDATION_STATUS = 'PASSED' THEN 'Active'
             ELSE 'Inactive'
-        END as USER_STATUS,
-        'Unknown' as GEOGRAPHIC_REGION,
-        'Unknown' as INDUSTRY_SECTOR,
-        'Standard User' as USER_ROLE,
+        END AS USER_STATUS,
+        'Unknown' AS GEOGRAPHIC_REGION,
+        'Unknown' AS INDUSTRY_SECTOR,
+        'Unknown' AS USER_ROLE,
         CASE 
             WHEN UPPER(PLAN_TYPE) = 'FREE' THEN 'Individual'
             ELSE 'Business'
-        END as ACCOUNT_TYPE,
-        'English' as LANGUAGE_PREFERENCE,
-        CURRENT_DATE() as EFFECTIVE_START_DATE,
-        '9999-12-31'::DATE as EFFECTIVE_END_DATE,
-        TRUE as IS_CURRENT_RECORD,
-        CURRENT_DATE() as LOAD_DATE,
-        CURRENT_DATE() as UPDATE_DATE,
+        END AS ACCOUNT_TYPE,
+        'English' AS LANGUAGE_PREFERENCE,
+        CURRENT_DATE() AS EFFECTIVE_START_DATE,
+        '9999-12-31'::DATE AS EFFECTIVE_END_DATE,
+        TRUE AS IS_CURRENT_RECORD,
+        CURRENT_DATE() AS LOAD_DATE,
+        CURRENT_DATE() AS UPDATE_DATE,
         SOURCE_SYSTEM
     FROM source_users
-    WHERE rn = 1
+),
+
+deduped_users AS (
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY USER_ID, EMAIL_DOMAIN, COMPANY, PLAN_TYPE 
+            ORDER BY REGISTRATION_DATE DESC
+        ) AS rn
+    FROM user_transformations
 )
 
-SELECT * FROM transformed_users
+SELECT 
+    USER_KEY,
+    USER_DIM_ID,
+    USER_ID,
+    USER_NAME,
+    EMAIL_DOMAIN,
+    COMPANY,
+    PLAN_TYPE,
+    PLAN_CATEGORY,
+    REGISTRATION_DATE,
+    USER_STATUS,
+    GEOGRAPHIC_REGION,
+    INDUSTRY_SECTOR,
+    USER_ROLE,
+    ACCOUNT_TYPE,
+    LANGUAGE_PREFERENCE,
+    EFFECTIVE_START_DATE,
+    EFFECTIVE_END_DATE,
+    IS_CURRENT_RECORD,
+    LOAD_DATE,
+    UPDATE_DATE,
+    SOURCE_SYSTEM
+FROM deduped_users
+WHERE rn = 1
