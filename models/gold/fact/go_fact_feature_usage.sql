@@ -1,79 +1,114 @@
 {{ config(
     materialized='table',
-    tags=['fact', 'gold']
+    pre_hook="INSERT INTO {{ ref('go_process_audit') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) VALUES (UUID_STRING(), 'GO_FACT_FEATURE_USAGE_LOAD', 'FACT_LOAD', CURRENT_TIMESTAMP(), 'STARTED', 'SI_FEATURE_USAGE,SI_MEETINGS', 'GO_FACT_FEATURE_USAGE', 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
+    post_hook="INSERT INTO {{ ref('go_process_audit') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_END_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, RECORDS_PROCESSED, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) VALUES (UUID_STRING(), 'GO_FACT_FEATURE_USAGE_LOAD', 'FACT_LOAD', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 'COMPLETED', 'SI_FEATURE_USAGE,SI_MEETINGS', 'GO_FACT_FEATURE_USAGE', (SELECT COUNT(*) FROM {{ this }}), 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE')"
 ) }}
 
 -- Feature Usage Fact Table
 -- Captures detailed feature usage metrics and patterns
 
-WITH usage_base AS (
+WITH source_features AS (
+    SELECT *
+    FROM {{ source('silver', 'si_feature_usage') }}
+    WHERE VALIDATION_STATUS = 'PASSED'
+),
+
+source_meetings AS (
+    SELECT *
+    FROM {{ source('silver', 'si_meetings') }}
+    WHERE VALIDATION_STATUS = 'PASSED'
+),
+
+unique_features AS (
+    SELECT DISTINCT 
+        FEATURE_NAME, 
+        FEATURE_KEY,
+        ROW_NUMBER() OVER (PARTITION BY FEATURE_NAME ORDER BY UPDATE_DATE DESC) AS rn
+    FROM {{ ref('go_dim_feature') }}
+),
+
+unique_users AS (
+    SELECT DISTINCT 
+        USER_ID, 
+        USER_KEY,
+        ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY UPDATE_DATE DESC) AS rn
+    FROM {{ ref('go_dim_user') }}
+    WHERE IS_CURRENT_RECORD = TRUE
+),
+
+unique_meetings AS (
+    SELECT DISTINCT 
+        MEETING_KEY,
+        ROW_NUMBER() OVER (PARTITION BY MEETING_KEY ORDER BY UPDATE_DATE DESC) AS rn
+    FROM {{ ref('go_dim_meeting') }}
+),
+
+feature_usage_transformations AS (
     SELECT 
-        fu.USAGE_ID,
-        fu.MEETING_ID,
+        ROW_NUMBER() OVER (ORDER BY fu.USAGE_ID) AS FEATURE_USAGE_ID,
+        -- Foreign Key Columns for BI Integration
+        dd.DATE_KEY,
+        COALESCE(df.FEATURE_KEY, 'UNKNOWN_FEATURE') AS FEATURE_KEY,
+        COALESCE(du.USER_KEY, 'UNKNOWN_USER') AS USER_KEY,
+        COALESCE(dm.MEETING_KEY, fu.MEETING_ID) AS MEETING_KEY,
+        -- Fact Measures
+        fu.USAGE_DATE,
+        fu.USAGE_DATE::TIMESTAMP_NTZ AS USAGE_TIMESTAMP,
         fu.FEATURE_NAME,
         fu.USAGE_COUNT,
-        fu.USAGE_DATE,
-        fu.SOURCE_SYSTEM,
-        ROW_NUMBER() OVER (
-            PARTITION BY fu.USAGE_ID 
-            ORDER BY COALESCE(fu.UPDATE_TIMESTAMP, fu.LOAD_TIMESTAMP) DESC
-        ) as rn
-    FROM DB_POC_ZOOM_1.GOLD.SI_FEATURE_USAGE fu
-    WHERE fu.VALIDATION_STATUS = 'PASSED'
-),
-
-meeting_context AS (
-    SELECT 
-        sm.MEETING_ID,
-        sm.HOST_ID,
-        sm.DURATION_MINUTES
-    FROM DB_POC_ZOOM_1.GOLD.SI_MEETINGS sm
-    WHERE sm.VALIDATION_STATUS = 'PASSED'
-),
-
-final_fact AS (
-    SELECT 
-        -- Foreign Key Columns for BI Integration
-        ub.USAGE_DATE as DATE_KEY,
-        COALESCE(df.FEATURE_KEY, 'UNKNOWN_FEATURE') as FEATURE_KEY,
-        COALESCE(du.USER_KEY, 'UNKNOWN_USER') as USER_KEY,
-        MD5(ub.MEETING_ID) as MEETING_KEY,
-        
-        -- Fact Measures
-        ub.USAGE_DATE,
-        ub.USAGE_DATE::TIMESTAMP_NTZ as USAGE_TIMESTAMP,
-        ub.FEATURE_NAME,
-        ub.USAGE_COUNT,
-        COALESCE(mc.DURATION_MINUTES, 0) as USAGE_DURATION_MINUTES,
-        COALESCE(mc.DURATION_MINUTES, 0) as SESSION_DURATION_MINUTES,
+        COALESCE(sm.DURATION_MINUTES, 30) AS USAGE_DURATION_MINUTES,
+        COALESCE(sm.DURATION_MINUTES, 30) AS SESSION_DURATION_MINUTES,
         CASE 
-            WHEN ub.USAGE_COUNT >= 10 THEN 5.0
-            WHEN ub.USAGE_COUNT >= 5 THEN 4.0
-            WHEN ub.USAGE_COUNT >= 3 THEN 3.0
-            WHEN ub.USAGE_COUNT >= 1 THEN 2.0
+            WHEN fu.USAGE_COUNT >= 10 THEN 5.0
+            WHEN fu.USAGE_COUNT >= 5 THEN 4.0
+            WHEN fu.USAGE_COUNT >= 3 THEN 3.0
+            WHEN fu.USAGE_COUNT >= 1 THEN 2.0
             ELSE 1.0
-        END as FEATURE_ADOPTION_SCORE,
-        8.5 as USER_EXPERIENCE_RATING,
-        9.0 as FEATURE_PERFORMANCE_SCORE,
-        1 as CONCURRENT_FEATURES_COUNT,
-        'Meeting' as USAGE_CONTEXT,
-        'Desktop' as DEVICE_TYPE,
-        'v5.0' as PLATFORM_VERSION,
-        0 as ERROR_COUNT,
+        END AS FEATURE_ADOPTION_SCORE,
+        8.5 AS USER_EXPERIENCE_RATING,
+        9.0 AS FEATURE_PERFORMANCE_SCORE,
+        1 AS CONCURRENT_FEATURES_COUNT,
+        'Meeting' AS USAGE_CONTEXT,
+        'Desktop' AS DEVICE_TYPE,
+        '5.12.0' AS PLATFORM_VERSION,
+        0 AS ERROR_COUNT,
         CASE 
-            WHEN ub.USAGE_COUNT > 0 THEN 100.0
+            WHEN fu.USAGE_COUNT > 0 THEN 100.0
             ELSE 0.0
-        END as SUCCESS_RATE,
-        
-        -- Metadata
-        CURRENT_DATE() as LOAD_DATE,
-        CURRENT_DATE() as UPDATE_DATE,
-        ub.SOURCE_SYSTEM
-    FROM usage_base ub
-    LEFT JOIN meeting_context mc ON ub.MEETING_ID = mc.MEETING_ID
-    LEFT JOIN {{ ref('go_dim_feature') }} df ON ub.FEATURE_NAME = df.FEATURE_NAME
-    LEFT JOIN {{ ref('go_dim_user') }} du ON mc.HOST_ID = du.USER_ID AND du.IS_CURRENT_RECORD = TRUE
-    WHERE ub.rn = 1
+        END AS SUCCESS_RATE,
+        CURRENT_DATE() AS LOAD_DATE,
+        CURRENT_DATE() AS UPDATE_DATE,
+        'SILVER_TO_GOLD_ETL' AS SOURCE_SYSTEM
+    FROM source_features fu
+    JOIN {{ ref('go_dim_date') }} dd ON fu.USAGE_DATE = dd.DATE_KEY
+    LEFT JOIN unique_features df ON fu.FEATURE_NAME = df.FEATURE_NAME AND df.rn = 1
+    LEFT JOIN source_meetings sm ON fu.MEETING_ID = sm.MEETING_ID
+    LEFT JOIN unique_users du ON sm.HOST_ID = du.USER_ID AND du.rn = 1
+    LEFT JOIN unique_meetings dm ON fu.MEETING_ID = dm.MEETING_KEY AND dm.rn = 1
 )
 
-SELECT * FROM final_fact
+SELECT 
+    FEATURE_USAGE_ID,
+    DATE_KEY,
+    FEATURE_KEY,
+    USER_KEY,
+    MEETING_KEY,
+    USAGE_DATE,
+    USAGE_TIMESTAMP,
+    FEATURE_NAME,
+    USAGE_COUNT,
+    USAGE_DURATION_MINUTES,
+    SESSION_DURATION_MINUTES,
+    FEATURE_ADOPTION_SCORE,
+    USER_EXPERIENCE_RATING,
+    FEATURE_PERFORMANCE_SCORE,
+    CONCURRENT_FEATURES_COUNT,
+    USAGE_CONTEXT,
+    DEVICE_TYPE,
+    PLATFORM_VERSION,
+    ERROR_COUNT,
+    SUCCESS_RATE,
+    LOAD_DATE,
+    UPDATE_DATE,
+    SOURCE_SYSTEM
+FROM feature_usage_transformations
