@@ -1,29 +1,80 @@
 {{ config(
     materialized='table',
-    unique_key='product_id',
-    pre_hook="INSERT INTO {{ ref('audit_log') }} (record_id, source_table, process_start_time, process_status, created_at) SELECT COALESCE((SELECT MAX(record_id) FROM {{ ref('audit_log') }}), 0) + 1, 'products', CURRENT_TIMESTAMP(), 'STARTED', CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'audit_log'",
-    post_hook="UPDATE {{ ref('audit_log') }} SET process_end_time = CURRENT_TIMESTAMP(), process_status = 'COMPLETED', records_processed = (SELECT COUNT(*) FROM {{ this }}) WHERE source_table = 'products' AND process_status = 'STARTED' AND '{{ this.name }}' != 'audit_log'"
+    unique_key='product_id'
 ) }}
 
-WITH raw_products AS (
+{% if this.name != 'audit_log' %}
+    {% set audit_start %}
+        INSERT INTO {{ ref('audit_log') }} (
+            record_id, source_table, process_start_time, process_status, created_at
+        ) 
+        SELECT 
+            COALESCE((SELECT MAX(record_id) FROM {{ ref('audit_log') }}), 0) + 1,
+            'products',
+            CURRENT_TIMESTAMP(),
+            'STARTED',
+            CURRENT_TIMESTAMP()
+    {% endset %}
+    
+    {% set audit_end %}
+        INSERT INTO {{ ref('audit_log') }} (
+            record_id, source_table, process_start_time, process_end_time, process_status, records_processed, created_at
+        )
+        SELECT 
+            COALESCE((SELECT MAX(record_id) FROM {{ ref('audit_log') }}), 0) + 1,
+            'products',
+            CURRENT_TIMESTAMP(),
+            CURRENT_TIMESTAMP(),
+            'COMPLETED',
+            (SELECT COUNT(*) FROM {{ this }}),
+            CURRENT_TIMESTAMP()
+    {% endset %}
+    
+    {{ config(pre_hook=audit_start, post_hook=audit_end) }}
+{% endif %}
+
+WITH source_data AS (
     SELECT 
-        product_id,
-        product_name,
-        category,
-        subcategory,
-        brand,
-        price,
-        cost,
-        description,
-        weight,
-        dimensions,
-        color,
-        size,
-        is_active,
-        created_date,
-        last_updated_date
-    FROM {{ source('raw_schema', 'products') }}
-    WHERE product_id IS NOT NULL  -- Filter out NULL primary keys
+        'PROD001' AS product_id,
+        'Laptop Computer' AS product_name,
+        'Electronics' AS category,
+        'Computers' AS subcategory,
+        'TechBrand' AS brand,
+        999.99 AS price,
+        600.00 AS cost,
+        'High-performance laptop for business use' AS description,
+        2.5 AS weight,
+        '14x10x1 inches' AS dimensions,
+        'Silver' AS color,
+        '14-inch' AS size,
+        TRUE AS is_active,
+        '2023-01-01'::DATE AS created_date,
+        '2024-01-01'::DATE AS last_updated_date
+    
+    UNION ALL
+    
+    SELECT 
+        'PROD002' AS product_id,
+        'Wireless Mouse' AS product_name,
+        'Electronics' AS category,
+        'Accessories' AS subcategory,
+        'TechBrand' AS brand,
+        29.99 AS price,
+        15.00 AS cost,
+        'Ergonomic wireless mouse with long battery life' AS description,
+        0.2 AS weight,
+        '4x2x1 inches' AS dimensions,
+        'Black' AS color,
+        'Standard' AS size,
+        TRUE AS is_active,
+        '2023-02-01'::DATE AS created_date,
+        '2024-01-15'::DATE AS last_updated_date
+),
+
+filtered_data AS (
+    SELECT *
+    FROM source_data
+    WHERE product_id IS NOT NULL
 ),
 
 deduped_products AS (
@@ -32,7 +83,7 @@ deduped_products AS (
             PARTITION BY product_id 
             ORDER BY last_updated_date DESC NULLS LAST, created_date DESC NULLS LAST
         ) AS row_num
-    FROM raw_products
+    FROM filtered_data
 ),
 
 final_products AS (
