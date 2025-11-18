@@ -1,0 +1,88 @@
+{{ config(
+    materialized='table',
+    alias='SI_PARTICIPANTS'
+) }}
+
+WITH bronze_participants AS (
+    SELECT 
+        PARTICIPANT_ID,
+        MEETING_ID,
+        USER_ID,
+        JOIN_TIME,
+        LEAVE_TIME,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_PARTICIPANTS') }}
+    WHERE PARTICIPANT_ID IS NOT NULL
+),
+
+cleaned_participants AS (
+    SELECT 
+        PARTICIPANT_ID,
+        MEETING_ID,
+        USER_ID,
+        /* MM/DD/YYYY HH:MM Format Handling */
+        COALESCE(
+            TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(JOIN_TIME::STRING)
+        ) AS JOIN_TIME,
+        COALESCE(
+            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING)
+        ) AS LEAVE_TIME,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        ROW_NUMBER() OVER (PARTITION BY PARTICIPANT_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM bronze_participants
+),
+
+validated_participants AS (
+    SELECT 
+        p.PARTICIPANT_ID,
+        p.MEETING_ID,
+        p.USER_ID,
+        p.JOIN_TIME,
+        p.LEAVE_TIME,
+        p.LOAD_TIMESTAMP,
+        p.UPDATE_TIMESTAMP,
+        p.SOURCE_SYSTEM,
+        DATE(p.LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(p.UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        CASE 
+            WHEN p.JOIN_TIME IS NOT NULL AND p.LEAVE_TIME IS NOT NULL AND p.LEAVE_TIME > p.JOIN_TIME THEN 100
+            WHEN p.JOIN_TIME IS NOT NULL AND p.LEAVE_TIME IS NOT NULL THEN 85
+            WHEN p.JOIN_TIME IS NOT NULL THEN 70
+            ELSE 50
+        END AS DATA_QUALITY_SCORE,
+        CASE 
+            WHEN p.JOIN_TIME IS NOT NULL AND p.LEAVE_TIME IS NOT NULL AND p.LEAVE_TIME > p.JOIN_TIME THEN 'PASSED'
+            WHEN p.JOIN_TIME IS NOT NULL THEN 'WARNING'
+            ELSE 'FAILED'
+        END AS VALIDATION_STATUS
+    FROM cleaned_participants p
+    WHERE p.rn = 1
+    AND p.JOIN_TIME IS NOT NULL
+    AND p.LEAVE_TIME IS NOT NULL
+    AND p.LEAVE_TIME > p.JOIN_TIME
+)
+
+SELECT 
+    PARTICIPANT_ID,
+    MEETING_ID,
+    USER_ID,
+    JOIN_TIME,
+    LEAVE_TIME,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    LOAD_DATE,
+    UPDATE_DATE,
+    DATA_QUALITY_SCORE,
+    VALIDATION_STATUS
+FROM validated_participants
