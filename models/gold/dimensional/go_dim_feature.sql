@@ -12,9 +12,9 @@ WITH source_features AS (
         SOURCE_SYSTEM,
         ROW_NUMBER() OVER (
             PARTITION BY UPPER(TRIM(FEATURE_NAME)) 
-            ORDER BY UPDATE_TIMESTAMP DESC
+            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
         ) as rn
-    FROM {{ source('silver', 'si_feature_usage') }}
+    FROM DB_POC_ZOOM_1.GOLD.SI_FEATURE_USAGE
     WHERE VALIDATION_STATUS = 'PASSED'
       AND FEATURE_NAME IS NOT NULL
 ),
