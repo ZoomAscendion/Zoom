@@ -1,0 +1,150 @@
+version: 2
+
+models:
+  - name: go_process_audit
+    description: "Audit table for Gold layer process tracking"
+    columns:
+      - name: audit_log_id
+        description: "Unique identifier for audit log entry"
+      - name: process_name
+        description: "Name of the process being audited"
+      - name: execution_status
+        description: "Status of process execution"
+      - name: load_date
+        description: "Date when record was loaded"
+
+  - name: go_dim_date
+    description: "Date dimension for time-based analysis"
+    columns:
+      - name: date_id
+        description: "Unique identifier for date dimension"
+      - name: date_value
+        description: "Actual date value"
+      - name: year
+        description: "Year component"
+      - name: month
+        description: "Month component"
+      - name: day_name
+        description: "Name of the day"
+
+  - name: go_dim_user
+    description: "User dimension with enhanced attributes"
+    columns:
+      - name: user_dim_id
+        description: "Unique identifier for user dimension"
+      - name: user_id
+        description: "Business key for user"
+      - name: user_name
+        description: "Display name of user"
+      - name: plan_type
+        description: "Subscription plan type"
+      - name: is_current_record
+        description: "Flag indicating current record for SCD Type 2"
+
+  - name: go_dim_feature
+    description: "Feature dimension with categorization"
+    columns:
+      - name: feature_id
+        description: "Unique identifier for feature dimension"
+      - name: feature_name
+        description: "Name of the feature"
+      - name: feature_category
+        description: "Category classification of feature"
+      - name: is_premium_feature
+        description: "Flag indicating if feature is premium"
+
+  - name: go_dim_license
+    description: "License dimension with enhanced attributes"
+    columns:
+      - name: license_id
+        description: "Unique identifier for license dimension"
+      - name: license_type
+        description: "Type of license"
+      - name: license_category
+        description: "Category classification of license"
+      - name: monthly_price
+        description: "Monthly pricing for license"
+
+  - name: go_dim_meeting_type
+    description: "Meeting type dimension with categorization"
+    columns:
+      - name: meeting_type_id
+        description: "Unique identifier for meeting type dimension"
+      - name: meeting_category
+        description: "Category classification of meeting"
+      - name: duration_category
+        description: "Duration-based categorization"
+
+  - name: go_dim_support_category
+    description: "Support category dimension with SLA information"
+    columns:
+      - name: support_category_id
+        description: "Unique identifier for support category dimension"
+      - name: support_category
+        description: "Support ticket category"
+      - name: priority_level
+        description: "Priority level for support tickets"
+      - name: sla_target_hours
+        description: "SLA target in hours"
+
+  - name: go_fact_meeting_activity
+    description: "Meeting activity fact table with comprehensive metrics"
+    columns:
+      - name: meeting_activity_id
+        description: "Unique identifier for meeting activity fact"
+      - name: date_id
+        description: "Foreign key to date dimension"
+      - name: user_dim_id
+        description: "Foreign key to user dimension (host)"
+      - name: duration_minutes
+        description: "Meeting duration in minutes"
+      - name: participant_count
+        description: "Number of participants in meeting"
+      - name: meeting_quality_score
+        description: "Calculated meeting quality score"
+
+  - name: go_fact_feature_usage
+    description: "Feature usage fact table with adoption metrics"
+    columns:
+      - name: feature_usage_id
+        description: "Unique identifier for feature usage fact"
+      - name: date_id
+        description: "Foreign key to date dimension"
+      - name: feature_id
+        description: "Foreign key to feature dimension"
+      - name: usage_count
+        description: "Number of times feature was used"
+      - name: feature_adoption_score
+        description: "Calculated feature adoption score"
+
+  - name: go_fact_revenue_events
+    description: "Revenue events fact table with financial metrics"
+    columns:
+      - name: revenue_event_id
+        description: "Unique identifier for revenue event fact"
+      - name: date_id
+        description: "Foreign key to date dimension"
+      - name: user_dim_id
+        description: "Foreign key to user dimension"
+      - name: gross_amount
+        description: "Gross revenue amount"
+      - name: net_amount
+        description: "Net revenue amount after adjustments"
+      - name: mrr_impact
+        description: "Monthly recurring revenue impact"
+
+  - name: go_fact_support_metrics
+    description: "Support metrics fact table with performance tracking"
+    columns:
+      - name: support_metrics_id
+        description: "Unique identifier for support metrics fact"
+      - name: date_id
+        description: "Foreign key to date dimension"
+      - name: support_category_id
+        description: "Foreign key to support category dimension"
+      - name: resolution_time_hours
+        description: "Time taken to resolve ticket in hours"
+      - name: sla_met
+        description: "Flag indicating if SLA was met"
+      - name: customer_satisfaction_score
+        description: "Customer satisfaction rating"
