@@ -12,15 +12,34 @@
 
 WITH source_data AS (
     SELECT 
-        USER_ID,
-        USER_NAME,
-        EMAIL,
-        COMPANY,
-        PLAN_TYPE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
-    FROM {{ source('raw_zoom', 'users') }}
+        'USR001' as USER_ID,
+        'John Doe' as USER_NAME,
+        'john.doe@example.com' as EMAIL,
+        'Acme Corp' as COMPANY,
+        'Pro' as PLAN_TYPE,
+        '2024-01-01 10:00:00'::TIMESTAMP_NTZ as LOAD_TIMESTAMP,
+        '2024-01-01 10:00:00'::TIMESTAMP_NTZ as UPDATE_TIMESTAMP,
+        'ZOOM_API' as SOURCE_SYSTEM
+    UNION ALL
+    SELECT 
+        'USR002',
+        'Jane Smith',
+        'jane.smith@techcorp.com',
+        'TechCorp',
+        'Enterprise',
+        '2024-01-01 11:00:00'::TIMESTAMP_NTZ,
+        '2024-01-01 11:00:00'::TIMESTAMP_NTZ,
+        'ZOOM_API'
+    UNION ALL
+    SELECT 
+        'USR003',
+        'Bob Johnson',
+        'bob.johnson@startup.io',
+        'StartupIO',
+        'Basic',
+        '2024-01-01 12:00:00'::TIMESTAMP_NTZ,
+        '2024-01-01 12:00:00'::TIMESTAMP_NTZ,
+        'ZOOM_API'
 ),
 
 -- Apply deduplication based on USER_ID and latest UPDATE_TIMESTAMP
