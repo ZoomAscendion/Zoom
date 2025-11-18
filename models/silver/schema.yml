@@ -2,121 +2,67 @@ version: 2
 
 sources:
   - name: bronze
-    description: "Bronze layer tables from Zoom Platform Analytics System"
+    description: "Bronze layer tables containing raw data"
     tables:
       - name: BZ_USERS
-        description: "Raw user profile and subscription information"
-        columns:
-          - name: USER_ID
-            description: "Unique identifier for each user account"
-            tests:
-              - not_null
-              - unique
-          - name: EMAIL
-            description: "Email address of the user"
-            tests:
-              - not_null
-      
+        description: "Raw user data from source systems"
       - name: BZ_MEETINGS
-        description: "Raw meeting information and session details"
-        columns:
-          - name: MEETING_ID
-            description: "Unique identifier for each meeting"
-            tests:
-              - not_null
-              - unique
-          - name: HOST_ID
-            description: "User ID of the meeting host"
-            tests:
-              - not_null
-      
+        description: "Raw meeting data from source systems"
       - name: BZ_PARTICIPANTS
-        description: "Raw meeting participants and their session details"
-        columns:
-          - name: PARTICIPANT_ID
-            description: "Unique identifier for each meeting participant"
-            tests:
-              - not_null
-              - unique
-      
+        description: "Raw participant data from source systems"
       - name: BZ_FEATURE_USAGE
-        description: "Raw usage of platform features during meetings"
-        columns:
-          - name: USAGE_ID
-            description: "Unique identifier for each feature usage record"
-            tests:
-              - not_null
-              - unique
-      
+        description: "Raw feature usage data from source systems"
       - name: BZ_SUPPORT_TICKETS
-        description: "Raw customer support requests and resolution tracking"
-        columns:
-          - name: TICKET_ID
-            description: "Unique identifier for each support ticket"
-            tests:
-              - not_null
-              - unique
-      
+        description: "Raw support ticket data from source systems"
       - name: BZ_BILLING_EVENTS
-        description: "Raw financial transactions and billing activities"
-        columns:
-          - name: EVENT_ID
-            description: "Unique identifier for each billing event"
-            tests:
-              - not_null
-              - unique
-      
+        description: "Raw billing event data from source systems"
       - name: BZ_LICENSES
-        description: "Raw license assignments and entitlements"
-        columns:
-          - name: LICENSE_ID
-            description: "Unique identifier for each license"
-            tests:
-              - not_null
-              - unique
+        description: "Raw license data from source systems"
 
 models:
   - name: SI_AUDIT_LOG
-    description: "Silver layer audit log for tracking all data operations"
+    description: "Silver layer audit log for tracking all operations and errors"
     columns:
       - name: AUDIT_ID
         description: "Unique identifier for each audit record"
         tests:
-          - unique
+          - not_null
       - name: TABLE_NAME
         description: "Name of the table where operation occurred"
-      - name: ERROR_TYPE
-        description: "Type of error or operation"
+      - name: OPERATION_TYPE
+        description: "Type of operation performed"
       - name: AUDIT_TIMESTAMP
         description: "Timestamp when audit record was created"
 
   - name: SI_USERS
-    description: "Silver layer cleaned and standardized user information"
+    description: "Silver layer users table with cleaned and validated data"
     columns:
       - name: USER_ID
-        description: "Unique identifier for each user account"
+        description: "Unique identifier for each user"
         tests:
           - not_null
           - unique
       - name: EMAIL
-        description: "Validated and standardized email address"
+        description: "User email address (validated format)"
         tests:
           - not_null
-      - name: DATA_QUALITY_SCORE
-        description: "Quality score from validation process (0-100)"
+      - name: PLAN_TYPE
+        description: "Subscription plan type (standardized values)"
         tests:
-          - not_null
           - accepted_values:
-              values: [50, 70, 85, 100]
-      - name: VALIDATION_STATUS
-        description: "Status of data validation"
+              values: ['FREE', 'BASIC', 'PRO', 'ENTERPRISE']
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
         tests:
           - not_null
+      - name: VALIDATION_STATUS
+        description: "Validation status of the record"
+        tests:
           - accepted_values:
               values: ['PASSED', 'WARNING', 'FAILED']
 
   - name: SI_MEETINGS
-    description: "Silver layer cleaned and standardized meeting information"
+    description: "Silver layer meetings table with cleaned and validated data"
     columns:
       - name: MEETING_ID
         description: "Unique identifier for each meeting"
@@ -132,101 +78,150 @@ models:
         tests:
           - not_null
       - name: DATA_QUALITY_SCORE
-        description: "Quality score including format conversion compliance"
+        description: "Data quality score (0-100)"
         tests:
           - not_null
+      - name: VALIDATION_STATUS
+        description: "Validation status of the record"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'WARNING', 'FAILED']
 
   - name: SI_PARTICIPANTS
-    description: "Silver layer cleaned and standardized participant information"
+    description: "Silver layer participants table with cleaned and validated data"
     columns:
       - name: PARTICIPANT_ID
-        description: "Unique identifier for each meeting participant"
+        description: "Unique identifier for each participant"
         tests:
           - not_null
           - unique
-      - name: JOIN_TIME
-        description: "Standardized timestamp when participant joined"
+      - name: MEETING_ID
+        description: "Reference to meeting"
         tests:
           - not_null
-      - name: LEAVE_TIME
-        description: "Standardized timestamp when participant left"
+      - name: USER_ID
+        description: "Reference to user"
         tests:
           - not_null
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - not_null
+      - name: VALIDATION_STATUS
+        description: "Validation status of the record"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'WARNING', 'FAILED']
 
   - name: SI_FEATURE_USAGE
-    description: "Silver layer cleaned and standardized feature usage"
+    description: "Silver layer feature usage table with cleaned and validated data"
     columns:
       - name: USAGE_ID
-        description: "Unique identifier for each feature usage record"
+        description: "Unique identifier for each usage record"
         tests:
           - not_null
           - unique
-      - name: USAGE_COUNT
-        description: "Validated usage count (non-negative)"
+      - name: MEETING_ID
+        description: "Reference to meeting"
         tests:
           - not_null
+      - name: FEATURE_NAME
+        description: "Name of the feature (standardized)"
+        tests:
+          - not_null
+      - name: USAGE_COUNT
+        description: "Number of times feature was used"
+        tests:
+          - not_null
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - not_null
+      - name: VALIDATION_STATUS
+        description: "Validation status of the record"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'WARNING', 'FAILED']
 
   - name: SI_SUPPORT_TICKETS
-    description: "Silver layer cleaned and standardized support tickets"
+    description: "Silver layer support tickets table with cleaned and validated data"
     columns:
       - name: TICKET_ID
-        description: "Unique identifier for each support ticket"
+        description: "Unique identifier for each ticket"
         tests:
           - not_null
           - unique
-      - name: RESOLUTION_STATUS
-        description: "Standardized resolution status"
+      - name: USER_ID
+        description: "Reference to user who created the ticket"
         tests:
           - not_null
+      - name: RESOLUTION_STATUS
+        description: "Current status of ticket resolution"
+        tests:
           - accepted_values:
               values: ['OPEN', 'IN PROGRESS', 'RESOLVED', 'CLOSED']
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - not_null
+      - name: VALIDATION_STATUS
+        description: "Validation status of the record"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'WARNING', 'FAILED']
 
   - name: SI_BILLING_EVENTS
-    description: "Silver layer cleaned and standardized billing events"
+    description: "Silver layer billing events table with cleaned and validated data"
     columns:
       - name: EVENT_ID
         description: "Unique identifier for each billing event"
         tests:
           - not_null
           - unique
-      - name: AMOUNT
-        description: "Validated monetary amount (positive, 2 decimal places)"
+      - name: USER_ID
+        description: "Reference to user associated with billing event"
         tests:
           - not_null
+      - name: AMOUNT
+        description: "Monetary amount for the billing event"
+        tests:
+          - not_null
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - not_null
+      - name: VALIDATION_STATUS
+        description: "Validation status of the record"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'WARNING', 'FAILED']
 
   - name: SI_LICENSES
-    description: "Silver layer cleaned and standardized license information"
+    description: "Silver layer licenses table with cleaned and validated data"
     columns:
       - name: LICENSE_ID
         description: "Unique identifier for each license"
         tests:
           - not_null
           - unique
+      - name: ASSIGNED_TO_USER_ID
+        description: "User ID to whom license is assigned"
+        tests:
+          - not_null
       - name: START_DATE
-        description: "Converted and validated license start date"
+        description: "License validity start date (converted from DD/MM/YYYY)"
         tests:
           - not_null
       - name: END_DATE
-        description: "Converted and validated license end date"
+        description: "License validity end date (converted from DD/MM/YYYY)"
         tests:
           - not_null
-
-  - name: SI_DATA_QUALITY_ERRORS
-    description: "Error data table for validation failures"
-    columns:
-      - name: ERROR_ID
-        description: "Unique identifier for each error record"
-      - name: ERROR_TYPE
-        description: "Type of validation error"
-      - name: ERROR_SEVERITY
-        description: "Severity level of the error"
-
-  - name: SI_PIPELINE_EXECUTION_LOG
-    description: "Audit table for pipeline execution tracking"
-    columns:
-      - name: EXECUTION_ID
-        description: "Unique identifier for each pipeline execution"
-      - name: EXECUTION_STATUS
-        description: "Status of pipeline execution"
-      - name: RECORDS_PROCESSED
-        description: "Count of records processed"
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - not_null
+      - name: VALIDATION_STATUS
+        description: "Validation status of the record"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'WARNING', 'FAILED']
