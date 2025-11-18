@@ -7,7 +7,7 @@
 
 WITH source_meetings AS (
     SELECT 
-        COALESCE(MEETING_ID, 'UNKNOWN_MEETING') AS MEETING_ID,
+        COALESCE(MEETING_ID, 'UNKNOWN_MEETING_' || ROW_NUMBER() OVER (ORDER BY LOAD_TIMESTAMP)) AS MEETING_ID,
         START_TIME,
         COALESCE(DURATION_MINUTES, 0) AS DURATION_MINUTES,
         COALESCE(DATA_QUALITY_SCORE, 100) AS DATA_QUALITY_SCORE,
@@ -49,7 +49,7 @@ meeting_transformations AS (
             WHEN START_TIME IS NOT NULL AND DAYOFWEEK(START_TIME) IN (1, 7) THEN TRUE 
             ELSE FALSE 
         END AS IS_WEEKEND,
-        FALSE AS IS_RECURRING, -- To be enhanced with recurring meeting logic
+        FALSE AS IS_RECURRING,
         CASE 
             WHEN DATA_QUALITY_SCORE >= 90 THEN 9.0
             WHEN DATA_QUALITY_SCORE >= 80 THEN 8.0
@@ -62,15 +62,6 @@ meeting_transformations AS (
         CURRENT_DATE() AS UPDATE_DATE,
         SOURCE_SYSTEM
     FROM source_meetings
-),
-
-deduped_meetings AS (
-    SELECT *,
-        ROW_NUMBER() OVER (
-            PARTITION BY MEETING_KEY 
-            ORDER BY LOAD_DATE DESC
-        ) AS rn
-    FROM meeting_transformations
 )
 
 SELECT 
@@ -90,5 +81,4 @@ SELECT
     LOAD_DATE,
     UPDATE_DATE,
     SOURCE_SYSTEM
-FROM deduped_meetings
-WHERE rn = 1
+FROM meeting_transformations
