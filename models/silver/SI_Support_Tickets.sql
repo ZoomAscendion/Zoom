@@ -4,8 +4,8 @@
     post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY, ERROR_DESCRIPTION) SELECT UUID_STRING(), 'SI_SUPPORT_TICKETS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE', 'Completed SI_SUPPORT_TICKETS transformation with ' || (SELECT COUNT(*) FROM {{ this }}) || ' records' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
 ) }}
 
--- SI_SUPPORT_TICKETS: Silver layer transformation from Bronze BZ_SUPPORT_TICKETS
--- Description: Stores cleaned and standardized customer support requests and resolution tracking
+/* SI_SUPPORT_TICKETS: Silver layer transformation from Bronze BZ_SUPPORT_TICKETS */
+/* Description: Stores cleaned and standardized customer support requests and resolution tracking */
 
 WITH bronze_support_tickets AS (
     SELECT 
@@ -17,7 +17,7 @@ WITH bronze_support_tickets AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_SUPPORT_TICKETS') }}
+    FROM BRONZE.BZ_SUPPORT_TICKETS
     WHERE TICKET_ID IS NOT NULL
 ),
 
@@ -49,7 +49,7 @@ validated_support_tickets AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        -- Calculate data quality score
+        /* Calculate data quality score */
         CASE 
             WHEN TICKET_ID IS NOT NULL 
                 AND USER_ID IS NOT NULL 
@@ -62,7 +62,7 @@ validated_support_tickets AS (
             THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
-        -- Set validation status
+        /* Set validation status */
         CASE 
             WHEN TICKET_ID IS NOT NULL 
                 AND USER_ID IS NOT NULL 
