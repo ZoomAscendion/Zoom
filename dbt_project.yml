@@ -1,8 +1,8 @@
-name: 'zoom_bronze_pipeline'
+name: 'zoom_gold_analytics'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_bronze_pipeline'
+profile: 'zoom_gold_analytics'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -11,12 +11,13 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
 models:
-  zoom_bronze_pipeline:
-    bronze:
+  zoom_gold_analytics:
+    +materialized: table
+    gold:
       +materialized: table
-      +tags: ["bronze"]
