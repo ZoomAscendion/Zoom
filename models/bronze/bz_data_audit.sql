@@ -1,19 +1,19 @@
--- Bronze Layer Audit Table
--- Author: Data Engineering Team
--- Description: Comprehensive audit trail for all Bronze layer data operations
--- Version: 1.0
--- Created: {{ run_started_at }}
-
-{{ config(
+{{
+  config(
     materialized='table',
     tags=['bronze', 'audit']
-) }}
+  )
+}}
 
-SELECT
-    NULL::NUMBER as RECORD_ID,
-    NULL::VARCHAR(255) as SOURCE_TABLE,
-    NULL::TIMESTAMP_NTZ(9) as LOAD_TIMESTAMP,
-    NULL::VARCHAR(255) as PROCESSED_BY,
-    NULL::NUMBER(38,3) as PROCESSING_TIME,
-    NULL::VARCHAR(50) as STATUS
-WHERE 1=0  -- This creates the table structure without inserting any data
+-- Bronze Layer Audit Table
+-- This table tracks all data processing operations in the Bronze layer
+-- No pre-hook or post-hook for audit table to prevent circular dependencies
+
+SELECT 
+    CAST(NULL AS NUMBER) AS RECORD_ID,
+    CAST(NULL AS VARCHAR(255)) AS SOURCE_TABLE,
+    CAST(NULL AS TIMESTAMP_NTZ(9)) AS LOAD_TIMESTAMP,
+    CAST(NULL AS VARCHAR(255)) AS PROCESSED_BY,
+    CAST(NULL AS NUMBER(38,3)) AS PROCESSING_TIME,
+    CAST(NULL AS VARCHAR(50)) AS STATUS
+WHERE 1=0  -- Create empty table with proper structure
