@@ -1,10 +1,10 @@
 {{ config(
     materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_MEETINGS', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_MEETINGS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_MEETINGS', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_MEETINGS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'"
 ) }}
 
-/* Silver layer transformation for Meetings table with enhanced data quality checks */
+-- Silver layer transformation for Meetings table with enhanced data quality checks
 WITH bronze_meetings AS (
     SELECT *
     FROM {{ source('bronze', 'BZ_MEETINGS') }}
@@ -13,7 +13,7 @@ WITH bronze_meetings AS (
 timestamp_cleaning AS (
     SELECT 
         *,
-        /* Clean EST timezone from timestamps */
+        -- Clean EST timezone from timestamps
         CASE 
             WHEN START_TIME::STRING LIKE '%EST%' THEN 
                 TRY_TO_TIMESTAMP(REGEXP_REPLACE(START_TIME::STRING, '\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS')
@@ -26,7 +26,7 @@ timestamp_cleaning AS (
             ELSE END_TIME
         END AS cleaned_end_time,
         
-        /* Critical P1: Clean numeric field text units from DURATION_MINUTES */
+        -- Critical P1: Clean numeric field text units from DURATION_MINUTES
         CASE 
             WHEN TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', '')) IS NOT NULL THEN
                 TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', ''))
@@ -38,7 +38,7 @@ timestamp_cleaning AS (
 data_quality_checks AS (
     SELECT 
         *,
-        /* Validate meeting logic */
+        -- Validate meeting logic
         CASE 
             WHEN cleaned_end_time <= cleaned_start_time THEN 'INVALID_TIME_LOGIC'
             WHEN cleaned_duration_minutes < 0 OR cleaned_duration_minutes > 1440 THEN 'INVALID_DURATION_RANGE'
@@ -46,7 +46,7 @@ data_quality_checks AS (
             ELSE 'VALID'
         END AS time_validation,
         
-        /* Data quality score calculation */
+        -- Data quality score calculation
         (
             CASE WHEN MEETING_ID IS NOT NULL THEN 15 ELSE 0 END +
             CASE WHEN HOST_ID IS NOT NULL THEN 15 ELSE 0 END +
@@ -56,7 +56,7 @@ data_quality_checks AS (
             CASE WHEN cleaned_end_time > cleaned_start_time THEN 15 ELSE 0 END
         ) AS data_quality_score,
         
-        /* Validation status */
+        -- Validation status
         CASE 
             WHEN MEETING_ID IS NULL OR HOST_ID IS NULL OR cleaned_start_time IS NULL OR cleaned_end_time IS NULL THEN 'FAILED'
             WHEN cleaned_end_time <= cleaned_start_time OR cleaned_duration_minutes IS NULL THEN 'FAILED'
@@ -70,7 +70,7 @@ deduplication AS (
     SELECT *,
         ROW_NUMBER() OVER (
             PARTITION BY MEETING_ID 
-            ORDER BY UPDATE_TIMESTAMP DESC NULLS LAST, LOAD_TIMESTAMP DESC
+            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC, LOAD_TIMESTAMP DESC
         ) AS row_num
     FROM data_quality_checks
     WHERE MEETING_ID IS NOT NULL
@@ -88,7 +88,7 @@ final_transformation AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
-        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        COALESCE(DATE(UPDATE_TIMESTAMP), DATE(LOAD_TIMESTAMP)) AS UPDATE_DATE,
         data_quality_score AS DATA_QUALITY_SCORE,
         validation_status AS VALIDATION_STATUS
     FROM deduplication
