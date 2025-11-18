@@ -1,14 +1,12 @@
 {{ config(
-    materialized='table',
-    pre_hook="",
-    post_hook=""
+    materialized='table'
 ) }}
 
 -- Gold Layer Process Audit Table
 -- This table must be created first to support audit logging for all other models
 
 SELECT 
-    UUID_STRING() AS AUDIT_LOG_ID,
+    'AUDIT_' || REPLACE(UUID_STRING(), '-', '_') AS AUDIT_LOG_ID,
     'INITIAL_AUDIT_SETUP' AS PROCESS_NAME,
     'AUDIT_INITIALIZATION' AS PROCESS_TYPE,
     CURRENT_TIMESTAMP() AS EXECUTION_START_TIMESTAMP,
