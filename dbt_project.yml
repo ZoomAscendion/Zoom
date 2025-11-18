@@ -2,10 +2,8 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
 profile: 'user'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -18,96 +16,30 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
   zoom_silver_pipeline:
-    # Configuration for all models in this project
     +materialized: table
-    +on_schema_change: sync_all_columns
     
-    # Silver layer models configuration
     silver:
       +materialized: table
-      +on_schema_change: sync_all_columns
-      +pre-hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-          INSERT INTO {{ ref('SI_AUDIT_LOG') }} 
-          (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) 
-          SELECT REPLACE(UUID_STRING(), '-', ''), '{{ this.name }}', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-          INSERT INTO {{ ref('SI_AUDIT_LOG') }} 
-          (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) 
-          SELECT REPLACE(UUID_STRING(), '-', ''), '{{ this.name }}', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'
-        {% endif %}
-      
-      # Audit log should run first
       SI_AUDIT_LOG:
         +materialized: table
-        +on_schema_change: sync_all_columns
-        +pre-hook: []
-        +post-hook: []
-    
-    # Bronze layer models configuration  
-    bronze:
-      +materialized: table
-      +on_schema_change: sync_all_columns
-    
-    # Gold layer models configuration
-    gold:
-      +materialized: table
-      +on_schema_change: sync_all_columns
+      SI_USERS:
+        +materialized: table
+      SI_MEETINGS:
+        +materialized: table
+      SI_PARTICIPANTS:
+        +materialized: table
+      SI_FEATURE_USAGE:
+        +materialized: table
+      SI_SUPPORT_TICKETS:
+        +materialized: table
+      SI_BILLING_EVENTS:
+        +materialized: table
+      SI_LICENSES:
+        +materialized: table
 
-# Model execution order configuration
-model-execution-order:
-  - "SI_AUDIT_LOG"
-  - "SI_USERS"
-  - "SI_MEETINGS" 
-  - "SI_PARTICIPANTS"
-  - "SI_FEATURE_USAGE"
-  - "SI_SUPPORT_TICKETS"
-  - "SI_BILLING_EVENTS"
-  - "SI_LICENSES"
-
-# Vars for the project
 vars:
-  # Data quality thresholds
   dq_score_threshold: 70
-  max_null_percentage: 10
-  
-  # Date ranges for processing
   start_date: '2020-01-01'
   end_date: '2030-12-31'
-  
-  # Audit configuration
-  enable_audit_logging: true
-  audit_table_name: 'SI_AUDIT_LOG'
-  
-  # Error handling
-  fail_on_dq_errors: false
-  log_dq_errors: true
-
-# Snapshot configuration
-snapshots:
-  zoom_silver_pipeline:
-    +target_schema: snapshots
-    +strategy: timestamp
-    +updated_at: updated_timestamp
-
-# Seeds configuration
-seeds:
-  zoom_silver_pipeline:
-    +schema: seeds
-    +quote_columns: false
-
-# Tests configuration
-tests:
-  zoom_silver_pipeline:
-    +store_failures: true
-    +schema: test_failures
-
-# Documentation configuration
-docs:
-  zoom_silver_pipeline:
-    +node_color: "#4CAF50"
