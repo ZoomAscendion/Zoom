@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, LOAD_DATE, SOURCE_SYSTEM) VALUES ('{{ invocation_id }}_FACT_REVENUE', 'go_fact_revenue_events', 'SILVER.SI_BILLING_EVENTS', 'GOLD.GO_FACT_REVENUE_EVENTS', CURRENT_TIMESTAMP(), 'RUNNING', CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), UPDATE_DATE = CURRENT_DATE() WHERE AUDIT_LOG_ID = '{{ invocation_id }}_FACT_REVENUE' AND PROCESS_NAME = 'go_fact_revenue_events'"
+    materialized='table'
 ) }}
 
 -- Revenue events fact table transformation from Silver to Gold layer
@@ -14,8 +12,7 @@ WITH revenue_base AS (
         be.EVENT_DATE,
         be.SOURCE_SYSTEM
     FROM {{ source('silver', 'si_billing_events') }} be
-    WHERE COALESCE(be.VALIDATION_STATUS, 'PASSED') = 'PASSED'
-      AND be.EVENT_ID IS NOT NULL
+    WHERE be.EVENT_ID IS NOT NULL
 ),
 
 revenue_events_fact AS (
