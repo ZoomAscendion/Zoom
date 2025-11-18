@@ -19,7 +19,7 @@ WITH raw_users_filtered AS (
         load_timestamp,
         update_timestamp,
         source_system
-    FROM {{ source('raw_schema', 'users') }}
+    FROM {{ source('raw_layer', 'users') }}
     WHERE user_id IS NOT NULL  -- Filter out null primary keys
 ),
 
