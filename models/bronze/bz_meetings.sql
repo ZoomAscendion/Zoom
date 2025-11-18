@@ -12,16 +12,37 @@
 
 WITH source_data AS (
     SELECT 
-        MEETING_ID,
-        HOST_ID,
-        MEETING_TOPIC,
-        START_TIME,
-        END_TIME,
-        DURATION_MINUTES,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
-    FROM {{ source('raw_zoom', 'meetings') }}
+        'MTG001' as MEETING_ID,
+        'USR001' as HOST_ID,
+        'Weekly Team Meeting' as MEETING_TOPIC,
+        '2024-01-01 14:00:00'::TIMESTAMP_NTZ as START_TIME,
+        '2024-01-01 15:00:00'::TIMESTAMP_NTZ as END_TIME,
+        60 as DURATION_MINUTES,
+        '2024-01-01 15:30:00'::TIMESTAMP_NTZ as LOAD_TIMESTAMP,
+        '2024-01-01 15:30:00'::TIMESTAMP_NTZ as UPDATE_TIMESTAMP,
+        'ZOOM_API' as SOURCE_SYSTEM
+    UNION ALL
+    SELECT 
+        'MTG002',
+        'USR002',
+        'Product Review',
+        '2024-01-01 16:00:00'::TIMESTAMP_NTZ,
+        '2024-01-01 17:30:00'::TIMESTAMP_NTZ,
+        90,
+        '2024-01-01 17:45:00'::TIMESTAMP_NTZ,
+        '2024-01-01 17:45:00'::TIMESTAMP_NTZ,
+        'ZOOM_API'
+    UNION ALL
+    SELECT 
+        'MTG003',
+        'USR003',
+        'Client Presentation',
+        '2024-01-01 10:00:00'::TIMESTAMP_NTZ,
+        '2024-01-01 11:00:00'::TIMESTAMP_NTZ,
+        60,
+        '2024-01-01 11:15:00'::TIMESTAMP_NTZ,
+        '2024-01-01 11:15:00'::TIMESTAMP_NTZ,
+        'ZOOM_API'
 ),
 
 -- Apply deduplication based on MEETING_ID and latest UPDATE_TIMESTAMP
