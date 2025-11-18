@@ -25,15 +25,10 @@ models:
     gold:
       +materialized: table
       +database: DB_POC_ZOOM
-      +schema: GOLD
       dimensional:
         +materialized: table
-        +pre_hook: "{{ log('Starting dimensional model load', info=true) }}"
-        +post_hook: "{{ log('Completed dimensional model load', info=true) }}"
       fact:
         +materialized: table
-        +pre_hook: "{{ log('Starting fact model load', info=true) }}"
-        +post_hook: "{{ log('Completed fact model load', info=true) }}"
 
 # Global variables
 vars:
@@ -54,16 +49,13 @@ vars:
 seeds:
   zoom_gold_pipeline:
     +database: DB_POC_ZOOM
-    +schema: GOLD
 
 # Snapshots configuration
 snapshots:
   zoom_gold_pipeline:
     +database: DB_POC_ZOOM
-    +schema: GOLD
 
 # Tests configuration
 tests:
   +store_failures: true
   +database: DB_POC_ZOOM
-  +schema: GOLD
