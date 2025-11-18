@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: raw_schema
     description: "Raw data layer containing unprocessed data from source systems"
-    database: DB_POC_ZOOM
+    database: DB_POC_ZOOM_1
     schema: RAW
     tables:
       - name: users
@@ -11,10 +11,15 @@ sources:
         columns:
           - name: user_id
             description: "Unique identifier for each user account"
+            tests:
+              - not_null
+              - unique
           - name: user_name
             description: "Display name of the user (PII)"
           - name: email
             description: "Email address of the user (PII)"
+            tests:
+              - not_null
           - name: company
             description: "Company or organization name"
           - name: plan_type
@@ -31,8 +36,13 @@ sources:
         columns:
           - name: meeting_id
             description: "Unique identifier for each meeting"
+            tests:
+              - not_null
+              - unique
           - name: host_id
             description: "User ID of the meeting host"
+            tests:
+              - not_null
           - name: meeting_topic
             description: "Topic or title of the meeting"
           - name: start_time
@@ -53,6 +63,9 @@ sources:
         columns:
           - name: participant_id
             description: "Unique identifier for each meeting participant"
+            tests:
+              - not_null
+              - unique
           - name: meeting_id
             description: "Reference to meeting"
           - name: user_id
@@ -73,6 +86,9 @@ sources:
         columns:
           - name: usage_id
             description: "Unique identifier for each feature usage record"
+            tests:
+              - not_null
+              - unique
           - name: meeting_id
             description: "Reference to meeting where feature was used"
           - name: feature_name
@@ -93,6 +109,9 @@ sources:
         columns:
           - name: ticket_id
             description: "Unique identifier for each support ticket"
+            tests:
+              - not_null
+              - unique
           - name: user_id
             description: "Reference to user who created the ticket"
           - name: ticket_type
@@ -113,6 +132,9 @@ sources:
         columns:
           - name: event_id
             description: "Unique identifier for each billing event"
+            tests:
+              - not_null
+              - unique
           - name: user_id
             description: "Reference to user associated with billing event"
           - name: event_type
@@ -133,6 +155,9 @@ sources:
         columns:
           - name: license_id
             description: "Unique identifier for each license"
+            tests:
+              - not_null
+              - unique
           - name: license_type
             description: "Type of license"
           - name: assigned_to_user_id
