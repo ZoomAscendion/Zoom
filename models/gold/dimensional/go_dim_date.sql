@@ -24,7 +24,7 @@ date_attributes AS (
         DAYOFWEEK(date_value) as DAY_OF_WEEK,
         DAYNAME(date_value) as DAY_NAME,
         CASE WHEN DAYOFWEEK(date_value) IN (1, 7) THEN TRUE ELSE FALSE END as IS_WEEKEND,
-        FALSE as IS_HOLIDAY, -- To be enhanced with holiday logic
+        FALSE as IS_HOLIDAY,
         CASE 
             WHEN MONTH(date_value) >= 4 THEN YEAR(date_value)
             ELSE YEAR(date_value) - 1
