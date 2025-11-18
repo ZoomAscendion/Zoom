@@ -1,11 +1,9 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_MEETINGS', 'PROCESS_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_MEETINGS', 'PROCESS_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    materialized='table'
 ) }}
 
 /* Silver Layer Meetings Table Transformation */
-/* Includes critical P1 fixes for numeric field text unit cleaning and EST timezone handling */
+/* Includes critical P1 fixes for numeric field text unit cleaning and timestamp handling */
 
 WITH bronze_meetings AS (
     SELECT 
@@ -25,40 +23,22 @@ WITH bronze_meetings AS (
 timestamp_cleaning AS (
     SELECT 
         *,
-        /* Critical P1 Fix: EST timezone format handling */
-        CASE 
-            WHEN START_TIME::STRING LIKE '%EST%' THEN 
-                COALESCE(
-                    TRY_TO_TIMESTAMP(REGEXP_REPLACE(START_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
-                    TRY_TO_TIMESTAMP(REGEXP_REPLACE(START_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'DD/MM/YYYY HH24:MI'),
-                    TRY_TO_TIMESTAMP(REGEXP_REPLACE(START_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'MM/DD/YYYY HH24:MI'),
-                    TRY_TO_TIMESTAMP(START_TIME)
-                )
-            ELSE 
-                COALESCE(
-                    TRY_TO_TIMESTAMP(START_TIME, 'YYYY-MM-DD HH24:MI:SS'),
-                    TRY_TO_TIMESTAMP(START_TIME, 'DD/MM/YYYY HH24:MI'),
-                    TRY_TO_TIMESTAMP(START_TIME, 'MM/DD/YYYY HH24:MI'),
-                    TRY_TO_TIMESTAMP(START_TIME)
-                )
-        END AS CLEAN_START_TIME,
+        /* Critical P1 Fix: Multi-format timestamp handling */
+        COALESCE(
+            TRY_TO_TIMESTAMP(START_TIME, 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(START_TIME, 'DD/MM/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(START_TIME, 'MM/DD/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(REGEXP_REPLACE(START_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(START_TIME)
+        ) AS CLEAN_START_TIME,
         
-        CASE 
-            WHEN END_TIME::STRING LIKE '%EST%' THEN 
-                COALESCE(
-                    TRY_TO_TIMESTAMP(REGEXP_REPLACE(END_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
-                    TRY_TO_TIMESTAMP(REGEXP_REPLACE(END_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'DD/MM/YYYY HH24:MI'),
-                    TRY_TO_TIMESTAMP(REGEXP_REPLACE(END_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'MM/DD/YYYY HH24:MI'),
-                    TRY_TO_TIMESTAMP(END_TIME)
-                )
-            ELSE 
-                COALESCE(
-                    TRY_TO_TIMESTAMP(END_TIME, 'YYYY-MM-DD HH24:MI:SS'),
-                    TRY_TO_TIMESTAMP(END_TIME, 'DD/MM/YYYY HH24:MI'),
-                    TRY_TO_TIMESTAMP(END_TIME, 'MM/DD/YYYY HH24:MI'),
-                    TRY_TO_TIMESTAMP(END_TIME)
-                )
-        END AS CLEAN_END_TIME,
+        COALESCE(
+            TRY_TO_TIMESTAMP(END_TIME, 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(END_TIME, 'DD/MM/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(END_TIME, 'MM/DD/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(REGEXP_REPLACE(END_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(END_TIME)
+        ) AS CLEAN_END_TIME,
         
         /* Critical P1 Fix: Clean duration text units like "108 mins" */
         CASE 
@@ -72,13 +52,6 @@ timestamp_cleaning AS (
 data_quality_checks AS (
     SELECT 
         *,
-        /* Calculate duration from cleaned timestamps for validation */
-        CASE 
-            WHEN CLEAN_START_TIME IS NOT NULL AND CLEAN_END_TIME IS NOT NULL THEN
-                DATEDIFF('minute', CLEAN_START_TIME, CLEAN_END_TIME)
-            ELSE NULL
-        END AS CALCULATED_DURATION,
-        
         /* Data Quality Score Calculation */
         (
             CASE WHEN MEETING_ID IS NOT NULL THEN 15 ELSE 0 END +
@@ -101,7 +74,7 @@ data_quality_checks AS (
 
 deduplication AS (
     SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY MEETING_ID ORDER BY UPDATE_TIMESTAMP DESC NULLS LAST, LOAD_TIMESTAMP DESC) as rn
+        ROW_NUMBER() OVER (PARTITION BY MEETING_ID ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC, LOAD_TIMESTAMP DESC) as rn
     FROM data_quality_checks
 )
 
@@ -116,7 +89,7 @@ SELECT
     UPDATE_TIMESTAMP,
     SOURCE_SYSTEM,
     DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
-    DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+    COALESCE(DATE(UPDATE_TIMESTAMP), DATE(LOAD_TIMESTAMP)) AS UPDATE_DATE,
     DATA_QUALITY_SCORE,
     VALIDATION_STATUS
 FROM deduplication
