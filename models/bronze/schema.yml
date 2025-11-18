@@ -1,5 +1,6 @@
 version: 2
 
+# Source definitions for RAW schema
 sources:
   - name: raw
     description: "Raw data layer containing unprocessed data from various source systems"
@@ -25,7 +26,7 @@ sources:
             description: "Timestamp when the record was last updated"
           - name: source_system
             description: "Source system from which the data originated"
-            
+
       - name: meetings
         description: "Raw meeting information and session details"
         columns:
@@ -47,7 +48,7 @@ sources:
             description: "Timestamp when the record was last updated"
           - name: source_system
             description: "Source system from which the data originated"
-            
+
       - name: participants
         description: "Raw meeting participants and their session details"
         columns:
@@ -67,7 +68,7 @@ sources:
             description: "Timestamp when the record was last updated"
           - name: source_system
             description: "Source system from which the data originated"
-            
+
       - name: feature_usage
         description: "Raw usage of platform features during meetings"
         columns:
@@ -87,7 +88,7 @@ sources:
             description: "Timestamp when the record was last updated"
           - name: source_system
             description: "Source system from which the data originated"
-            
+
       - name: support_tickets
         description: "Raw customer support requests and resolution tracking"
         columns:
@@ -107,7 +108,7 @@ sources:
             description: "Timestamp when the record was last updated"
           - name: source_system
             description: "Source system from which the data originated"
-            
+
       - name: billing_events
         description: "Raw financial transactions and billing activities"
         columns:
@@ -116,7 +117,7 @@ sources:
           - name: user_id
             description: "Identifier linking to the user who generated the billing event"
           - name: event_type
-            description: "Type of billing event"
+            description: "Type of billing event (e.g., subscription, usage, refund)"
           - name: amount
             description: "Monetary amount associated with the billing event"
           - name: event_date
@@ -127,14 +128,14 @@ sources:
             description: "Timestamp when the record was last updated"
           - name: source_system
             description: "Source system from which the data originated"
-            
+
       - name: licenses
         description: "Raw license assignments and entitlements"
         columns:
           - name: license_id
             description: "Unique identifier for each license"
           - name: license_type
-            description: "Type of Zoom license"
+            description: "Type of Zoom license (Basic, Pro, Business, Enterprise)"
           - name: assigned_to_user_id
             description: "User ID to whom the license is assigned"
           - name: start_date
@@ -148,12 +149,16 @@ sources:
           - name: source_system
             description: "Source system from which the data originated"
 
+# Model definitions for Bronze schema
 models:
   - name: bz_data_audit
-    description: "Comprehensive audit trail for all Bronze layer data operations"
+    description: "Audit table for comprehensive tracking of all Bronze layer data operations"
     columns:
       - name: record_id
         description: "Auto-incrementing unique identifier for each audit record"
+        tests:
+          - not_null
+          - unique
       - name: source_table
         description: "Name of the Bronze layer table"
       - name: load_timestamp
@@ -164,9 +169,9 @@ models:
         description: "Time taken to process the operation in seconds"
       - name: status
         description: "Status of the operation (SUCCESS, FAILED, WARNING)"
-        
+
   - name: bz_users
-    description: "Bronze layer table storing user profile and subscription information"
+    description: "Bronze layer table storing cleaned and deduplicated user profile information"
     columns:
       - name: user_id
         description: "Unique identifier for each user account"
@@ -174,24 +179,22 @@ models:
           - not_null
           - unique
       - name: user_name
-        description: "Display name of the user"
+        description: "Display name of the user (PII)"
       - name: email
-        description: "Email address of the user"
-        tests:
-          - not_null
+        description: "Email address of the user (PII)"
       - name: company
-        description: "Company or organization the user belongs to"
+        description: "Company or organization name"
       - name: plan_type
-        description: "Type of Zoom plan the user is subscribed to"
+        description: "Subscription plan type (Basic, Pro, Business, Enterprise)"
       - name: load_timestamp
         description: "Timestamp when record was loaded into Bronze layer"
       - name: update_timestamp
         description: "Timestamp when record was last updated"
       - name: source_system
         description: "Source system from which data originated"
-        
+
   - name: bz_meetings
-    description: "Bronze layer table storing meeting information and session details"
+    description: "Bronze layer table storing cleaned and deduplicated meeting information"
     columns:
       - name: meeting_id
         description: "Unique identifier for each meeting"
@@ -201,7 +204,7 @@ models:
       - name: host_id
         description: "User ID of the meeting host"
       - name: meeting_topic
-        description: "Topic or title of the meeting"
+        description: "Topic or title of the meeting (Potential PII)"
       - name: start_time
         description: "Meeting start timestamp"
       - name: end_time
@@ -214,9 +217,9 @@ models:
         description: "Timestamp when record was last updated"
       - name: source_system
         description: "Source system from which data originated"
-        
+
   - name: bz_participants
-    description: "Bronze layer table tracking meeting participants and their session details"
+    description: "Bronze layer table storing cleaned and deduplicated meeting participant information"
     columns:
       - name: participant_id
         description: "Unique identifier for each meeting participant"
@@ -237,9 +240,9 @@ models:
         description: "Timestamp when record was last updated"
       - name: source_system
         description: "Source system from which data originated"
-        
+
   - name: bz_feature_usage
-    description: "Bronze layer table recording usage of platform features during meetings"
+    description: "Bronze layer table storing cleaned and deduplicated feature usage information"
     columns:
       - name: usage_id
         description: "Unique identifier for each feature usage record"
@@ -260,9 +263,9 @@ models:
         description: "Timestamp when record was last updated"
       - name: source_system
         description: "Source system from which data originated"
-        
+
   - name: bz_support_tickets
-    description: "Bronze layer table managing customer support requests and resolution tracking"
+    description: "Bronze layer table storing cleaned and deduplicated support ticket information"
     columns:
       - name: ticket_id
         description: "Unique identifier for each support ticket"
@@ -283,9 +286,9 @@ models:
         description: "Timestamp when record was last updated"
       - name: source_system
         description: "Source system from which data originated"
-        
+
   - name: bz_billing_events
-    description: "Bronze layer table tracking financial transactions and billing activities"
+    description: "Bronze layer table storing cleaned and deduplicated billing event information"
     columns:
       - name: event_id
         description: "Unique identifier for each billing event"
@@ -306,9 +309,9 @@ models:
         description: "Timestamp when record was last updated"
       - name: source_system
         description: "Source system from which data originated"
-        
+
   - name: bz_licenses
-    description: "Bronze layer table managing license assignments and entitlements"
+    description: "Bronze layer table storing cleaned and deduplicated license information"
     columns:
       - name: license_id
         description: "Unique identifier for each license"
