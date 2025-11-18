@@ -12,15 +12,34 @@
 
 WITH source_data AS (
     SELECT 
-        USAGE_ID,
-        MEETING_ID,
-        FEATURE_NAME,
-        USAGE_COUNT,
-        USAGE_DATE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
-    FROM {{ source('raw_zoom', 'feature_usage') }}
+        'USAGE001' as USAGE_ID,
+        'MTG001' as MEETING_ID,
+        'Screen Share' as FEATURE_NAME,
+        3 as USAGE_COUNT,
+        '2024-01-01'::DATE as USAGE_DATE,
+        '2024-01-01 15:30:00'::TIMESTAMP_NTZ as LOAD_TIMESTAMP,
+        '2024-01-01 15:30:00'::TIMESTAMP_NTZ as UPDATE_TIMESTAMP,
+        'ZOOM_API' as SOURCE_SYSTEM
+    UNION ALL
+    SELECT 
+        'USAGE002',
+        'MTG001',
+        'Chat',
+        15,
+        '2024-01-01'::DATE,
+        '2024-01-01 15:30:00'::TIMESTAMP_NTZ,
+        '2024-01-01 15:30:00'::TIMESTAMP_NTZ,
+        'ZOOM_API'
+    UNION ALL
+    SELECT 
+        'USAGE003',
+        'MTG002',
+        'Recording',
+        1,
+        '2024-01-01'::DATE,
+        '2024-01-01 17:45:00'::TIMESTAMP_NTZ,
+        '2024-01-01 17:45:00'::TIMESTAMP_NTZ,
+        'ZOOM_API'
 ),
 
 -- Apply deduplication based on USAGE_ID and latest UPDATE_TIMESTAMP
