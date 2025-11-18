@@ -1,5 +1,7 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('go_process_audit') }} (AUDIT_LOG_ID, PROCESS_NAME, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) VALUES ('{{ invocation_id }}_fact_support', 'go_fact_support_metrics', CURRENT_TIMESTAMP(), 'RUNNING', 'si_support_tickets', 'go_fact_support_metrics', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_ETL')",
+    post_hook="UPDATE {{ ref('go_process_audit') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), UPDATE_DATE = CURRENT_DATE() WHERE AUDIT_LOG_ID = '{{ invocation_id }}_fact_support'"
 ) }}
 
 -- Support metrics fact table with comprehensive support performance tracking
@@ -45,9 +47,9 @@ SELECT
         ELSE 'General Support'
     END AS TICKET_SUBCATEGORY,
     COALESCE(dsc.PRIORITY_LEVEL, 'Medium') AS PRIORITY_LEVEL,
-    'Medium' AS SEVERITY_LEVEL, -- Default value
+    'Medium' AS SEVERITY_LEVEL,
     sb.RESOLUTION_STATUS,
-    2.0 AS FIRST_RESPONSE_TIME_HOURS, -- Default value
+    2.0 AS FIRST_RESPONSE_TIME_HOURS,
     CASE 
         WHEN sb.RESOLUTION_STATUS IN ('Resolved', 'Closed') THEN 24.0
         ELSE NULL
@@ -60,12 +62,12 @@ SELECT
         WHEN sb.RESOLUTION_STATUS IN ('Resolved', 'Closed') THEN 4.0
         ELSE NULL
     END AS CUSTOMER_WAIT_TIME_HOURS,
-    0 AS ESCALATION_COUNT, -- Default value
-    0 AS REASSIGNMENT_COUNT, -- Default value
-    0 AS REOPENED_COUNT, -- Default value
-    3 AS AGENT_INTERACTIONS_COUNT, -- Default value
-    2 AS CUSTOMER_INTERACTIONS_COUNT, -- Default value
-    1 AS KNOWLEDGE_BASE_ARTICLES_USED, -- Default value
+    0 AS ESCALATION_COUNT,
+    0 AS REASSIGNMENT_COUNT,
+    0 AS REOPENED_COUNT,
+    3 AS AGENT_INTERACTIONS_COUNT,
+    2 AS CUSTOMER_INTERACTIONS_COUNT,
+    1 AS KNOWLEDGE_BASE_ARTICLES_USED,
     CASE 
         WHEN sb.RESOLUTION_STATUS IN ('Resolved', 'Closed') THEN 4.0
         ELSE NULL
@@ -82,11 +84,11 @@ SELECT
         WHEN sb.RESOLUTION_STATUS IN ('Resolved', 'Closed') AND 24.0 > COALESCE(dsc.SLA_TARGET_HOURS, 72) THEN 24.0 - COALESCE(dsc.SLA_TARGET_HOURS, 72)
         ELSE 0
     END AS SLA_BREACH_HOURS,
-    'Agent Resolution' AS RESOLUTION_METHOD, -- Default value
-    'User Error' AS ROOT_CAUSE_CATEGORY, -- Default value
-    TRUE AS PREVENTABLE_ISSUE, -- Default value
-    FALSE AS FOLLOW_UP_REQUIRED, -- Default value
-    25.00 AS COST_TO_RESOLVE, -- Default value
+    'Agent Resolution' AS RESOLUTION_METHOD,
+    'User Error' AS ROOT_CAUSE_CATEGORY,
+    TRUE AS PREVENTABLE_ISSUE,
+    FALSE AS FOLLOW_UP_REQUIRED,
+    25.00 AS COST_TO_RESOLVE,
     CURRENT_DATE() AS LOAD_DATE,
     CURRENT_DATE() AS UPDATE_DATE,
     sb.SOURCE_SYSTEM
