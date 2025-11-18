@@ -5,9 +5,7 @@
 
 {{ config(
     materialized='table',
-    tags=['bronze', 'support_tickets'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, status) SELECT 'BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_SUPPORT_TICKETS' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    tags=['bronze', 'support_tickets']
 ) }}
 
 -- Bronze Pipeline Step 6.1: Select and filter raw data excluding null primary keys
@@ -30,7 +28,7 @@ deduped_support_tickets AS (
     SELECT *,
         ROW_NUMBER() OVER (
             PARTITION BY ticket_id 
-            ORDER BY update_timestamp DESC, load_timestamp DESC
+            ORDER BY COALESCE(update_timestamp, load_timestamp) DESC, load_timestamp DESC
         ) as rn
     FROM raw_support_tickets_filtered
 ),
