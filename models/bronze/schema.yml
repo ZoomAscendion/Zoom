@@ -1,7 +1,7 @@
 version: 2
 
 sources:
-  - name: raw_schema
+  - name: raw
     description: "Raw data layer containing unprocessed data from various source systems"
     tables:
       - name: USERS
@@ -175,12 +175,17 @@ models:
       - name: USER_ID
         description: "Unique identifier for each user account"
         data_type: VARCHAR(16777216)
+        tests:
+          - not_null
+          - unique
       - name: USER_NAME
         description: "Display name of the user (PII)"
         data_type: VARCHAR(16777216)
       - name: EMAIL
         description: "Email address of the user (PII)"
         data_type: VARCHAR(16777216)
+        tests:
+          - not_null
       - name: COMPANY
         description: "Company or organization name"
         data_type: VARCHAR(16777216)
@@ -203,9 +208,14 @@ models:
       - name: MEETING_ID
         description: "Unique identifier for each meeting"
         data_type: VARCHAR(16777216)
+        tests:
+          - not_null
+          - unique
       - name: HOST_ID
         description: "User ID of the meeting host"
         data_type: VARCHAR(16777216)
+        tests:
+          - not_null
       - name: MEETING_TOPIC
         description: "Topic or title of the meeting (Potential PII)"
         data_type: VARCHAR(16777216)
@@ -234,6 +244,9 @@ models:
       - name: PARTICIPANT_ID
         description: "Unique identifier for each meeting participant"
         data_type: VARCHAR(16777216)
+        tests:
+          - not_null
+          - unique
       - name: MEETING_ID
         description: "Reference to meeting"
         data_type: VARCHAR(16777216)
@@ -262,6 +275,9 @@ models:
       - name: USAGE_ID
         description: "Unique identifier for each feature usage record"
         data_type: VARCHAR(16777216)
+        tests:
+          - not_null
+          - unique
       - name: MEETING_ID
         description: "Reference to meeting where feature was used"
         data_type: VARCHAR(16777216)
@@ -290,6 +306,9 @@ models:
       - name: TICKET_ID
         description: "Unique identifier for each support ticket"
         data_type: VARCHAR(16777216)
+        tests:
+          - not_null
+          - unique
       - name: USER_ID
         description: "Reference to user who created the ticket"
         data_type: VARCHAR(16777216)
@@ -318,6 +337,9 @@ models:
       - name: EVENT_ID
         description: "Unique identifier for each billing event"
         data_type: VARCHAR(16777216)
+        tests:
+          - not_null
+          - unique
       - name: USER_ID
         description: "Reference to user associated with billing event"
         data_type: VARCHAR(16777216)
@@ -346,6 +368,9 @@ models:
       - name: LICENSE_ID
         description: "Unique identifier for each license"
         data_type: VARCHAR(16777216)
+        tests:
+          - not_null
+          - unique
       - name: LICENSE_TYPE
         description: "Type of license"
         data_type: VARCHAR(16777216)
