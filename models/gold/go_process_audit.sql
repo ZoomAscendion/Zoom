@@ -3,10 +3,10 @@
 ) }}
 
 -- Gold Layer Process Audit Table
--- This table must be created first to support audit logging for all other models
+-- This table tracks all pipeline executions and provides audit trail
 
 SELECT 
-    'AUDIT_' || REPLACE(UUID_STRING(), '-', '_') AS AUDIT_LOG_ID,
+    'AUDIT_INIT_001' AS AUDIT_LOG_ID,
     'INITIAL_AUDIT_SETUP' AS PROCESS_NAME,
     'AUDIT_INITIALIZATION' AS PROCESS_TYPE,
     CURRENT_TIMESTAMP() AS EXECUTION_START_TIMESTAMP,
