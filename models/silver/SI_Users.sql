@@ -14,14 +14,15 @@ WITH bronze_users AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM BRONZE.BZ_USERS
+    WHERE USER_ID IS NOT NULL
 ),
 
 cleaned_users AS (
     SELECT 
         USER_ID,
-        TRIM(USER_NAME) AS USER_NAME,
-        LOWER(TRIM(EMAIL)) AS EMAIL,
-        TRIM(COMPANY) AS COMPANY,
+        COALESCE(TRIM(USER_NAME), 'Unknown') AS USER_NAME,
+        COALESCE(LOWER(TRIM(EMAIL)), 'unknown@example.com') AS EMAIL,
+        COALESCE(TRIM(COMPANY), 'Unknown') AS COMPANY,
         CASE 
             WHEN PLAN_TYPE IN ('Free', 'Basic', 'Pro', 'Enterprise') THEN PLAN_TYPE
             ELSE 'Free'
@@ -30,9 +31,8 @@ cleaned_users AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
-        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE
+        COALESCE(DATE(UPDATE_TIMESTAMP), DATE(LOAD_TIMESTAMP)) AS UPDATE_DATE
     FROM bronze_users
-    WHERE USER_ID IS NOT NULL
 ),
 
 validated_users AS (
@@ -41,12 +41,12 @@ validated_users AS (
         /* Data quality score calculation */
         CASE 
             WHEN USER_ID IS NOT NULL 
-                AND USER_NAME IS NOT NULL 
-                AND EMAIL IS NOT NULL 
+                AND USER_NAME != 'Unknown'
+                AND EMAIL != 'unknown@example.com'
                 AND REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
                 AND PLAN_TYPE IN ('Free', 'Basic', 'Pro', 'Enterprise')
             THEN 100
-            WHEN USER_ID IS NOT NULL AND EMAIL IS NOT NULL 
+            WHEN USER_ID IS NOT NULL AND EMAIL != 'unknown@example.com'
             THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
@@ -54,12 +54,12 @@ validated_users AS (
         /* Validation status */
         CASE 
             WHEN USER_ID IS NOT NULL 
-                AND USER_NAME IS NOT NULL 
-                AND EMAIL IS NOT NULL 
+                AND USER_NAME != 'Unknown'
+                AND EMAIL != 'unknown@example.com'
                 AND REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
                 AND PLAN_TYPE IN ('Free', 'Basic', 'Pro', 'Enterprise')
             THEN 'PASSED'
-            WHEN USER_ID IS NOT NULL AND EMAIL IS NOT NULL 
+            WHEN USER_ID IS NOT NULL AND EMAIL != 'unknown@example.com'
             THEN 'WARNING'
             ELSE 'FAILED'
         END AS VALIDATION_STATUS
@@ -68,7 +68,7 @@ validated_users AS (
 
 deduped_users AS (
     SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+        ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC) AS rn
     FROM validated_users
 )
 
@@ -87,4 +87,3 @@ SELECT
     VALIDATION_STATUS
 FROM deduped_users
 WHERE rn = 1
-    AND VALIDATION_STATUS IN ('PASSED', 'WARNING')
