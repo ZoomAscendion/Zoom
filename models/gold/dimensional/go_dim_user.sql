@@ -6,43 +6,47 @@
 -- Transforms Silver layer user data into Gold dimension with enhanced attributes
 
 WITH source_users AS (
-    SELECT *
+    SELECT 
+        COALESCE(USER_ID, 'UNKNOWN_USER_' || ROW_NUMBER() OVER (ORDER BY LOAD_TIMESTAMP)) AS USER_ID,
+        COALESCE(USER_NAME, 'Unknown User') AS USER_NAME,
+        EMAIL,
+        COALESCE(COMPANY, 'Unknown Company') AS COMPANY,
+        COALESCE(PLAN_TYPE, 'Unknown') AS PLAN_TYPE,
+        COALESCE(LOAD_DATE, CURRENT_DATE()) AS LOAD_DATE,
+        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
     FROM {{ source('silver', 'si_users') }}
     WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
 ),
 
 user_transformations AS (
     SELECT 
-        MD5(COALESCE(USER_ID, 'UNKNOWN_USER')) AS USER_KEY,
-        ROW_NUMBER() OVER (ORDER BY COALESCE(USER_ID, 'UNKNOWN_USER')) AS USER_DIM_ID,
-        COALESCE(USER_ID, 'UNKNOWN_USER') AS USER_ID,
-        INITCAP(TRIM(COALESCE(USER_NAME, 'Unknown User'))) AS USER_NAME,
+        MD5(USER_ID) AS USER_KEY,
+        ROW_NUMBER() OVER (ORDER BY USER_ID) AS USER_DIM_ID,
+        USER_ID,
+        INITCAP(TRIM(USER_NAME)) AS USER_NAME,
         CASE 
             WHEN EMAIL IS NOT NULL AND POSITION('@' IN EMAIL) > 0
             THEN UPPER(SUBSTRING(EMAIL, POSITION('@' IN EMAIL) + 1))
             ELSE 'UNKNOWN_DOMAIN'
         END AS EMAIL_DOMAIN,
-        INITCAP(TRIM(COALESCE(COMPANY, 'Unknown Company'))) AS COMPANY,
+        INITCAP(TRIM(COMPANY)) AS COMPANY,
         CASE 
-            WHEN UPPER(COALESCE(PLAN_TYPE, 'UNKNOWN')) IN ('FREE', 'BASIC') THEN 'Basic'
-            WHEN UPPER(COALESCE(PLAN_TYPE, 'UNKNOWN')) IN ('PRO', 'PROFESSIONAL') THEN 'Pro'
-            WHEN UPPER(COALESCE(PLAN_TYPE, 'UNKNOWN')) IN ('BUSINESS', 'ENTERPRISE') THEN 'Enterprise'
+            WHEN UPPER(PLAN_TYPE) IN ('FREE', 'BASIC') THEN 'Basic'
+            WHEN UPPER(PLAN_TYPE) IN ('PRO', 'PROFESSIONAL') THEN 'Pro'
+            WHEN UPPER(PLAN_TYPE) IN ('BUSINESS', 'ENTERPRISE') THEN 'Enterprise'
             ELSE 'Unknown'
         END AS PLAN_TYPE,
         CASE 
-            WHEN UPPER(COALESCE(PLAN_TYPE, 'UNKNOWN')) = 'FREE' THEN 'Free'
+            WHEN UPPER(PLAN_TYPE) = 'FREE' THEN 'Free'
             ELSE 'Paid'
         END AS PLAN_CATEGORY,
-        COALESCE(LOAD_DATE, CURRENT_DATE()) AS REGISTRATION_DATE,
-        CASE 
-            WHEN COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED' THEN 'Active'
-            ELSE 'Inactive'
-        END AS USER_STATUS,
+        LOAD_DATE AS REGISTRATION_DATE,
+        'Active' AS USER_STATUS,
         'Unknown' AS GEOGRAPHIC_REGION,
         'Unknown' AS INDUSTRY_SECTOR,
         'Unknown' AS USER_ROLE,
         CASE 
-            WHEN UPPER(COALESCE(PLAN_TYPE, 'UNKNOWN')) = 'FREE' THEN 'Individual'
+            WHEN UPPER(PLAN_TYPE) = 'FREE' THEN 'Individual'
             ELSE 'Business'
         END AS ACCOUNT_TYPE,
         'English' AS LANGUAGE_PREFERENCE,
@@ -51,14 +55,14 @@ user_transformations AS (
         TRUE AS IS_CURRENT_RECORD,
         CURRENT_DATE() AS LOAD_DATE,
         CURRENT_DATE() AS UPDATE_DATE,
-        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
+        SOURCE_SYSTEM
     FROM source_users
 ),
 
 deduped_users AS (
     SELECT *,
         ROW_NUMBER() OVER (
-            PARTITION BY USER_ID, EMAIL_DOMAIN, COMPANY, PLAN_TYPE 
+            PARTITION BY USER_ID 
             ORDER BY REGISTRATION_DATE DESC
         ) AS rn
     FROM user_transformations
