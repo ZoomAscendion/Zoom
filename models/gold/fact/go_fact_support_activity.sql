@@ -6,84 +6,63 @@
 -- Captures support ticket activities and resolution metrics
 
 WITH source_tickets AS (
-    SELECT *
+    SELECT 
+        COALESCE(TICKET_ID, 'UNKNOWN_TICKET') AS TICKET_ID,
+        COALESCE(USER_ID, 'UNKNOWN_USER') AS USER_ID,
+        COALESCE(TICKET_TYPE, 'General Support') AS TICKET_TYPE,
+        COALESCE(RESOLUTION_STATUS, 'Open') AS RESOLUTION_STATUS,
+        COALESCE(OPEN_DATE, CURRENT_DATE()) AS OPEN_DATE,
+        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
     FROM {{ source('silver', 'si_support_tickets') }}
     WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
 ),
 
-unique_users AS (
-    SELECT DISTINCT 
-        USER_ID, 
-        USER_KEY,
-        ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY UPDATE_DATE DESC) AS rn
-    FROM {{ ref('go_dim_user') }}
-    WHERE IS_CURRENT_RECORD = TRUE
-),
-
-unique_support_categories AS (
-    SELECT DISTINCT 
-        SUPPORT_CATEGORY, 
-        SUPPORT_CATEGORY_KEY,
-        PRIORITY_LEVEL,
-        SLA_TARGET_HOURS,
-        ROW_NUMBER() OVER (PARTITION BY SUPPORT_CATEGORY ORDER BY UPDATE_DATE DESC) AS rn
-    FROM {{ ref('go_dim_support_category') }}
-),
-
 support_transformations AS (
     SELECT 
-        ROW_NUMBER() OVER (ORDER BY COALESCE(st.TICKET_ID, 'UNKNOWN_TICKET')) AS SUPPORT_ACTIVITY_ID,
+        ROW_NUMBER() OVER (ORDER BY st.TICKET_ID) AS SUPPORT_ACTIVITY_ID,
         -- Foreign Key Columns for BI Integration
         COALESCE(du.USER_KEY, 'UNKNOWN_USER') AS USER_KEY,
         COALESCE(dd.DATE_KEY, CURRENT_DATE()) AS DATE_KEY,
         COALESCE(dsc.SUPPORT_CATEGORY_KEY, 'UNKNOWN_CATEGORY') AS SUPPORT_CATEGORY_KEY,
         -- Fact Measures
-        COALESCE(st.OPEN_DATE, CURRENT_DATE()) AS TICKET_OPEN_DATE,
+        st.OPEN_DATE AS TICKET_OPEN_DATE,
         CASE 
-            WHEN COALESCE(st.RESOLUTION_STATUS, 'Open') IN ('Resolved', 'Closed') 
-            THEN COALESCE(st.OPEN_DATE, CURRENT_DATE()) + INTERVAL '2 DAYS' 
+            WHEN st.RESOLUTION_STATUS IN ('Resolved', 'Closed') 
+            THEN st.OPEN_DATE + INTERVAL '2 DAYS' 
             ELSE NULL 
         END AS TICKET_CLOSE_DATE,
-        COALESCE(st.TICKET_TYPE, 'General Support') AS TICKET_TYPE,
-        COALESCE(st.RESOLUTION_STATUS, 'Open') AS RESOLUTION_STATUS,
+        st.TICKET_TYPE,
+        st.RESOLUTION_STATUS,
         COALESCE(dsc.PRIORITY_LEVEL, 'Medium') AS PRIORITY_LEVEL,
         CASE 
-            WHEN COALESCE(st.RESOLUTION_STATUS, 'Open') IN ('Resolved', 'Closed')
-            THEN DATEDIFF('hour', COALESCE(st.OPEN_DATE, CURRENT_DATE()), COALESCE(st.OPEN_DATE, CURRENT_DATE()) + INTERVAL '2 DAYS')
+            WHEN st.RESOLUTION_STATUS IN ('Resolved', 'Closed')
+            THEN 48.0
             ELSE NULL 
         END AS RESOLUTION_TIME_HOURS,
         0 AS ESCALATION_COUNT,
         8.0 AS CUSTOMER_SATISFACTION_SCORE,
         CASE 
-            WHEN COALESCE(st.RESOLUTION_STATUS, 'Open') IN ('Resolved', 'Closed') THEN TRUE 
+            WHEN st.RESOLUTION_STATUS IN ('Resolved', 'Closed') THEN TRUE 
             ELSE FALSE 
         END AS FIRST_CONTACT_RESOLUTION_FLAG,
         4.0 AS FIRST_RESPONSE_TIME_HOURS,
-        CASE 
-            WHEN COALESCE(st.RESOLUTION_STATUS, 'Open') IN ('Resolved', 'Closed')
-            THEN DATEDIFF('hour', COALESCE(st.OPEN_DATE, CURRENT_DATE()), COALESCE(st.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY')
-            ELSE NULL 
-        END AS ACTIVE_WORK_TIME_HOURS,
-        CASE 
-            WHEN COALESCE(st.RESOLUTION_STATUS, 'Open') IN ('Resolved', 'Closed')
-            THEN DATEDIFF('hour', COALESCE(st.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY', COALESCE(st.OPEN_DATE, CURRENT_DATE()) + INTERVAL '2 DAYS')
-            ELSE NULL 
-        END AS CUSTOMER_WAIT_TIME_HOURS,
+        24.0 AS ACTIVE_WORK_TIME_HOURS,
+        24.0 AS CUSTOMER_WAIT_TIME_HOURS,
         0 AS REASSIGNMENT_COUNT,
         0 AS REOPENED_COUNT,
         3 AS AGENT_INTERACTIONS_COUNT,
         2 AS CUSTOMER_INTERACTIONS_COUNT,
         1 AS KNOWLEDGE_BASE_ARTICLES_USED,
         CASE 
-            WHEN COALESCE(st.RESOLUTION_STATUS, 'Open') IN ('Resolved', 'Closed') AND 
-                 DATEDIFF('hour', COALESCE(st.OPEN_DATE, CURRENT_DATE()), COALESCE(st.OPEN_DATE, CURRENT_DATE()) + INTERVAL '2 DAYS') <= COALESCE(dsc.SLA_TARGET_HOURS, 24)
+            WHEN st.RESOLUTION_STATUS IN ('Resolved', 'Closed') AND 
+                 48.0 <= COALESCE(dsc.SLA_TARGET_HOURS, 72.0)
             THEN TRUE 
             ELSE FALSE 
         END AS SLA_MET,
         CASE 
-            WHEN COALESCE(st.RESOLUTION_STATUS, 'Open') IN ('Resolved', 'Closed') AND 
-                 DATEDIFF('hour', COALESCE(st.OPEN_DATE, CURRENT_DATE()), COALESCE(st.OPEN_DATE, CURRENT_DATE()) + INTERVAL '2 DAYS') > COALESCE(dsc.SLA_TARGET_HOURS, 24)
-            THEN DATEDIFF('hour', COALESCE(st.OPEN_DATE, CURRENT_DATE()), COALESCE(st.OPEN_DATE, CURRENT_DATE()) + INTERVAL '2 DAYS') - COALESCE(dsc.SLA_TARGET_HOURS, 24)
+            WHEN st.RESOLUTION_STATUS IN ('Resolved', 'Closed') AND 
+                 48.0 > COALESCE(dsc.SLA_TARGET_HOURS, 72.0)
+            THEN 48.0 - COALESCE(dsc.SLA_TARGET_HOURS, 72.0)
             ELSE 0 
         END AS SLA_BREACH_HOURS,
         'Email Support' AS RESOLUTION_METHOD,
@@ -95,9 +74,9 @@ support_transformations AS (
         CURRENT_DATE() AS UPDATE_DATE,
         'SILVER_TO_GOLD_ETL' AS SOURCE_SYSTEM
     FROM source_tickets st
-    LEFT JOIN unique_users du ON COALESCE(st.USER_ID, 'UNKNOWN_USER') = du.USER_ID AND du.rn = 1
-    LEFT JOIN {{ ref('go_dim_date') }} dd ON COALESCE(st.OPEN_DATE, CURRENT_DATE()) = dd.DATE_KEY
-    LEFT JOIN unique_support_categories dsc ON COALESCE(st.TICKET_TYPE, 'General Support') = dsc.SUPPORT_CATEGORY AND dsc.rn = 1
+    LEFT JOIN {{ ref('go_dim_user') }} du ON st.USER_ID = du.USER_ID AND du.IS_CURRENT_RECORD = TRUE
+    LEFT JOIN {{ ref('go_dim_date') }} dd ON st.OPEN_DATE = dd.DATE_KEY
+    LEFT JOIN {{ ref('go_dim_support_category') }} dsc ON st.TICKET_TYPE = dsc.SUPPORT_CATEGORY
 )
 
 SELECT 
