@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_USERS', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_USERS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    materialized='table'
 ) }}
 
 -- SI_Users table transformation from Bronze to Silver
@@ -17,7 +15,7 @@ WITH bronze_users AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_USERS') }}
+    FROM BRONZE.BZ_USERS
 ),
 
 cleaned_users AS (
@@ -43,7 +41,7 @@ validated_users AS (
         *,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
         DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
-        -- Calculate data quality score based on completeness and validation
+        /* Calculate data quality score based on completeness and validation */
         CASE 
             WHEN USER_ID IS NOT NULL 
                 AND USER_NAME IS NOT NULL 
@@ -55,7 +53,7 @@ validated_users AS (
             THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
-        -- Set validation status based on data quality checks
+        /* Set validation status based on data quality checks */
         CASE 
             WHEN USER_ID IS NOT NULL 
                 AND USER_NAME IS NOT NULL 
