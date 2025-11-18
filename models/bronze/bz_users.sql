@@ -1,17 +1,19 @@
--- Bronze Layer Users Table
--- Description: Stores user profile and subscription information from source systems
--- Author: Data Engineering Team
--- Created: {{ run_started_at }}
+/*
+  Author: Data Engineering Team
+  Created: 2024-12-19
+  Description: Bronze layer transformation for USERS table
+  Purpose: Clean and deduplicate raw user data with audit trail
+*/
 
 {{ config(
     materialized='table',
     tags=['bronze', 'users'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) VALUES ('BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'STARTED')",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) VALUES ('BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 1.0, 'SUCCESS')"
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) VALUES ('BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED')",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) VALUES ('BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'SUCCESS')"
 ) }}
 
--- CTE to select and filter raw data
-WITH raw_users AS (
+WITH source_data AS (
+    -- Select raw data from source with null filtering for primary key
     SELECT 
         USER_ID,
         USER_NAME,
@@ -22,24 +24,28 @@ WITH raw_users AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM {{ source('raw', 'users') }}
-    WHERE USER_ID IS NOT NULL  -- Filter out records with NULL primary key
+    WHERE USER_ID IS NOT NULL  -- Filter out records with null primary key
 ),
 
--- CTE for deduplication based on primary key and latest timestamp
-deduped_users AS (
-    SELECT *
-    FROM (
-        SELECT *,
-               ROW_NUMBER() OVER (
-                   PARTITION BY USER_ID 
-                   ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
-               ) AS rn
-        FROM raw_users
-    )
-    WHERE rn = 1
+deduped_data AS (
+    -- Apply deduplication logic based on primary key and latest timestamp
+    SELECT 
+        USER_ID,
+        USER_NAME,
+        EMAIL,
+        COMPANY,
+        PLAN_TYPE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        ROW_NUMBER() OVER (
+            PARTITION BY USER_ID 
+            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
+        ) AS row_num
+    FROM source_data
 )
 
--- Final selection with 1-1 mapping from raw to bronze
+-- Final select with audit columns
 SELECT 
     USER_ID,
     USER_NAME,
@@ -49,4 +55,5 @@ SELECT
     LOAD_TIMESTAMP,
     UPDATE_TIMESTAMP,
     SOURCE_SYSTEM
-FROM deduped_users
+FROM deduped_data
+WHERE row_num = 1  -- Keep only the most recent record per USER_ID
