@@ -22,7 +22,7 @@ WITH source_data AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('raw_schema', 'USERS') }}
+    FROM {{ source('raw', 'USERS') }}
 ),
 
 deduped_data AS (
