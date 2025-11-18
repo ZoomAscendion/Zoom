@@ -20,28 +20,3 @@ models:
   zoom_gold_pipeline:
     gold:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'go_audit_log' %}
-        INSERT INTO {{ ref('go_audit_log') }} (
-          PROCESS_NAME, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, 
-          EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, LOAD_DATE, SOURCE_SYSTEM
-        ) VALUES (
-          '{{ this.name }}', 'SILVER_LAYER', '{{ this.name }}', 
-          CURRENT_TIMESTAMP(), 'RUNNING', CURRENT_DATE(), 'DBT_GOLD_PIPELINE'
-        )
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'go_audit_log' %}
-        UPDATE {{ ref('go_audit_log') }} 
-        SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(),
-            EXECUTION_STATUS = 'SUCCESS',
-            RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
-            UPDATE_DATE = CURRENT_DATE()
-        WHERE PROCESS_NAME = '{{ this.name }}' 
-          AND EXECUTION_STATUS = 'RUNNING'
-          AND EXECUTION_START_TIMESTAMP = (
-            SELECT MAX(EXECUTION_START_TIMESTAMP) 
-            FROM {{ ref('go_audit_log') }} 
-            WHERE PROCESS_NAME = '{{ this.name }}'
-          )
-        {% endif %}
