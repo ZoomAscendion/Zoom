@@ -1,5 +1,7 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('go_process_audit') }} (AUDIT_LOG_ID, PROCESS_NAME, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) VALUES ('{{ invocation_id }}_fact_revenue', 'go_fact_revenue_events', CURRENT_TIMESTAMP(), 'RUNNING', 'si_billing_events', 'go_fact_revenue_events', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_ETL')",
+    post_hook="UPDATE {{ ref('go_process_audit') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), UPDATE_DATE = CURRENT_DATE() WHERE AUDIT_LOG_ID = '{{ invocation_id }}_fact_revenue'"
 ) }}
 
 -- Revenue events fact table with comprehensive financial metrics
@@ -33,8 +35,8 @@ SELECT
         ELSE 'Other'
     END AS REVENUE_TYPE,
     rb.AMOUNT AS GROSS_AMOUNT,
-    rb.AMOUNT * 0.08 AS TAX_AMOUNT, -- Assuming 8% tax
-    0.00 AS DISCOUNT_AMOUNT, -- Default value
+    rb.AMOUNT * 0.08 AS TAX_AMOUNT,
+    0.00 AS DISCOUNT_AMOUNT,
     CASE 
         WHEN rb.EVENT_TYPE = 'Refund' THEN -rb.AMOUNT
         ELSE rb.AMOUNT
@@ -42,14 +44,14 @@ SELECT
     'USD' AS CURRENCY_CODE,
     1.0 AS EXCHANGE_RATE,
     rb.AMOUNT AS USD_AMOUNT,
-    'Credit Card' AS PAYMENT_METHOD, -- Default value
+    'Credit Card' AS PAYMENT_METHOD,
     CASE 
         WHEN rb.EVENT_TYPE IN ('Subscription', 'Renewal') THEN 12
         ELSE 0
     END AS SUBSCRIPTION_PERIOD_MONTHS,
-    1 AS LICENSE_QUANTITY, -- Default value
-    0.00 AS PRORATION_AMOUNT, -- Default value
-    rb.AMOUNT * 0.05 AS COMMISSION_AMOUNT, -- Assuming 5% commission
+    1 AS LICENSE_QUANTITY,
+    0.00 AS PRORATION_AMOUNT,
+    rb.AMOUNT * 0.05 AS COMMISSION_AMOUNT,
     CASE 
         WHEN rb.EVENT_TYPE IN ('Subscription', 'Renewal', 'Upgrade') THEN rb.AMOUNT / 12
         ELSE 0
@@ -58,7 +60,7 @@ SELECT
         WHEN rb.EVENT_TYPE IN ('Subscription', 'Renewal', 'Upgrade') THEN rb.AMOUNT
         ELSE 0
     END AS ARR_IMPACT,
-    rb.AMOUNT * 5 AS CUSTOMER_LIFETIME_VALUE, -- Simplified calculation
+    rb.AMOUNT * 5 AS CUSTOMER_LIFETIME_VALUE,
     CASE 
         WHEN rb.EVENT_TYPE = 'Downgrade' THEN 4.0
         WHEN rb.EVENT_TYPE = 'Refund' THEN 3.5
@@ -76,7 +78,7 @@ SELECT
         WHEN rb.EVENT_TYPE = 'Refund' THEN 'Customer Request'
         ELSE NULL
     END AS REFUND_REASON,
-    'Online' AS SALES_CHANNEL, -- Default value
+    'Online' AS SALES_CHANNEL,
     NULL AS PROMOTION_CODE,
     CURRENT_DATE() AS LOAD_DATE,
     CURRENT_DATE() AS UPDATE_DATE,
