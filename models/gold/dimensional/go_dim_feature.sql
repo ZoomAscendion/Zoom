@@ -26,7 +26,6 @@ feature_transformations AS (
             WHEN UPPER(FEATURE_NAME) LIKE '%BREAKOUT%' THEN 'Advanced Meeting'
             WHEN UPPER(FEATURE_NAME) LIKE '%POLL%' THEN 'Engagement'
             WHEN UPPER(FEATURE_NAME) LIKE '%WHITEBOARD%' THEN 'Collaboration'
-            WHEN UPPER(FEATURE_NAME) LIKE '%ANNOTATION%' THEN 'Collaboration'
             ELSE 'General'
         END AS FEATURE_CATEGORY,
         CASE 
@@ -53,15 +52,6 @@ feature_transformations AS (
         CURRENT_DATE() AS UPDATE_DATE,
         SOURCE_SYSTEM
     FROM source_features
-),
-
-deduped_features AS (
-    SELECT *,
-        ROW_NUMBER() OVER (
-            PARTITION BY FEATURE_NAME 
-            ORDER BY LOAD_DATE DESC
-        ) AS rn
-    FROM feature_transformations
 )
 
 SELECT 
@@ -80,5 +70,4 @@ SELECT
     LOAD_DATE,
     UPDATE_DATE,
     SOURCE_SYSTEM
-FROM deduped_features
-WHERE rn = 1
+FROM feature_transformations
