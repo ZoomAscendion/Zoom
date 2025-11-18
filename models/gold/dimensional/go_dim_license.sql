@@ -89,15 +89,6 @@ license_transformations AS (
         CURRENT_DATE() AS UPDATE_DATE,
         SOURCE_SYSTEM
     FROM source_licenses
-),
-
-deduped_licenses AS (
-    SELECT *,
-        ROW_NUMBER() OVER (
-            PARTITION BY LICENSE_TYPE 
-            ORDER BY EFFECTIVE_START_DATE DESC
-        ) AS rn
-    FROM license_transformations
 )
 
 SELECT 
@@ -121,5 +112,4 @@ SELECT
     LOAD_DATE,
     UPDATE_DATE,
     SOURCE_SYSTEM
-FROM deduped_licenses
-WHERE rn = 1
+FROM license_transformations
