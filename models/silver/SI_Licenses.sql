@@ -1,9 +1,11 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
 ) }}
 
--- SI_Licenses table transformation from Bronze to Silver
--- Includes critical P1 fix for DD/MM/YYYY date format conversion
+-- SI_LICENSES: Silver layer transformation from Bronze BZ_LICENSES
+-- Description: Stores cleaned and standardized license assignments with enhanced DD/MM/YYYY date format conversion
 
 WITH bronze_licenses AS (
     SELECT 
@@ -15,7 +17,8 @@ WITH bronze_licenses AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM BRONZE.BZ_LICENSES
+    FROM {{ source('bronze', 'BZ_LICENSES') }}
+    WHERE LICENSE_ID IS NOT NULL
 ),
 
 cleaned_licenses AS (
@@ -23,34 +26,35 @@ cleaned_licenses AS (
         LICENSE_ID,
         UPPER(TRIM(LICENSE_TYPE)) AS LICENSE_TYPE,
         ASSIGNED_TO_USER_ID,
-        /* Critical P1 fix: Handle DD/MM/YYYY date format conversion */
+        
+        /* Critical P1 Fix: DD/MM/YYYY date format conversion */
         COALESCE(
             TRY_TO_DATE(START_DATE::STRING, 'YYYY-MM-DD'),
             TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY'),
             TRY_TO_DATE(START_DATE::STRING, 'DD-MM-YYYY'),
             TRY_TO_DATE(START_DATE::STRING, 'MM/DD/YYYY'),
-            TRY_TO_DATE(START_DATE::STRING)
+            TRY_TO_DATE(START_DATE)
         ) AS START_DATE,
-        /* Critical P1 fix: Handle DD/MM/YYYY date format conversion */
+        
         COALESCE(
             TRY_TO_DATE(END_DATE::STRING, 'YYYY-MM-DD'),
             TRY_TO_DATE(END_DATE::STRING, 'DD/MM/YYYY'),
             TRY_TO_DATE(END_DATE::STRING, 'DD-MM-YYYY'),
             TRY_TO_DATE(END_DATE::STRING, 'MM/DD/YYYY'),
-            TRY_TO_DATE(END_DATE::STRING)
+            TRY_TO_DATE(END_DATE)
         ) AS END_DATE,
+        
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
+        SOURCE_SYSTEM,
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        CASE WHEN UPDATE_TIMESTAMP IS NOT NULL THEN DATE(UPDATE_TIMESTAMP) ELSE NULL END AS UPDATE_DATE
     FROM bronze_licenses
-    WHERE LICENSE_ID IS NOT NULL
 ),
 
 validated_licenses AS (
     SELECT 
         *,
-        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
-        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
         /* Calculate data quality score */
         CASE 
             WHEN LICENSE_ID IS NOT NULL 
@@ -64,6 +68,7 @@ validated_licenses AS (
             THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
+        
         /* Set validation status */
         CASE 
             WHEN LICENSE_ID IS NOT NULL 
@@ -80,10 +85,9 @@ validated_licenses AS (
     FROM cleaned_licenses
 ),
 
-/* Remove duplicates keeping the latest record */
 deduped_licenses AS (
     SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY LICENSE_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+        ROW_NUMBER() OVER (PARTITION BY LICENSE_ID ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC) AS rn
     FROM validated_licenses
 )
 
@@ -102,4 +106,4 @@ SELECT
     VALIDATION_STATUS
 FROM deduped_licenses
 WHERE rn = 1
-  AND VALIDATION_STATUS != 'FAILED'
+    AND VALIDATION_STATUS != 'FAILED'
