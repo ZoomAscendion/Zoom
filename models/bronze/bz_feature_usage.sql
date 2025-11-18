@@ -1,18 +1,17 @@
--- Bronze Layer Feature Usage Table
--- Author: Data Engineering Team
--- Description: Records usage of platform features during meetings
--- Version: 1.0
--- Created: {{ run_started_at }}
-
-{{ config(
+{{
+  config(
     materialized='table',
     tags=['bronze', 'feature_usage'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', DATEDIFF('second', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_FEATURE_USAGE' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
-) }}
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) VALUES ('BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED')",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) VALUES ('BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', DATEDIFF('second', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_FEATURE_USAGE' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS')"
+  )
+}}
+
+-- Bronze Layer Feature Usage Table
+-- 1:1 mapping from RAW.FEATURE_USAGE to BRONZE.BZ_FEATURE_USAGE
+-- Includes deduplication logic based on USAGE_ID and LOAD_TIMESTAMP
 
 WITH source_data AS (
-    -- Select all data from source FEATURE_USAGE table
     SELECT 
         USAGE_ID,
         MEETING_ID,
@@ -22,25 +21,21 @@ WITH source_data AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('raw', 'FEATURE_USAGE') }}
+    FROM {{ source('raw_schema', 'feature_usage') }}
 ),
 
+-- Apply deduplication logic - keep latest record per USAGE_ID
 deduped_data AS (
-    -- Apply deduplication based on USAGE_ID and UPDATE_TIMESTAMP
-    SELECT *
-    FROM (
-        SELECT *,
-               ROW_NUMBER() OVER (
-                   PARTITION BY USAGE_ID 
-                   ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC
-               ) as rn
-        FROM source_data
-    )
-    WHERE rn = 1
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY USAGE_ID 
+            ORDER BY LOAD_TIMESTAMP DESC, UPDATE_TIMESTAMP DESC
+        ) AS row_num
+    FROM source_data
 )
 
--- Final select with 1-1 mapping from raw to bronze
-SELECT
+-- Final selection with audit columns
+SELECT 
     USAGE_ID,
     MEETING_ID,
     FEATURE_NAME,
@@ -50,3 +45,4 @@ SELECT
     UPDATE_TIMESTAMP,
     SOURCE_SYSTEM
 FROM deduped_data
+WHERE row_num = 1
