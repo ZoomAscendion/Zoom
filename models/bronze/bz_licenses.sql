@@ -6,22 +6,8 @@
 {{ config(
     materialized='table',
     tags=['bronze', 'licenses'],
-    pre_hook="
-        {% if target.name != 'audit' %}
-        INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS)
-        VALUES ('BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_{{ this.name }}', 'STARTED')
-        {% endif %}
-    ",
-    post_hook="
-        {% if target.name != 'audit' %}
-        INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
-        VALUES ('BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_{{ this.name }}', 
-                DATEDIFF('seconds', 
-                    (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_LICENSES' AND STATUS = 'STARTED'), 
-                    CURRENT_TIMESTAMP()), 
-                'COMPLETED')
-        {% endif %}
-    "
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_BZ_LICENSES', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_BZ_LICENSES', 1.0, 'COMPLETED' WHERE '{{ this.name }}' != 'bz_data_audit'"
 ) }}
 
 WITH source_data AS (
