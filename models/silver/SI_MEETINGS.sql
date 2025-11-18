@@ -1,0 +1,103 @@
+{{ config(
+    materialized='table',
+    alias='SI_MEETINGS'
+) }}
+
+WITH bronze_meetings AS (
+    SELECT 
+        MEETING_ID,
+        HOST_ID,
+        MEETING_TOPIC,
+        START_TIME,
+        END_TIME,
+        DURATION_MINUTES,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_MEETINGS') }}
+    WHERE MEETING_ID IS NOT NULL
+),
+
+cleaned_meetings AS (
+    SELECT 
+        MEETING_ID,
+        HOST_ID,
+        TRIM(MEETING_TOPIC) AS MEETING_TOPIC,
+        /* Critical P1: EST Timezone Format Handling */
+        CASE 
+            WHEN START_TIME::STRING LIKE '%EST%' THEN 
+                COALESCE(
+                    TRY_TO_TIMESTAMP(REGEXP_REPLACE(START_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
+                    TRY_TO_TIMESTAMP(START_TIME::STRING)
+                )
+            ELSE START_TIME
+        END AS START_TIME,
+        CASE 
+            WHEN END_TIME::STRING LIKE '%EST%' THEN 
+                COALESCE(
+                    TRY_TO_TIMESTAMP(REGEXP_REPLACE(END_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
+                    TRY_TO_TIMESTAMP(END_TIME::STRING)
+                )
+            ELSE END_TIME
+        END AS END_TIME,
+        /* Critical P1: Numeric Field Text Unit Cleaning */
+        CASE 
+            WHEN TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', '')) IS NOT NULL THEN
+                TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', ''))
+            ELSE TRY_TO_NUMBER(DURATION_MINUTES::STRING)
+        END AS CLEAN_DURATION_MINUTES,
+        DURATION_MINUTES AS ORIGINAL_DURATION,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        ROW_NUMBER() OVER (PARTITION BY MEETING_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM bronze_meetings
+),
+
+validated_meetings AS (
+    SELECT 
+        MEETING_ID,
+        HOST_ID,
+        MEETING_TOPIC,
+        START_TIME,
+        END_TIME,
+        COALESCE(CLEAN_DURATION_MINUTES, 0) AS DURATION_MINUTES,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        CASE 
+            WHEN START_TIME IS NOT NULL AND END_TIME IS NOT NULL AND CLEAN_DURATION_MINUTES IS NOT NULL THEN 100
+            WHEN START_TIME IS NOT NULL AND END_TIME IS NOT NULL THEN 85
+            WHEN START_TIME IS NOT NULL THEN 70
+            ELSE 50
+        END AS DATA_QUALITY_SCORE,
+        CASE 
+            WHEN START_TIME IS NOT NULL AND END_TIME IS NOT NULL AND CLEAN_DURATION_MINUTES IS NOT NULL 
+                 AND END_TIME > START_TIME THEN 'PASSED'
+            WHEN START_TIME IS NOT NULL AND END_TIME IS NOT NULL THEN 'WARNING'
+            ELSE 'FAILED'
+        END AS VALIDATION_STATUS
+    FROM cleaned_meetings
+    WHERE rn = 1
+    AND START_TIME IS NOT NULL
+    AND END_TIME IS NOT NULL
+    AND END_TIME > START_TIME
+)
+
+SELECT 
+    MEETING_ID,
+    HOST_ID,
+    MEETING_TOPIC,
+    START_TIME,
+    END_TIME,
+    DURATION_MINUTES,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    LOAD_DATE,
+    UPDATE_DATE,
+    DATA_QUALITY_SCORE,
+    VALIDATION_STATUS
+FROM validated_meetings
