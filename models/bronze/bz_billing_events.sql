@@ -1,17 +1,19 @@
--- Bronze Layer Billing Events Table
--- Description: Tracks financial transactions and billing activities
--- Author: Data Engineering Team
--- Created: {{ run_started_at }}
+/*
+  Author: Data Engineering Team
+  Created: 2024-12-19
+  Description: Bronze layer transformation for BILLING_EVENTS table
+  Purpose: Clean and deduplicate raw billing event data with audit trail
+*/
 
 {{ config(
     materialized='table',
     tags=['bronze', 'billing_events'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) VALUES ('BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'STARTED')",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) VALUES ('BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 1.0, 'SUCCESS')"
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) VALUES ('BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED')",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) VALUES ('BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'SUCCESS')"
 ) }}
 
--- CTE to select and filter raw data
-WITH raw_billing_events AS (
+WITH source_data AS (
+    -- Select raw data from source with null filtering for primary key
     SELECT 
         EVENT_ID,
         USER_ID,
@@ -22,24 +24,29 @@ WITH raw_billing_events AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM {{ source('raw', 'billing_events') }}
-    WHERE EVENT_ID IS NOT NULL  -- Filter out records with NULL primary key
+    WHERE EVENT_ID IS NOT NULL  -- Filter out records with null primary key
+      AND USER_ID IS NOT NULL  -- Filter out records with null foreign key
 ),
 
--- CTE for deduplication based on primary key and latest timestamp
-deduped_billing_events AS (
-    SELECT *
-    FROM (
-        SELECT *,
-               ROW_NUMBER() OVER (
-                   PARTITION BY EVENT_ID 
-                   ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
-               ) AS rn
-        FROM raw_billing_events
-    )
-    WHERE rn = 1
+deduped_data AS (
+    -- Apply deduplication logic based on primary key and latest timestamp
+    SELECT 
+        EVENT_ID,
+        USER_ID,
+        EVENT_TYPE,
+        AMOUNT,
+        EVENT_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        ROW_NUMBER() OVER (
+            PARTITION BY EVENT_ID 
+            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
+        ) AS row_num
+    FROM source_data
 )
 
--- Final selection with 1-1 mapping from raw to bronze
+-- Final select with audit columns
 SELECT 
     EVENT_ID,
     USER_ID,
@@ -49,4 +56,5 @@ SELECT
     LOAD_TIMESTAMP,
     UPDATE_TIMESTAMP,
     SOURCE_SYSTEM
-FROM deduped_billing_events
+FROM deduped_data
+WHERE row_num = 1  -- Keep only the most recent record per EVENT_ID
