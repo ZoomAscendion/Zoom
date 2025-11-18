@@ -20,7 +20,7 @@ WITH bronze_meetings AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_MEETINGS') }}
+    FROM BRONZE.BZ_MEETINGS
 ),
 
 cleansed_meetings AS (
@@ -43,7 +43,7 @@ cleansed_meetings AS (
             WHEN END_TIME::STRING LIKE '%EST%' THEN 
                 COALESCE(
                     TRY_TO_TIMESTAMP(REPLACE(END_TIME::STRING, ' EST', ''), 'YYYY-MM-DD HH24:MI:SS'),
-                    CURRENT_TIMESTAMP()
+                    DATEADD('MINUTE', 30, CURRENT_TIMESTAMP())
                 )
             ELSE END_TIME
         END AS END_TIME,
