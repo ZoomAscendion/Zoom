@@ -19,7 +19,7 @@ WITH raw_billing_events_filtered AS (
         load_timestamp,
         update_timestamp,
         source_system
-    FROM {{ source('raw_schema', 'billing_events') }}
+    FROM {{ source('raw_layer', 'billing_events') }}
     WHERE event_id IS NOT NULL  -- Filter out null primary keys
 ),
 
