@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, LOAD_DATE, SOURCE_SYSTEM) VALUES ('{{ invocation_id }}_FEATURE', 'go_dim_feature', 'SILVER.SI_FEATURE_USAGE', 'GOLD.GO_DIM_FEATURE', CURRENT_TIMESTAMP(), 'RUNNING', CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), UPDATE_DATE = CURRENT_DATE() WHERE AUDIT_LOG_ID = '{{ invocation_id }}_FEATURE' AND PROCESS_NAME = 'go_dim_feature'"
+    materialized='table'
 ) }}
 
 -- Feature dimension transformation from Silver to Gold layer
@@ -10,8 +8,7 @@ WITH feature_data AS (
         FEATURE_NAME,
         SOURCE_SYSTEM
     FROM {{ source('silver', 'si_feature_usage') }}
-    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
-      AND FEATURE_NAME IS NOT NULL
+    WHERE FEATURE_NAME IS NOT NULL
 ),
 
 feature_transformed AS (
