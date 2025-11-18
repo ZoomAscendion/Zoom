@@ -1,6 +1,7 @@
 -- Bronze Layer Audit Table
--- Description: Comprehensive audit trail for all Bronze layer data operations
 -- Author: Data Engineering Team
+-- Description: Comprehensive audit trail for all Bronze layer data operations
+-- Version: 1.0
 -- Created: {{ run_started_at }}
 
 {{ config(
@@ -8,11 +9,11 @@
     tags=['bronze', 'audit']
 ) }}
 
-SELECT 
-    CAST(1 AS NUMBER) as RECORD_ID,
-    CAST('INITIALIZATION' AS VARCHAR(255)) as SOURCE_TABLE,
-    CURRENT_TIMESTAMP() as LOAD_TIMESTAMP,
-    CAST('DBT_SYSTEM' AS VARCHAR(255)) as PROCESSED_BY,
-    CAST(0.001 AS NUMBER(38,3)) as PROCESSING_TIME,
-    CAST('SUCCESS' AS VARCHAR(255)) as STATUS
-WHERE FALSE  -- This ensures the table is created but empty initially
+SELECT
+    NULL::NUMBER as RECORD_ID,
+    NULL::VARCHAR(255) as SOURCE_TABLE,
+    NULL::TIMESTAMP_NTZ(9) as LOAD_TIMESTAMP,
+    NULL::VARCHAR(255) as PROCESSED_BY,
+    NULL::NUMBER(38,3) as PROCESSING_TIME,
+    NULL::VARCHAR(50) as STATUS
+WHERE 1=0  -- This creates the table structure without inserting any data
