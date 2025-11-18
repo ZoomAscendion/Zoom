@@ -4,9 +4,9 @@
     post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY, ERROR_DESCRIPTION) SELECT UUID_STRING(), 'SI_PARTICIPANTS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE', 'Completed SI_PARTICIPANTS transformation with ' || (SELECT COUNT(*) FROM {{ this }}) || ' records' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
 ) }}
 
--- SI_PARTICIPANTS: Silver layer transformation from Bronze BZ_PARTICIPANTS
--- Description: Stores cleaned and standardized meeting participants with enhanced timestamp handling
--- Implements MM/DD/YYYY HH:MM format validation and conversion
+/* SI_PARTICIPANTS: Silver layer transformation from Bronze BZ_PARTICIPANTS */
+/* Description: Stores cleaned and standardized meeting participants with enhanced timestamp handling */
+/* Implements MM/DD/YYYY HH:MM format validation and conversion */
 
 WITH bronze_participants AS (
     SELECT 
@@ -18,7 +18,7 @@ WITH bronze_participants AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_PARTICIPANTS') }}
+    FROM BRONZE.BZ_PARTICIPANTS
     WHERE PARTICIPANT_ID IS NOT NULL
 ),
 
@@ -27,7 +27,7 @@ cleaned_participants AS (
         PARTICIPANT_ID,
         MEETING_ID,
         USER_ID,
-        -- Enhanced timestamp handling for multiple formats
+        /* Enhanced timestamp handling for multiple formats */
         COALESCE(
             TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
             TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
@@ -35,7 +35,7 @@ cleaned_participants AS (
             TRY_TO_TIMESTAMP(REGEXP_REPLACE(JOIN_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
             TRY_TO_TIMESTAMP(JOIN_TIME::STRING)
         ) AS JOIN_TIME,
-        -- Enhanced timestamp handling for multiple formats
+        /* Enhanced timestamp handling for multiple formats */
         COALESCE(
             TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
             TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
@@ -60,7 +60,7 @@ validated_participants AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        -- Calculate data quality score
+        /* Calculate data quality score */
         CASE 
             WHEN PARTICIPANT_ID IS NOT NULL 
                 AND MEETING_ID IS NOT NULL 
@@ -73,7 +73,7 @@ validated_participants AS (
             THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
-        -- Set validation status
+        /* Set validation status */
         CASE 
             WHEN PARTICIPANT_ID IS NOT NULL 
                 AND MEETING_ID IS NOT NULL 
