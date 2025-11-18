@@ -1,10 +1,10 @@
 {{ config(
     materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'"
 ) }}
 
-/* Silver layer transformation for Licenses table with DD/MM/YYYY date format handling */
+-- Silver layer transformation for Licenses table with DD/MM/YYYY date format handling
 WITH bronze_licenses AS (
     SELECT *
     FROM {{ source('bronze', 'BZ_LICENSES') }}
@@ -13,7 +13,7 @@ WITH bronze_licenses AS (
 date_cleaning AS (
     SELECT 
         *,
-        /* Critical P1: DD/MM/YYYY date format conversion */
+        -- Critical P1: DD/MM/YYYY date format conversion
         COALESCE(
             TRY_TO_DATE(START_DATE::STRING, 'YYYY-MM-DD'),
             TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY'),
@@ -35,13 +35,13 @@ date_cleaning AS (
 data_quality_checks AS (
     SELECT 
         *,
-        /* Validate license date logic */
+        -- Validate license date logic
         CASE 
             WHEN cleaned_start_date >= cleaned_end_date THEN 'INVALID_DATE_LOGIC'
             ELSE 'VALID'
         END AS date_validation,
         
-        /* Data quality score calculation */
+        -- Data quality score calculation
         (
             CASE WHEN LICENSE_ID IS NOT NULL THEN 20 ELSE 0 END +
             CASE WHEN LICENSE_TYPE IS NOT NULL AND LENGTH(TRIM(LICENSE_TYPE)) > 0 THEN 20 ELSE 0 END +
@@ -50,7 +50,7 @@ data_quality_checks AS (
             CASE WHEN cleaned_end_date IS NOT NULL AND cleaned_end_date > cleaned_start_date THEN 20 ELSE 0 END
         ) AS data_quality_score,
         
-        /* Validation status */
+        -- Validation status
         CASE 
             WHEN LICENSE_ID IS NULL OR LICENSE_TYPE IS NULL OR ASSIGNED_TO_USER_ID IS NULL THEN 'FAILED'
             WHEN cleaned_start_date IS NULL OR cleaned_end_date IS NULL THEN 'FAILED'
@@ -64,7 +64,7 @@ deduplication AS (
     SELECT *,
         ROW_NUMBER() OVER (
             PARTITION BY LICENSE_ID 
-            ORDER BY UPDATE_TIMESTAMP DESC NULLS LAST, LOAD_TIMESTAMP DESC
+            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC, LOAD_TIMESTAMP DESC
         ) AS row_num
     FROM data_quality_checks
     WHERE LICENSE_ID IS NOT NULL
@@ -81,7 +81,7 @@ final_transformation AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
-        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        COALESCE(DATE(UPDATE_TIMESTAMP), DATE(LOAD_TIMESTAMP)) AS UPDATE_DATE,
         data_quality_score AS DATA_QUALITY_SCORE,
         validation_status AS VALIDATION_STATUS
     FROM deduplication
