@@ -22,7 +22,7 @@ WITH source_data AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('raw_schema', 'BILLING_EVENTS') }}
+    FROM {{ source('raw', 'BILLING_EVENTS') }}
 ),
 
 deduped_data AS (
