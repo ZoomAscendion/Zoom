@@ -48,11 +48,11 @@ trends and areas for improvement.
 
 **Data Constraints**
 
--   Duration_Minutes must be a non-negative integer.
+-   Duration in Minutes must be a non-negative integer.
 
--   Start_Time and End_Time must be valid timestamps.
+-   Start Time and End Time must be valid timestamps.
 
--   A Meeting_ID in Attendees or Features_Usage must exist in the
+-   A Meeting IF in Attendees or Features Usage must exist in the
     Meetings table.
 
 -   Dimension should have  one/many to many relationships wiht fact tables.
@@ -95,7 +95,7 @@ service quality and reduce ticket volume.
 
 -   Type and Resolution_Status must be from a predefined list of values.
 
--   User_ID must exist in the Users table.
+-   User ID must exist in the Users table.
 
 -   Open_Date must be a valid date.
 
