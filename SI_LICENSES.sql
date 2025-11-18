@@ -1,27 +1,22 @@
 {{ config(
     materialized='table',
-    tags=['silver', 'licenses']
+    tags=['silver', 'licenses'],
+    pre_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'PRE_HOOK_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_AUDIT_LOG'",
+    post_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'POST_HOOK_COMPLETE', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_AUDIT_LOG'"
 ) }}
 
 WITH bronze_licenses AS (
-    SELECT 
-        LICENSE_ID,
-        LICENSE_TYPE,
-        ASSIGNED_TO_USER_ID,
-        START_DATE,
-        END_DATE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
-    FROM {{ ref('bz_licenses') }}
+    SELECT *,
+           ROW_NUMBER() OVER (PARTITION BY LICENSE_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM {{ source('bronze', 'BZ_LICENSES') }}
+    WHERE LICENSE_ID IS NOT NULL
 ),
 
-date_format_conversion AS (
+cleaned_licenses AS (
     SELECT 
         LICENSE_ID,
-        TRIM(COALESCE(LICENSE_TYPE, 'UNKNOWN')) AS LICENSE_TYPE,
+        UPPER(TRIM(LICENSE_TYPE)) AS LICENSE_TYPE,
         ASSIGNED_TO_USER_ID,
-        /* Critical P1 DQ Check: DD/MM/YYYY Date Format Conversion */
         COALESCE(
             TRY_TO_DATE(START_DATE::STRING, 'YYYY-MM-DD'),
             TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY'),
@@ -34,58 +29,54 @@ date_format_conversion AS (
             TRY_TO_DATE(END_DATE::STRING, 'MM/DD/YYYY'),
             TRY_TO_DATE(END_DATE::STRING)
         ) AS CLEAN_END_DATE,
-        START_DATE AS ORIGINAL_START_DATE,
-        END_DATE AS ORIGINAL_END_DATE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
-    FROM bronze_licenses
-),
-
-data_quality_checks AS (
-    SELECT 
-        LICENSE_ID,
-        LICENSE_TYPE,
-        ASSIGNED_TO_USER_ID,
-        COALESCE(CLEAN_START_DATE, CURRENT_DATE()) AS START_DATE,
-        COALESCE(CLEAN_END_DATE, CURRENT_DATE()) AS END_DATE,
-        ORIGINAL_START_DATE,
-        ORIGINAL_END_DATE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE
+    FROM bronze_licenses
+    WHERE rn = 1
+),
+
+validated_licenses AS (
+    SELECT *,
         CASE 
-            WHEN LICENSE_ID IS NULL THEN 0
-            WHEN ASSIGNED_TO_USER_ID IS NULL THEN 20
-            WHEN CLEAN_START_DATE IS NULL THEN 40
-            WHEN CLEAN_END_DATE IS NULL THEN 40
-            WHEN CLEAN_START_DATE >= CLEAN_END_DATE THEN 60
-            ELSE 100
+            WHEN LICENSE_ID IS NOT NULL 
+                 AND LICENSE_TYPE IS NOT NULL 
+                 AND ASSIGNED_TO_USER_ID IS NOT NULL 
+                 AND CLEAN_START_DATE IS NOT NULL 
+                 AND CLEAN_END_DATE IS NOT NULL
+                 AND CLEAN_END_DATE >= CLEAN_START_DATE
+            THEN 95
+            WHEN LICENSE_ID IS NOT NULL AND ASSIGNED_TO_USER_ID IS NOT NULL
+            THEN 75
+            ELSE 50
         END AS DATA_QUALITY_SCORE,
         CASE 
-            WHEN LICENSE_ID IS NULL THEN 'FAILED'
-            WHEN ASSIGNED_TO_USER_ID IS NULL THEN 'FAILED'
-            WHEN CLEAN_START_DATE IS NULL OR CLEAN_END_DATE IS NULL THEN 'WARNING'
-            WHEN CLEAN_START_DATE >= CLEAN_END_DATE THEN 'WARNING'
-            ELSE 'PASSED'
-        END AS VALIDATION_STATUS,
-        ROW_NUMBER() OVER (PARTITION BY LICENSE_ID ORDER BY LOAD_TIMESTAMP DESC) AS rn
-    FROM date_format_conversion
-    WHERE LICENSE_ID IS NOT NULL
+            WHEN LICENSE_ID IS NOT NULL 
+                 AND LICENSE_TYPE IS NOT NULL 
+                 AND ASSIGNED_TO_USER_ID IS NOT NULL 
+                 AND CLEAN_START_DATE IS NOT NULL 
+                 AND CLEAN_END_DATE IS NOT NULL
+            THEN 'PASSED'
+            WHEN LICENSE_ID IS NOT NULL AND ASSIGNED_TO_USER_ID IS NOT NULL
+            THEN 'WARNING'
+            ELSE 'FAILED'
+        END AS VALIDATION_STATUS
+    FROM cleaned_licenses
 )
 
 SELECT 
     LICENSE_ID,
     LICENSE_TYPE,
     ASSIGNED_TO_USER_ID,
-    START_DATE,
-    END_DATE,
+    CLEAN_START_DATE AS START_DATE,
+    CLEAN_END_DATE AS END_DATE,
     LOAD_TIMESTAMP,
     UPDATE_TIMESTAMP,
     SOURCE_SYSTEM,
-    DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
-    DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+    LOAD_DATE,
+    UPDATE_DATE,
     DATA_QUALITY_SCORE,
     VALIDATION_STATUS
-FROM data_quality_checks
-WHERE rn = 1
+FROM validated_licenses
