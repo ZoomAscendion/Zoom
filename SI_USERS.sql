@@ -1,56 +1,60 @@
 {{ config(
     materialized='table',
-    tags=['silver', 'users']
+    tags=['silver', 'users'],
+    pre_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'PRE_HOOK_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_AUDIT_LOG'",
+    post_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'POST_HOOK_COMPLETE', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_AUDIT_LOG'"
 ) }}
 
 WITH bronze_users AS (
-    SELECT 
-        USER_ID,
-        USER_NAME,
-        EMAIL,
-        COMPANY,
-        PLAN_TYPE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
-    FROM {{ ref('bz_users') }}
+    SELECT *,
+           ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM {{ source('bronze', 'BZ_USERS') }}
+    WHERE USER_ID IS NOT NULL
 ),
 
-data_quality_checks AS (
+cleaned_users AS (
     SELECT 
         USER_ID,
-        TRIM(COALESCE(USER_NAME, 'UNKNOWN')) AS USER_NAME,
+        TRIM(USER_NAME) AS USER_NAME,
+        LOWER(TRIM(EMAIL)) AS EMAIL,
+        TRIM(COMPANY) AS COMPANY,
         CASE 
-            WHEN EMAIL IS NOT NULL AND REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
-            THEN LOWER(TRIM(EMAIL))
-            ELSE NULL
-        END AS EMAIL,
-        TRIM(COALESCE(COMPANY, 'UNKNOWN')) AS COMPANY,
-        CASE 
-            WHEN UPPER(TRIM(PLAN_TYPE)) IN ('FREE', 'BASIC', 'PRO', 'ENTERPRISE')
-            THEN UPPER(TRIM(PLAN_TYPE))
+            WHEN UPPER(TRIM(PLAN_TYPE)) IN ('FREE', 'BASIC', 'PRO', 'ENTERPRISE') THEN UPPER(TRIM(PLAN_TYPE))
             ELSE 'FREE'
         END AS PLAN_TYPE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE
+    FROM bronze_users
+    WHERE rn = 1
+),
+
+validated_users AS (
+    SELECT *,
         CASE 
-            WHEN USER_ID IS NULL THEN 0
-            WHEN EMAIL IS NULL OR NOT REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$') THEN 30
-            WHEN USER_NAME IS NULL OR TRIM(USER_NAME) = '' THEN 60
-            WHEN PLAN_TYPE IS NULL OR UPPER(TRIM(PLAN_TYPE)) NOT IN ('FREE', 'BASIC', 'PRO', 'ENTERPRISE') THEN 80
-            ELSE 100
+            WHEN USER_ID IS NOT NULL 
+                 AND USER_NAME IS NOT NULL 
+                 AND EMAIL IS NOT NULL 
+                 AND REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$') 
+                 AND PLAN_TYPE IN ('FREE', 'BASIC', 'PRO', 'ENTERPRISE')
+            THEN 95
+            WHEN USER_ID IS NOT NULL AND EMAIL IS NOT NULL
+            THEN 75
+            ELSE 50
         END AS DATA_QUALITY_SCORE,
         CASE 
-            WHEN USER_ID IS NULL THEN 'FAILED'
-            WHEN EMAIL IS NULL OR NOT REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$') THEN 'FAILED'
-            WHEN USER_NAME IS NULL OR TRIM(USER_NAME) = '' THEN 'WARNING'
-            WHEN PLAN_TYPE IS NULL OR UPPER(TRIM(PLAN_TYPE)) NOT IN ('FREE', 'BASIC', 'PRO', 'ENTERPRISE') THEN 'WARNING'
-            ELSE 'PASSED'
-        END AS VALIDATION_STATUS,
-        ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY LOAD_TIMESTAMP DESC) AS rn
-    FROM bronze_users
-    WHERE USER_ID IS NOT NULL
+            WHEN USER_ID IS NOT NULL 
+                 AND USER_NAME IS NOT NULL 
+                 AND EMAIL IS NOT NULL 
+                 AND REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
+            THEN 'PASSED'
+            WHEN USER_ID IS NOT NULL AND EMAIL IS NOT NULL
+            THEN 'WARNING'
+            ELSE 'FAILED'
+        END AS VALIDATION_STATUS
+    FROM cleaned_users
 )
 
 SELECT 
@@ -62,9 +66,8 @@ SELECT
     LOAD_TIMESTAMP,
     UPDATE_TIMESTAMP,
     SOURCE_SYSTEM,
-    DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
-    DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+    LOAD_DATE,
+    UPDATE_DATE,
     DATA_QUALITY_SCORE,
     VALIDATION_STATUS
-FROM data_quality_checks
-WHERE rn = 1
+FROM validated_users
