@@ -5,12 +5,6 @@ config-version: 2
 profile: 'zoom_silver_pipeline'
 
 model-paths: ["models"]
-analysis-paths: ["analyses"]
-test-paths: ["tests"]
-seed-paths: ["seeds"]
-macro-paths: ["macros"]
-snapshot-paths: ["snapshots"]
-
 target-path: "target"
 clean-targets:
   - "target"
@@ -18,14 +12,4 @@ clean-targets:
 
 models:
   zoom_silver_pipeline:
-    silver:
-      +materialized: table
-
-vars:
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
-
-log-level: info
-partial_parse: true
-use_colors: true
-send_anonymous_usage_stats: false
+    +materialized: table
