@@ -1,18 +1,17 @@
--- Bronze Layer Meetings Table
--- Author: Data Engineering Team
--- Description: Stores meeting information and session details
--- Version: 1.0
--- Created: {{ run_started_at }}
-
-{{ config(
+{{
+  config(
     materialized='table',
     tags=['bronze', 'meetings'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', DATEDIFF('second', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_MEETINGS' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
-) }}
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) VALUES ('BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED')",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) VALUES ('BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', DATEDIFF('second', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_MEETINGS' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS')"
+  )
+}}
+
+-- Bronze Layer Meetings Table
+-- 1:1 mapping from RAW.MEETINGS to BRONZE.BZ_MEETINGS
+-- Includes deduplication logic based on MEETING_ID and LOAD_TIMESTAMP
 
 WITH source_data AS (
-    -- Select all data from source MEETINGS table
     SELECT 
         MEETING_ID,
         HOST_ID,
@@ -23,25 +22,21 @@ WITH source_data AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('raw', 'MEETINGS') }}
+    FROM {{ source('raw_schema', 'meetings') }}
 ),
 
+-- Apply deduplication logic - keep latest record per MEETING_ID
 deduped_data AS (
-    -- Apply deduplication based on MEETING_ID and UPDATE_TIMESTAMP
-    SELECT *
-    FROM (
-        SELECT *,
-               ROW_NUMBER() OVER (
-                   PARTITION BY MEETING_ID 
-                   ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC
-               ) as rn
-        FROM source_data
-    )
-    WHERE rn = 1
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY MEETING_ID 
+            ORDER BY LOAD_TIMESTAMP DESC, UPDATE_TIMESTAMP DESC
+        ) AS row_num
+    FROM source_data
 )
 
--- Final select with 1-1 mapping from raw to bronze
-SELECT
+-- Final selection with audit columns
+SELECT 
     MEETING_ID,
     HOST_ID,
     MEETING_TOPIC,
@@ -52,3 +47,4 @@ SELECT
     UPDATE_TIMESTAMP,
     SOURCE_SYSTEM
 FROM deduped_data
+WHERE row_num = 1
