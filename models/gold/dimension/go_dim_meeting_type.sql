@@ -1,5 +1,7 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('go_process_audit') }} (AUDIT_LOG_ID, PROCESS_NAME, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) VALUES ('{{ invocation_id }}_meeting', 'go_dim_meeting_type', CURRENT_TIMESTAMP(), 'RUNNING', 'si_meetings', 'go_dim_meeting_type', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_ETL')",
+    post_hook="UPDATE {{ ref('go_process_audit') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), UPDATE_DATE = CURRENT_DATE() WHERE AUDIT_LOG_ID = '{{ invocation_id }}_meeting'"
 ) }}
 
 -- Meeting type dimension with enhanced categorization
@@ -10,9 +12,11 @@ WITH meeting_data AS (
         START_TIME,
         DURATION_MINUTES,
         DATA_QUALITY_SCORE,
-        SOURCE_SYSTEM
+        SOURCE_SYSTEM,
+        ROW_NUMBER() OVER (ORDER BY MEETING_ID) AS rn
     FROM {{ source('silver', 'si_meetings') }}
     WHERE VALIDATION_STATUS = 'PASSED'
+    LIMIT 1000 -- Limit for dimension table
 )
 
 SELECT 
@@ -52,3 +56,4 @@ SELECT
     CURRENT_DATE() AS UPDATE_DATE,
     SOURCE_SYSTEM
 FROM meeting_data
+WHERE rn <= 100 -- Create dimension with sample data
