@@ -5,9 +5,7 @@
 
 {{ config(
     materialized='table',
-    tags=['bronze', 'meetings'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_BZ_MEETINGS', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_BZ_MEETINGS', 1.0, 'COMPLETED' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    tags=['bronze', 'meetings']
 ) }}
 
 WITH source_data AS (
