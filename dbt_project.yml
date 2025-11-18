@@ -2,10 +2,8 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_silver_pipeline'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -18,25 +16,47 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
+      +pre-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (
+            AUDIT_ID, 
+            TABLE_NAME, 
+            OPERATION_TYPE, 
+            AUDIT_TIMESTAMP, 
+            PROCESSED_BY
+          ) 
+          SELECT 
+            UUID_STRING(), 
+            '{{ this.name }}', 
+            'PIPELINE_START', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_SILVER_PIPELINE'
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (
+            AUDIT_ID, 
+            TABLE_NAME, 
+            OPERATION_TYPE, 
+            AUDIT_TIMESTAMP, 
+            PROCESSED_BY
+          ) 
+          SELECT 
+            UUID_STRING(), 
+            '{{ this.name }}', 
+            'PIPELINE_END', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_SILVER_PIPELINE'
+        {% endif %}
 
-# Specify the minimum version of dbt required to run this project
-require-dbt-version: [">=1.0.0", "<2.0.0"]
-
-# Configure logging
-log-path: "logs"
-
-# Configure packages
-packages-install-path: "dbt_packages"
-
-# Configure vars
 vars:
-  # The start date for our data (this is a placeholder)
-  start_date: '2020-01-01'
-  # Set timezone for timestamp conversions
-  default_timezone: 'UTC'
+  # Data quality thresholds
+  dq_score_threshold: 70
+  # Audit settings
+  enable_audit_logging: true
+  # Error handling
+  skip_failed_records: true
