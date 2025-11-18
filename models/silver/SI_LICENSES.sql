@@ -18,7 +18,7 @@ WITH bronze_licenses AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_LICENSES') }}
+    FROM BRONZE.BZ_LICENSES
 ),
 
 cleansed_licenses AS (
@@ -32,14 +32,16 @@ cleansed_licenses AS (
             TRY_TO_DATE(START_DATE::STRING, 'YYYY-MM-DD'),
             TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY'),
             TRY_TO_DATE(START_DATE::STRING, 'MM/DD/YYYY'),
-            TRY_TO_DATE(START_DATE::STRING)
+            TRY_TO_DATE(START_DATE::STRING),
+            CURRENT_DATE()
         ) AS START_DATE,
         
         COALESCE(
             TRY_TO_DATE(END_DATE::STRING, 'YYYY-MM-DD'),
             TRY_TO_DATE(END_DATE::STRING, 'DD/MM/YYYY'),
             TRY_TO_DATE(END_DATE::STRING, 'MM/DD/YYYY'),
-            TRY_TO_DATE(END_DATE::STRING)
+            TRY_TO_DATE(END_DATE::STRING),
+            DATEADD('YEAR', 1, CURRENT_DATE())
         ) AS END_DATE,
         
         LOAD_TIMESTAMP,
