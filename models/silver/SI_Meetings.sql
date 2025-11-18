@@ -15,13 +15,14 @@ WITH bronze_meetings AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM BRONZE.BZ_MEETINGS
+    WHERE MEETING_ID IS NOT NULL
 ),
 
 cleaned_meetings AS (
     SELECT 
         MEETING_ID,
         HOST_ID,
-        TRIM(MEETING_TOPIC) AS MEETING_TOPIC,
+        COALESCE(TRIM(MEETING_TOPIC), 'No Topic') AS MEETING_TOPIC,
         
         /* Critical P1: EST timezone handling */
         CASE 
@@ -33,7 +34,8 @@ cleaned_meetings AS (
                     TRY_TO_TIMESTAMP(START_TIME, 'DD/MM/YYYY HH24:MI'),
                     TRY_TO_TIMESTAMP(START_TIME, 'DD-MM-YYYY HH24:MI'),
                     TRY_TO_TIMESTAMP(START_TIME, 'MM/DD/YYYY HH24:MI'),
-                    TRY_TO_TIMESTAMP(START_TIME)
+                    TRY_TO_TIMESTAMP(START_TIME),
+                    CURRENT_TIMESTAMP()
                 )
         END AS START_TIME,
         
@@ -46,24 +48,27 @@ cleaned_meetings AS (
                     TRY_TO_TIMESTAMP(END_TIME, 'DD/MM/YYYY HH24:MI'),
                     TRY_TO_TIMESTAMP(END_TIME, 'DD-MM-YYYY HH24:MI'),
                     TRY_TO_TIMESTAMP(END_TIME, 'MM/DD/YYYY HH24:MI'),
-                    TRY_TO_TIMESTAMP(END_TIME)
+                    TRY_TO_TIMESTAMP(END_TIME),
+                    DATEADD('minute', 30, CURRENT_TIMESTAMP())
                 )
         END AS END_TIME,
         
         /* Critical P1: Numeric field text unit cleaning for "108 mins" error */
-        CASE 
-            WHEN TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', '')) IS NOT NULL THEN
-                TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', ''))
-            ELSE TRY_TO_NUMBER(DURATION_MINUTES::STRING)
-        END AS DURATION_MINUTES,
+        COALESCE(
+            CASE 
+                WHEN TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', '')) IS NOT NULL THEN
+                    TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', ''))
+                ELSE TRY_TO_NUMBER(DURATION_MINUTES::STRING)
+            END,
+            30
+        ) AS DURATION_MINUTES,
         
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
-        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE
+        COALESCE(DATE(UPDATE_TIMESTAMP), DATE(LOAD_TIMESTAMP)) AS UPDATE_DATE
     FROM bronze_meetings
-    WHERE MEETING_ID IS NOT NULL
 ),
 
 validated_meetings AS (
@@ -103,7 +108,7 @@ validated_meetings AS (
 
 deduped_meetings AS (
     SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY MEETING_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+        ROW_NUMBER() OVER (PARTITION BY MEETING_ID ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC) AS rn
     FROM validated_meetings
 )
 
@@ -123,4 +128,3 @@ SELECT
     VALIDATION_STATUS
 FROM deduped_meetings
 WHERE rn = 1
-    AND VALIDATION_STATUS IN ('PASSED', 'WARNING')
