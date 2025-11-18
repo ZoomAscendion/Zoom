@@ -16,9 +16,9 @@ WITH support_base AS (
         st.SOURCE_SYSTEM,
         ROW_NUMBER() OVER (
             PARTITION BY st.TICKET_ID 
-            ORDER BY st.UPDATE_TIMESTAMP DESC
+            ORDER BY COALESCE(st.UPDATE_TIMESTAMP, st.LOAD_TIMESTAMP) DESC
         ) as rn
-    FROM {{ source('silver', 'si_support_tickets') }} st
+    FROM DB_POC_ZOOM_1.GOLD.SI_SUPPORT_TICKETS st
     WHERE st.VALIDATION_STATUS = 'PASSED'
 ),
 
