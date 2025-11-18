@@ -1,37 +1,6 @@
 {{ config(
-    materialized='table',
-    unique_key='product_id'
+    materialized='table'
 ) }}
-
-{% if this.name != 'audit_log' %}
-    {% set audit_start %}
-        INSERT INTO {{ ref('audit_log') }} (
-            record_id, source_table, process_start_time, process_status, created_at
-        ) 
-        SELECT 
-            COALESCE((SELECT MAX(record_id) FROM {{ ref('audit_log') }}), 0) + 1,
-            'products',
-            CURRENT_TIMESTAMP(),
-            'STARTED',
-            CURRENT_TIMESTAMP()
-    {% endset %}
-    
-    {% set audit_end %}
-        INSERT INTO {{ ref('audit_log') }} (
-            record_id, source_table, process_start_time, process_end_time, process_status, records_processed, created_at
-        )
-        SELECT 
-            COALESCE((SELECT MAX(record_id) FROM {{ ref('audit_log') }}), 0) + 1,
-            'products',
-            CURRENT_TIMESTAMP(),
-            CURRENT_TIMESTAMP(),
-            'COMPLETED',
-            (SELECT COUNT(*) FROM {{ this }}),
-            CURRENT_TIMESTAMP()
-    {% endset %}
-    
-    {{ config(pre_hook=audit_start, post_hook=audit_end) }}
-{% endif %}
 
 WITH source_data AS (
     SELECT 
