@@ -1,223 +1,369 @@
 version: 2
 
+sources:
+  - name: raw_schema
+    description: "Raw data layer containing unprocessed data from various source systems"
+    tables:
+      - name: USERS
+        description: "Raw user profile and subscription information"
+        columns:
+          - name: USER_ID
+            description: "Unique identifier for each user account"
+          - name: USER_NAME
+            description: "Display name of the user (PII)"
+          - name: EMAIL
+            description: "Email address of the user (PII)"
+          - name: COMPANY
+            description: "Company or organization name"
+          - name: PLAN_TYPE
+            description: "Subscription plan type (Basic, Pro, Business, Enterprise)"
+          - name: LOAD_TIMESTAMP
+            description: "Timestamp when record was loaded into raw layer"
+          - name: UPDATE_TIMESTAMP
+            description: "Timestamp when record was last updated"
+          - name: SOURCE_SYSTEM
+            description: "Source system from which data originated"
+      
+      - name: MEETINGS
+        description: "Raw meeting information and session details"
+        columns:
+          - name: MEETING_ID
+            description: "Unique identifier for each meeting"
+          - name: HOST_ID
+            description: "User ID of the meeting host"
+          - name: MEETING_TOPIC
+            description: "Topic or title of the meeting (Potential PII)"
+          - name: START_TIME
+            description: "Meeting start timestamp"
+          - name: END_TIME
+            description: "Meeting end timestamp"
+          - name: DURATION_MINUTES
+            description: "Meeting duration in minutes"
+          - name: LOAD_TIMESTAMP
+            description: "Timestamp when record was loaded into raw layer"
+          - name: UPDATE_TIMESTAMP
+            description: "Timestamp when record was last updated"
+          - name: SOURCE_SYSTEM
+            description: "Source system from which data originated"
+      
+      - name: PARTICIPANTS
+        description: "Raw meeting participants and their session details"
+        columns:
+          - name: PARTICIPANT_ID
+            description: "Unique identifier for each meeting participant"
+          - name: MEETING_ID
+            description: "Reference to meeting"
+          - name: USER_ID
+            description: "Reference to user who participated"
+          - name: JOIN_TIME
+            description: "Timestamp when participant joined meeting"
+          - name: LEAVE_TIME
+            description: "Timestamp when participant left meeting"
+          - name: LOAD_TIMESTAMP
+            description: "Timestamp when record was loaded into raw layer"
+          - name: UPDATE_TIMESTAMP
+            description: "Timestamp when record was last updated"
+          - name: SOURCE_SYSTEM
+            description: "Source system from which data originated"
+      
+      - name: FEATURE_USAGE
+        description: "Raw usage of platform features during meetings"
+        columns:
+          - name: USAGE_ID
+            description: "Unique identifier for each feature usage record"
+          - name: MEETING_ID
+            description: "Reference to meeting where feature was used"
+          - name: FEATURE_NAME
+            description: "Name of the feature being tracked"
+          - name: USAGE_COUNT
+            description: "Number of times feature was used"
+          - name: USAGE_DATE
+            description: "Date when feature usage occurred"
+          - name: LOAD_TIMESTAMP
+            description: "Timestamp when record was loaded into raw layer"
+          - name: UPDATE_TIMESTAMP
+            description: "Timestamp when record was last updated"
+          - name: SOURCE_SYSTEM
+            description: "Source system from which data originated"
+      
+      - name: SUPPORT_TICKETS
+        description: "Raw customer support requests and resolution tracking"
+        columns:
+          - name: TICKET_ID
+            description: "Unique identifier for each support ticket"
+          - name: USER_ID
+            description: "Reference to user who created the ticket"
+          - name: TICKET_TYPE
+            description: "Type of support ticket"
+          - name: RESOLUTION_STATUS
+            description: "Current status of ticket resolution"
+          - name: OPEN_DATE
+            description: "Date when ticket was opened"
+          - name: LOAD_TIMESTAMP
+            description: "Timestamp when record was loaded into raw layer"
+          - name: UPDATE_TIMESTAMP
+            description: "Timestamp when record was last updated"
+          - name: SOURCE_SYSTEM
+            description: "Source system from which data originated"
+      
+      - name: BILLING_EVENTS
+        description: "Raw financial transactions and billing activities"
+        columns:
+          - name: EVENT_ID
+            description: "Unique identifier for each billing event"
+          - name: USER_ID
+            description: "Reference to user associated with billing event"
+          - name: EVENT_TYPE
+            description: "Type of billing event"
+          - name: AMOUNT
+            description: "Monetary amount for the billing event"
+          - name: EVENT_DATE
+            description: "Date when the billing event occurred"
+          - name: LOAD_TIMESTAMP
+            description: "Timestamp when record was loaded into raw layer"
+          - name: UPDATE_TIMESTAMP
+            description: "Timestamp when record was last updated"
+          - name: SOURCE_SYSTEM
+            description: "Source system from which data originated"
+      
+      - name: LICENSES
+        description: "Raw license assignments and entitlements"
+        columns:
+          - name: LICENSE_ID
+            description: "Unique identifier for each license"
+          - name: LICENSE_TYPE
+            description: "Type of license"
+          - name: ASSIGNED_TO_USER_ID
+            description: "User ID to whom license is assigned"
+          - name: START_DATE
+            description: "License validity start date"
+          - name: END_DATE
+            description: "License validity end date"
+          - name: LOAD_TIMESTAMP
+            description: "Timestamp when record was loaded into raw layer"
+          - name: UPDATE_TIMESTAMP
+            description: "Timestamp when record was last updated"
+          - name: SOURCE_SYSTEM
+            description: "Source system from which data originated"
+
 models:
   - name: bz_data_audit
     description: "Comprehensive audit trail for all Bronze layer data operations"
     columns:
-      - name: record_id
+      - name: RECORD_ID
         description: "Auto-incrementing unique identifier for each audit record"
-        data_type: number
-      - name: source_table
+        data_type: NUMBER
+      - name: SOURCE_TABLE
         description: "Name of the Bronze layer table"
-        data_type: varchar(255)
-      - name: load_timestamp
+        data_type: VARCHAR(255)
+      - name: LOAD_TIMESTAMP
         description: "When the operation occurred"
-        data_type: timestamp_ntz
-      - name: processed_by
+        data_type: TIMESTAMP_NTZ(9)
+      - name: PROCESSED_BY
         description: "User or process that performed the operation"
-        data_type: varchar(255)
-      - name: processing_time
+        data_type: VARCHAR(255)
+      - name: PROCESSING_TIME
         description: "Time taken to process the operation in seconds"
-        data_type: number(38,3)
-      - name: status
-        description: "Status of the operation (SUCCESS, FAILED, WARNING, STARTED)"
-        data_type: varchar(255)
+        data_type: NUMBER(38,3)
+      - name: STATUS
+        description: "Status of the operation (SUCCESS, FAILED, WARNING)"
+        data_type: VARCHAR(50)
   
   - name: bz_users
     description: "Bronze layer table storing user profile and subscription information"
     columns:
-      - name: user_id
+      - name: USER_ID
         description: "Unique identifier for each user account"
-        data_type: varchar
-      - name: user_name
+        data_type: VARCHAR(16777216)
+      - name: USER_NAME
         description: "Display name of the user (PII)"
-        data_type: varchar
-      - name: email
+        data_type: VARCHAR(16777216)
+      - name: EMAIL
         description: "Email address of the user (PII)"
-        data_type: varchar
-      - name: company
+        data_type: VARCHAR(16777216)
+      - name: COMPANY
         description: "Company or organization name"
-        data_type: varchar
-      - name: plan_type
+        data_type: VARCHAR(16777216)
+      - name: PLAN_TYPE
         description: "Subscription plan type (Basic, Pro, Business, Enterprise)"
-        data_type: varchar
-      - name: load_timestamp
+        data_type: VARCHAR(16777216)
+      - name: LOAD_TIMESTAMP
         description: "Timestamp when record was loaded into Bronze layer"
-        data_type: timestamp_ntz
-      - name: update_timestamp
+        data_type: TIMESTAMP_NTZ(9)
+      - name: UPDATE_TIMESTAMP
         description: "Timestamp when record was last updated"
-        data_type: timestamp_ntz
-      - name: source_system
+        data_type: TIMESTAMP_NTZ(9)
+      - name: SOURCE_SYSTEM
         description: "Source system from which data originated"
-        data_type: varchar
+        data_type: VARCHAR(16777216)
   
   - name: bz_meetings
     description: "Bronze layer table storing meeting information and session details"
     columns:
-      - name: meeting_id
+      - name: MEETING_ID
         description: "Unique identifier for each meeting"
-        data_type: varchar
-      - name: host_id
+        data_type: VARCHAR(16777216)
+      - name: HOST_ID
         description: "User ID of the meeting host"
-        data_type: varchar
-      - name: meeting_topic
+        data_type: VARCHAR(16777216)
+      - name: MEETING_TOPIC
         description: "Topic or title of the meeting (Potential PII)"
-        data_type: varchar
-      - name: start_time
+        data_type: VARCHAR(16777216)
+      - name: START_TIME
         description: "Meeting start timestamp"
-        data_type: timestamp_ntz
-      - name: end_time
+        data_type: TIMESTAMP_NTZ(9)
+      - name: END_TIME
         description: "Meeting end timestamp"
-        data_type: timestamp_ntz
-      - name: duration_minutes
+        data_type: TIMESTAMP_NTZ(9)
+      - name: DURATION_MINUTES
         description: "Meeting duration in minutes"
-        data_type: number
-      - name: load_timestamp
+        data_type: NUMBER(38,0)
+      - name: LOAD_TIMESTAMP
         description: "Timestamp when record was loaded into Bronze layer"
-        data_type: timestamp_ntz
-      - name: update_timestamp
+        data_type: TIMESTAMP_NTZ(9)
+      - name: UPDATE_TIMESTAMP
         description: "Timestamp when record was last updated"
-        data_type: timestamp_ntz
-      - name: source_system
+        data_type: TIMESTAMP_NTZ(9)
+      - name: SOURCE_SYSTEM
         description: "Source system from which data originated"
-        data_type: varchar
+        data_type: VARCHAR(16777216)
   
   - name: bz_participants
     description: "Bronze layer table tracking meeting participants and their session details"
     columns:
-      - name: participant_id
+      - name: PARTICIPANT_ID
         description: "Unique identifier for each meeting participant"
-        data_type: varchar
-      - name: meeting_id
+        data_type: VARCHAR(16777216)
+      - name: MEETING_ID
         description: "Reference to meeting"
-        data_type: varchar
-      - name: user_id
+        data_type: VARCHAR(16777216)
+      - name: USER_ID
         description: "Reference to user who participated"
-        data_type: varchar
-      - name: join_time
+        data_type: VARCHAR(16777216)
+      - name: JOIN_TIME
         description: "Timestamp when participant joined meeting"
-        data_type: timestamp_ntz
-      - name: leave_time
+        data_type: TIMESTAMP_NTZ(9)
+      - name: LEAVE_TIME
         description: "Timestamp when participant left meeting"
-        data_type: timestamp_ntz
-      - name: load_timestamp
+        data_type: TIMESTAMP_NTZ(9)
+      - name: LOAD_TIMESTAMP
         description: "Timestamp when record was loaded into Bronze layer"
-        data_type: timestamp_ntz
-      - name: update_timestamp
+        data_type: TIMESTAMP_NTZ(9)
+      - name: UPDATE_TIMESTAMP
         description: "Timestamp when record was last updated"
-        data_type: timestamp_ntz
-      - name: source_system
+        data_type: TIMESTAMP_NTZ(9)
+      - name: SOURCE_SYSTEM
         description: "Source system from which data originated"
-        data_type: varchar
+        data_type: VARCHAR(16777216)
   
   - name: bz_feature_usage
     description: "Bronze layer table recording usage of platform features during meetings"
     columns:
-      - name: usage_id
+      - name: USAGE_ID
         description: "Unique identifier for each feature usage record"
-        data_type: varchar
-      - name: meeting_id
+        data_type: VARCHAR(16777216)
+      - name: MEETING_ID
         description: "Reference to meeting where feature was used"
-        data_type: varchar
-      - name: feature_name
+        data_type: VARCHAR(16777216)
+      - name: FEATURE_NAME
         description: "Name of the feature being tracked"
-        data_type: varchar
-      - name: usage_count
+        data_type: VARCHAR(16777216)
+      - name: USAGE_COUNT
         description: "Number of times feature was used"
-        data_type: number
-      - name: usage_date
+        data_type: NUMBER(38,0)
+      - name: USAGE_DATE
         description: "Date when feature usage occurred"
-        data_type: date
-      - name: load_timestamp
+        data_type: DATE
+      - name: LOAD_TIMESTAMP
         description: "Timestamp when record was loaded into Bronze layer"
-        data_type: timestamp_ntz
-      - name: update_timestamp
+        data_type: TIMESTAMP_NTZ(9)
+      - name: UPDATE_TIMESTAMP
         description: "Timestamp when record was last updated"
-        data_type: timestamp_ntz
-      - name: source_system
+        data_type: TIMESTAMP_NTZ(9)
+      - name: SOURCE_SYSTEM
         description: "Source system from which data originated"
-        data_type: varchar
+        data_type: VARCHAR(16777216)
   
   - name: bz_support_tickets
     description: "Bronze layer table managing customer support requests and resolution tracking"
     columns:
-      - name: ticket_id
+      - name: TICKET_ID
         description: "Unique identifier for each support ticket"
-        data_type: varchar
-      - name: user_id
+        data_type: VARCHAR(16777216)
+      - name: USER_ID
         description: "Reference to user who created the ticket"
-        data_type: varchar
-      - name: ticket_type
+        data_type: VARCHAR(16777216)
+      - name: TICKET_TYPE
         description: "Type of support ticket"
-        data_type: varchar
-      - name: resolution_status
+        data_type: VARCHAR(16777216)
+      - name: RESOLUTION_STATUS
         description: "Current status of ticket resolution"
-        data_type: varchar
-      - name: open_date
+        data_type: VARCHAR(16777216)
+      - name: OPEN_DATE
         description: "Date when ticket was opened"
-        data_type: date
-      - name: load_timestamp
+        data_type: DATE
+      - name: LOAD_TIMESTAMP
         description: "Timestamp when record was loaded into Bronze layer"
-        data_type: timestamp_ntz
-      - name: update_timestamp
+        data_type: TIMESTAMP_NTZ(9)
+      - name: UPDATE_TIMESTAMP
         description: "Timestamp when record was last updated"
-        data_type: timestamp_ntz
-      - name: source_system
+        data_type: TIMESTAMP_NTZ(9)
+      - name: SOURCE_SYSTEM
         description: "Source system from which data originated"
-        data_type: varchar
+        data_type: VARCHAR(16777216)
   
   - name: bz_billing_events
     description: "Bronze layer table tracking financial transactions and billing activities"
     columns:
-      - name: event_id
+      - name: EVENT_ID
         description: "Unique identifier for each billing event"
-        data_type: varchar
-      - name: user_id
+        data_type: VARCHAR(16777216)
+      - name: USER_ID
         description: "Reference to user associated with billing event"
-        data_type: varchar
-      - name: event_type
+        data_type: VARCHAR(16777216)
+      - name: EVENT_TYPE
         description: "Type of billing event"
-        data_type: varchar
-      - name: amount
+        data_type: VARCHAR(16777216)
+      - name: AMOUNT
         description: "Monetary amount for the billing event"
-        data_type: number(10,2)
-      - name: event_date
+        data_type: NUMBER(10,2)
+      - name: EVENT_DATE
         description: "Date when the billing event occurred"
-        data_type: date
-      - name: load_timestamp
+        data_type: DATE
+      - name: LOAD_TIMESTAMP
         description: "Timestamp when record was loaded into Bronze layer"
-        data_type: timestamp_ntz
-      - name: update_timestamp
+        data_type: TIMESTAMP_NTZ(9)
+      - name: UPDATE_TIMESTAMP
         description: "Timestamp when record was last updated"
-        data_type: timestamp_ntz
-      - name: source_system
+        data_type: TIMESTAMP_NTZ(9)
+      - name: SOURCE_SYSTEM
         description: "Source system from which data originated"
-        data_type: varchar
+        data_type: VARCHAR(16777216)
   
   - name: bz_licenses
     description: "Bronze layer table managing license assignments and entitlements"
     columns:
-      - name: license_id
+      - name: LICENSE_ID
         description: "Unique identifier for each license"
-        data_type: varchar
-      - name: license_type
+        data_type: VARCHAR(16777216)
+      - name: LICENSE_TYPE
         description: "Type of license"
-        data_type: varchar
-      - name: assigned_to_user_id
+        data_type: VARCHAR(16777216)
+      - name: ASSIGNED_TO_USER_ID
         description: "User ID to whom license is assigned"
-        data_type: varchar
-      - name: start_date
+        data_type: VARCHAR(16777216)
+      - name: START_DATE
         description: "License validity start date"
-        data_type: date
-      - name: end_date
+        data_type: DATE
+      - name: END_DATE
         description: "License validity end date"
-        data_type: date
-      - name: load_timestamp
+        data_type: DATE
+      - name: LOAD_TIMESTAMP
         description: "Timestamp when record was loaded into Bronze layer"
-        data_type: timestamp_ntz
-      - name: update_timestamp
+        data_type: TIMESTAMP_NTZ(9)
+      - name: UPDATE_TIMESTAMP
         description: "Timestamp when record was last updated"
-        data_type: timestamp_ntz
-      - name: source_system
+        data_type: TIMESTAMP_NTZ(9)
+      - name: SOURCE_SYSTEM
         description: "Source system from which data originated"
-        data_type: varchar
+        data_type: VARCHAR(16777216)
