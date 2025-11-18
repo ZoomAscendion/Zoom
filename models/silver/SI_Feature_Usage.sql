@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_FEATURE_USAGE', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_FEATURE_USAGE', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    materialized='table'
 ) }}
 
 -- SI_Feature_Usage table transformation from Bronze to Silver
@@ -17,7 +15,7 @@ WITH bronze_feature_usage AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_FEATURE_USAGE') }}
+    FROM BRONZE.BZ_FEATURE_USAGE
 ),
 
 cleaned_feature_usage AS (
@@ -43,7 +41,7 @@ validated_feature_usage AS (
         *,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
         DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
-        -- Calculate data quality score
+        /* Calculate data quality score */
         CASE 
             WHEN USAGE_ID IS NOT NULL 
                 AND MEETING_ID IS NOT NULL 
@@ -56,7 +54,7 @@ validated_feature_usage AS (
             THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
-        -- Set validation status
+        /* Set validation status */
         CASE 
             WHEN USAGE_ID IS NOT NULL 
                 AND MEETING_ID IS NOT NULL 
