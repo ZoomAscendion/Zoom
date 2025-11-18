@@ -21,17 +21,52 @@ clean-targets:
 # Configuring models
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/silver/
+    # Config indicated by + and applies to all files under models/example/
     silver:
       +materialized: table
+      +on_schema_change: sync_all_columns
+      # Ensure audit log runs first
+      SI_Audit_Log:
+        +pre_hook: []
+        +post_hook: []
+      # All other models depend on audit log
+      SI_Users:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Meetings:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Participants:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Feature_Usage:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Support_Tickets:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Billing_Events:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Licenses:
+        +depends_on:
+          - ref('SI_Audit_Log')
 
-# Variables
+# Set the concurrency for this project
+threads: 4
+
+# Specify the minimum version of dbt required to run this project
+require-dbt-version: [">=1.0.0", "<2.0.0"]
+
+# Configure logging
+log-path: "logs"
+
+# Configure packages
+packages-install-path: "dbt_packages"
+
+# Configure vars
 vars:
-  # The `start_date` variable will be accessible in all resources
+  # The start date for our data (this is a placeholder)
   start_date: '2020-01-01'
-  # The `end_date` variable will be accessible in all resources  
-  end_date: '2030-12-31'
-  # Data quality threshold
-  dq_threshold: 70
-  # Audit retention days
-  audit_retention_days: 730
+  # Set timezone for timestamp conversions
+  default_timezone: 'UTC'
