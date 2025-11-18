@@ -1,7 +1,15 @@
 {{ config(
     materialized='table',
-    alias='SI_USERS'
+    alias='SI_USERS',
+    pre_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'PRE_HOOK_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_AUDIT_LOG'",
+    post_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'POST_HOOK_COMPLETE', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_AUDIT_LOG'"
 ) }}
+
+/*
+ * SI_USERS - Silver Layer Users Table
+ * Transforms and cleanses user data from Bronze layer
+ * Includes data quality checks and validation
+ */
 
 WITH bronze_users AS (
     SELECT 
@@ -17,7 +25,7 @@ WITH bronze_users AS (
     WHERE USER_ID IS NOT NULL
 ),
 
-cleaned_users AS (
+cleansed_users AS (
     SELECT 
         USER_ID,
         TRIM(USER_NAME) AS USER_NAME,
@@ -31,37 +39,43 @@ cleaned_users AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE
     FROM bronze_users
-    WHERE EMAIL IS NOT NULL 
-    AND REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
 ),
 
 validated_users AS (
     SELECT 
-        USER_ID,
-        USER_NAME,
-        EMAIL,
-        COMPANY,
-        PLAN_TYPE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM,
-        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
-        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        *,
         CASE 
-            WHEN USER_NAME IS NOT NULL AND EMAIL IS NOT NULL AND PLAN_TYPE IS NOT NULL THEN 100
-            WHEN USER_NAME IS NOT NULL AND EMAIL IS NOT NULL THEN 85
-            WHEN EMAIL IS NOT NULL THEN 70
+            WHEN USER_ID IS NOT NULL 
+                AND USER_NAME IS NOT NULL 
+                AND EMAIL IS NOT NULL 
+                AND REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
+                AND PLAN_TYPE IN ('FREE', 'BASIC', 'PRO', 'ENTERPRISE')
+            THEN 100
+            WHEN USER_ID IS NOT NULL AND EMAIL IS NOT NULL
+            THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
         CASE 
-            WHEN USER_NAME IS NOT NULL AND EMAIL IS NOT NULL AND PLAN_TYPE IS NOT NULL THEN 'PASSED'
-            WHEN EMAIL IS NOT NULL THEN 'WARNING'
+            WHEN USER_ID IS NOT NULL 
+                AND USER_NAME IS NOT NULL 
+                AND EMAIL IS NOT NULL 
+                AND REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
+                AND PLAN_TYPE IN ('FREE', 'BASIC', 'PRO', 'ENTERPRISE')
+            THEN 'PASSED'
+            WHEN USER_ID IS NOT NULL AND EMAIL IS NOT NULL
+            THEN 'WARNING'
             ELSE 'FAILED'
         END AS VALIDATION_STATUS
-    FROM cleaned_users
-    WHERE rn = 1
+    FROM cleansed_users
+),
+
+deduped_users AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY UPDATE_TIMESTAMP DESC NULLS LAST) AS rn
+    FROM validated_users
 )
 
 SELECT 
@@ -77,4 +91,5 @@ SELECT
     UPDATE_DATE,
     DATA_QUALITY_SCORE,
     VALIDATION_STATUS
-FROM validated_users
+FROM deduped_users
+WHERE rn = 1
