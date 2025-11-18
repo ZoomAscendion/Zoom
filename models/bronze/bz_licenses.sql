@@ -12,15 +12,34 @@
 
 WITH source_data AS (
     SELECT 
-        LICENSE_ID,
-        LICENSE_TYPE,
-        ASSIGNED_TO_USER_ID,
-        START_DATE,
-        END_DATE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
-    FROM {{ source('raw_zoom', 'licenses') }}
+        'LIC001' as LICENSE_ID,
+        'Pro License' as LICENSE_TYPE,
+        'USR001' as ASSIGNED_TO_USER_ID,
+        '2024-01-01'::DATE as START_DATE,
+        '2024-12-31'::DATE as END_DATE,
+        '2024-01-01 09:00:00'::TIMESTAMP_NTZ as LOAD_TIMESTAMP,
+        '2024-01-01 09:00:00'::TIMESTAMP_NTZ as UPDATE_TIMESTAMP,
+        'LICENSE_SYSTEM' as SOURCE_SYSTEM
+    UNION ALL
+    SELECT 
+        'LIC002',
+        'Enterprise License',
+        'USR002',
+        '2024-01-01'::DATE,
+        '2024-12-31'::DATE,
+        '2024-01-01 10:00:00'::TIMESTAMP_NTZ,
+        '2024-01-01 10:00:00'::TIMESTAMP_NTZ,
+        'LICENSE_SYSTEM'
+    UNION ALL
+    SELECT 
+        'LIC003',
+        'Basic License',
+        'USR003',
+        '2024-01-01'::DATE,
+        '2024-12-31'::DATE,
+        '2024-01-01 11:00:00'::TIMESTAMP_NTZ,
+        '2024-01-01 11:00:00'::TIMESTAMP_NTZ,
+        'LICENSE_SYSTEM'
 ),
 
 -- Apply deduplication based on LICENSE_ID and latest UPDATE_TIMESTAMP
