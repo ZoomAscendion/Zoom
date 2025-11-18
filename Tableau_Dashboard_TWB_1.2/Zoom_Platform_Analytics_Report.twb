@@ -1,0 +1,1747 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20233.23.1017.0948 -->
+<workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AccessibleZoneTabOrder.true...AccessibleZoneTabOrder />
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <AutoCreateAndUpdateDSDPhoneLayouts />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <SetMembershipControl />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
+  <datasources>
+    <datasource caption='ZoomPlatformAnalytics_DS' inline='true' name='federated.0hjr7b01ceyq8s13cn8nj0plzb42' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.1bbandk06t32nw1aonthl103n18b'>
+            <connection authentication='oauth' class='snowflake' dbname='DB_POC_ZOOM' instanceurl='https://a8977680256071-ascendion_partner.snowflakecomputing.com' odbc-connect-string-extras='' one-time-sql='' role='FR__POC__ADMIN__ZOOM' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' server-oauth='' service='FR__POC__ADMIN__ZOOM' username='SATHYANARAYANA.P@ASCENDION.COM' warehouse='WH_POC_ZOOM_DEV_XSMALL' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='collection'>
+          <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='FACT_MEETING_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
+          <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='DIM_DATE' table='[DB_POC_ZOOM].[GOLD].[DIM_DATE]' type='table' />
+          <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='DIM_MEETING' table='[DB_POC_ZOOM].[GOLD].[DIM_MEETING]' type='table' />
+          <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='DIM_USER' table='[DB_POC_ZOOM].[GOLD].[DIM_USER]' type='table' />
+          <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='FACT_FEATURE_USAGE' table='[DB_POC_ZOOM].[GOLD].[FACT_FEATURE_USAGE]' type='table' />
+          <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='DIM_FEATURE' table='[DB_POC_ZOOM].[GOLD].[DIM_FEATURE]' type='table' />
+          <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
+          <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_ZOOM].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
+        </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <cols>
+          <map key='[MEETING_ACTIVITY_ID]' value='[FACT_MEETING_ACTIVITY].[MEETING_ACTIVITY_ID]' />
+          <map key='[USER_KEY]' value='[FACT_MEETING_ACTIVITY].[USER_KEY]' />
+          <map key='[MEETING_KEY]' value='[FACT_MEETING_ACTIVITY].[MEETING_KEY]' />
+          <map key='[DATE_KEY]' value='[FACT_MEETING_ACTIVITY].[DATE_KEY]' />
+          <map key='[FEATURE_KEY]' value='[FACT_MEETING_ACTIVITY].[FEATURE_KEY]' />
+          <map key='[MEETING_DATE]' value='[FACT_MEETING_ACTIVITY].[MEETING_DATE]' />
+          <map key='[MEETING_TOPIC]' value='[FACT_MEETING_ACTIVITY].[MEETING_TOPIC]' />
+          <map key='[START_TIME]' value='[FACT_MEETING_ACTIVITY].[START_TIME]' />
+          <map key='[END_TIME]' value='[FACT_MEETING_ACTIVITY].[END_TIME]' />
+          <map key='[DURATION_MINUTES]' value='[FACT_MEETING_ACTIVITY].[DURATION_MINUTES]' />
+          <map key='[PARTICIPANT_COUNT]' value='[FACT_MEETING_ACTIVITY].[PARTICIPANT_COUNT]' />
+          <map key='[TOTAL_JOIN_TIME_MINUTES]' value='[FACT_MEETING_ACTIVITY].[TOTAL_JOIN_TIME_MINUTES]' />
+          <map key='[AVERAGE_PARTICIPATION_MINUTES]' value='[FACT_MEETING_ACTIVITY].[AVERAGE_PARTICIPATION_MINUTES]' />
+          <map key='[FEATURES_USED_COUNT]' value='[FACT_MEETING_ACTIVITY].[FEATURES_USED_COUNT]' />
+          <map key='[SCREEN_SHARE_USAGE_COUNT]' value='[FACT_MEETING_ACTIVITY].[SCREEN_SHARE_USAGE_COUNT]' />
+          <map key='[RECORDING_USAGE_COUNT]' value='[FACT_MEETING_ACTIVITY].[RECORDING_USAGE_COUNT]' />
+          <map key='[CHAT_USAGE_COUNT]' value='[FACT_MEETING_ACTIVITY].[CHAT_USAGE_COUNT]' />
+          <map key='[MEETING_QUALITY_SCORE]' value='[FACT_MEETING_ACTIVITY].[MEETING_QUALITY_SCORE]' />
+          <map key='[AUDIO_QUALITY_SCORE]' value='[FACT_MEETING_ACTIVITY].[AUDIO_QUALITY_SCORE]' />
+          <map key='[VIDEO_QUALITY_SCORE]' value='[FACT_MEETING_ACTIVITY].[VIDEO_QUALITY_SCORE]' />
+          <map key='[CONNECTION_ISSUES_COUNT]' value='[FACT_MEETING_ACTIVITY].[CONNECTION_ISSUES_COUNT]' />
+          <map key='[MEETING_SATISFACTION_SCORE]' value='[FACT_MEETING_ACTIVITY].[MEETING_SATISFACTION_SCORE]' />
+          <map key='[PEAK_CONCURRENT_PARTICIPANTS]' value='[FACT_MEETING_ACTIVITY].[PEAK_CONCURRENT_PARTICIPANTS]' />
+          <map key='[LATE_JOINERS_COUNT]' value='[FACT_MEETING_ACTIVITY].[LATE_JOINERS_COUNT]' />
+          <map key='[EARLY_LEAVERS_COUNT]' value='[FACT_MEETING_ACTIVITY].[EARLY_LEAVERS_COUNT]' />
+          <map key='[BREAKOUT_ROOMS_USED]' value='[FACT_MEETING_ACTIVITY].[BREAKOUT_ROOMS_USED]' />
+          <map key='[POLLS_CONDUCTED]' value='[FACT_MEETING_ACTIVITY].[POLLS_CONDUCTED]' />
+          <map key='[FILE_SHARES_COUNT]' value='[FACT_MEETING_ACTIVITY].[FILE_SHARES_COUNT]' />
+          <map key='[USER_NAME]' value='[DIM_USER].[USER_NAME]' />
+          <map key='[EMAIL_DOMAIN]' value='[DIM_USER].[EMAIL_DOMAIN]' />
+          <map key='[COMPANY]' value='[DIM_USER].[COMPANY]' />
+          <map key='[PLAN_TYPE]' value='[DIM_USER].[PLAN_TYPE]' />
+          <map key='[PLAN_CATEGORY]' value='[DIM_USER].[PLAN_CATEGORY]' />
+          <map key='[REGISTRATION_DATE]' value='[DIM_USER].[REGISTRATION_DATE]' />
+          <map key='[USER_STATUS]' value='[DIM_USER].[USER_STATUS]' />
+          <map key='[GEOGRAPHIC_REGION]' value='[DIM_USER].[GEOGRAPHIC_REGION]' />
+          <map key='[INDUSTRY_SECTOR]' value='[DIM_USER].[INDUSTRY_SECTOR]' />
+          <map key='[USER_ROLE]' value='[DIM_USER].[USER_ROLE]' />
+          <map key='[ACCOUNT_TYPE]' value='[DIM_USER].[ACCOUNT_TYPE]' />
+          <map key='[LANGUAGE_PREFERENCE]' value='[DIM_USER].[LANGUAGE_PREFERENCE]' />
+          <map key='[MEETING_TYPE]' value='[DIM_MEETING].[MEETING_TYPE]' />
+          <map key='[MEETING_CATEGORY]' value='[DIM_MEETING].[MEETING_CATEGORY]' />
+          <map key='[DURATION_CATEGORY]' value='[DIM_MEETING].[DURATION_CATEGORY]' />
+          <map key='[PARTICIPANT_SIZE_CATEGORY]' value='[DIM_MEETING].[PARTICIPANT_SIZE_CATEGORY]' />
+          <map key='[TIME_OF_DAY_CATEGORY]' value='[DIM_MEETING].[TIME_OF_DAY_CATEGORY]' />
+          <map key='[DAY_OF_WEEK]' value='[DIM_MEETING].[DAY_OF_WEEK]' />
+          <map key='[IS_WEEKEND]' value='[DIM_MEETING].[IS_WEEKEND]' />
+          <map key='[IS_RECURRING]' value='[DIM_MEETING].[IS_RECURRING]' />
+          <map key='[BUSINESS_PURPOSE]' value='[DIM_MEETING].[BUSINESS_PURPOSE]' />
+          <map key='[FEATURE_NAME]' value='[DIM_FEATURE].[FEATURE_NAME]' />
+          <map key='[FEATURE_CATEGORY]' value='[DIM_FEATURE].[FEATURE_CATEGORY]' />
+          <map key='[FEATURE_TYPE]' value='[DIM_FEATURE].[FEATURE_TYPE]' />
+          <map key='[FEATURE_COMPLEXITY]' value='[DIM_FEATURE].[FEATURE_COMPLEXITY]' />
+          <map key='[IS_PREMIUM_FEATURE]' value='[DIM_FEATURE].[IS_PREMIUM_FEATURE]' />
+          <map key='[FEATURE_RELEASE_DATE]' value='[DIM_FEATURE].[FEATURE_RELEASE_DATE]' />
+          <map key='[FEATURE_STATUS]' value='[DIM_FEATURE].[FEATURE_STATUS]' />
+          <map key='[USAGE_FREQUENCY_CATEGORY]' value='[DIM_FEATURE].[USAGE_FREQUENCY_CATEGORY]' />
+          <map key='[FEATURE_DESCRIPTION]' value='[DIM_FEATURE].[FEATURE_DESCRIPTION]' />
+          <map key='[TARGET_USER_SEGMENT]' value='[DIM_FEATURE].[TARGET_USER_SEGMENT]' />
+          <map key='[USAGE_COUNT]' value='[FACT_FEATURE_USAGE].[USAGE_COUNT]' />
+          <map key='[USAGE_DURATION_MINUTES]' value='[FACT_FEATURE_USAGE].[USAGE_DURATION_MINUTES]' />
+          <map key='[SESSION_DURATION_MINUTES]' value='[FACT_FEATURE_USAGE].[SESSION_DURATION_MINUTES]' />
+          <map key='[FEATURE_ADOPTION_SCORE]' value='[FACT_FEATURE_USAGE].[FEATURE_ADOPTION_SCORE]' />
+          <map key='[USER_EXPERIENCE_RATING]' value='[FACT_FEATURE_USAGE].[USER_EXPERIENCE_RATING]' />
+          <map key='[FEATURE_PERFORMANCE_SCORE]' value='[FACT_FEATURE_USAGE].[FEATURE_PERFORMANCE_SCORE]' />
+          <map key='[CONCURRENT_FEATURES_COUNT]' value='[FACT_FEATURE_USAGE].[CONCURRENT_FEATURES_COUNT]' />
+          <map key='[USAGE_CONTEXT]' value='[FACT_FEATURE_USAGE].[USAGE_CONTEXT]' />
+          <map key='[DEVICE_TYPE]' value='[FACT_FEATURE_USAGE].[DEVICE_TYPE]' />
+          <map key='[PLATFORM_VERSION]' value='[FACT_FEATURE_USAGE].[PLATFORM_VERSION]' />
+          <map key='[ERROR_COUNT]' value='[FACT_FEATURE_USAGE].[ERROR_COUNT]' />
+          <map key='[SUCCESS_RATE]' value='[FACT_FEATURE_USAGE].[SUCCESS_RATE]' />
+          <map key='[SUPPORT_ACTIVITY_ID]' value='[FACT_SUPPORT_ACTIVITY].[SUPPORT_ACTIVITY_ID]' />
+          <map key='[TICKET_OPEN_DATE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_OPEN_DATE]' />
+          <map key='[TICKET_CLOSE_DATE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_CLOSE_DATE]' />
+          <map key='[TICKET_TYPE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_TYPE]' />
+          <map key='[RESOLUTION_STATUS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_STATUS]' />
+          <map key='[PRIORITY_LEVEL]' value='[FACT_SUPPORT_ACTIVITY].[PRIORITY_LEVEL]' />
+          <map key='[RESOLUTION_TIME_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_TIME_HOURS]' />
+          <map key='[ESCALATION_COUNT]' value='[FACT_SUPPORT_ACTIVITY].[ESCALATION_COUNT]' />
+          <map key='[CUSTOMER_SATISFACTION_SCORE]' value='[FACT_SUPPORT_ACTIVITY].[CUSTOMER_SATISFACTION_SCORE]' />
+          <map key='[FIRST_CONTACT_RESOLUTION_FLAG]' value='[FACT_SUPPORT_ACTIVITY].[FIRST_CONTACT_RESOLUTION_FLAG]' />
+          <map key='[FIRST_RESPONSE_TIME_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[FIRST_RESPONSE_TIME_HOURS]' />
+          <map key='[ACTIVE_WORK_TIME_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[ACTIVE_WORK_TIME_HOURS]' />
+          <map key='[CUSTOMER_WAIT_TIME_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[CUSTOMER_WAIT_TIME_HOURS]' />
+          <map key='[REASSIGNMENT_COUNT]' value='[FACT_SUPPORT_ACTIVITY].[REASSIGNMENT_COUNT]' />
+          <map key='[REOPENED_COUNT]' value='[FACT_SUPPORT_ACTIVITY].[REOPENED_COUNT]' />
+          <map key='[AGENT_INTERACTIONS_COUNT]' value='[FACT_SUPPORT_ACTIVITY].[AGENT_INTERACTIONS_COUNT]' />
+          <map key='[CUSTOMER_INTERACTIONS_COUNT]' value='[FACT_SUPPORT_ACTIVITY].[CUSTOMER_INTERACTIONS_COUNT]' />
+          <map key='[KNOWLEDGE_BASE_ARTICLES_USED]' value='[FACT_SUPPORT_ACTIVITY].[KNOWLEDGE_BASE_ARTICLES_USED]' />
+          <map key='[SLA_MET]' value='[FACT_SUPPORT_ACTIVITY].[SLA_MET]' />
+          <map key='[SLA_BREACH_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[SLA_BREACH_HOURS]' />
+          <map key='[RESOLUTION_METHOD]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_METHOD]' />
+          <map key='[ROOT_CAUSE_CATEGORY]' value='[FACT_SUPPORT_ACTIVITY].[ROOT_CAUSE_CATEGORY]' />
+          <map key='[PREVENTABLE_ISSUE]' value='[FACT_SUPPORT_ACTIVITY].[PREVENTABLE_ISSUE]' />
+          <map key='[FOLLOW_UP_REQUIRED]' value='[FACT_SUPPORT_ACTIVITY].[FOLLOW_UP_REQUIRED]' />
+          <map key='[COST_TO_RESOLVE]' value='[FACT_SUPPORT_ACTIVITY].[COST_TO_RESOLVE]' />
+          <map key='[SUPPORT_CATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY]' />
+          <map key='[SUPPORT_SUBCATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_SUBCATEGORY]' />
+          <map key='[EXPECTED_RESOLUTION_TIME_HOURS]' value='[DIM_SUPPORT_CATEGORY].[EXPECTED_RESOLUTION_TIME_HOURS]' />
+          <map key='[REQUIRES_ESCALATION]' value='[DIM_SUPPORT_CATEGORY].[REQUIRES_ESCALATION]' />
+          <map key='[SELF_SERVICE_AVAILABLE]' value='[DIM_SUPPORT_CATEGORY].[SELF_SERVICE_AVAILABLE]' />
+          <map key='[KNOWLEDGE_BASE_ARTICLES]' value='[DIM_SUPPORT_CATEGORY].[KNOWLEDGE_BASE_ARTICLES]' />
+          <map key='[COMMON_RESOLUTION_STEPS]' value='[DIM_SUPPORT_CATEGORY].[COMMON_RESOLUTION_STEPS]' />
+          <map key='[CUSTOMER_IMPACT_LEVEL]' value='[DIM_SUPPORT_CATEGORY].[CUSTOMER_IMPACT_LEVEL]' />
+          <map key='[DEPARTMENT_RESPONSIBLE]' value='[DIM_SUPPORT_CATEGORY].[DEPARTMENT_RESPONSIBLE]' />
+          <map key='[SLA_TARGET_HOURS]' value='[DIM_SUPPORT_CATEGORY].[SLA_TARGET_HOURS]' />
+          <map key='[DATE_VALUE]' value='[DIM_DATE].[DATE_VALUE]' />
+          <map key='[YEAR]' value='[DIM_DATE].[YEAR]' />
+          <map key='[QUARTER]' value='[DIM_DATE].[QUARTER]' />
+          <map key='[MONTH]' value='[DIM_DATE].[MONTH]' />
+          <map key='[MONTH_NAME]' value='[DIM_DATE].[MONTH_NAME]' />
+          <map key='[DAY_OF_MONTH]' value='[DIM_DATE].[DAY_OF_MONTH]' />
+          <map key='[DAY_NAME]' value='[DIM_DATE].[DAY_NAME]' />
+          <map key='[IS_HOLIDAY]' value='[DIM_DATE].[IS_HOLIDAY]' />
+          <map key='[FISCAL_YEAR]' value='[DIM_DATE].[FISCAL_YEAR]' />
+          <map key='[FISCAL_QUARTER]' value='[DIM_DATE].[FISCAL_QUARTER]' />
+          <map key='[WEEK_OF_YEAR]' value='[DIM_DATE].[WEEK_OF_YEAR]' />
+        </cols>
+        <metadata-records>
+          <metadata-record class='column'>
+            <remote-name>MEETING_ACTIVITY_ID</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[MEETING_ACTIVITY_ID]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>MEETING_ACTIVITY_ID</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>18</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_KEY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_KEY]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>USER_KEY</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>32</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MEETING_KEY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MEETING_KEY]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>MEETING_KEY</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>32</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DATE_KEY</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[DATE_KEY]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>DATE_KEY</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FEATURE_KEY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[FEATURE_KEY]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>FEATURE_KEY</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>32</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MEETING_DATE</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[MEETING_DATE]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>MEETING_DATE</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MEETING_TOPIC</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MEETING_TOPIC]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>MEETING_TOPIC</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>START_TIME</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[START_TIME]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>START_TIME</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>END_TIME</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[END_TIME]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>END_TIME</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DURATION_MINUTES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[DURATION_MINUTES]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>DURATION_MINUTES</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PARTICIPANT_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[PARTICIPANT_COUNT]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>PARTICIPANT_COUNT</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>18</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TOTAL_JOIN_TIME_MINUTES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[TOTAL_JOIN_TIME_MINUTES]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>TOTAL_JOIN_TIME_MINUTES</remote-alias>
+            <ordinal>12</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>30</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>AVERAGE_PARTICIPATION_MINUTES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[AVERAGE_PARTICIPATION_MINUTES]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>AVERAGE_PARTICIPATION_MINUTES</remote-alias>
+            <ordinal>13</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>36</precision>
+            <scale>6</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FEATURES_USED_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[FEATURES_USED_COUNT]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>FEATURES_USED_COUNT</remote-alias>
+            <ordinal>14</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>18</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SCREEN_SHARE_USAGE_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[SCREEN_SHARE_USAGE_COUNT]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>SCREEN_SHARE_USAGE_COUNT</remote-alias>
+            <ordinal>15</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>RECORDING_USAGE_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[RECORDING_USAGE_COUNT]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>RECORDING_USAGE_COUNT</remote-alias>
+            <ordinal>16</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>CHAT_USAGE_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[CHAT_USAGE_COUNT]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>CHAT_USAGE_COUNT</remote-alias>
+            <ordinal>17</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MEETING_QUALITY_SCORE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[MEETING_QUALITY_SCORE]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>MEETING_QUALITY_SCORE</remote-alias>
+            <ordinal>18</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>AUDIO_QUALITY_SCORE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[AUDIO_QUALITY_SCORE]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>AUDIO_QUALITY_SCORE</remote-alias>
+            <ordinal>19</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>VIDEO_QUALITY_SCORE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[VIDEO_QUALITY_SCORE]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>VIDEO_QUALITY_SCORE</remote-alias>
+            <ordinal>20</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>CONNECTION_ISSUES_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[CONNECTION_ISSUES_COUNT]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>CONNECTION_ISSUES_COUNT</remote-alias>
+            <ordinal>21</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MEETING_SATISFACTION_SCORE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[MEETING_SATISFACTION_SCORE]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>MEETING_SATISFACTION_SCORE</remote-alias>
+            <ordinal>22</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PEAK_CONCURRENT_PARTICIPANTS</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[PEAK_CONCURRENT_PARTICIPANTS]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>PEAK_CONCURRENT_PARTICIPANTS</remote-alias>
+            <ordinal>23</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>18</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>LATE_JOINERS_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[LATE_JOINERS_COUNT]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>LATE_JOINERS_COUNT</remote-alias>
+            <ordinal>24</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>EARLY_LEAVERS_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[EARLY_LEAVERS_COUNT]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>EARLY_LEAVERS_COUNT</remote-alias>
+            <ordinal>25</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>BREAKOUT_ROOMS_USED</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[BREAKOUT_ROOMS_USED]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>BREAKOUT_ROOMS_USED</remote-alias>
+            <ordinal>26</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>POLLS_CONDUCTED</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[POLLS_CONDUCTED]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>POLLS_CONDUCTED</remote-alias>
+            <ordinal>27</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FILE_SHARES_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[FILE_SHARES_COUNT]</local-name>
+            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
+            <remote-alias>FILE_SHARES_COUNT</remote-alias>
+            <ordinal>28</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_NAME]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>USER_NAME</remote-alias>
+            <ordinal>29</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>EMAIL_DOMAIN</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[EMAIL_DOMAIN]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>EMAIL_DOMAIN</remote-alias>
+            <ordinal>30</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COMPANY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[COMPANY]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>COMPANY</remote-alias>
+            <ordinal>31</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PLAN_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[PLAN_TYPE]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>PLAN_TYPE</remote-alias>
+            <ordinal>32</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>10</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PLAN_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[PLAN_CATEGORY]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>PLAN_CATEGORY</remote-alias>
+            <ordinal>33</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>7</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>REGISTRATION_DATE</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[REGISTRATION_DATE]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>REGISTRATION_DATE</remote-alias>
+            <ordinal>34</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_STATUS</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_STATUS]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>USER_STATUS</remote-alias>
+            <ordinal>35</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>8</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>GEOGRAPHIC_REGION</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[GEOGRAPHIC_REGION]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>GEOGRAPHIC_REGION</remote-alias>
+            <ordinal>36</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>7</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>INDUSTRY_SECTOR</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[INDUSTRY_SECTOR]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>INDUSTRY_SECTOR</remote-alias>
+            <ordinal>37</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>7</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_ROLE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_ROLE]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>USER_ROLE</remote-alias>
+            <ordinal>38</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>7</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ACCOUNT_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ACCOUNT_TYPE]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>ACCOUNT_TYPE</remote-alias>
+            <ordinal>39</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>10</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>LANGUAGE_PREFERENCE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[LANGUAGE_PREFERENCE]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>LANGUAGE_PREFERENCE</remote-alias>
+            <ordinal>40</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>7</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MEETING_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MEETING_TYPE]</local-name>
+            <parent-name>[DIM_MEETING]</parent-name>
+            <remote-alias>MEETING_TYPE</remote-alias>
+            <ordinal>41</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MEETING_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MEETING_CATEGORY]</local-name>
+            <parent-name>[DIM_MEETING]</parent-name>
+            <remote-alias>MEETING_CATEGORY</remote-alias>
+            <ordinal>42</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DURATION_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[DURATION_CATEGORY]</local-name>
+            <parent-name>[DIM_MEETING]</parent-name>
+            <remote-alias>DURATION_CATEGORY</remote-alias>
+            <ordinal>43</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>8</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PARTICIPANT_SIZE_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[PARTICIPANT_SIZE_CATEGORY]</local-name>
+            <parent-name>[DIM_MEETING]</parent-name>
+            <remote-alias>PARTICIPANT_SIZE_CATEGORY</remote-alias>
+            <ordinal>44</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>7</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TIME_OF_DAY_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[TIME_OF_DAY_CATEGORY]</local-name>
+            <parent-name>[DIM_MEETING]</parent-name>
+            <remote-alias>TIME_OF_DAY_CATEGORY</remote-alias>
+            <ordinal>45</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>9</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DAY_OF_WEEK</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[DAY_OF_WEEK]</local-name>
+            <parent-name>[DIM_MEETING]</parent-name>
+            <remote-alias>DAY_OF_WEEK</remote-alias>
+            <ordinal>46</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>7</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>IS_WEEKEND</remote-name>
+            <remote-type>11</remote-type>
+            <local-name>[IS_WEEKEND]</local-name>
+            <parent-name>[DIM_MEETING]</parent-name>
+            <remote-alias>IS_WEEKEND</remote-alias>
+            <ordinal>47</ordinal>
+            <local-type>boolean</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>IS_RECURRING</remote-name>
+            <remote-type>11</remote-type>
+            <local-name>[IS_RECURRING]</local-name>
+            <parent-name>[DIM_MEETING]</parent-name>
+            <remote-alias>IS_RECURRING</remote-alias>
+            <ordinal>48</ordinal>
+            <local-type>boolean</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>BUSINESS_PURPOSE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[BUSINESS_PURPOSE]</local-name>
+            <parent-name>[DIM_MEETING]</parent-name>
+            <remote-alias>BUSINESS_PURPOSE</remote-alias>
+            <ordinal>49</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FEATURE_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[FEATURE_NAME]</local-name>
+            <parent-name>[DIM_FEATURE]</parent-name>
+            <remote-alias>FEATURE_NAME</remote-alias>
+            <ordinal>50</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FEATURE_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[FEATURE_CATEGORY]</local-name>
+            <parent-name>[DIM_FEATURE]</parent-name>
+            <remote-alias>FEATURE_CATEGORY</remote-alias>
+            <ordinal>51</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FEATURE_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[FEATURE_TYPE]</local-name>
+            <parent-name>[DIM_FEATURE]</parent-name>
+            <remote-alias>FEATURE_TYPE</remote-alias>
+            <ordinal>52</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>8</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FEATURE_COMPLEXITY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[FEATURE_COMPLEXITY]</local-name>
+            <parent-name>[DIM_FEATURE]</parent-name>
+            <remote-alias>FEATURE_COMPLEXITY</remote-alias>
+            <ordinal>53</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>6</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>IS_PREMIUM_FEATURE</remote-name>
+            <remote-type>11</remote-type>
+            <local-name>[IS_PREMIUM_FEATURE]</local-name>
+            <parent-name>[DIM_FEATURE]</parent-name>
+            <remote-alias>IS_PREMIUM_FEATURE</remote-alias>
+            <ordinal>54</ordinal>
+            <local-type>boolean</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FEATURE_RELEASE_DATE</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[FEATURE_RELEASE_DATE]</local-name>
+            <parent-name>[DIM_FEATURE]</parent-name>
+            <remote-alias>FEATURE_RELEASE_DATE</remote-alias>
+            <ordinal>55</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FEATURE_STATUS</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[FEATURE_STATUS]</local-name>
+            <parent-name>[DIM_FEATURE]</parent-name>
+            <remote-alias>FEATURE_STATUS</remote-alias>
+            <ordinal>56</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>6</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USAGE_FREQUENCY_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USAGE_FREQUENCY_CATEGORY]</local-name>
+            <parent-name>[DIM_FEATURE]</parent-name>
+            <remote-alias>USAGE_FREQUENCY_CATEGORY</remote-alias>
+            <ordinal>57</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>6</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FEATURE_DESCRIPTION</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[FEATURE_DESCRIPTION]</local-name>
+            <parent-name>[DIM_FEATURE]</parent-name>
+            <remote-alias>FEATURE_DESCRIPTION</remote-alias>
+            <ordinal>58</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TARGET_USER_SEGMENT</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[TARGET_USER_SEGMENT]</local-name>
+            <parent-name>[DIM_FEATURE]</parent-name>
+            <remote-alias>TARGET_USER_SEGMENT</remote-alias>
+            <ordinal>59</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>9</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USAGE_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[USAGE_COUNT]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>USAGE_COUNT</remote-alias>
+            <ordinal>60</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USAGE_DURATION_MINUTES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[USAGE_DURATION_MINUTES]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>USAGE_DURATION_MINUTES</remote-alias>
+            <ordinal>61</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SESSION_DURATION_MINUTES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[SESSION_DURATION_MINUTES]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>SESSION_DURATION_MINUTES</remote-alias>
+            <ordinal>62</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>38</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FEATURE_ADOPTION_SCORE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[FEATURE_ADOPTION_SCORE]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>FEATURE_ADOPTION_SCORE</remote-alias>
+            <ordinal>63</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_EXPERIENCE_RATING</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[USER_EXPERIENCE_RATING]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>USER_EXPERIENCE_RATING</remote-alias>
+            <ordinal>64</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FEATURE_PERFORMANCE_SCORE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[FEATURE_PERFORMANCE_SCORE]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>FEATURE_PERFORMANCE_SCORE</remote-alias>
+            <ordinal>65</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>CONCURRENT_FEATURES_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[CONCURRENT_FEATURES_COUNT]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>CONCURRENT_FEATURES_COUNT</remote-alias>
+            <ordinal>66</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USAGE_CONTEXT</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USAGE_CONTEXT]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>USAGE_CONTEXT</remote-alias>
+            <ordinal>67</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DEVICE_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[DEVICE_TYPE]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>DEVICE_TYPE</remote-alias>
+            <ordinal>68</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>7</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PLATFORM_VERSION</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[PLATFORM_VERSION]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>PLATFORM_VERSION</remote-alias>
+            <ordinal>69</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>6</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ERROR_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[ERROR_COUNT]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>ERROR_COUNT</remote-alias>
+            <ordinal>70</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SUCCESS_RATE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[SUCCESS_RATE]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>SUCCESS_RATE</remote-alias>
+            <ordinal>71</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>3</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SUPPORT_ACTIVITY_ID</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[SUPPORT_ACTIVITY_ID]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>SUPPORT_ACTIVITY_ID</remote-alias>
+            <ordinal>72</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>18</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TICKET_OPEN_DATE</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[TICKET_OPEN_DATE]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>TICKET_OPEN_DATE</remote-alias>
+            <ordinal>73</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TICKET_CLOSE_DATE</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[TICKET_CLOSE_DATE]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>TICKET_CLOSE_DATE</remote-alias>
+            <ordinal>74</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TICKET_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[TICKET_TYPE]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>TICKET_TYPE</remote-alias>
+            <ordinal>75</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>RESOLUTION_STATUS</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[RESOLUTION_STATUS]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>RESOLUTION_STATUS</remote-alias>
+            <ordinal>76</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PRIORITY_LEVEL</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[PRIORITY_LEVEL]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>PRIORITY_LEVEL</remote-alias>
+            <ordinal>77</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>8</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>RESOLUTION_TIME_HOURS</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[RESOLUTION_TIME_HOURS]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>RESOLUTION_TIME_HOURS</remote-alias>
+            <ordinal>78</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>2</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ESCALATION_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[ESCALATION_COUNT]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>ESCALATION_COUNT</remote-alias>
+            <ordinal>79</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>CUSTOMER_SATISFACTION_SCORE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[CUSTOMER_SATISFACTION_SCORE]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>CUSTOMER_SATISFACTION_SCORE</remote-alias>
+            <ordinal>80</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FIRST_CONTACT_RESOLUTION_FLAG</remote-name>
+            <remote-type>11</remote-type>
+            <local-name>[FIRST_CONTACT_RESOLUTION_FLAG]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>FIRST_CONTACT_RESOLUTION_FLAG</remote-alias>
+            <ordinal>81</ordinal>
+            <local-type>boolean</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FIRST_RESPONSE_TIME_HOURS</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[FIRST_RESPONSE_TIME_HOURS]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>FIRST_RESPONSE_TIME_HOURS</remote-alias>
+            <ordinal>82</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ACTIVE_WORK_TIME_HOURS</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[ACTIVE_WORK_TIME_HOURS]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>ACTIVE_WORK_TIME_HOURS</remote-alias>
+            <ordinal>83</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>2</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>CUSTOMER_WAIT_TIME_HOURS</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[CUSTOMER_WAIT_TIME_HOURS]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>CUSTOMER_WAIT_TIME_HOURS</remote-alias>
+            <ordinal>84</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>REASSIGNMENT_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[REASSIGNMENT_COUNT]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>REASSIGNMENT_COUNT</remote-alias>
+            <ordinal>85</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>REOPENED_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[REOPENED_COUNT]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>REOPENED_COUNT</remote-alias>
+            <ordinal>86</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>AGENT_INTERACTIONS_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[AGENT_INTERACTIONS_COUNT]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>AGENT_INTERACTIONS_COUNT</remote-alias>
+            <ordinal>87</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>CUSTOMER_INTERACTIONS_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[CUSTOMER_INTERACTIONS_COUNT]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>CUSTOMER_INTERACTIONS_COUNT</remote-alias>
+            <ordinal>88</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>KNOWLEDGE_BASE_ARTICLES_USED</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[KNOWLEDGE_BASE_ARTICLES_USED]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>KNOWLEDGE_BASE_ARTICLES_USED</remote-alias>
+            <ordinal>89</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SLA_MET</remote-name>
+            <remote-type>11</remote-type>
+            <local-name>[SLA_MET]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>SLA_MET</remote-alias>
+            <ordinal>90</ordinal>
+            <local-type>boolean</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SLA_BREACH_HOURS</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[SLA_BREACH_HOURS]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>SLA_BREACH_HOURS</remote-alias>
+            <ordinal>91</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>3</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>RESOLUTION_METHOD</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[RESOLUTION_METHOD]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>RESOLUTION_METHOD</remote-alias>
+            <ordinal>92</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>19</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ROOT_CAUSE_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ROOT_CAUSE_CATEGORY]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>ROOT_CAUSE_CATEGORY</remote-alias>
+            <ordinal>93</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>15</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PREVENTABLE_ISSUE</remote-name>
+            <remote-type>11</remote-type>
+            <local-name>[PREVENTABLE_ISSUE]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>PREVENTABLE_ISSUE</remote-alias>
+            <ordinal>94</ordinal>
+            <local-type>boolean</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FOLLOW_UP_REQUIRED</remote-name>
+            <remote-type>11</remote-type>
+            <local-name>[FOLLOW_UP_REQUIRED]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>FOLLOW_UP_REQUIRED</remote-alias>
+            <ordinal>95</ordinal>
+            <local-type>boolean</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COST_TO_RESOLVE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[COST_TO_RESOLVE]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>COST_TO_RESOLVE</remote-alias>
+            <ordinal>96</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>2</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SUPPORT_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[SUPPORT_CATEGORY]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>SUPPORT_CATEGORY</remote-alias>
+            <ordinal>97</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SUPPORT_SUBCATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[SUPPORT_SUBCATEGORY]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>SUPPORT_SUBCATEGORY</remote-alias>
+            <ordinal>98</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>15</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>EXPECTED_RESOLUTION_TIME_HOURS</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[EXPECTED_RESOLUTION_TIME_HOURS]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>EXPECTED_RESOLUTION_TIME_HOURS</remote-alias>
+            <ordinal>99</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>2</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>REQUIRES_ESCALATION</remote-name>
+            <remote-type>11</remote-type>
+            <local-name>[REQUIRES_ESCALATION]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>REQUIRES_ESCALATION</remote-alias>
+            <ordinal>100</ordinal>
+            <local-type>boolean</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SELF_SERVICE_AVAILABLE</remote-name>
+            <remote-type>11</remote-type>
+            <local-name>[SELF_SERVICE_AVAILABLE]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>SELF_SERVICE_AVAILABLE</remote-alias>
+            <ordinal>101</ordinal>
+            <local-type>boolean</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>KNOWLEDGE_BASE_ARTICLES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[KNOWLEDGE_BASE_ARTICLES]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>KNOWLEDGE_BASE_ARTICLES</remote-alias>
+            <ordinal>102</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>2</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COMMON_RESOLUTION_STEPS</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[COMMON_RESOLUTION_STEPS]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>COMMON_RESOLUTION_STEPS</remote-alias>
+            <ordinal>103</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>CUSTOMER_IMPACT_LEVEL</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[CUSTOMER_IMPACT_LEVEL]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>CUSTOMER_IMPACT_LEVEL</remote-alias>
+            <ordinal>104</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>6</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DEPARTMENT_RESPONSIBLE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[DEPARTMENT_RESPONSIBLE]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>DEPARTMENT_RESPONSIBLE</remote-alias>
+            <ordinal>105</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>18</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SLA_TARGET_HOURS</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[SLA_TARGET_HOURS]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>SLA_TARGET_HOURS</remote-alias>
+            <ordinal>106</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>2</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DATE_VALUE</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[DATE_VALUE]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>DATE_VALUE</remote-alias>
+            <ordinal>107</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>YEAR</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[YEAR]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>YEAR</remote-alias>
+            <ordinal>108</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>4</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>QUARTER</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[QUARTER]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>QUARTER</remote-alias>
+            <ordinal>109</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>2</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MONTH</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[MONTH]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>MONTH</remote-alias>
+            <ordinal>110</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>2</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MONTH_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MONTH_NAME]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>MONTH_NAME</remote-alias>
+            <ordinal>111</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>3</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DAY_OF_MONTH</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[DAY_OF_MONTH]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>DAY_OF_MONTH</remote-alias>
+            <ordinal>112</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>2</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DAY_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[DAY_NAME]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>DAY_NAME</remote-alias>
+            <ordinal>113</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>3</width>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>IS_HOLIDAY</remote-name>
+            <remote-type>11</remote-type>
+            <local-name>[IS_HOLIDAY]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>IS_HOLIDAY</remote-alias>
+            <ordinal>114</ordinal>
+            <local-type>boolean</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FISCAL_YEAR</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[FISCAL_YEAR]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>FISCAL_YEAR</remote-alias>
+            <ordinal>115</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>5</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FISCAL_QUARTER</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[FISCAL_QUARTER]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>FISCAL_QUARTER</remote-alias>
+            <ordinal>116</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>1</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>WEEK_OF_YEAR</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[WEEK_OF_YEAR]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>WEEK_OF_YEAR</remote-alias>
+            <ordinal>117</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>2</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Meeting Activity Id' datatype='integer' name='[MEETING_ACTIVITY_ID]' role='dimension' type='ordinal' />
+      <column caption='User Key' datatype='string' name='[USER_KEY]' role='dimension' type='nominal' />
+      <column caption='Meeting Key' datatype='string' name='[MEETING_KEY]' role='dimension' type='nominal' />
+      <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+      <column caption='Feature Key' datatype='string' name='[FEATURE_KEY]' role='dimension' type='nominal' />
+      <column caption='Meeting Date' datatype='date' name='[MEETING_DATE]' role='dimension' type='ordinal' />
+      <column caption='Meeting Topic' datatype='string' name='[MEETING_TOPIC]' role='dimension' type='nominal' />
+      <column caption='Start Time' datatype='datetime' name='[START_TIME]' role='dimension' type='ordinal' />
+      <column caption='End Time' datatype='datetime' name='[END_TIME]' role='dimension' type='ordinal' />
+      <column caption='Duration Minutes' datatype='integer' name='[DURATION_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Participant Count' datatype='integer' name='[PARTICIPANT_COUNT]' role='measure' type='quantitative' />
+      <column caption='Total Join Time Minutes' datatype='integer' name='[TOTAL_JOIN_TIME_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Average Participation Minutes' datatype='real' name='[AVERAGE_PARTICIPATION_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Features Used Count' datatype='integer' name='[FEATURES_USED_COUNT]' role='measure' type='quantitative' />
+      <column caption='Screen Share Usage Count' datatype='integer' name='[SCREEN_SHARE_USAGE_COUNT]' role='measure' type='quantitative' />
+      <column caption='Recording Usage Count' datatype='integer' name='[RECORDING_USAGE_COUNT]' role='measure' type='quantitative' />
+      <column caption='Chat Usage Count' datatype='integer' name='[CHAT_USAGE_COUNT]' role='measure' type='quantitative' />
+      <column caption='Meeting Quality Score' datatype='integer' name='[MEETING_QUALITY_SCORE]' role='measure' type='quantitative' />
+      <column caption='Audio Quality Score' datatype='integer' name='[AUDIO_QUALITY_SCORE]' role='measure' type='quantitative' />
+      <column caption='Video Quality Score' datatype='integer' name='[VIDEO_QUALITY_SCORE]' role='measure' type='quantitative' />
+      <column caption='Connection Issues Count' datatype='integer' name='[CONNECTION_ISSUES_COUNT]' role='measure' type='quantitative' />
+      <column caption='Meeting Satisfaction Score' datatype='integer' name='[MEETING_SATISFACTION_SCORE]' role='measure' type='quantitative' />
+      <column caption='Peak Concurrent Participants' datatype='integer' name='[PEAK_CONCURRENT_PARTICIPANTS]' role='measure' type='quantitative' />
+      <column caption='Late Joiners Count' datatype='integer' name='[LATE_JOINERS_COUNT]' role='measure' type='quantitative' />
+      <column caption='Early Leavers Count' datatype='integer' name='[EARLY_LEAVERS_COUNT]' role='measure' type='quantitative' />
+      <column caption='Breakout Rooms Used' datatype='integer' name='[BREAKOUT_ROOMS_USED]' role='measure' type='quantitative' />
+      <column caption='Polls Conducted' datatype='integer' name='[POLLS_CONDUCTED]' role='measure' type='quantitative' />
+      <column caption='File Shares Count' datatype='integer' name='[FILE_SHARES_COUNT]' role='measure' type='quantitative' />
+      <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+      <column caption='Email Domain' datatype='string' name='[EMAIL_DOMAIN]' role='dimension' type='nominal' />
+      <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
+      <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Plan Category' datatype='string' name='[PLAN_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Registration Date' datatype='date' name='[REGISTRATION_DATE]' role='dimension' type='ordinal' />
+      <column caption='User Status' datatype='string' name='[USER_STATUS]' role='dimension' type='nominal' />
+      <column caption='Geographic Region' datatype='string' name='[GEOGRAPHIC_REGION]' role='dimension' type='nominal' />
+      <column caption='Industry Sector' datatype='string' name='[INDUSTRY_SECTOR]' role='dimension' type='nominal' />
+      <column caption='User Role' datatype='string' name='[USER_ROLE]' role='dimension' type='nominal' />
+      <column caption='Account Type' datatype='string' name='[ACCOUNT_TYPE]' role='dimension' type='nominal' />
+      <column caption='Language Preference' datatype='string' name='[LANGUAGE_PREFERENCE]' role='dimension' type='nominal' />
+      <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
+      <column caption='Meeting Category' datatype='string' name='[MEETING_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Duration Category' datatype='string' name='[DURATION_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Participant Size Category' datatype='string' name='[PARTICIPANT_SIZE_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Time Of Day Category' datatype='string' name='[TIME_OF_DAY_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Day Of Week' datatype='string' name='[DAY_OF_WEEK]' role='dimension' type='nominal' />
+      <column caption='Is Weekend' datatype='boolean' name='[IS_WEEKEND]' role='dimension' type='nominal' />
+      <column caption='Is Recurring' datatype='boolean' name='[IS_RECURRING]' role='dimension' type='nominal' />
+      <column caption='Business Purpose' datatype='string' name='[BUSINESS_PURPOSE]' role='dimension' type='nominal' />
+      <column caption='Feature Name' datatype='string' name='[FEATURE_NAME]' role='dimension' type='nominal' />
+      <column caption='Feature Category' datatype='string' name='[FEATURE_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Feature Type' datatype='string' name='[FEATURE_TYPE]' role='dimension' type='nominal' />
+      <column caption='Feature Complexity' datatype='string' name='[FEATURE_COMPLEXITY]' role='dimension' type='nominal' />
+      <column caption='Is Premium Feature' datatype='boolean' name='[IS_PREMIUM_FEATURE]' role='dimension' type='nominal' />
+      <column caption='Feature Release Date' datatype='date' name='[FEATURE_RELEASE_DATE]' role='dimension' type='ordinal' />
+      <column caption='Feature Status' datatype='string' name='[FEATURE_STATUS]' role='dimension' type='nominal' />
+      <column caption='Usage Frequency Category' datatype='string' name='[USAGE_FREQUENCY_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Feature Description' datatype='string' name='[FEATURE_DESCRIPTION]' role='dimension' type='nominal' />
+      <column caption='Target User Segment' datatype='string' name='[TARGET_USER_SEGMENT]' role='dimension' type='nominal' />
+      <column caption='Usage Count' datatype='integer' name='[USAGE_COUNT]' role='measure' type='quantitative' />
+      <column caption='Usage Duration Minutes' datatype='integer' name='[USAGE_DURATION_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Session Duration Minutes' datatype='integer' name='[SESSION_DURATION_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Feature Adoption Score' datatype='integer' name='[FEATURE_ADOPTION_SCORE]' role='measure' type='quantitative' />
+      <column caption='User Experience Rating' datatype='integer' name='[USER_EXPERIENCE_RATING]' role='measure' type='quantitative' />
+      <column caption='Feature Performance Score' datatype='integer' name='[FEATURE_PERFORMANCE_SCORE]' role='measure' type='quantitative' />
+      <column caption='Concurrent Features Count' datatype='integer' name='[CONCURRENT_FEATURES_COUNT]' role='measure' type='quantitative' />
+      <column caption='Usage Context' datatype='string' name='[USAGE_CONTEXT]' role='dimension' type='nominal' />
+      <column caption='Device Type' datatype='string' name='[DEVICE_TYPE]' role='dimension' type='nominal' />
+      <column caption='Platform Version' datatype='string' name='[PLATFORM_VERSION]' role='dimension' type='nominal' />
+      <column caption='Error Count' datatype='integer' name='[ERROR_COUNT]' role='measure' type='quantitative' />
+      <column caption='Success Rate' datatype='integer' name='[SUCCESS_RATE]' role='measure' type='quantitative' />
+      <column caption='Support Activity Id' datatype='integer' name='[SUPPORT_ACTIVITY_ID]' role='dimension' type='ordinal' />
+      <column caption='Ticket Open Date' datatype='date' name='[TICKET_OPEN_DATE]' role='dimension' type='ordinal' />
+      <column caption='Ticket Close Date' datatype='date' name='[TICKET_CLOSE_DATE]' role='dimension' type='ordinal' />
+      <column caption='Ticket Type' datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
+      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+      <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
+      <column caption='Resolution Time Hours' datatype='integer' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='Escalation Count' datatype='integer' name='[ESCALATION_COUNT]' role='measure' type='quantitative' />
+      <column caption='Customer Satisfaction Score' datatype='integer' name='[CUSTOMER_SATISFACTION_SCORE]' role='measure' type='quantitative' />
+      <column caption='First Contact Resolution Flag' datatype='boolean' name='[FIRST_CONTACT_RESOLUTION_FLAG]' role='dimension' type='nominal' />
+      <column caption='First Response Time Hours' datatype='integer' name='[FIRST_RESPONSE_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='Active Work Time Hours' datatype='integer' name='[ACTIVE_WORK_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='Customer Wait Time Hours' datatype='integer' name='[CUSTOMER_WAIT_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='Reassignment Count' datatype='integer' name='[REASSIGNMENT_COUNT]' role='measure' type='quantitative' />
+      <column caption='Reopened Count' datatype='integer' name='[REOPENED_COUNT]' role='measure' type='quantitative' />
+      <column caption='Agent Interactions Count' datatype='integer' name='[AGENT_INTERACTIONS_COUNT]' role='measure' type='quantitative' />
+      <column caption='Customer Interactions Count' datatype='integer' name='[CUSTOMER_INTERACTIONS_COUNT]' role='measure' type='quantitative' />
+      <column caption='Knowledge Base Articles Used' datatype='integer' name='[KNOWLEDGE_BASE_ARTICLES_USED]' role='measure' type='quantitative' />
+      <column caption='Sla Met' datatype='boolean' name='[SLA_MET]' role='dimension' type='nominal' />
+      <column caption='Sla Breach Hours' datatype='integer' name='[SLA_BREACH_HOURS]' role='measure' type='quantitative' />
+      <column caption='Resolution Method' datatype='string' name='[RESOLUTION_METHOD]' role='dimension' type='nominal' />
+      <column caption='Root Cause Category' datatype='string' name='[ROOT_CAUSE_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Preventable Issue' datatype='boolean' name='[PREVENTABLE_ISSUE]' role='dimension' type='nominal' />
+      <column caption='Follow Up Required' datatype='boolean' name='[FOLLOW_UP_REQUIRED]' role='dimension' type='nominal' />
+      <column caption='Cost To Resolve' datatype='integer' name='[COST_TO_RESOLVE]' role='measure' type='quantitative' />
+      <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Support Subcategory' datatype='string' name='[SUPPORT_SUBCATEGORY]' role='dimension' type='nominal' />
+      <column caption='Expected Resolution Time Hours' datatype='integer' name='[EXPECTED_RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='Requires Escalation' datatype='boolean' name='[REQUIRES_ESCALATION]' role='dimension' type='nominal' />
+      <column caption='Self Service Available' datatype='boolean' name='[SELF_SERVICE_AVAILABLE]' role='dimension' type='nominal' />
+      <column caption='Knowledge Base Articles' datatype='integer' name='[KNOWLEDGE_BASE_ARTICLES]' role='measure' type='quantitative' />
+      <column caption='Common Resolution Steps' datatype='string' name='[COMMON_RESOLUTION_STEPS]' role='dimension' type='nominal' />
+      <column caption='Customer Impact Level' datatype='string' name='[CUSTOMER_IMPACT_LEVEL]' role='dimension' type='nominal' />
+      <column caption='Department Responsible' datatype='string' name='[DEPARTMENT_RESPONSIBLE]' role='dimension' type='nominal' />
+      <column caption='Sla Target Hours' datatype='integer' name='[SLA_TARGET_HOURS]' role='measure' type='quantitative' />
+      <column caption='Date Value' datatype='date' name='[DATE_VALUE]' role='dimension' type='ordinal' />
+      <column caption='Year' datatype='integer' name='[YEAR]' role='dimension' type='quantitative' />
+      <column caption='Quarter' datatype='integer' name='[QUARTER]' role='dimension' type='quantitative' />
+      <column caption='Month' datatype='integer' name='[MONTH]' role='dimension' type='quantitative' />
+      <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+      <column caption='Day Of Month' datatype='integer' name='[DAY_OF_MONTH]' role='dimension' type='quantitative' />
+      <column caption='Day Name' datatype='string' name='[DAY_NAME]' role='dimension' type='nominal' />
+      <column caption='Is Holiday' datatype='boolean' name='[IS_HOLIDAY]' role='dimension' type='nominal' />
+      <column caption='Fiscal Year' datatype='integer' name='[FISCAL_YEAR]' role='dimension' type='quantitative' />
+      <column caption='Fiscal Quarter' datatype='integer' name='[FISCAL_QUARTER]' role='dimension' type='quantitative' />
+      <column caption='Week Of Year' datatype='integer' name='[WEEK_OF_YEAR]' role='dimension' type='quantitative' />
+      <column caption='Total Number of Users' datatype='integer' name='[Calculation_A1B2C3D4E5F6]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([USER_KEY])' />
+      </column>
+      <column caption='Average Meeting Duration' datatype='real' name='[Calculation_B2C3D4E5F6A1]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([DURATION_MINUTES])' />
+      </column>
+      <column caption='Number of Meetings per User' datatype='real' name='[Calculation_C3D4E5F6A1B2]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([MEETING_ACTIVITY_ID]) / COUNTD([USER_KEY])' />
+      </column>
+      <column caption='Number of Tickets' datatype='integer' name='[Calculation_D4E5F6A1B2C3]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
+      </column>
+      <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <object-graph>
+        <objects>
+          <object caption='FACT_MEETING_ACTIVITY' id='FACT_MEETING_ACTIVITY_A1B2C3D4E5F6'>
+            <properties context=''>
+              <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='FACT_MEETING_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
+            </properties>
+          </object>
+          <object caption='DIM_DATE' id='DIM_DATE_B2C3D4E5F6A1'>
+            <properties context=''>
+              <relation connection='snow
