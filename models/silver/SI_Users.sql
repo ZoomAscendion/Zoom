@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_USERS', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_USERS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    materialized='table'
 ) }}
 
 /* Silver layer transformation for Users */
@@ -15,7 +13,7 @@ WITH bronze_users AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_USERS') }}
+    FROM BRONZE.BZ_USERS
 ),
 
 cleaned_users AS (
