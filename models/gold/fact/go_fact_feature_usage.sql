@@ -16,9 +16,9 @@ WITH usage_base AS (
         fu.SOURCE_SYSTEM,
         ROW_NUMBER() OVER (
             PARTITION BY fu.USAGE_ID 
-            ORDER BY fu.UPDATE_TIMESTAMP DESC
+            ORDER BY COALESCE(fu.UPDATE_TIMESTAMP, fu.LOAD_TIMESTAMP) DESC
         ) as rn
-    FROM {{ source('silver', 'si_feature_usage') }} fu
+    FROM DB_POC_ZOOM_1.GOLD.SI_FEATURE_USAGE fu
     WHERE fu.VALIDATION_STATUS = 'PASSED'
 ),
 
@@ -27,7 +27,7 @@ meeting_context AS (
         sm.MEETING_ID,
         sm.HOST_ID,
         sm.DURATION_MINUTES
-    FROM {{ source('silver', 'si_meetings') }} sm
+    FROM DB_POC_ZOOM_1.GOLD.SI_MEETINGS sm
     WHERE sm.VALIDATION_STATUS = 'PASSED'
 ),
 
