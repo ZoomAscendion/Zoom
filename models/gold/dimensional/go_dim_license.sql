@@ -1,0 +1,94 @@
+{{ config(
+    materialized='table',
+    tags=['dimension', 'gold'],
+    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, LOAD_DATE, SOURCE_SYSTEM) VALUES (UUID_STRING(), 'GO_DIM_LICENSE_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SILVER.SI_LICENSES', 'GOLD.GO_DIM_LICENSE', CURRENT_DATE(), 'DBT_GOLD_LAYER')",
+    post_hook="UPDATE {{ ref('go_audit_log') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}) WHERE PROCESS_NAME = 'GO_DIM_LICENSE_LOAD' AND DATE(EXECUTION_START_TIMESTAMP) = CURRENT_DATE()"
+) }}
+
+-- License Dimension Transformation
+-- Creates license dimension with enhanced attributes
+
+WITH source_licenses AS (
+    SELECT DISTINCT
+        LICENSE_TYPE,
+        START_DATE,
+        END_DATE,
+        SOURCE_SYSTEM,
+        ROW_NUMBER() OVER (
+            PARTITION BY UPPER(TRIM(LICENSE_TYPE)) 
+            ORDER BY UPDATE_TIMESTAMP DESC
+        ) as rn
+    FROM {{ source('silver', 'si_licenses') }}
+    WHERE VALIDATION_STATUS = 'PASSED'
+),
+
+transformed_licenses AS (
+    SELECT 
+        MD5(UPPER(TRIM(LICENSE_TYPE))) as LICENSE_KEY,
+        INITCAP(TRIM(LICENSE_TYPE)) as LICENSE_TYPE,
+        CASE 
+            WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 'Standard'
+            WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 'Professional'
+            WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 'Enterprise'
+            ELSE 'Other'
+        END as LICENSE_CATEGORY,
+        CASE 
+            WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 'Tier 1'
+            WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 'Tier 2'
+            WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 'Tier 3'
+            ELSE 'Tier 0'
+        END as LICENSE_TIER,
+        CASE 
+            WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 100
+            WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 500
+            WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 1000
+            ELSE 50
+        END as MAX_PARTICIPANTS,
+        CASE 
+            WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 5
+            WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 100
+            WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 1000
+            ELSE 1
+        END as STORAGE_LIMIT_GB,
+        CASE 
+            WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 40
+            WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 100
+            WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 500
+            ELSE 0
+        END as RECORDING_LIMIT_HOURS,
+        CASE 
+            WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN TRUE
+            ELSE FALSE
+        END as ADMIN_FEATURES_INCLUDED,
+        CASE 
+            WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' OR UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN TRUE
+            ELSE FALSE
+        END as API_ACCESS_INCLUDED,
+        CASE 
+            WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN TRUE
+            ELSE FALSE
+        END as SSO_SUPPORT_INCLUDED,
+        CASE 
+            WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 14.99
+            WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 19.99
+            WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 39.99
+            ELSE 0.00
+        END as MONTHLY_PRICE,
+        CASE 
+            WHEN UPPER(LICENSE_TYPE) LIKE '%BASIC%' THEN 149.90
+            WHEN UPPER(LICENSE_TYPE) LIKE '%PRO%' THEN 199.90
+            WHEN UPPER(LICENSE_TYPE) LIKE '%ENTERPRISE%' THEN 399.90
+            ELSE 0.00
+        END as ANNUAL_PRICE,
+        'Standard license benefits for ' || LICENSE_TYPE as LICENSE_BENEFITS,
+        START_DATE as EFFECTIVE_START_DATE,
+        COALESCE(END_DATE, '9999-12-31'::DATE) as EFFECTIVE_END_DATE,
+        TRUE as IS_CURRENT_RECORD,
+        CURRENT_DATE() as LOAD_DATE,
+        CURRENT_DATE() as UPDATE_DATE,
+        SOURCE_SYSTEM
+    FROM source_licenses
+    WHERE rn = 1
+)
+
+SELECT * FROM transformed_licenses
