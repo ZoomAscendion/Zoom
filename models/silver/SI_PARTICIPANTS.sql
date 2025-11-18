@@ -1,7 +1,15 @@
 {{ config(
     materialized='table',
-    alias='SI_PARTICIPANTS'
+    alias='SI_PARTICIPANTS',
+    pre_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'PRE_HOOK_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_AUDIT_LOG'",
+    post_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'POST_HOOK_COMPLETE', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_AUDIT_LOG'"
 ) }}
+
+/*
+ * SI_PARTICIPANTS - Silver Layer Participants Table
+ * Transforms and cleanses participant data from Bronze layer
+ * Includes MM/DD/YYYY HH:MM format validation and conversion
+ */
 
 WITH bronze_participants AS (
     SELECT 
@@ -17,12 +25,11 @@ WITH bronze_participants AS (
     WHERE PARTICIPANT_ID IS NOT NULL
 ),
 
-cleaned_participants AS (
+format_cleaned_participants AS (
     SELECT 
         PARTICIPANT_ID,
         MEETING_ID,
         USER_ID,
-        /* MM/DD/YYYY HH:MM Format Handling */
         COALESCE(
             TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
             TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
@@ -38,38 +45,45 @@ cleaned_participants AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        ROW_NUMBER() OVER (PARTITION BY PARTICIPANT_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE
     FROM bronze_participants
 ),
 
 validated_participants AS (
     SELECT 
-        p.PARTICIPANT_ID,
-        p.MEETING_ID,
-        p.USER_ID,
-        p.JOIN_TIME,
-        p.LEAVE_TIME,
-        p.LOAD_TIMESTAMP,
-        p.UPDATE_TIMESTAMP,
-        p.SOURCE_SYSTEM,
-        DATE(p.LOAD_TIMESTAMP) AS LOAD_DATE,
-        DATE(p.UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        *,
         CASE 
-            WHEN p.JOIN_TIME IS NOT NULL AND p.LEAVE_TIME IS NOT NULL AND p.LEAVE_TIME > p.JOIN_TIME THEN 100
-            WHEN p.JOIN_TIME IS NOT NULL AND p.LEAVE_TIME IS NOT NULL THEN 85
-            WHEN p.JOIN_TIME IS NOT NULL THEN 70
+            WHEN PARTICIPANT_ID IS NOT NULL 
+                AND MEETING_ID IS NOT NULL 
+                AND USER_ID IS NOT NULL 
+                AND JOIN_TIME IS NOT NULL 
+                AND LEAVE_TIME IS NOT NULL
+                AND LEAVE_TIME > JOIN_TIME
+            THEN 100
+            WHEN PARTICIPANT_ID IS NOT NULL AND MEETING_ID IS NOT NULL AND USER_ID IS NOT NULL
+            THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
         CASE 
-            WHEN p.JOIN_TIME IS NOT NULL AND p.LEAVE_TIME IS NOT NULL AND p.LEAVE_TIME > p.JOIN_TIME THEN 'PASSED'
-            WHEN p.JOIN_TIME IS NOT NULL THEN 'WARNING'
+            WHEN PARTICIPANT_ID IS NOT NULL 
+                AND MEETING_ID IS NOT NULL 
+                AND USER_ID IS NOT NULL 
+                AND JOIN_TIME IS NOT NULL 
+                AND LEAVE_TIME IS NOT NULL
+                AND LEAVE_TIME > JOIN_TIME
+            THEN 'PASSED'
+            WHEN PARTICIPANT_ID IS NOT NULL AND MEETING_ID IS NOT NULL AND USER_ID IS NOT NULL
+            THEN 'WARNING'
             ELSE 'FAILED'
         END AS VALIDATION_STATUS
-    FROM cleaned_participants p
-    WHERE p.rn = 1
-    AND p.JOIN_TIME IS NOT NULL
-    AND p.LEAVE_TIME IS NOT NULL
-    AND p.LEAVE_TIME > p.JOIN_TIME
+    FROM format_cleaned_participants
+),
+
+deduped_participants AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY PARTICIPANT_ID ORDER BY UPDATE_TIMESTAMP DESC NULLS LAST) AS rn
+    FROM validated_participants
 )
 
 SELECT 
@@ -85,4 +99,5 @@ SELECT
     UPDATE_DATE,
     DATA_QUALITY_SCORE,
     VALIDATION_STATUS
-FROM validated_participants
+FROM deduped_participants
+WHERE rn = 1
