@@ -14,26 +14,26 @@ WITH bronze_support_tickets AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM BRONZE.BZ_SUPPORT_TICKETS
+    WHERE TICKET_ID IS NOT NULL
 ),
 
 cleaned_support_tickets AS (
     SELECT 
         TICKET_ID,
         USER_ID,
-        UPPER(TRIM(TICKET_TYPE)) AS TICKET_TYPE,
+        COALESCE(UPPER(TRIM(TICKET_TYPE)), 'GENERAL') AS TICKET_TYPE,
         CASE 
             WHEN RESOLUTION_STATUS IN ('Open', 'In Progress', 'Resolved', 'Closed') THEN RESOLUTION_STATUS
             ELSE 'Open'
         END AS RESOLUTION_STATUS,
-        OPEN_DATE,
+        COALESCE(OPEN_DATE, CURRENT_DATE()) AS OPEN_DATE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
-        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE
+        COALESCE(DATE(UPDATE_TIMESTAMP), DATE(LOAD_TIMESTAMP)) AS UPDATE_DATE
     FROM bronze_support_tickets
-    WHERE TICKET_ID IS NOT NULL
-        AND OPEN_DATE <= CURRENT_DATE()
+    WHERE COALESCE(OPEN_DATE, CURRENT_DATE()) <= CURRENT_DATE()
 ),
 
 validated_support_tickets AS (
@@ -43,9 +43,8 @@ validated_support_tickets AS (
         CASE 
             WHEN TICKET_ID IS NOT NULL 
                 AND USER_ID IS NOT NULL 
-                AND TICKET_TYPE IS NOT NULL 
+                AND TICKET_TYPE != 'GENERAL'
                 AND RESOLUTION_STATUS IN ('Open', 'In Progress', 'Resolved', 'Closed')
-                AND OPEN_DATE IS NOT NULL
                 AND OPEN_DATE <= CURRENT_DATE()
             THEN 100
             WHEN TICKET_ID IS NOT NULL AND USER_ID IS NOT NULL 
@@ -57,9 +56,8 @@ validated_support_tickets AS (
         CASE 
             WHEN TICKET_ID IS NOT NULL 
                 AND USER_ID IS NOT NULL 
-                AND TICKET_TYPE IS NOT NULL 
+                AND TICKET_TYPE != 'GENERAL'
                 AND RESOLUTION_STATUS IN ('Open', 'In Progress', 'Resolved', 'Closed')
-                AND OPEN_DATE IS NOT NULL
                 AND OPEN_DATE <= CURRENT_DATE()
             THEN 'PASSED'
             WHEN TICKET_ID IS NOT NULL AND USER_ID IS NOT NULL 
@@ -71,7 +69,7 @@ validated_support_tickets AS (
 
 deduped_support_tickets AS (
     SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY TICKET_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+        ROW_NUMBER() OVER (PARTITION BY TICKET_ID ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC) AS rn
     FROM validated_support_tickets
 )
 
@@ -90,4 +88,3 @@ SELECT
     VALIDATION_STATUS
 FROM deduped_support_tickets
 WHERE rn = 1
-    AND VALIDATION_STATUS IN ('PASSED', 'WARNING')
