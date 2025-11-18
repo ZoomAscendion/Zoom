@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, LOAD_DATE, SOURCE_SYSTEM) VALUES ('{{ invocation_id }}_SUPPORT', 'go_dim_support_category', 'SILVER.SI_SUPPORT_TICKETS', 'GOLD.GO_DIM_SUPPORT_CATEGORY', CURRENT_TIMESTAMP(), 'RUNNING', CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), UPDATE_DATE = CURRENT_DATE() WHERE AUDIT_LOG_ID = '{{ invocation_id }}_SUPPORT' AND PROCESS_NAME = 'go_dim_support_category'"
+    materialized='table'
 ) }}
 
 -- Support category dimension transformation from Silver to Gold layer
@@ -10,8 +8,7 @@ WITH support_data AS (
         TICKET_TYPE,
         SOURCE_SYSTEM
     FROM {{ source('silver', 'si_support_tickets') }}
-    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
-      AND TICKET_TYPE IS NOT NULL
+    WHERE TICKET_TYPE IS NOT NULL
 ),
 
 support_category_transformed AS (
