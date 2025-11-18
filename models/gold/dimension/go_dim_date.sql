@@ -1,5 +1,7 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('go_process_audit') }} (AUDIT_LOG_ID, PROCESS_NAME, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) VALUES ('{{ invocation_id }}_date', 'go_dim_date', CURRENT_TIMESTAMP(), 'RUNNING', 'SYSTEM', 'go_dim_date', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_ETL')",
+    post_hook="UPDATE {{ ref('go_process_audit') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), UPDATE_DATE = CURRENT_DATE() WHERE AUDIT_LOG_ID = '{{ invocation_id }}_date'"
 ) }}
 
 -- Date dimension for time-based analysis
@@ -22,7 +24,7 @@ SELECT
     DAYOFWEEK(date_value) AS DAY_OF_WEEK,
     DAYNAME(date_value) AS DAY_NAME,
     CASE WHEN DAYOFWEEK(date_value) IN (1, 7) THEN TRUE ELSE FALSE END AS IS_WEEKEND,
-    FALSE AS IS_HOLIDAY, -- To be enhanced with holiday logic
+    FALSE AS IS_HOLIDAY,
     CASE 
         WHEN MONTH(date_value) >= 4 THEN YEAR(date_value)
         ELSE YEAR(date_value) - 1
