@@ -24,57 +24,12 @@ models:
     # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            AUDIT_ID, 
-            TABLE_NAME, 
-            OPERATION_TYPE, 
-            AUDIT_TIMESTAMP, 
-            PROCESSED_BY
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            '{{ this.name }}', 
-            'PIPELINE_START', 
-            CURRENT_TIMESTAMP(), 
-            'DBT_SILVER_PIPELINE'
-          WHERE EXISTS (SELECT 1 FROM {{ this }} LIMIT 1)
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            AUDIT_ID, 
-            TABLE_NAME, 
-            OPERATION_TYPE, 
-            AUDIT_TIMESTAMP, 
-            PROCESSED_BY
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            '{{ this.name }}', 
-            'PIPELINE_END', 
-            CURRENT_TIMESTAMP(), 
-            'DBT_SILVER_PIPELINE'
-          WHERE EXISTS (SELECT 1 FROM {{ this }} LIMIT 1)
-        {% endif %}
-
-# Model execution order - ensure SI_Audit_Log runs first
-model-order:
-  - "SI_Audit_Log"
-  - "SI_Users"
-  - "SI_Meetings"
-  - "SI_Participants"
-  - "SI_Feature_Usage"
-  - "SI_Support_Tickets"
-  - "SI_Billing_Events"
-  - "SI_Licenses"
 
 vars:
   # dbt Cloud environment variables
   start_date: '2020-01-01'
   end_date: '2030-12-31'
-  
+
 # Snapshot configurations
 snapshots:
   zoom_silver_pipeline:
