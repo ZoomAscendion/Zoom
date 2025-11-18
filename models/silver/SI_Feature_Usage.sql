@@ -4,8 +4,8 @@
     post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY, ERROR_DESCRIPTION) SELECT UUID_STRING(), 'SI_FEATURE_USAGE', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE', 'Completed SI_FEATURE_USAGE transformation with ' || (SELECT COUNT(*) FROM {{ this }}) || ' records' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
 ) }}
 
--- SI_FEATURE_USAGE: Silver layer transformation from Bronze BZ_FEATURE_USAGE
--- Description: Stores cleaned and standardized platform feature usage during meetings
+/* SI_FEATURE_USAGE: Silver layer transformation from Bronze BZ_FEATURE_USAGE */
+/* Description: Stores cleaned and standardized platform feature usage during meetings */
 
 WITH bronze_feature_usage AS (
     SELECT 
@@ -17,7 +17,7 @@ WITH bronze_feature_usage AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_FEATURE_USAGE') }}
+    FROM BRONZE.BZ_FEATURE_USAGE
     WHERE USAGE_ID IS NOT NULL
 ),
 
@@ -49,7 +49,7 @@ validated_feature_usage AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        -- Calculate data quality score
+        /* Calculate data quality score */
         CASE 
             WHEN USAGE_ID IS NOT NULL 
                 AND MEETING_ID IS NOT NULL 
@@ -62,7 +62,7 @@ validated_feature_usage AS (
             THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
-        -- Set validation status
+        /* Set validation status */
         CASE 
             WHEN USAGE_ID IS NOT NULL 
                 AND MEETING_ID IS NOT NULL 
