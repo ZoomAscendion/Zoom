@@ -1,7 +1,7 @@
 {{ config(
     materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'"
 ) }}
 
 /* Transform Bronze Licenses to Silver with DD/MM/YYYY date format conversion */
@@ -24,7 +24,7 @@ cleaned_licenses AS (
         UPPER(TRIM(LICENSE_TYPE)) AS LICENSE_TYPE,
         ASSIGNED_TO_USER_ID,
         
-        /* Critical P1: DD/MM/YYYY date format conversion ("27/08/2024" error fix) */
+        /* Critical P1: DD/MM/YYYY date format conversion */
         CASE 
             WHEN TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY') IS NOT NULL THEN
                 TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY')
