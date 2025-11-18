@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, LOAD_DATE, SOURCE_SYSTEM) VALUES ('{{ invocation_id }}_LICENSE', 'go_dim_license', 'SILVER.SI_LICENSES', 'GOLD.GO_DIM_LICENSE', CURRENT_TIMESTAMP(), 'RUNNING', CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), UPDATE_DATE = CURRENT_DATE() WHERE AUDIT_LOG_ID = '{{ invocation_id }}_LICENSE' AND PROCESS_NAME = 'go_dim_license'"
+    materialized='table'
 ) }}
 
 -- License dimension transformation from Silver to Gold layer
@@ -12,8 +10,7 @@ WITH license_data AS (
         END_DATE,
         SOURCE_SYSTEM
     FROM {{ source('silver', 'si_licenses') }}
-    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
-      AND LICENSE_TYPE IS NOT NULL
+    WHERE LICENSE_TYPE IS NOT NULL
 ),
 
 license_transformed AS (
