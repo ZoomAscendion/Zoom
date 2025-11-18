@@ -2,10 +2,8 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_silver_pipeline'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -18,60 +16,16 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
 
-# Snowflake-specific configurations
 vars:
-  # Database and schema configurations
   source_database: 'DB_POC_ZOOM'
   source_schema: 'BRONZE'
   target_schema: 'SILVER'
-  
-  # Data quality thresholds
   dq_score_threshold: 70
   max_duration_minutes: 1440
-  
-  # Audit configurations
   audit_enabled: true
   error_logging_enabled: true
-
-# Seeds configuration
-seeds:
-  zoom_silver_pipeline:
-    +materialized: table
-
-# Snapshots configuration
-snapshots:
-  zoom_silver_pipeline:
-    +target_schema: snapshots
-
-# Test configurations
-tests:
-  +store_failures: true
-  +severity: warn
-
-# Documentation
-docs:
-  generate: true
-  serve:
-    port: 8080
-
-# Logging
-log-level: info
-
-# Partial parsing
-partial_parse: true
-
-# Static parser
-static_parser: true
-
-# Use colors in logs
-use_colors: true
-
-# Send anonymous usage stats
-send_anonymous_usage_stats: false
