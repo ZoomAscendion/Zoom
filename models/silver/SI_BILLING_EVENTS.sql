@@ -1,0 +1,78 @@
+{{ config(
+    materialized='table',
+    alias='SI_BILLING_EVENTS'
+) }}
+
+WITH bronze_billing_events AS (
+    SELECT 
+        EVENT_ID,
+        USER_ID,
+        EVENT_TYPE,
+        AMOUNT,
+        EVENT_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_BILLING_EVENTS') }}
+    WHERE EVENT_ID IS NOT NULL
+),
+
+cleaned_billing_events AS (
+    SELECT 
+        EVENT_ID,
+        USER_ID,
+        UPPER(TRIM(EVENT_TYPE)) AS EVENT_TYPE,
+        ROUND(AMOUNT, 2) AS AMOUNT,
+        EVENT_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        ROW_NUMBER() OVER (PARTITION BY EVENT_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM bronze_billing_events
+    WHERE USER_ID IS NOT NULL
+    AND AMOUNT > 0
+    AND EVENT_DATE IS NOT NULL
+    AND EVENT_DATE <= CURRENT_DATE()
+),
+
+validated_billing_events AS (
+    SELECT 
+        EVENT_ID,
+        USER_ID,
+        EVENT_TYPE,
+        AMOUNT,
+        EVENT_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        CASE 
+            WHEN EVENT_TYPE IS NOT NULL AND AMOUNT > 0 AND EVENT_DATE IS NOT NULL THEN 100
+            WHEN EVENT_TYPE IS NOT NULL AND AMOUNT > 0 THEN 85
+            WHEN EVENT_TYPE IS NOT NULL THEN 70
+            ELSE 50
+        END AS DATA_QUALITY_SCORE,
+        CASE 
+            WHEN EVENT_TYPE IS NOT NULL AND AMOUNT > 0 AND EVENT_DATE IS NOT NULL THEN 'PASSED'
+            WHEN EVENT_TYPE IS NOT NULL THEN 'WARNING'
+            ELSE 'FAILED'
+        END AS VALIDATION_STATUS
+    FROM cleaned_billing_events
+    WHERE rn = 1
+)
+
+SELECT 
+    EVENT_ID,
+    USER_ID,
+    EVENT_TYPE,
+    AMOUNT,
+    EVENT_DATE,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    LOAD_DATE,
+    UPDATE_DATE,
+    DATA_QUALITY_SCORE,
+    VALIDATION_STATUS
+FROM validated_billing_events
