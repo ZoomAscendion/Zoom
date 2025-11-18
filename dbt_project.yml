@@ -24,13 +24,92 @@ models:
     # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
+      +pre-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (
+            AUDIT_ID, 
+            TABLE_NAME, 
+            OPERATION_TYPE, 
+            AUDIT_TIMESTAMP, 
+            PROCESSED_BY,
+            SOURCE_SYSTEM
+          ) 
+          SELECT 
+            UUID_STRING(), 
+            '{{ this.name }}', 
+            'PIPELINE_START', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_SILVER_PIPELINE',
+            'SILVER_LAYER'
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (
+            AUDIT_ID, 
+            TABLE_NAME, 
+            OPERATION_TYPE, 
+            AUDIT_TIMESTAMP, 
+            PROCESSED_BY,
+            SOURCE_SYSTEM
+          ) 
+          SELECT 
+            UUID_STRING(), 
+            '{{ this.name }}', 
+            'PIPELINE_END', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_SILVER_PIPELINE',
+            'SILVER_LAYER'
+        {% endif %}
 
-# Require dbt version
-require-dbt-version: ">=1.0.0"
+# Model execution order configuration
+model-ordering:
+  - name: SI_Audit_Log
+    depends_on: []
+  - name: SI_Users
+    depends_on: [SI_Audit_Log]
+  - name: SI_Meetings
+    depends_on: [SI_Audit_Log, SI_Users]
+  - name: SI_Participants
+    depends_on: [SI_Audit_Log, SI_Users, SI_Meetings]
+  - name: SI_Feature_Usage
+    depends_on: [SI_Audit_Log, SI_Meetings]
+  - name: SI_Support_Tickets
+    depends_on: [SI_Audit_Log, SI_Users]
+  - name: SI_Billing_Events
+    depends_on: [SI_Audit_Log, SI_Users]
+  - name: SI_Licenses
+    depends_on: [SI_Audit_Log, SI_Users]
 
-# Vars for the project
+# Snapshot configurations
+snapshots:
+  zoom_silver_pipeline:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: update_timestamp
+
+# Seed configurations
+seeds:
+  zoom_silver_pipeline:
+    +enabled: true
+    +schema: seeds
+
+# Test configurations
+tests:
+  zoom_silver_pipeline:
+    +enabled: true
+    +severity: warn
+
+# Documentation configurations
+docs:
+  generate: true
+  
+# Variables
 vars:
-  # The start date for the data pipeline
+  # The `start_date` variable will be accessible in all resources
   start_date: '2020-01-01'
-  # The timezone for timestamp conversions
-  timezone: 'UTC'
+  # The `end_date` variable will be accessible in all resources  
+  end_date: '2030-12-31'
+  # Data quality threshold
+  dq_threshold: 70
+  # Audit retention days
+  audit_retention_days: 730
