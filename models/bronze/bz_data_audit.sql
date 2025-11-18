@@ -20,7 +20,7 @@ WITH audit_base AS (
 
 SELECT 
     ROW_NUMBER() OVER (ORDER BY load_timestamp) AS record_id,
-    source_table,
+    CAST(source_table AS VARCHAR(255)) AS source_table,
     load_timestamp,
     processed_by,
     processing_time,
