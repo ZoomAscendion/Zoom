@@ -1,13 +1,10 @@
 {{ config(
-    materialized='table',
-    pre_hook=none,
-    post_hook=none
+    materialized='table'
 ) }}
 
 /* 
  * SI_AUDIT_LOG - Independent Silver Audit Table
  * Creates empty table structure for audit logging
- * No pre-hooks or post-hooks to avoid circular dependencies
  */
 
 SELECT 
