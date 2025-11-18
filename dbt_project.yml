@@ -6,8 +6,6 @@ config-version: 2
 profile: 'zoom_silver_pipeline'
 
 # These configurations specify where dbt should look for different types of files.
-# The `model-paths` config, for example, states that models in this project can be
-# found in the "models/" directory. You probably won't need to change these!
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -15,74 +13,23 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+target-path: "target"
+clean-targets:
   - "target"
   - "dbt_packages"
 
 # Configuring models
-# Full documentation: https://docs.getdbt.com/docs/configuring-models
-
 models:
   zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            AUDIT_ID, 
-            TABLE_NAME, 
-            OPERATION_TYPE, 
-            AUDIT_TIMESTAMP, 
-            PROCESSED_BY
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            '{{ this.name }}', 
-            'PIPELINE_START', 
-            CURRENT_TIMESTAMP(), 
-            'DBT_SILVER_PIPELINE'
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (
-            AUDIT_ID, 
-            TABLE_NAME, 
-            OPERATION_TYPE, 
-            AUDIT_TIMESTAMP, 
-            PROCESSED_BY
-          ) 
-          SELECT 
-            UUID_STRING(), 
-            '{{ this.name }}', 
-            'PIPELINE_END', 
-            CURRENT_TIMESTAMP(), 
-            'DBT_SILVER_PIPELINE'
-        {% endif %}
-
-# Model execution order
-model-ordering:
-  - "SI_Audit_Log"  # Must run first
-  - "SI_Users"
-  - "SI_Meetings"
-  - "SI_Participants"
-  - "SI_Feature_Usage"
-  - "SI_Support_Tickets"
-  - "SI_Billing_Events"
-  - "SI_Licenses"
 
 # Snowflake-specific configurations
 vars:
-  # dbt configuration
   start_date: '2020-01-01'
   end_date: '2030-12-31'
-  
-  # Data quality thresholds
   dq_score_threshold: 70
   max_error_rate: 0.05
-  
-  # Audit configuration
   enable_audit_logging: true
   audit_retention_days: 365
 
@@ -90,13 +37,6 @@ vars:
 seeds:
   zoom_silver_pipeline:
     +materialized: table
-
-# Snapshots configuration
-snapshots:
-  zoom_silver_pipeline:
-    +materialized: snapshot
-    +strategy: timestamp
-    +updated_at: 'UPDATE_TIMESTAMP'
 
 # Tests configuration
 tests:
