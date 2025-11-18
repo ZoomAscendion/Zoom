@@ -5,9 +5,9 @@ config-version: 2
 profile: 'zoom_silver_pipeline'
 
 model-paths: ["models"]
-analysis-paths: ["analysis"]
+analysis-paths: ["analyses"]
 test-paths: ["tests"]
-seed-paths: ["data"]
+seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
@@ -18,24 +18,34 @@ clean-targets:
 
 models:
   zoom_silver_pipeline:
-    +materialized: table
-    +tags: ["silver"]
+    bronze:
+      +materialized: table
+    silver:
+      +materialized: table
+      +pre-hook: |
+        {% if this.name != 'SI_AUDIT_LOG' %}
+          INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
+            SOURCE_TABLE, ERROR_TYPE, COLUMN_NAME, ERROR_VALUE, PROCESS_TIMESTAMP, PROCESS_STATUS, EXECUTION_ID, PIPELINE_NAME, RECORD_COUNT, ERROR_COUNT, WARNING_COUNT, PROCESSED_BY, SOURCE_SYSTEM
+          )
+          VALUES (
+            '{{ this.name }}', 'PROCESS_START', 'N/A', 'N/A', CURRENT_TIMESTAMP(), 'STARTED', 
+            '{{ invocation_id }}', 'BRONZE_TO_SILVER_{{ this.name }}', 0, 0, 0, 'DBT_SILVER_PIPELINE', 'BRONZE_LAYER'
+          )
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'SI_AUDIT_LOG' %}
+          INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
+            SOURCE_TABLE, ERROR_TYPE, COLUMN_NAME, ERROR_VALUE, PROCESS_TIMESTAMP, PROCESS_STATUS, EXECUTION_ID, PIPELINE_NAME, RECORD_COUNT, ERROR_COUNT, WARNING_COUNT, PROCESSED_BY, SOURCE_SYSTEM
+          )
+          VALUES (
+            '{{ this.name }}', 'PROCESS_END', 'N/A', 'N/A', CURRENT_TIMESTAMP(), 'COMPLETED', 
+            '{{ invocation_id }}', 'BRONZE_TO_SILVER_{{ this.name }}', 
+            (SELECT COUNT(*) FROM {{ this }}), 0, 0, 'DBT_SILVER_PIPELINE', 'BRONZE_LAYER'
+          )
+        {% endif %}
+    gold:
+      +materialized: table
 
 vars:
-  dq_score_threshold_passed: 90
-  dq_score_threshold_warning: 70
   start_date: '2020-01-01'
   end_date: '2030-12-31'
-  max_error_threshold: 100
-  enable_audit_logging: true
-
-on-run-start:
-  - "{{ log('Starting Silver Layer Pipeline Execution', info=true) }}"
-
-on-run-end:
-  - "{{ log('Silver Layer Pipeline Execution Completed', info=true) }}"
-
-quoting:
-  database: false
-  schema: false
-  identifier: false
