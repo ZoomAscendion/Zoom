@@ -1,6 +1,5 @@
 {{ config(
-    materialized='table',
-    on_schema_change='sync_all_columns'
+    materialized='table'
 ) }}
 
 -- SI_AUDIT_LOG: Independent Silver Audit Table
