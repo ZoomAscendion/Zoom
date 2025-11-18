@@ -1,11 +1,9 @@
-name: 'zoom_gold_pipeline'
+name: 'zoom_bronze_pipeline'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
-profile: 'zoom_gold_pipeline'
+profile: 'zoom_bronze_pipeline'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -13,49 +11,29 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
-  zoom_gold_pipeline:
-    # Config indicated by + and applies to all files under models/gold/
-    gold:
+  zoom_bronze_pipeline:
+    bronze:
       +materialized: table
-      +database: DB_POC_ZOOM
-      dimensional:
-        +materialized: table
-      fact:
-        +materialized: table
-
-# Global variables
+      +tags: ["bronze"]
+      
 vars:
-  # Date range for date dimension
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
+  # DBT Variables for Bronze Layer
+  source_schema: "RAW"
+  target_schema: "BRONZE"
+  audit_enabled: true
   
-  # Data quality thresholds
-  min_data_quality_score: 70
-  
-  # Audit settings
-  enable_audit_logging: true
-  
-  # Error handling
-  continue_on_error: false
-
-# Seeds configuration
-seeds:
-  zoom_gold_pipeline:
-    +database: DB_POC_ZOOM
-
-# Snapshots configuration
-snapshots:
-  zoom_gold_pipeline:
-    +database: DB_POC_ZOOM
-
-# Tests configuration
-tests:
-  +store_failures: true
-  +database: DB_POC_ZOOM
+# Model ordering to ensure audit table is created first
+model-dependencies:
+  bz_data_audit: []
+  bz_users: ["bz_data_audit"]
+  bz_meetings: ["bz_data_audit"]
+  bz_participants: ["bz_data_audit"]
+  bz_feature_usage: ["bz_data_audit"]
+  bz_support_tickets: ["bz_data_audit"]
+  bz_billing_events: ["bz_data_audit"]
+  bz_licenses: ["bz_data_audit"]
