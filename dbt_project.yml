@@ -22,13 +22,13 @@ models:
       +materialized: table
       +pre-hook: |
         {% if this.name != 'SI_AUDIT_LOG' %}
-        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
+        INSERT INTO SILVER.SI_AUDIT_LOG (
           AUDIT_ID, TABLE_NAME, COLUMN_NAME, RECORD_ID, ERROR_TYPE, 
           ERROR_DESCRIPTION, ORIGINAL_VALUE, AUDIT_TIMESTAMP, 
           OPERATION_TYPE, PROCESSED_BY, SOURCE_SYSTEM
         )
         SELECT 
-          CONCAT('{{ this.name }}', '_', TO_CHAR(CURRENT_TIMESTAMP(), 'YYYYMMDDHH24MISS'), '_', ROW_NUMBER() OVER (ORDER BY 1)) as AUDIT_ID,
+          CONCAT('{{ this.name }}', '_', TO_CHAR(CURRENT_TIMESTAMP(), 'YYYYMMDDHH24MISS'), '_START') as AUDIT_ID,
           '{{ this.name }}' as TABLE_NAME,
           'PROCESSING_START' as COLUMN_NAME,
           'N/A' as RECORD_ID,
@@ -39,17 +39,16 @@ models:
           'INSERT' as OPERATION_TYPE,
           'DBT_SILVER_PIPELINE' as PROCESSED_BY,
           'BRONZE_LAYER' as SOURCE_SYSTEM
-        FROM (SELECT 1 as dummy_col)
         {% endif %}
       +post-hook: |
         {% if this.name != 'SI_AUDIT_LOG' %}
-        INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
+        INSERT INTO SILVER.SI_AUDIT_LOG (
           AUDIT_ID, TABLE_NAME, COLUMN_NAME, RECORD_ID, ERROR_TYPE, 
           ERROR_DESCRIPTION, ORIGINAL_VALUE, AUDIT_TIMESTAMP, 
           OPERATION_TYPE, PROCESSED_BY, SOURCE_SYSTEM
         )
         SELECT 
-          CONCAT('{{ this.name }}', '_', TO_CHAR(CURRENT_TIMESTAMP(), 'YYYYMMDDHH24MISS'), '_', ROW_NUMBER() OVER (ORDER BY 1)) as AUDIT_ID,
+          CONCAT('{{ this.name }}', '_', TO_CHAR(CURRENT_TIMESTAMP(), 'YYYYMMDDHH24MISS'), '_END') as AUDIT_ID,
           '{{ this.name }}' as TABLE_NAME,
           'PROCESSING_END' as COLUMN_NAME,
           'N/A' as RECORD_ID,
@@ -60,5 +59,4 @@ models:
           'INSERT' as OPERATION_TYPE,
           'DBT_SILVER_PIPELINE' as PROCESSED_BY,
           'BRONZE_LAYER' as SOURCE_SYSTEM
-        FROM (SELECT 1 as dummy_col)
         {% endif %}
