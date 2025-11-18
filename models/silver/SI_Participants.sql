@@ -14,6 +14,7 @@ WITH bronze_participants AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
     FROM BRONZE.BZ_PARTICIPANTS
+    WHERE PARTICIPANT_ID IS NOT NULL
 ),
 
 cleaned_participants AS (
@@ -28,7 +29,8 @@ cleaned_participants AS (
             TRY_TO_TIMESTAMP(JOIN_TIME, 'DD/MM/YYYY HH24:MI'),
             TRY_TO_TIMESTAMP(JOIN_TIME, 'DD-MM-YYYY HH24:MI'),
             TRY_TO_TIMESTAMP(JOIN_TIME, 'MM/DD/YYYY HH24:MI'),
-            TRY_TO_TIMESTAMP(JOIN_TIME)
+            TRY_TO_TIMESTAMP(JOIN_TIME),
+            CURRENT_TIMESTAMP()
         ) AS JOIN_TIME,
         
         COALESCE(
@@ -36,16 +38,16 @@ cleaned_participants AS (
             TRY_TO_TIMESTAMP(LEAVE_TIME, 'DD/MM/YYYY HH24:MI'),
             TRY_TO_TIMESTAMP(LEAVE_TIME, 'DD-MM-YYYY HH24:MI'),
             TRY_TO_TIMESTAMP(LEAVE_TIME, 'MM/DD/YYYY HH24:MI'),
-            TRY_TO_TIMESTAMP(LEAVE_TIME)
+            TRY_TO_TIMESTAMP(LEAVE_TIME),
+            DATEADD('minute', 30, CURRENT_TIMESTAMP())
         ) AS LEAVE_TIME,
         
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
-        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE
+        COALESCE(DATE(UPDATE_TIMESTAMP), DATE(LOAD_TIMESTAMP)) AS UPDATE_DATE
     FROM bronze_participants
-    WHERE PARTICIPANT_ID IS NOT NULL
 ),
 
 validated_participants AS (
@@ -83,7 +85,7 @@ validated_participants AS (
 
 deduped_participants AS (
     SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY PARTICIPANT_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+        ROW_NUMBER() OVER (PARTITION BY PARTICIPANT_ID ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC) AS rn
     FROM validated_participants
 )
 
@@ -102,4 +104,3 @@ SELECT
     VALIDATION_STATUS
 FROM deduped_participants
 WHERE rn = 1
-    AND VALIDATION_STATUS IN ('PASSED', 'WARNING')
