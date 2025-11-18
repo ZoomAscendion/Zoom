@@ -1,6 +1,5 @@
 {{ config(
-    materialized='table',
-    on_schema_change='sync_all_columns'
+    materialized='table'
 ) }}
 
 /* Audit log table for Silver layer - must be created first */
