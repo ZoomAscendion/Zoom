@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_PARTICIPANTS', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_PARTICIPANTS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    materialized='table'
 ) }}
 
 -- SI_Participants table transformation from Bronze to Silver
@@ -17,7 +15,7 @@ WITH bronze_participants AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_PARTICIPANTS') }}
+    FROM BRONZE.BZ_PARTICIPANTS
 ),
 
 cleaned_participants AS (
@@ -25,7 +23,7 @@ cleaned_participants AS (
         PARTICIPANT_ID,
         MEETING_ID,
         USER_ID,
-        -- Handle MM/DD/YYYY HH:MM format conversion for JOIN_TIME
+        /* Handle MM/DD/YYYY HH:MM format conversion for JOIN_TIME */
         COALESCE(
             TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
             TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
@@ -33,7 +31,7 @@ cleaned_participants AS (
             TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
             TRY_TO_TIMESTAMP(JOIN_TIME::STRING)
         ) AS JOIN_TIME,
-        -- Handle MM/DD/YYYY HH:MM format conversion for LEAVE_TIME
+        /* Handle MM/DD/YYYY HH:MM format conversion for LEAVE_TIME */
         COALESCE(
             TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
             TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
@@ -53,7 +51,7 @@ validated_participants AS (
         *,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
         DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
-        -- Calculate data quality score
+        /* Calculate data quality score */
         CASE 
             WHEN PARTICIPANT_ID IS NOT NULL 
                 AND MEETING_ID IS NOT NULL 
@@ -66,7 +64,7 @@ validated_participants AS (
             THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
-        -- Set validation status
+        /* Set validation status */
         CASE 
             WHEN PARTICIPANT_ID IS NOT NULL 
                 AND MEETING_ID IS NOT NULL 
