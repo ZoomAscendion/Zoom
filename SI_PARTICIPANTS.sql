@@ -1,0 +1,82 @@
+{{ config(
+    materialized='table',
+    tags=['silver', 'participants'],
+    pre_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'PRE_HOOK_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_AUDIT_LOG'",
+    post_hook="INSERT INTO {{ ref('SI_AUDIT_LOG') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'POST_HOOK_COMPLETE', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_AUDIT_LOG'"
+) }}
+
+WITH bronze_participants AS (
+    SELECT *,
+           ROW_NUMBER() OVER (PARTITION BY PARTICIPANT_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM {{ source('bronze', 'BZ_PARTICIPANTS') }}
+    WHERE PARTICIPANT_ID IS NOT NULL
+),
+
+cleaned_participants AS (
+    SELECT 
+        PARTICIPANT_ID,
+        MEETING_ID,
+        USER_ID,
+        COALESCE(
+            TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(JOIN_TIME::STRING)
+        ) AS JOIN_TIME,
+        COALESCE(
+            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING)
+        ) AS LEAVE_TIME,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE
+    FROM bronze_participants
+    WHERE rn = 1
+),
+
+validated_participants AS (
+    SELECT *,
+        CASE 
+            WHEN PARTICIPANT_ID IS NOT NULL 
+                 AND MEETING_ID IS NOT NULL 
+                 AND USER_ID IS NOT NULL 
+                 AND JOIN_TIME IS NOT NULL 
+                 AND LEAVE_TIME IS NOT NULL
+                 AND LEAVE_TIME > JOIN_TIME
+            THEN 95
+            WHEN PARTICIPANT_ID IS NOT NULL AND MEETING_ID IS NOT NULL
+            THEN 75
+            ELSE 50
+        END AS DATA_QUALITY_SCORE,
+        CASE 
+            WHEN PARTICIPANT_ID IS NOT NULL 
+                 AND MEETING_ID IS NOT NULL 
+                 AND USER_ID IS NOT NULL 
+                 AND JOIN_TIME IS NOT NULL 
+                 AND LEAVE_TIME IS NOT NULL
+            THEN 'PASSED'
+            WHEN PARTICIPANT_ID IS NOT NULL AND MEETING_ID IS NOT NULL
+            THEN 'WARNING'
+            ELSE 'FAILED'
+        END AS VALIDATION_STATUS
+    FROM cleaned_participants
+)
+
+SELECT 
+    PARTICIPANT_ID,
+    MEETING_ID,
+    USER_ID,
+    JOIN_TIME,
+    LEAVE_TIME,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    LOAD_DATE,
+    UPDATE_DATE,
+    DATA_QUALITY_SCORE,
+    VALIDATION_STATUS
+FROM validated_participants
