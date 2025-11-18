@@ -24,25 +24,8 @@ models:
 vars:
   start_date: '2020-01-01'
   end_date: '2030-12-31'
-  dq_score_threshold: 70
-  max_error_rate: 0.05
-  enable_audit_logging: true
-  audit_retention_days: 365
 
-seeds:
-  zoom_silver_pipeline:
-    +materialized: table
-
-tests:
-  zoom_silver_pipeline:
-    +severity: error
-    +store_failures: true
-
-docs:
-  generate: true
-  
 log-level: info
 partial_parse: true
-static_parser: true
 use_colors: true
 send_anonymous_usage_stats: false
