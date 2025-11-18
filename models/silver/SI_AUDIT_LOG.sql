@@ -3,7 +3,12 @@
     alias='SI_AUDIT_LOG'
 ) }}
 
-/* Audit Log Table - Must run first without hooks */
+/* 
+ * SI_AUDIT_LOG - Independent Silver Audit Table
+ * This table must be created first without hooks
+ * Creates empty table structure for audit logging
+ */
+
 SELECT 
     CAST(NULL AS VARCHAR(255)) AS AUDIT_ID,
     CAST(NULL AS VARCHAR(255)) AS TABLE_NAME,
