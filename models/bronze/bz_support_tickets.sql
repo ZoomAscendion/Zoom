@@ -1,27 +1,15 @@
 -- Bronze Layer Support Tickets Table
--- Description: Raw customer support requests and resolution tracking from source systems
--- Source: RAW.SUPPORT_TICKETS
--- Target: BRONZE.BZ_SUPPORT_TICKETS
--- Transformation: 1-1 mapping with deduplication
+-- Description: Manages customer support requests and resolution tracking
+-- Author: Data Engineering Team
+-- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
     tags=['bronze', 'support_tickets'],
-    pre_hook="
-        {% if not (this.name == 'bz_data_audit') %}
-        INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS)
-        VALUES ('BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), CURRENT_USER(), 'STARTED')
-        {% endif %}
-    ",
-    post_hook="
-        {% if not (this.name == 'bz_data_audit') %}
-        INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS)
-        VALUES ('BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), CURRENT_USER(), 'COMPLETED')
-        {% endif %}
-    "
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) VALUES ('BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'DBT_PROCESS', 0, 'STARTED') WHERE '{{ this.name }}' != 'bz_data_audit'",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) VALUES ('BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'DBT_PROCESS', DATEDIFF('second', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_SUPPORT_TICKETS' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS') WHERE '{{ this.name }}' != 'bz_data_audit'"
 ) }}
 
--- CTE for data extraction and deduplication
 WITH source_data AS (
     SELECT 
         TICKET_ID,
@@ -31,17 +19,22 @@ WITH source_data AS (
         OPEN_DATE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM,
-        -- Add row number for deduplication based on latest update timestamp
+        SOURCE_SYSTEM
+    FROM {{ source('raw_zoom', 'support_tickets') }}
+),
+
+-- Apply deduplication based on TICKET_ID and latest UPDATE_TIMESTAMP
+deduped_data AS (
+    SELECT *,
         ROW_NUMBER() OVER (
             PARTITION BY TICKET_ID 
             ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC
-        ) AS rn
-    FROM {{ source('raw_schema', 'support_tickets') }}
+        ) as rn
+    FROM source_data
 ),
 
--- Final deduplication
-deduped_data AS (
+-- Final transformation with audit columns
+final AS (
     SELECT 
         TICKET_ID,
         USER_ID,
@@ -51,19 +44,8 @@ deduped_data AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM source_data
+    FROM deduped_data
     WHERE rn = 1
 )
 
--- Final select with data quality checks
-SELECT 
-    TICKET_ID,
-    USER_ID,
-    TICKET_TYPE,
-    RESOLUTION_STATUS,
-    OPEN_DATE,
-    LOAD_TIMESTAMP,
-    UPDATE_TIMESTAMP,
-    SOURCE_SYSTEM
-FROM deduped_data
-WHERE TICKET_ID IS NOT NULL  -- Basic data quality check
+SELECT * FROM final
