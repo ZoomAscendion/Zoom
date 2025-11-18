@@ -22,9 +22,9 @@ WITH source_users AS (
         VALIDATION_STATUS,
         ROW_NUMBER() OVER (
             PARTITION BY USER_ID 
-            ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC
+            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
         ) as rn
-    FROM {{ source('silver', 'si_users') }}
+    FROM DB_POC_ZOOM_1.GOLD.SI_USERS
     WHERE VALIDATION_STATUS = 'PASSED'
 ),
 
@@ -33,7 +33,11 @@ transformed_users AS (
         MD5(USER_ID) as USER_KEY,
         USER_ID,
         INITCAP(TRIM(COALESCE(USER_NAME, 'Unknown'))) as USER_NAME,
-        UPPER(SUBSTRING(EMAIL, POSITION('@' IN EMAIL) + 1)) as EMAIL_DOMAIN,
+        CASE 
+            WHEN EMAIL IS NOT NULL AND POSITION('@' IN EMAIL) > 0 
+            THEN UPPER(SUBSTRING(EMAIL, POSITION('@' IN EMAIL) + 1))
+            ELSE 'unknown.com'
+        END as EMAIL_DOMAIN,
         INITCAP(TRIM(COALESCE(COMPANY, 'Unknown'))) as COMPANY,
         CASE 
             WHEN UPPER(PLAN_TYPE) IN ('FREE', 'BASIC') THEN 'Basic'
@@ -45,7 +49,7 @@ transformed_users AS (
             WHEN UPPER(PLAN_TYPE) = 'FREE' THEN 'Free'
             ELSE 'Paid'
         END as PLAN_CATEGORY,
-        LOAD_DATE as REGISTRATION_DATE,
+        COALESCE(LOAD_DATE, CURRENT_DATE()) as REGISTRATION_DATE,
         CASE 
             WHEN VALIDATION_STATUS = 'PASSED' THEN 'Active'
             ELSE 'Inactive'
