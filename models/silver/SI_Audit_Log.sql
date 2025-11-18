@@ -1,11 +1,8 @@
 {{ config(
-    materialized='table',
-    on_schema_change='sync_all_columns'
+    materialized='table'
 ) }}
 
 -- Silver Layer Audit Log Table
--- This table must be created first to support audit logging for all other models
-
 SELECT 
     CAST(NULL AS VARCHAR(255)) AS AUDIT_ID,
     CAST(NULL AS VARCHAR(255)) AS TABLE_NAME,
