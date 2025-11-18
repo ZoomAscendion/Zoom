@@ -1,0 +1,49 @@
+{{ config(
+    materialized='table'
+) }}
+
+-- Feature dimension with enhanced categorization
+
+WITH feature_data AS (
+    SELECT DISTINCT
+        FEATURE_NAME,
+        SOURCE_SYSTEM
+    FROM {{ source('silver', 'si_feature_usage') }}
+    WHERE VALIDATION_STATUS = 'PASSED'
+      AND FEATURE_NAME IS NOT NULL
+)
+
+SELECT 
+    ROW_NUMBER() OVER (ORDER BY FEATURE_NAME) AS FEATURE_ID,
+    INITCAP(TRIM(FEATURE_NAME)) AS FEATURE_NAME,
+    CASE 
+        WHEN UPPER(FEATURE_NAME) LIKE '%SCREEN%SHARE%' THEN 'Collaboration'
+        WHEN UPPER(FEATURE_NAME) LIKE '%RECORD%' THEN 'Recording'
+        WHEN UPPER(FEATURE_NAME) LIKE '%CHAT%' THEN 'Communication'
+        WHEN UPPER(FEATURE_NAME) LIKE '%BREAKOUT%' THEN 'Advanced Meeting'
+        WHEN UPPER(FEATURE_NAME) LIKE '%POLL%' THEN 'Engagement'
+        ELSE 'General'
+    END AS FEATURE_CATEGORY,
+    CASE 
+        WHEN UPPER(FEATURE_NAME) LIKE '%BASIC%' THEN 'Core'
+        WHEN UPPER(FEATURE_NAME) LIKE '%ADVANCED%' THEN 'Advanced'
+        ELSE 'Standard'
+    END AS FEATURE_TYPE,
+    CASE 
+        WHEN UPPER(FEATURE_NAME) LIKE '%BREAKOUT%' OR UPPER(FEATURE_NAME) LIKE '%POLL%' THEN 'High'
+        WHEN UPPER(FEATURE_NAME) LIKE '%RECORD%' THEN 'Medium'
+        ELSE 'Low'
+    END AS FEATURE_COMPLEXITY,
+    CASE 
+        WHEN UPPER(FEATURE_NAME) LIKE '%RECORD%' OR UPPER(FEATURE_NAME) LIKE '%BREAKOUT%' THEN TRUE
+        ELSE FALSE
+    END AS IS_PREMIUM_FEATURE,
+    '2020-01-01'::DATE AS FEATURE_RELEASE_DATE,
+    'Active' AS FEATURE_STATUS,
+    'Medium' AS USAGE_FREQUENCY_CATEGORY,
+    'Feature usage tracking for ' || FEATURE_NAME AS FEATURE_DESCRIPTION,
+    'All Users' AS TARGET_USER_SEGMENT,
+    CURRENT_DATE() AS LOAD_DATE,
+    CURRENT_DATE() AS UPDATE_DATE,
+    SOURCE_SYSTEM
+FROM feature_data
