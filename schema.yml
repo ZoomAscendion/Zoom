@@ -1,0 +1,219 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "Bronze layer tables containing raw data from source systems"
+    tables:
+      - name: bz_users
+        description: "Raw user data from source systems"
+        columns:
+          - name: user_id
+            description: "Unique identifier for each user"
+            tests:
+              - not_null
+              - unique
+          - name: email
+            description: "User email address"
+            tests:
+              - not_null
+      - name: bz_meetings
+        description: "Raw meeting data from source systems"
+        columns:
+          - name: meeting_id
+            description: "Unique identifier for each meeting"
+            tests:
+              - not_null
+              - unique
+          - name: host_id
+            description: "User ID of the meeting host"
+            tests:
+              - not_null
+      - name: bz_participants
+        description: "Raw participant data from source systems"
+        columns:
+          - name: participant_id
+            description: "Unique identifier for each participant"
+            tests:
+              - not_null
+              - unique
+      - name: bz_feature_usage
+        description: "Raw feature usage data from source systems"
+        columns:
+          - name: usage_id
+            description: "Unique identifier for each usage record"
+            tests:
+              - not_null
+              - unique
+      - name: bz_support_tickets
+        description: "Raw support ticket data from source systems"
+        columns:
+          - name: ticket_id
+            description: "Unique identifier for each ticket"
+            tests:
+              - not_null
+              - unique
+      - name: bz_billing_events
+        description: "Raw billing event data from source systems"
+        columns:
+          - name: event_id
+            description: "Unique identifier for each billing event"
+            tests:
+              - not_null
+              - unique
+      - name: bz_licenses
+        description: "Raw license data from source systems"
+        columns:
+          - name: license_id
+            description: "Unique identifier for each license"
+            tests:
+              - not_null
+              - unique
+
+models:
+  - name: SI_AUDIT_LOG
+    description: "Silver layer audit log for tracking data processing operations"
+    columns:
+      - name: audit_id
+        description: "Unique identifier for each audit record"
+        tests:
+          - not_null
+          - unique
+      - name: table_name
+        description: "Name of the table being audited"
+        tests:
+          - not_null
+      - name: error_type
+        description: "Type of error or operation"
+        tests:
+          - not_null
+
+  - name: SI_USERS
+    description: "Silver layer users table with data quality validations and transformations"
+    columns:
+      - name: user_id
+        description: "Unique identifier for each user"
+        tests:
+          - not_null
+          - unique
+      - name: email
+        description: "Validated and standardized email address"
+        tests:
+          - not_null
+      - name: data_quality_score
+        description: "Data quality score (0-100)"
+        tests:
+          - accepted_values:
+              values: [50, 75, 95]
+
+  - name: SI_MEETINGS
+    description: "Silver layer meetings table with numeric field cleaning and timestamp validation"
+    columns:
+      - name: meeting_id
+        description: "Unique identifier for each meeting"
+        tests:
+          - not_null
+          - unique
+      - name: duration_minutes
+        description: "Meeting duration in minutes (cleaned from text units)"
+        tests:
+          - not_null
+      - name: data_quality_score
+        description: "Data quality score (0-100)"
+        tests:
+          - accepted_values:
+              values: [50, 75, 95]
+
+  - name: SI_PARTICIPANTS
+    description: "Silver layer participants table with timestamp format validation"
+    columns:
+      - name: participant_id
+        description: "Unique identifier for each participant"
+        tests:
+          - not_null
+          - unique
+      - name: meeting_id
+        description: "Reference to meeting"
+        tests:
+          - not_null
+      - name: data_quality_score
+        description: "Data quality score (0-100)"
+        tests:
+          - accepted_values:
+              values: [50, 75, 95]
+
+  - name: SI_FEATURE_USAGE
+    description: "Silver layer feature usage table with validation"
+    columns:
+      - name: usage_id
+        description: "Unique identifier for each usage record"
+        tests:
+          - not_null
+          - unique
+      - name: usage_count
+        description: "Number of times feature was used"
+        tests:
+          - not_null
+      - name: data_quality_score
+        description: "Data quality score (0-100)"
+        tests:
+          - accepted_values:
+              values: [50, 75, 95]
+
+  - name: SI_SUPPORT_TICKETS
+    description: "Silver layer support tickets table with validation"
+    columns:
+      - name: ticket_id
+        description: "Unique identifier for each ticket"
+        tests:
+          - not_null
+          - unique
+      - name: resolution_status
+        description: "Current status of ticket resolution"
+        tests:
+          - accepted_values:
+              values: ['Open', 'In Progress', 'Resolved', 'Closed']
+      - name: data_quality_score
+        description: "Data quality score (0-100)"
+        tests:
+          - accepted_values:
+              values: [50, 75, 95]
+
+  - name: SI_BILLING_EVENTS
+    description: "Silver layer billing events table with validation"
+    columns:
+      - name: event_id
+        description: "Unique identifier for each billing event"
+        tests:
+          - not_null
+          - unique
+      - name: amount
+        description: "Billing amount"
+        tests:
+          - not_null
+      - name: data_quality_score
+        description: "Data quality score (0-100)"
+        tests:
+          - accepted_values:
+              values: [50, 75, 95]
+
+  - name: SI_LICENSES
+    description: "Silver layer licenses table with DD/MM/YYYY date format conversion"
+    columns:
+      - name: license_id
+        description: "Unique identifier for each license"
+        tests:
+          - not_null
+          - unique
+      - name: start_date
+        description: "License start date (converted from DD/MM/YYYY format)"
+        tests:
+          - not_null
+      - name: end_date
+        description: "License end date (converted from DD/MM/YYYY format)"
+        tests:
+          - not_null
+      - name: data_quality_score
+        description: "Data quality score (0-100)"
+        tests:
+          - accepted_values:
+              values: [50, 75, 95]
