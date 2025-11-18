@@ -1,8 +1,8 @@
-name: 'bronze_transformation'
+name: 'zoom_gold_layer'
 version: '1.0.0'
 config-version: 2
 
-profile: 'bronze_transformation'
+profile: 'zoom_gold_layer'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,7 +17,17 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  bronze_transformation:
-    +materialized: table
-    bronze:
+  zoom_gold_layer:
+    gold:
       +materialized: table
+      +tags: ["gold"]
+      dimensional:
+        +materialized: table
+        +tags: ["dimension", "gold"]
+      fact:
+        +materialized: table
+        +tags: ["fact", "gold"]
+
+vars:
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
