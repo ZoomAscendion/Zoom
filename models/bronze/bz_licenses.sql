@@ -1,18 +1,17 @@
--- Bronze Layer Licenses Table
--- Author: Data Engineering Team
--- Description: Manages license assignments and entitlements
--- Version: 1.0
--- Created: {{ run_started_at }}
-
-{{ config(
+{{
+  config(
     materialized='table',
     tags=['bronze', 'licenses'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', DATEDIFF('second', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_LICENSES' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
-) }}
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) VALUES ('BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED')",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) VALUES ('BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', DATEDIFF('second', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_LICENSES' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS')"
+  )
+}}
+
+-- Bronze Layer Licenses Table
+-- 1:1 mapping from RAW.LICENSES to BRONZE.BZ_LICENSES
+-- Includes deduplication logic based on LICENSE_ID and LOAD_TIMESTAMP
 
 WITH source_data AS (
-    -- Select all data from source LICENSES table
     SELECT 
         LICENSE_ID,
         LICENSE_TYPE,
@@ -22,25 +21,21 @@ WITH source_data AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('raw', 'LICENSES') }}
+    FROM {{ source('raw_schema', 'licenses') }}
 ),
 
+-- Apply deduplication logic - keep latest record per LICENSE_ID
 deduped_data AS (
-    -- Apply deduplication based on LICENSE_ID and UPDATE_TIMESTAMP
-    SELECT *
-    FROM (
-        SELECT *,
-               ROW_NUMBER() OVER (
-                   PARTITION BY LICENSE_ID 
-                   ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC
-               ) as rn
-        FROM source_data
-    )
-    WHERE rn = 1
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY LICENSE_ID 
+            ORDER BY LOAD_TIMESTAMP DESC, UPDATE_TIMESTAMP DESC
+        ) AS row_num
+    FROM source_data
 )
 
--- Final select with 1-1 mapping from raw to bronze
-SELECT
+-- Final selection with audit columns
+SELECT 
     LICENSE_ID,
     LICENSE_TYPE,
     ASSIGNED_TO_USER_ID,
@@ -50,3 +45,4 @@ SELECT
     UPDATE_TIMESTAMP,
     SOURCE_SYSTEM
 FROM deduped_data
+WHERE row_num = 1
