@@ -16,9 +16,9 @@ WITH revenue_base AS (
         be.SOURCE_SYSTEM,
         ROW_NUMBER() OVER (
             PARTITION BY be.EVENT_ID 
-            ORDER BY be.UPDATE_TIMESTAMP DESC
+            ORDER BY COALESCE(be.UPDATE_TIMESTAMP, be.LOAD_TIMESTAMP) DESC
         ) as rn
-    FROM {{ source('silver', 'si_billing_events') }} be
+    FROM DB_POC_ZOOM_1.GOLD.SI_BILLING_EVENTS be
     WHERE be.VALIDATION_STATUS = 'PASSED'
 ),
 
@@ -29,9 +29,9 @@ user_licenses AS (
         dl.LICENSE_KEY,
         ROW_NUMBER() OVER (
             PARTITION BY sl.ASSIGNED_TO_USER_ID 
-            ORDER BY sl.UPDATE_TIMESTAMP DESC
+            ORDER BY COALESCE(sl.UPDATE_TIMESTAMP, sl.LOAD_TIMESTAMP) DESC
         ) as rn
-    FROM {{ source('silver', 'si_licenses') }} sl
+    FROM DB_POC_ZOOM_1.GOLD.SI_LICENSES sl
     JOIN {{ ref('go_dim_license') }} dl ON sl.LICENSE_TYPE = dl.LICENSE_TYPE AND dl.IS_CURRENT_RECORD = TRUE
     WHERE sl.VALIDATION_STATUS = 'PASSED'
       AND sl.START_DATE <= CURRENT_DATE() 
