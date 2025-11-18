@@ -1,10 +1,10 @@
 {{ config(
     materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_FEATURE_USAGE', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_FEATURE_USAGE', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_FEATURE_USAGE', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_FEATURE_USAGE', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'"
 ) }}
 
-/* Silver layer transformation for Feature Usage table */
+-- Silver layer transformation for Feature Usage table
 WITH bronze_feature_usage AS (
     SELECT *
     FROM {{ source('bronze', 'BZ_FEATURE_USAGE') }}
@@ -13,7 +13,7 @@ WITH bronze_feature_usage AS (
 data_quality_checks AS (
     SELECT 
         *,
-        /* Data quality score calculation */
+        -- Data quality score calculation
         (
             CASE WHEN USAGE_ID IS NOT NULL THEN 20 ELSE 0 END +
             CASE WHEN MEETING_ID IS NOT NULL THEN 20 ELSE 0 END +
@@ -22,7 +22,7 @@ data_quality_checks AS (
             CASE WHEN USAGE_DATE IS NOT NULL THEN 20 ELSE 0 END
         ) AS data_quality_score,
         
-        /* Validation status */
+        -- Validation status
         CASE 
             WHEN USAGE_ID IS NULL OR MEETING_ID IS NULL OR FEATURE_NAME IS NULL THEN 'FAILED'
             WHEN USAGE_COUNT IS NULL OR USAGE_COUNT < 0 THEN 'FAILED'
@@ -36,7 +36,7 @@ deduplication AS (
     SELECT *,
         ROW_NUMBER() OVER (
             PARTITION BY USAGE_ID 
-            ORDER BY UPDATE_TIMESTAMP DESC NULLS LAST, LOAD_TIMESTAMP DESC
+            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC, LOAD_TIMESTAMP DESC
         ) AS row_num
     FROM data_quality_checks
     WHERE USAGE_ID IS NOT NULL
@@ -53,7 +53,7 @@ final_transformation AS (
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
         DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
-        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        COALESCE(DATE(UPDATE_TIMESTAMP), DATE(LOAD_TIMESTAMP)) AS UPDATE_DATE,
         data_quality_score AS DATA_QUALITY_SCORE,
         validation_status AS VALIDATION_STATUS
     FROM deduplication
