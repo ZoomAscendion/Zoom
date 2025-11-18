@@ -1,8 +1,8 @@
-name: 'zoom_silver_pipeline'
+name: 'zoom_bronze_layer'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_silver_pipeline'
+profile: 'zoom_bronze_layer'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,15 +17,7 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_silver_pipeline:
-    silver:
+  zoom_bronze_layer:
+    bronze:
       +materialized: table
-
-vars:
-  source_database: 'DB_POC_ZOOM'
-  source_schema: 'BRONZE'
-  target_schema: 'SILVER'
-  dq_score_threshold: 70
-  max_duration_minutes: 1440
-  audit_enabled: true
-  error_logging_enabled: true
+      +on_schema_change: "fail"
