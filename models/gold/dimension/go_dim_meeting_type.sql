@@ -1,0 +1,60 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, LOAD_DATE, SOURCE_SYSTEM) VALUES ('{{ invocation_id }}_MEETING', 'go_dim_meeting_type', 'SILVER.SI_MEETINGS', 'GOLD.GO_DIM_MEETING_TYPE', CURRENT_TIMESTAMP(), 'RUNNING', CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
+    post_hook="UPDATE {{ ref('go_audit_log') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), UPDATE_DATE = CURRENT_DATE() WHERE AUDIT_LOG_ID = '{{ invocation_id }}_MEETING' AND PROCESS_NAME = 'go_dim_meeting_type'"
+) }}
+
+-- Meeting type dimension transformation from Silver to Gold layer
+WITH meeting_data AS (
+    SELECT 
+        MEETING_ID,
+        DURATION_MINUTES,
+        START_TIME,
+        DATA_QUALITY_SCORE,
+        SOURCE_SYSTEM
+    FROM {{ source('silver', 'si_meetings') }}
+    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
+      AND MEETING_ID IS NOT NULL
+),
+
+meeting_type_transformed AS (
+    SELECT 
+        ROW_NUMBER() OVER (ORDER BY MEETING_ID) AS MEETING_TYPE_ID,
+        'Standard Meeting' AS MEETING_TYPE,
+        CASE 
+            WHEN COALESCE(DURATION_MINUTES, 0) <= 15 THEN 'Quick Sync'
+            WHEN COALESCE(DURATION_MINUTES, 0) <= 60 THEN 'Standard Meeting'
+            WHEN COALESCE(DURATION_MINUTES, 0) <= 120 THEN 'Extended Meeting'
+            ELSE 'Long Session'
+        END AS MEETING_CATEGORY,
+        CASE 
+            WHEN COALESCE(DURATION_MINUTES, 0) <= 15 THEN 'Brief'
+            WHEN COALESCE(DURATION_MINUTES, 0) <= 60 THEN 'Standard'
+            WHEN COALESCE(DURATION_MINUTES, 0) <= 120 THEN 'Extended'
+            ELSE 'Long'
+        END AS DURATION_CATEGORY,
+        'Unknown' AS PARTICIPANT_SIZE_CATEGORY,
+        CASE 
+            WHEN HOUR(COALESCE(START_TIME, CURRENT_TIMESTAMP())) BETWEEN 6 AND 11 THEN 'Morning'
+            WHEN HOUR(COALESCE(START_TIME, CURRENT_TIMESTAMP())) BETWEEN 12 AND 17 THEN 'Afternoon'
+            WHEN HOUR(COALESCE(START_TIME, CURRENT_TIMESTAMP())) BETWEEN 18 AND 21 THEN 'Evening'
+            ELSE 'Night'
+        END AS TIME_OF_DAY_CATEGORY,
+        DAYNAME(COALESCE(START_TIME, CURRENT_TIMESTAMP())) AS DAY_OF_WEEK,
+        CASE WHEN DAYOFWEEK(COALESCE(START_TIME, CURRENT_TIMESTAMP())) IN (1, 7) THEN TRUE ELSE FALSE END AS IS_WEEKEND_MEETING,
+        FALSE AS IS_RECURRING_TYPE,
+        CASE 
+            WHEN COALESCE(DATA_QUALITY_SCORE, 0) >= 90 THEN 9.0
+            WHEN COALESCE(DATA_QUALITY_SCORE, 0) >= 80 THEN 8.0
+            WHEN COALESCE(DATA_QUALITY_SCORE, 0) >= 70 THEN 7.0
+            ELSE 6.0
+        END AS MEETING_QUALITY_THRESHOLD,
+        'Standard meeting features' AS TYPICAL_FEATURES_USED,
+        'Business Meeting' AS BUSINESS_PURPOSE,
+        CURRENT_DATE() AS LOAD_DATE,
+        CURRENT_DATE() AS UPDATE_DATE,
+        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
+    FROM meeting_data
+)
+
+SELECT * FROM meeting_type_transformed
