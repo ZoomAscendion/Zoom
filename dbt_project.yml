@@ -2,8 +2,10 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_silver'
+# This setting configures which "profile" dbt uses for this project.
+profile: 'zoom_silver_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -11,52 +13,172 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
   zoom_silver_pipeline:
-    silver:
+    # Audit tables - created first
+    SI_AUDIT_LOG:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-          INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
-            AUDIT_ID, TABLE_NAME, COLUMN_NAME, RECORD_ID, ERROR_TYPE, 
-            ERROR_DESCRIPTION, ORIGINAL_VALUE, AUDIT_TIMESTAMP, 
-            OPERATION_TYPE, PROCESSED_BY, SOURCE_SYSTEM
-          )
-          SELECT 
-            UUID_STRING() as AUDIT_ID,
-            '{{ this.name }}' as TABLE_NAME,
-            'PIPELINE_START' as COLUMN_NAME,
-            'N/A' as RECORD_ID,
-            'PIPELINE_EXECUTION' as ERROR_TYPE,
-            'Pipeline execution started for {{ this.name }}' as ERROR_DESCRIPTION,
-            'N/A' as ORIGINAL_VALUE,
-            CURRENT_TIMESTAMP() as AUDIT_TIMESTAMP,
-            'INSERT' as OPERATION_TYPE,
-            'DBT_SILVER_PIPELINE' as PROCESSED_BY,
-            'BRONZE_LAYER' as SOURCE_SYSTEM;
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_AUDIT_LOG' %}
-          INSERT INTO {{ ref('SI_AUDIT_LOG') }} (
-            AUDIT_ID, TABLE_NAME, COLUMN_NAME, RECORD_ID, ERROR_TYPE, 
-            ERROR_DESCRIPTION, ORIGINAL_VALUE, AUDIT_TIMESTAMP, 
-            OPERATION_TYPE, PROCESSED_BY, SOURCE_SYSTEM
-          )
-          SELECT 
-            UUID_STRING() as AUDIT_ID,
-            '{{ this.name }}' as TABLE_NAME,
-            'PIPELINE_END' as COLUMN_NAME,
-            'N/A' as RECORD_ID,
-            'PIPELINE_EXECUTION' as ERROR_TYPE,
-            'Pipeline execution completed for {{ this.name }}' as ERROR_DESCRIPTION,
-            'N/A' as ORIGINAL_VALUE,
-            CURRENT_TIMESTAMP() as AUDIT_TIMESTAMP,
-            'INSERT' as OPERATION_TYPE,
-            'DBT_SILVER_PIPELINE' as PROCESSED_BY,
-            'BRONZE_LAYER' as SOURCE_SYSTEM;
-        {% endif %}
+      +tags: ["silver", "audit"]
+      +pre_hook: []
+      +post_hook: []
+    
+    # Bronze layer models
+    bz_users:
+      +materialized: table
+      +tags: ["bronze", "users"]
+    bz_meetings:
+      +materialized: table
+      +tags: ["bronze", "meetings"]
+    bz_participants:
+      +materialized: table
+      +tags: ["bronze", "participants"]
+    bz_feature_usage:
+      +materialized: table
+      +tags: ["bronze", "feature_usage"]
+    bz_support_tickets:
+      +materialized: table
+      +tags: ["bronze", "support"]
+    bz_billing_events:
+      +materialized: table
+      +tags: ["bronze", "billing"]
+    bz_licenses:
+      +materialized: table
+      +tags: ["bronze", "licenses"]
+    bz_data_audit:
+      +materialized: table
+      +tags: ["bronze", "audit"]
+    
+    # Silver layer models with critical DQ checks
+    SI_USERS:
+      +materialized: table
+      +tags: ["silver", "users", "dq_validated"]
+    SI_MEETINGS:
+      +materialized: table
+      +tags: ["silver", "meetings", "numeric_cleaning", "critical_p1"]
+    SI_PARTICIPANTS:
+      +materialized: table
+      +tags: ["silver", "participants", "timestamp_validation"]
+    SI_FEATURE_USAGE:
+      +materialized: table
+      +tags: ["silver", "feature_usage", "dq_validated"]
+    SI_SUPPORT_TICKETS:
+      +materialized: table
+      +tags: ["silver", "support", "dq_validated"]
+    SI_BILLING_EVENTS:
+      +materialized: table
+      +tags: ["silver", "billing", "dq_validated"]
+    SI_LICENSES:
+      +materialized: table
+      +tags: ["silver", "licenses", "date_format_conversion", "critical_p1"]
+    SI_LICENSES_FIXED:
+      +materialized: table
+      +tags: ["silver", "licenses", "fixed_version"]
+    SI_MEETINGS_FIXED:
+      +materialized: table
+      +tags: ["silver", "meetings", "fixed_version"]
+    SI_PARTICIPANTS_FIXED:
+      +materialized: table
+      +tags: ["silver", "participants", "fixed_version"]
+    
+    # Gold layer dimension tables
+    go_dim_date:
+      +materialized: table
+      +tags: ["gold", "dimension", "date"]
+    go_dim_user:
+      +materialized: table
+      +tags: ["gold", "dimension", "user"]
+    go_dim_feature:
+      +materialized: table
+      +tags: ["gold", "dimension", "feature"]
+    go_dim_license:
+      +materialized: table
+      +tags: ["gold", "dimension", "license"]
+    go_dim_meeting:
+      +materialized: table
+      +tags: ["gold", "dimension", "meeting"]
+    go_dim_support_category:
+      +materialized: table
+      +tags: ["gold", "dimension", "support"]
+    
+    # Gold layer fact tables
+    go_fact_meeting_activity:
+      +materialized: table
+      +tags: ["gold", "fact", "meeting_activity"]
+    go_fact_feature_usage:
+      +materialized: table
+      +tags: ["gold", "fact", "feature_usage"]
+    go_fact_support_activity:
+      +materialized: table
+      +tags: ["gold", "fact", "support_activity"]
+    go_fact_revenue_activity:
+      +materialized: table
+      +tags: ["gold", "fact", "revenue_activity"]
+    
+    # Audit and logging tables
+    go_audit_log:
+      +materialized: table
+      +tags: ["gold", "audit"]
+
+# Global configurations
+vars:
+  # Data quality thresholds
+  dq_score_threshold_pass: 90
+  dq_score_threshold_warning: 70
+  dq_score_threshold_fail: 50
+  
+  # Date format patterns for critical P1 checks
+  date_formats:
+    - 'YYYY-MM-DD'
+    - 'DD/MM/YYYY'
+    - 'MM/DD/YYYY'
+  
+  # Numeric cleaning patterns for critical P1 checks
+  numeric_cleaning_pattern: '[^0-9.]'
+  
+  # Timezone handling
+  timezone_patterns:
+    - 'EST'
+    - 'PST'
+    - 'CST'
+    - 'IST'
+    - 'UTC'
+  
+  # Business rules
+  max_meeting_duration_minutes: 1440
+  valid_plan_types: ['Free', 'Basic', 'Pro', 'Enterprise']
+  valid_resolution_statuses: ['Open', 'In Progress', 'Resolved', 'Closed']
+
+# Test configurations
+tests:
+  +store_failures: true
+  +severity: warn
+
+# Snapshot configurations
+snapshots:
+  zoom_silver_pipeline:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: update_timestamp
+
+# Seeds configurations
+seeds:
+  zoom_silver_pipeline:
+    +column_types:
+      id: varchar(50)
+      created_at: timestamp
+
+# Documentation
+docs:
+  generate: true
+  serve:
+    port: 8080
+
+# Dispatch configurations for package compatibility
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['zoom_silver_pipeline', 'dbt_utils']
