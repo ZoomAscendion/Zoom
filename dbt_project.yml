@@ -13,6 +13,7 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
@@ -35,7 +36,7 @@ seeds:
   zoom_bronze_pipeline:
     +quote_columns: false
 
-# Snapshots configuration
-snapshots:
+# Tests configuration
+tests:
   zoom_bronze_pipeline:
-    +target_schema: snapshots
+    +store_failures: true
