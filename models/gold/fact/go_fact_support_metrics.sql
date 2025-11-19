@@ -13,7 +13,7 @@ WITH support_base AS (
         st.RESOLUTION_STATUS,
         st.OPEN_DATE,
         st.SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_support_tickets') }} st
+    FROM {{ ref('SI_Support_Tickets') }} st
     WHERE st.VALIDATION_STATUS = 'PASSED'
 )
 
