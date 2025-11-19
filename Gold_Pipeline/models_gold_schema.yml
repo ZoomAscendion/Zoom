@@ -1,0 +1,405 @@
+version: 2
+
+models:
+  # Audit Log Model
+  - name: go_audit_log
+    description: "Audit log table for tracking all Gold layer transformations and operations"
+    columns:
+      - name: audit_id
+        description: "Unique identifier for audit record"
+        tests:
+          - not_null
+          - unique
+      - name: table_name
+        description: "Name of the table being audited"
+        tests:
+          - not_null
+      - name: operation_type
+        description: "Type of operation (PRE_LOAD, POST_LOAD, etc.)"
+        tests:
+          - not_null
+      - name: operation_timestamp
+        description: "Timestamp when operation occurred"
+        tests:
+          - not_null
+      - name: record_count
+        description: "Number of records affected"
+      - name: user_name
+        description: "User who performed the operation"
+      - name: session_id
+        description: "Session identifier"
+      - name: source_system
+        description: "Source system identifier"
+
+  # Dimension Models
+  - name: go_dim_date
+    description: "Date dimension table with comprehensive date attributes"
+    columns:
+      - name: date_id
+        description: "Surrogate key for date dimension"
+        tests:
+          - not_null
+          - unique
+      - name: date_value
+        description: "Actual date value"
+        tests:
+          - not_null
+          - unique
+      - name: year
+        description: "Year component"
+        tests:
+          - not_null
+      - name: quarter
+        description: "Quarter component (1-4)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4]
+      - name: month
+        description: "Month component (1-12)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+      - name: is_weekend
+        description: "Boolean indicator for weekend dates"
+        tests:
+          - not_null
+
+  - name: go_dim_user
+    description: "User dimension with SCD Type 2 implementation"
+    columns:
+      - name: user_dim_id
+        description: "Surrogate key for user dimension"
+        tests:
+          - not_null
+          - unique
+      - name: user_id
+        description: "Natural key for user"
+        tests:
+          - not_null
+      - name: user_name
+        description: "Standardized user name"
+        tests:
+          - not_null
+      - name: email_domain
+        description: "Email domain extracted from email address"
+      - name: plan_category
+        description: "Categorized plan type"
+        tests:
+          - accepted_values:
+              values: ['Basic', 'Professional', 'Enterprise', 'Other']
+      - name: geographic_region
+        description: "Geographic region based on email domain"
+        tests:
+          - accepted_values:
+              values: ['North America', 'Europe', 'Asia Pacific', 'Other']
+      - name: is_current_record
+        description: "Indicates if this is the current version of the user record"
+        tests:
+          - not_null
+
+  - name: go_dim_feature
+    description: "Feature dimension with comprehensive feature metadata"
+    columns:
+      - name: feature_id
+        description: "Surrogate key for feature dimension"
+        tests:
+          - not_null
+          - unique
+      - name: feature_name
+        description: "Standardized feature name"
+        tests:
+          - not_null
+          - unique
+      - name: feature_category
+        description: "Feature category classification"
+        tests:
+          - accepted_values:
+              values: ['Screen Sharing', 'Recording', 'Communication', 'Meeting Management', 'Engagement', 'Collaboration', 'Audio', 'Video', 'File Sharing', 'Security', 'Other']
+      - name: feature_type
+        description: "Feature type classification"
+        tests:
+          - accepted_values:
+              values: ['Core', 'Advanced', 'Premium']
+      - name: is_premium_feature
+        description: "Boolean indicator for premium features"
+        tests:
+          - not_null
+
+  - name: go_dim_license
+    description: "License dimension with pricing and feature information"
+    columns:
+      - name: license_id
+        description: "Natural key for license"
+        tests:
+          - not_null
+          - unique
+      - name: license_type
+        description: "Type of license"
+        tests:
+          - not_null
+      - name: license_category
+        description: "License category classification"
+        tests:
+          - accepted_values:
+              values: ['Basic', 'Professional', 'Business', 'Enterprise', 'Other']
+      - name: monthly_price
+        description: "Monthly price in USD"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000
+      - name: is_current_record
+        description: "Indicates if this is the current version of the license record"
+        tests:
+          - not_null
+
+  - name: go_dim_meeting_type
+    description: "Meeting type dimension with meeting categorization"
+    columns:
+      - name: meeting_type_id
+        description: "Surrogate key for meeting type dimension"
+        tests:
+          - not_null
+          - unique
+      - name: meeting_type
+        description: "Type of meeting"
+        tests:
+          - not_null
+      - name: meeting_category
+        description: "Meeting category classification"
+        tests:
+          - accepted_values:
+              values: ['Operational', 'Learning', 'HR', 'Presentation', 'Review', 'Strategic', 'Educational', 'Social', 'Business']
+      - name: duration_category
+        description: "Duration category classification"
+        tests:
+          - accepted_values:
+              values: ['Quick (≤15 min)', 'Short (16-30 min)', 'Medium (31-60 min)', 'Long (61-120 min)', 'Extended (>120 min)']
+
+  - name: go_dim_support_category
+    description: "Support category dimension with comprehensive support metadata"
+    columns:
+      - name: support_category_id
+        description: "Surrogate key for support category dimension"
+        tests:
+          - not_null
+          - unique
+      - name: support_category
+        description: "Main support category"
+        tests:
+          - not_null
+      - name: priority_level
+        description: "Priority level for support tickets"
+        tests:
+          - accepted_values:
+              values: ['Critical', 'High', 'Medium', 'Low']
+      - name: expected_resolution_time_hours
+        description: "Expected resolution time in hours"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 168
+
+  # Fact Models
+  - name: go_fact_feature_usage
+    description: "Feature usage fact table with comprehensive usage analytics"
+    columns:
+      - name: feature_usage_id
+        description: "Surrogate key for feature usage fact"
+        tests:
+          - not_null
+          - unique
+      - name: date_id
+        description: "Foreign key to date dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('go_dim_date')
+              field: date_id
+      - name: feature_id
+        description: "Foreign key to feature dimension"
+        tests:
+          - relationships:
+              to: ref('go_dim_feature')
+              field: feature_id
+      - name: user_dim_id
+        description: "Foreign key to user dimension"
+        tests:
+          - relationships:
+              to: ref('go_dim_user')
+              field: user_dim_id
+      - name: usage_count
+        description: "Number of times feature was used"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000
+      - name: feature_adoption_score
+        description: "Feature adoption score (0-100)"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100
+      - name: success_rate
+        description: "Success rate percentage"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100
+
+  - name: go_fact_meeting_activity
+    description: "Meeting activity fact table with comprehensive meeting analytics"
+    columns:
+      - name: meeting_activity_id
+        description: "Surrogate key for meeting activity fact"
+        tests:
+          - not_null
+          - unique
+      - name: date_id
+        description: "Foreign key to date dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('go_dim_date')
+              field: date_id
+      - name: meeting_type_id
+        description: "Foreign key to meeting type dimension"
+        tests:
+          - relationships:
+              to: ref('go_dim_meeting_type')
+              field: meeting_type_id
+      - name: host_user_dim_id
+        description: "Foreign key to user dimension for meeting host"
+        tests:
+          - relationships:
+              to: ref('go_dim_user')
+              field: user_dim_id
+      - name: participant_count
+        description: "Number of participants in the meeting"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000
+      - name: actual_duration_minutes
+        description: "Actual meeting duration in minutes"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1440
+      - name: meeting_quality_score
+        description: "Overall meeting quality score"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100
+
+  - name: go_fact_revenue_events
+    description: "Revenue events fact table with comprehensive billing analytics"
+    columns:
+      - name: revenue_event_id
+        description: "Surrogate key for revenue event fact"
+        tests:
+          - not_null
+          - unique
+      - name: date_id
+        description: "Foreign key to date dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('go_dim_date')
+              field: date_id
+      - name: license_id
+        description: "Foreign key to license dimension"
+        tests:
+          - relationships:
+              to: ref('go_dim_license')
+              field: license_id
+      - name: user_dim_id
+        description: "Foreign key to user dimension"
+        tests:
+          - relationships:
+              to: ref('go_dim_user')
+              field: user_dim_id
+      - name: gross_amount
+        description: "Gross transaction amount"
+        tests:
+          - not_null
+      - name: net_amount
+        description: "Net transaction amount after discounts"
+        tests:
+          - not_null
+      - name: currency_code
+        description: "Currency code for the transaction"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['USD', 'EUR', 'GBP', 'CAD', 'AUD']
+      - name: payment_status
+        description: "Status of the payment"
+        tests:
+          - accepted_values:
+              values: ['Completed', 'Pending', 'Failed', 'Refunded']
+
+  - name: go_fact_support_metrics
+    description: "Support metrics fact table with comprehensive support analytics"
+    columns:
+      - name: support_metrics_id
+        description: "Surrogate key for support metrics fact"
+        tests:
+          - not_null
+          - unique
+      - name: date_id
+        description: "Foreign key to date dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('go_dim_date')
+              field: date_id
+      - name: support_category_id
+        description: "Foreign key to support category dimension"
+        tests:
+          - relationships:
+              to: ref('go_dim_support_category')
+              field: support_category_id
+      - name: user_dim_id
+        description: "Foreign key to user dimension"
+        tests:
+          - relationships:
+              to: ref('go_dim_user')
+              field: user_dim_id
+      - name: ticket_id
+        description: "Natural key for support ticket"
+        tests:
+          - not_null
+          - unique
+      - name: priority_level
+        description: "Priority level of the ticket"
+        tests:
+          - accepted_values:
+              values: ['Critical', 'High', 'Medium', 'Low']
+      - name: resolution_status
+        description: "Current resolution status"
+        tests:
+          - not_null
+      - name: customer_satisfaction_score
+        description: "Customer satisfaction score (1-5)"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 5
+      - name: sla_met
+        description: "Boolean indicator if SLA was met"
+        tests:
+          - not_null
+      - name: cost_to_resolve
+        description: "Estimated cost to resolve the ticket"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000
