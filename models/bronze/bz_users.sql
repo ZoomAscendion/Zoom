@@ -1,0 +1,49 @@
+-- Bronze Layer Users Table
+-- Description: Stores user profile and subscription information from source systems
+-- Author: Data Engineering Team
+-- Created: {{ run_started_at }}
+
+{{ config(
+    materialized='table',
+    tags=['bronze', 'users'],
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) VALUES ('BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_USER', 'STARTED')",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) VALUES ('BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_USER', DATEDIFF('seconds', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_USERS' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS')"
+) }}
+
+-- CTE to filter out NULL primary keys and prepare raw data
+WITH raw_users_filtered AS (
+    SELECT 
+        USER_ID,
+        USER_NAME,
+        EMAIL,
+        COMPANY,
+        PLAN_TYPE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('raw', 'users') }}
+    WHERE USER_ID IS NOT NULL
+),
+
+-- CTE for deduplication based on primary key and latest timestamp
+deduped_users AS (
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY USER_ID 
+            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
+        ) AS row_num
+    FROM raw_users_filtered
+)
+
+-- Final selection with 1-to-1 mapping from raw to bronze
+SELECT 
+    USER_ID,
+    USER_NAME,
+    EMAIL,
+    COMPANY,
+    PLAN_TYPE,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM
+FROM deduped_users
+WHERE row_num = 1
