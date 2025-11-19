@@ -11,7 +11,7 @@ WITH source_licenses AS (
         START_DATE,
         END_DATE,
         SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_licenses') }}
+    FROM DB_POC_ZOOM.SILVER.SI_LICENSES
     WHERE VALIDATION_STATUS = 'PASSED'
       AND LICENSE_TYPE IS NOT NULL
 ),
