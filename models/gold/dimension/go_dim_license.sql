@@ -7,16 +7,17 @@
 -- License dimension transformation from Silver layer
 WITH license_source AS (
     SELECT DISTINCT
-        license_type,
+        COALESCE(license_type, 'Basic') AS license_type,
         start_date,
         end_date,
-        source_system
-    FROM {{ source('silver', 'si_licenses') }}
+        COALESCE(source_system, 'UNKNOWN') AS source_system
+    FROM {{ source('gold', 'si_licenses') }}
     WHERE validation_status = 'PASSED'
 ),
 
 license_transformed AS (
     SELECT
+        ROW_NUMBER() OVER (ORDER BY license_type) AS license_id,
         {{ dbt_utils.generate_surrogate_key(['license_type']) }} AS license_key,
         INITCAP(TRIM(license_type)) AS license_type,
         CASE 
@@ -74,8 +75,8 @@ license_transformed AS (
             ELSE 0.00
         END AS annual_price,
         'Standard license benefits for ' || license_type AS license_benefits,
-        start_date AS effective_start_date,
-        end_date AS effective_end_date,
+        COALESCE(start_date, CURRENT_DATE()) AS effective_start_date,
+        COALESCE(end_date, '9999-12-31'::DATE) AS effective_end_date,
         TRUE AS is_current_record,
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date,
