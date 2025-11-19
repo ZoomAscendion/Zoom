@@ -30,5 +30,3 @@ Total Number of users
 Average meeting duration
 
 Number of meetings created per user
-
-Feature Usage Distribution
