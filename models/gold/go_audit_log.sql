@@ -1,8 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['PROCESS_START_TIMESTAMP'],
-    pre_hook="",
-    post_hook=""
+    materialized='table'
 ) }}
 
 -- Audit log table for Gold layer process tracking
@@ -10,7 +7,7 @@
 
 WITH audit_base AS (
     SELECT 
-        {{ dbt_utils.generate_surrogate_key(['CURRENT_TIMESTAMP()']) }} AS PROCESS_ID,
+        'INIT_' || TO_CHAR(CURRENT_TIMESTAMP(), 'YYYYMMDDHH24MISS') AS PROCESS_ID,
         'GOLD_LAYER_INITIALIZATION' AS PROCESS_NAME,
         'AUDIT_LOG_CREATION' AS PROCESS_TYPE,
         CURRENT_TIMESTAMP() AS PROCESS_START_TIMESTAMP,
