@@ -12,6 +12,7 @@ WITH support_data AS (
     FROM {{ source('silver', 'si_support_tickets') }}
     WHERE VALIDATION_STATUS = 'PASSED'
       AND TICKET_TYPE IS NOT NULL
+      AND TRIM(TICKET_TYPE) != ''
 )
 
 SELECT 
