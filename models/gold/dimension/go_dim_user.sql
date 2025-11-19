@@ -15,7 +15,7 @@ WITH source_users AS (
         LOAD_DATE,
         VALIDATION_STATUS,
         SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_users') }}
+    FROM {{ ref('SI_Users') }}
     WHERE VALIDATION_STATUS = 'PASSED'
 )
 
