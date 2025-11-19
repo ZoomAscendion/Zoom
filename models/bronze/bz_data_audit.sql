@@ -8,12 +8,23 @@
     tags=['bronze', 'audit']
 ) }}
 
--- Create audit table structure
+-- Create audit table with proper structure
+WITH audit_structure AS (
+    SELECT 
+        1 AS record_id,
+        'SAMPLE_TABLE' AS source_table,
+        CURRENT_TIMESTAMP() AS load_timestamp,
+        'dbt_user' AS processed_by,
+        0.0 AS processing_time,
+        'SUCCESS' AS status
+    WHERE FALSE  -- This ensures no actual data is inserted initially
+)
+
 SELECT 
-    CAST(NULL AS NUMBER) AS record_id,
-    CAST(NULL AS VARCHAR(255)) AS source_table,
-    CAST(NULL AS TIMESTAMP_NTZ(9)) AS load_timestamp,
-    CAST(NULL AS VARCHAR(255)) AS processed_by,
-    CAST(NULL AS NUMBER(38,3)) AS processing_time,
-    CAST(NULL AS VARCHAR(50)) AS status
-WHERE 1=0
+    record_id,
+    source_table,
+    load_timestamp,
+    processed_by,
+    processing_time,
+    status
+FROM audit_structure
