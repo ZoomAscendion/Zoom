@@ -1,0 +1,273 @@
+version: 2
+
+models:
+  - name: go_audit_log
+    description: "Audit log for tracking all Gold layer transformations"
+    columns:
+      - name: audit_id
+        description: "Unique identifier for each audit record"
+        tests:
+          - unique
+          - not_null
+      - name: process_name
+        description: "Name of the process being audited"
+        tests:
+          - not_null
+      - name: process_status
+        description: "Status of the process execution"
+        tests:
+          - accepted_values:
+              values: ['STARTED', 'COMPLETED', 'FAILED']
+
+  - name: go_dim_date
+    description: "Date dimension for time-based analysis"
+    columns:
+      - name: date_id
+        description: "Unique identifier for each date"
+        tests:
+          - unique
+          - not_null
+      - name: date_value
+        description: "The actual date value"
+        tests:
+          - unique
+          - not_null
+      - name: year
+        description: "Year component of the date"
+        tests:
+          - not_null
+      - name: is_weekend
+        description: "Flag indicating if the date is a weekend"
+        tests:
+          - accepted_values:
+              values: [true, false]
+
+  - name: go_dim_user
+    description: "User dimension with SCD Type 2 implementation"
+    columns:
+      - name: user_dim_id
+        description: "Surrogate key for user dimension"
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: "Business key for user"
+        tests:
+          - not_null
+      - name: plan_type
+        description: "Standardized plan type"
+        tests:
+          - accepted_values:
+              values: ['Basic', 'Pro', 'Enterprise', 'Unknown']
+      - name: is_current_record
+        description: "Flag for current SCD record"
+        tests:
+          - accepted_values:
+              values: [true, false]
+
+  - name: go_dim_feature
+    description: "Feature dimension with categorization"
+    columns:
+      - name: feature_id
+        description: "Unique identifier for each feature"
+        tests:
+          - unique
+          - not_null
+      - name: feature_name
+        description: "Name of the feature"
+        tests:
+          - not_null
+      - name: feature_category
+        description: "Category classification of the feature"
+        tests:
+          - accepted_values:
+              values: ['Collaboration', 'Recording', 'Communication', 'Advanced Meeting', 'Engagement', 'Security', 'General']
+      - name: is_premium_feature
+        description: "Flag indicating if feature is premium"
+        tests:
+          - accepted_values:
+              values: [true, false]
+
+  - name: go_dim_license
+    description: "License dimension with pricing and entitlements"
+    columns:
+      - name: license_id
+        description: "Unique identifier for each license type"
+        tests:
+          - unique
+          - not_null
+      - name: license_type
+        description: "Type of license"
+        tests:
+          - not_null
+      - name: monthly_price
+        description: "Monthly price for the license"
+        tests:
+          - not_null
+      - name: is_current_record
+        description: "Flag for current SCD record"
+        tests:
+          - accepted_values:
+              values: [true, false]
+
+  - name: go_dim_meeting_type
+    description: "Meeting type dimension with categorization"
+    columns:
+      - name: meeting_type_id
+        description: "Unique identifier for each meeting type"
+        tests:
+          - unique
+          - not_null
+      - name: duration_category
+        description: "Duration-based categorization"
+        tests:
+          - accepted_values:
+              values: ['Brief', 'Standard', 'Extended', 'Long']
+      - name: is_weekend_meeting
+        description: "Flag for weekend meetings"
+        tests:
+          - accepted_values:
+              values: [true, false]
+
+  - name: go_dim_support_category
+    description: "Support category dimension with SLA metadata"
+    columns:
+      - name: support_category_id
+        description: "Unique identifier for each support category"
+        tests:
+          - unique
+          - not_null
+      - name: support_category
+        description: "Support category name"
+        tests:
+          - not_null
+      - name: priority_level
+        description: "Priority level for the category"
+        tests:
+          - accepted_values:
+              values: ['Critical', 'High', 'Medium', 'Low']
+      - name: sla_target_hours
+        description: "SLA target in hours"
+        tests:
+          - not_null
+
+  - name: go_fact_feature_usage
+    description: "Feature usage fact with adoption metrics"
+    columns:
+      - name: feature_usage_id
+        description: "Unique identifier for each usage record"
+        tests:
+          - unique
+          - not_null
+      - name: date_id
+        description: "Foreign key to date dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('go_dim_date')
+              field: date_id
+      - name: feature_id
+        description: "Foreign key to feature dimension"
+        tests:
+          - relationships:
+              to: ref('go_dim_feature')
+              field: feature_id
+      - name: usage_count
+        description: "Number of times feature was used"
+        tests:
+          - not_null
+      - name: success_rate
+        description: "Success rate percentage"
+        tests:
+          - not_null
+
+  - name: go_fact_meeting_activity
+    description: "Meeting activity fact with comprehensive metrics"
+    columns:
+      - name: meeting_activity_id
+        description: "Unique identifier for each meeting activity"
+        tests:
+          - unique
+          - not_null
+      - name: date_id
+        description: "Foreign key to date dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('go_dim_date')
+              field: date_id
+      - name: host_user_dim_id
+        description: "Foreign key to user dimension for host"
+        tests:
+          - relationships:
+              to: ref('go_dim_user')
+              field: user_dim_id
+      - name: actual_duration_minutes
+        description: "Actual meeting duration in minutes"
+        tests:
+          - not_null
+      - name: meeting_quality_score
+        description: "Calculated meeting quality score"
+        tests:
+          - not_null
+
+  - name: go_fact_revenue_events
+    description: "Revenue events fact with financial analytics"
+    columns:
+      - name: revenue_event_id
+        description: "Unique identifier for each revenue event"
+        tests:
+          - unique
+          - not_null
+      - name: date_id
+        description: "Foreign key to date dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('go_dim_date')
+              field: date_id
+      - name: user_dim_id
+        description: "Foreign key to user dimension"
+        tests:
+          - relationships:
+              to: ref('go_dim_user')
+              field: user_dim_id
+      - name: net_amount
+        description: "Net revenue amount"
+        tests:
+          - not_null
+      - name: currency_code
+        description: "Currency code for the transaction"
+        tests:
+          - accepted_values:
+              values: ['USD']
+
+  - name: go_fact_support_metrics
+    description: "Support metrics fact with SLA tracking"
+    columns:
+      - name: support_metrics_id
+        description: "Unique identifier for each support metric"
+        tests:
+          - unique
+          - not_null
+      - name: date_id
+        description: "Foreign key to date dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('go_dim_date')
+              field: date_id
+      - name: support_category_id
+        description: "Foreign key to support category dimension"
+        tests:
+          - relationships:
+              to: ref('go_dim_support_category')
+              field: support_category_id
+      - name: ticket_id
+        description: "Support ticket identifier"
+        tests:
+          - not_null
+      - name: customer_satisfaction_score
+        description: "Customer satisfaction rating"
+        tests:
+          - not_null
