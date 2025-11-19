@@ -1,23 +1,23 @@
 {{ config(
     materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (process_name, source_table, target_table, process_status, start_time, load_date, source_system) VALUES ('go_dim_feature', 'SI_FEATURE_USAGE', 'go_dim_feature', 'STARTED', CURRENT_TIMESTAMP(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET process_status = 'COMPLETED', end_time = CURRENT_TIMESTAMP() WHERE target_table = 'go_dim_feature' AND process_status = 'STARTED'"
+    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (audit_log_id, process_name, process_type, execution_start_timestamp, execution_status, source_table_name, target_table_name, process_trigger, executed_by, load_date, source_system) VALUES ('{{ dbt_utils.generate_surrogate_key(['GO_DIM_FEATURE', run_started_at]) }}', 'GO_DIM_FEATURE_LOAD', 'DBT_MODEL', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_FEATURE_USAGE', 'GO_DIM_FEATURE', 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
+    post_hook="UPDATE {{ ref('go_audit_log') }} SET execution_end_timestamp = CURRENT_TIMESTAMP(), execution_status = 'SUCCESS', records_processed = (SELECT COUNT(*) FROM {{ this }}), execution_duration_seconds = DATEDIFF('second', execution_start_timestamp, CURRENT_TIMESTAMP()) WHERE audit_log_id = '{{ dbt_utils.generate_surrogate_key(['GO_DIM_FEATURE', run_started_at]) }}'"
 ) }}
 
--- Feature dimension with categorization
-WITH source_features AS (
+-- Feature dimension transformation from Silver layer
+WITH feature_source AS (
     SELECT DISTINCT
-        COALESCE(TRIM(feature_name), 'Unknown Feature') AS feature_name,
+        feature_name,
         source_system
     FROM {{ source('silver', 'si_feature_usage') }}
-    WHERE feature_name IS NOT NULL
-      AND TRIM(feature_name) != ''
+    WHERE validation_status = 'PASSED'
+      AND feature_name IS NOT NULL
 ),
 
-transformed_features AS (
-    SELECT 
-        ROW_NUMBER() OVER (ORDER BY feature_name) AS feature_id,
-        INITCAP(feature_name) AS feature_name,
+feature_transformed AS (
+    SELECT
+        {{ dbt_utils.generate_surrogate_key(['feature_name']) }} AS feature_key,
+        INITCAP(TRIM(feature_name)) AS feature_name,
         CASE 
             WHEN UPPER(feature_name) LIKE '%SCREEN%SHARE%' THEN 'Collaboration'
             WHEN UPPER(feature_name) LIKE '%RECORD%' THEN 'Recording'
@@ -48,7 +48,7 @@ transformed_features AS (
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date,
         source_system
-    FROM source_features
+    FROM feature_source
 )
 
-SELECT * FROM transformed_features
+SELECT * FROM feature_transformed
