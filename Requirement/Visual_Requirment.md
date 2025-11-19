@@ -14,23 +14,12 @@ How many meetings were held per user?
 What is the average meeting duration?
 This keeps the report lightweight and simple.
 
-2.Data Model (use only one Fact and one Dimension)
+2.Data Model ( Ensure that we use the fact table "Fact Meeting Acitivty" and 
+dimension tables "Meetings" , "Users" and "Dates" )
 
-Fact Table:
+3.KPIS needed are:
 
-FACT_TABLE
-COLUMN 1
-COLUMN 2
-COLUMN 3
-
-Dimension Tables:
-
-DIM_TABLE
-COLUMN 1
-COLUMN 2
-COLUMN 3
-
-3.Data Attributes in the Report
-
-Meeting information (Meeting_ID, Duration_Minutes, Start_Time)
-
+Total Number of users
+Average meeting duration
+Number of meetings created per user
+Feature Usage Distribution
