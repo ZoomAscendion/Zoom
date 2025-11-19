@@ -2,9 +2,7 @@
   config(
     materialized='table',
     cluster_by=['FEATURE_ID', 'FEATURE_CATEGORY'],
-    tags=['dimension', 'gold'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT '{{ dbt_utils.generate_surrogate_key(['go_dim_feature', run_started_at]) }}', 'go_dim_feature', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_FEATURE_USAGE', 'GO_DIM_FEATURE', 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_LAYER'",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_END_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, RECORDS_PROCESSED, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT '{{ dbt_utils.generate_surrogate_key(['go_dim_feature_complete', run_started_at]) }}', 'go_dim_feature', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 'SUCCESS', 'SI_FEATURE_USAGE', 'GO_DIM_FEATURE', (SELECT COUNT(*) FROM {{ this }}), 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_LAYER'"
+    tags=['dimension', 'gold']
   )
 }}
 
@@ -13,10 +11,10 @@
 
 WITH source_features AS (
     SELECT DISTINCT
-        FEATURE_NAME,
-        SOURCE_SYSTEM
+        COALESCE(FEATURE_NAME, 'Unknown Feature') AS FEATURE_NAME,
+        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
     FROM {{ source('silver', 'si_feature_usage') }}
-    WHERE VALIDATION_STATUS = 'PASSED'
+    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
       AND FEATURE_NAME IS NOT NULL
 ),
 
