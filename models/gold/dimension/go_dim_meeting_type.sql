@@ -1,22 +1,11 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (process_name, source_table, target_table, process_status, start_time, load_date, source_system) VALUES ('go_dim_meeting_type', 'SI_MEETINGS', 'go_dim_meeting_type', 'STARTED', CURRENT_TIMESTAMP(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
+    post_hook="UPDATE {{ ref('go_audit_log') }} SET process_status = 'COMPLETED', end_time = CURRENT_TIMESTAMP() WHERE target_table = 'go_dim_meeting_type' AND process_status = 'STARTED'"
 ) }}
 
--- Meeting type dimension derived from meeting characteristics
--- Categorizes meetings by duration, time, and participant patterns
-
-WITH source_meetings AS (
-    SELECT 
-        duration_minutes,
-        start_time,
-        source_system
-    FROM {{ source('silver', 'si_meetings') }}
-    WHERE validation_status = 'PASSED'
-      AND duration_minutes IS NOT NULL
-      AND start_time IS NOT NULL
-),
-
-meeting_categories AS (
+-- Meeting type dimension
+WITH meeting_categories AS (
     SELECT DISTINCT
         CASE 
             WHEN duration_minutes <= 15 THEN 'Quick Sync'
@@ -39,7 +28,9 @@ meeting_categories AS (
         DAYNAME(start_time) AS day_of_week,
         CASE WHEN DAYOFWEEK(start_time) IN (1, 7) THEN TRUE ELSE FALSE END AS is_weekend_meeting,
         source_system
-    FROM source_meetings
+    FROM {{ source('silver', 'si_meetings') }}
+    WHERE duration_minutes IS NOT NULL
+      AND start_time IS NOT NULL
 ),
 
 transformed_meeting_types AS (
@@ -48,29 +39,14 @@ transformed_meeting_types AS (
         'Standard Meeting' AS meeting_type,
         meeting_category,
         duration_category,
-        'Unknown' AS participant_size_category,  -- To be enhanced with participant data
+        'Unknown' AS participant_size_category,
         time_of_day_category,
         day_of_week,
         is_weekend_meeting,
-        FALSE AS is_recurring_type,  -- To be enhanced with recurring meeting logic
-        CASE 
-            WHEN duration_category = 'Brief' THEN 7.0
-            WHEN duration_category = 'Standard' THEN 8.0
-            WHEN duration_category = 'Extended' THEN 7.5
-            ELSE 7.0
-        END AS meeting_quality_threshold,
-        CASE 
-            WHEN meeting_category = 'Quick Sync' THEN 'Screen Share, Chat'
-            WHEN meeting_category = 'Standard Meeting' THEN 'Screen Share, Chat, Recording'
-            WHEN meeting_category = 'Extended Meeting' THEN 'Screen Share, Chat, Recording, Breakout Rooms'
-            ELSE 'All Features'
-        END AS typical_features_used,
-        CASE 
-            WHEN time_of_day_category = 'Morning' THEN 'Daily Standup'
-            WHEN time_of_day_category = 'Afternoon' THEN 'Business Meeting'
-            WHEN time_of_day_category = 'Evening' THEN 'Training Session'
-            ELSE 'Ad-hoc Meeting'
-        END AS business_purpose,
+        FALSE AS is_recurring_type,
+        8.0 AS meeting_quality_threshold,
+        'Standard meeting features' AS typical_features_used,
+        'Business Meeting' AS business_purpose,
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date,
         source_system
