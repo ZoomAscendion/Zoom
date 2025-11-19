@@ -22,7 +22,7 @@ models:
       +materialized: table
       +pre-hook: |
         {% if this.name != 'go_process_audit' %}
-        INSERT INTO {{ ref('go_process_audit') }} (
+        INSERT INTO {{ target.database }}.{{ target.schema }}.go_process_audit (
           PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, 
           EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME,
           LOAD_DATE, SOURCE_SYSTEM
@@ -35,16 +35,11 @@ models:
         {% endif %}
       +post-hook: |
         {% if this.name != 'go_process_audit' %}
-        UPDATE {{ ref('go_process_audit') }}
+        UPDATE {{ target.database }}.{{ target.schema }}.go_process_audit
         SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(),
             EXECUTION_STATUS = 'SUCCESS',
             RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
             UPDATE_DATE = CURRENT_DATE()
         WHERE PROCESS_NAME = '{{ this.name }}'
           AND EXECUTION_STATUS = 'RUNNING'
-          AND EXECUTION_START_TIMESTAMP = (
-            SELECT MAX(EXECUTION_START_TIMESTAMP)
-            FROM {{ ref('go_process_audit') }}
-            WHERE PROCESS_NAME = '{{ this.name }}'
-          )
         {% endif %}
