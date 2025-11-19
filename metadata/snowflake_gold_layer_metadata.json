@@ -1,0 +1,356 @@
+{
+  "metadata_extraction": {
+    "running_instance_id": "3923ce75-572a-4e99-9152-707af6d3e613",
+    "extraction_timestamp": "2024-12-19",
+    "schema_name": "GOLD",
+    "total_objects": 7,
+    "object_types": {
+      "tables": 7,
+      "views": 0
+    }
+  },
+  "schema_objects": {
+    "BILLING_EVENTS": {
+      "object_type": "TABLE",
+      "column_count": 8,
+      "columns": [
+        {
+          "name": "EVENT_ID",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Unique identifier for billing events"
+        },
+        {
+          "name": "USER_ID",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Foreign key reference to users table"
+        },
+        {
+          "name": "EVENT_TYPE",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Type of billing event"
+        },
+        {
+          "name": "AMOUNT",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Billing amount for the event"
+        },
+        {
+          "name": "EVENT_DATE",
+          "data_type": "DATE",
+          "description": "Date when the billing event occurred"
+        },
+        {
+          "name": "LOAD_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when record was initially loaded"
+        },
+        {
+          "name": "UPDATE_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when record was last updated"
+        },
+        {
+          "name": "SOURCE_SYSTEM",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Source system identifier"
+        }
+      ]
+    },
+    "FEATURE_USAGE": {
+      "object_type": "TABLE",
+      "column_count": 8,
+      "columns": [
+        {
+          "name": "USAGE_ID",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Unique identifier for feature usage records"
+        },
+        {
+          "name": "MEETING_ID",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Foreign key reference to meetings table"
+        },
+        {
+          "name": "FEATURE_NAME",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Name of the feature being used"
+        },
+        {
+          "name": "USAGE_COUNT",
+          "data_type": "NUMBER(38,0)",
+          "description": "Number of times feature was used"
+        },
+        {
+          "name": "USAGE_DATE",
+          "data_type": "DATE",
+          "description": "Date when feature usage occurred"
+        },
+        {
+          "name": "LOAD_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when record was initially loaded"
+        },
+        {
+          "name": "UPDATE_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when record was last updated"
+        },
+        {
+          "name": "SOURCE_SYSTEM",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Source system identifier"
+        }
+      ]
+    },
+    "LICENSES": {
+      "object_type": "TABLE",
+      "column_count": 8,
+      "columns": [
+        {
+          "name": "LICENSE_ID",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Unique identifier for licenses"
+        },
+        {
+          "name": "LICENSE_TYPE",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Type of license (Basic, Pro, Enterprise, etc.)"
+        },
+        {
+          "name": "ASSIGNED_TO_USER_ID",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Foreign key reference to users table"
+        },
+        {
+          "name": "START_DATE",
+          "data_type": "DATE",
+          "description": "License start date"
+        },
+        {
+          "name": "END_DATE",
+          "data_type": "VARCHAR(16777216)",
+          "description": "License end date"
+        },
+        {
+          "name": "LOAD_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when record was initially loaded"
+        },
+        {
+          "name": "UPDATE_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when record was last updated"
+        },
+        {
+          "name": "SOURCE_SYSTEM",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Source system identifier"
+        }
+      ]
+    },
+    "MEETINGS": {
+      "object_type": "TABLE",
+      "column_count": 9,
+      "columns": [
+        {
+          "name": "MEETING_ID",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Unique identifier for meetings"
+        },
+        {
+          "name": "HOST_ID",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Foreign key reference to users table for meeting host"
+        },
+        {
+          "name": "MEETING_TOPIC",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Topic or title of the meeting"
+        },
+        {
+          "name": "START_TIME",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Meeting start timestamp"
+        },
+        {
+          "name": "END_TIME",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Meeting end timestamp"
+        },
+        {
+          "name": "DURATION_MINUTES",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Meeting duration in minutes"
+        },
+        {
+          "name": "LOAD_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when record was initially loaded"
+        },
+        {
+          "name": "UPDATE_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when record was last updated"
+        },
+        {
+          "name": "SOURCE_SYSTEM",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Source system identifier"
+        }
+      ]
+    },
+    "PARTICIPANTS": {
+      "object_type": "TABLE",
+      "column_count": 8,
+      "columns": [
+        {
+          "name": "PARTICIPANT_ID",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Unique identifier for meeting participants"
+        },
+        {
+          "name": "MEETING_ID",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Foreign key reference to meetings table"
+        },
+        {
+          "name": "USER_ID",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Foreign key reference to users table"
+        },
+        {
+          "name": "JOIN_TIME",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Timestamp when participant joined the meeting"
+        },
+        {
+          "name": "LEAVE_TIME",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when participant left the meeting"
+        },
+        {
+          "name": "LOAD_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when record was initially loaded"
+        },
+        {
+          "name": "UPDATE_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when record was last updated"
+        },
+        {
+          "name": "SOURCE_SYSTEM",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Source system identifier"
+        }
+      ]
+    },
+    "SUPPORT_TICKETS": {
+      "object_type": "TABLE",
+      "column_count": 8,
+      "columns": [
+        {
+          "name": "TICKET_ID",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Unique identifier for support tickets"
+        },
+        {
+          "name": "USER_ID",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Foreign key reference to users table"
+        },
+        {
+          "name": "TICKET_TYPE",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Type or category of support ticket"
+        },
+        {
+          "name": "RESOLUTION_STATUS",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Current status of ticket resolution"
+        },
+        {
+          "name": "OPEN_DATE",
+          "data_type": "DATE",
+          "description": "Date when support ticket was opened"
+        },
+        {
+          "name": "LOAD_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when record was initially loaded"
+        },
+        {
+          "name": "UPDATE_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when record was last updated"
+        },
+        {
+          "name": "SOURCE_SYSTEM",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Source system identifier"
+        }
+      ]
+    },
+    "USERS": {
+      "object_type": "TABLE",
+      "column_count": 8,
+      "columns": [
+        {
+          "name": "USER_ID",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Unique identifier for users"
+        },
+        {
+          "name": "USER_NAME",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Display name of the user"
+        },
+        {
+          "name": "EMAIL",
+          "data_type": "VARCHAR(16777216)",
+          "description": "User email address"
+        },
+        {
+          "name": "COMPANY",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Company or organization name"
+        },
+        {
+          "name": "PLAN_TYPE",
+          "data_type": "VARCHAR(16777216)",
+          "description": "User subscription plan type"
+        },
+        {
+          "name": "LOAD_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when record was initially loaded"
+        },
+        {
+          "name": "UPDATE_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "description": "Timestamp when record was last updated"
+        },
+        {
+          "name": "SOURCE_SYSTEM",
+          "data_type": "VARCHAR(16777216)",
+          "description": "Source system identifier"
+        }
+      ]
+    }
+  },
+  "data_governance": {
+    "common_patterns": {
+      "audit_columns": ["LOAD_TIMESTAMP", "UPDATE_TIMESTAMP", "SOURCE_SYSTEM"],
+      "primary_key_pattern": "Most tables use ID columns as primary keys",
+      "foreign_key_relationships": {
+        "USER_ID": "References USERS table",
+        "MEETING_ID": "References MEETINGS table"
+      }
+    },
+    "data_quality_notes": {
+      "timestamp_consistency": "All tables include audit timestamps for data lineage",
+      "source_tracking": "SOURCE_SYSTEM column enables multi-source data integration",
+      "data_types": "Most columns use VARCHAR(16777216) for flexibility"
+    }
+  }
+}
