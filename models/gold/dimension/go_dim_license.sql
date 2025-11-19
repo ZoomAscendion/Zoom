@@ -11,7 +11,7 @@ WITH source_licenses AS (
         START_DATE,
         END_DATE,
         SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_licenses') }}
+    FROM {{ ref('SI_Licenses') }}
     WHERE VALIDATION_STATUS = 'PASSED'
 )
 
