@@ -3,119 +3,119 @@ version: 2
 sources:
   - name: silver
     description: "Silver layer tables containing cleaned and validated data"
-    database: DB_POC_ZOOM_1
-    schema: GOLD
+    database: DB_POC_ZOOM
+    schema: SILVER
     tables:
       - name: si_users
-        description: "Silver layer user profile and subscription information"
+        description: "Silver layer user data with profile and subscription information"
         columns:
-          - name: user_id
-            description: "Unique identifier for each user account"
-          - name: user_name
+          - name: USER_ID
+            description: "Unique identifier for each user"
+          - name: USER_NAME
             description: "Display name of the user"
-          - name: email
+          - name: EMAIL
             description: "Email address of the user"
-          - name: company
+          - name: COMPANY
             description: "Company or organization name"
-          - name: plan_type
+          - name: PLAN_TYPE
             description: "Subscription plan type"
-          - name: validation_status
-            description: "Status of data validation (PASSED, FAILED, WARNING)"
-
+          - name: VALIDATION_STATUS
+            description: "Data validation status"
+            
       - name: si_meetings
-        description: "Silver layer meeting information and session details"
+        description: "Silver layer meeting data with session details"
         columns:
-          - name: meeting_id
+          - name: MEETING_ID
             description: "Unique identifier for each meeting"
-          - name: host_id
+          - name: HOST_ID
             description: "User ID of the meeting host"
-          - name: meeting_topic
+          - name: MEETING_TOPIC
             description: "Topic or title of the meeting"
-          - name: start_time
+          - name: START_TIME
             description: "Meeting start timestamp"
-          - name: end_time
+          - name: END_TIME
             description: "Meeting end timestamp"
-          - name: duration_minutes
+          - name: DURATION_MINUTES
             description: "Meeting duration in minutes"
-          - name: validation_status
-            description: "Status of data validation (PASSED, FAILED, WARNING)"
-
+          - name: VALIDATION_STATUS
+            description: "Data validation status"
+            
       - name: si_participants
-        description: "Silver layer meeting participants and their session details"
+        description: "Silver layer participant data for meetings"
         columns:
-          - name: participant_id
-            description: "Unique identifier for each meeting participant"
-          - name: meeting_id
+          - name: PARTICIPANT_ID
+            description: "Unique identifier for each participant"
+          - name: MEETING_ID
             description: "Reference to meeting"
-          - name: user_id
+          - name: USER_ID
             description: "Reference to user who participated"
-          - name: join_time
-            description: "Timestamp when participant joined meeting"
-          - name: leave_time
-            description: "Timestamp when participant left meeting"
-          - name: validation_status
-            description: "Status of data validation (PASSED, FAILED, WARNING)"
-
+          - name: JOIN_TIME
+            description: "Timestamp when participant joined"
+          - name: LEAVE_TIME
+            description: "Timestamp when participant left"
+          - name: VALIDATION_STATUS
+            description: "Data validation status"
+            
       - name: si_feature_usage
-        description: "Silver layer platform feature usage during meetings"
+        description: "Silver layer feature usage data"
         columns:
-          - name: usage_id
-            description: "Unique identifier for each feature usage record"
-          - name: meeting_id
+          - name: USAGE_ID
+            description: "Unique identifier for each usage record"
+          - name: MEETING_ID
             description: "Reference to meeting where feature was used"
-          - name: feature_name
+          - name: FEATURE_NAME
             description: "Name of the feature being tracked"
-          - name: usage_count
+          - name: USAGE_COUNT
             description: "Number of times feature was used"
-          - name: usage_date
+          - name: USAGE_DATE
             description: "Date when feature usage occurred"
-          - name: validation_status
-            description: "Status of data validation (PASSED, FAILED, WARNING)"
-
+          - name: VALIDATION_STATUS
+            description: "Data validation status"
+            
       - name: si_support_tickets
-        description: "Silver layer customer support requests and resolution tracking"
+        description: "Silver layer support ticket data"
         columns:
-          - name: ticket_id
+          - name: TICKET_ID
             description: "Unique identifier for each support ticket"
-          - name: user_id
+          - name: USER_ID
             description: "Reference to user who created the ticket"
-          - name: ticket_type
+          - name: TICKET_TYPE
             description: "Type of support ticket"
-          - name: resolution_status
+          - name: RESOLUTION_STATUS
             description: "Current status of ticket resolution"
-          - name: open_date
+          - name: OPEN_DATE
             description: "Date when ticket was opened"
-          - name: validation_status
-            description: "Status of data validation (PASSED, FAILED, WARNING)"
-
+          - name: VALIDATION_STATUS
+            description: "Data validation status"
+            
       - name: si_billing_events
-        description: "Silver layer financial transactions and billing activities"
+        description: "Silver layer billing and revenue data"
         columns:
-          - name: event_id
+          - name: EVENT_ID
             description: "Unique identifier for each billing event"
-          - name: user_id
+          - name: USER_ID
             description: "Reference to user associated with billing event"
-          - name: event_type
+          - name: EVENT_TYPE
             description: "Type of billing event"
-          - name: amount
+          - name: AMOUNT
             description: "Monetary amount for the billing event"
-          - name: event_date
+          - name: EVENT_DATE
             description: "Date when the billing event occurred"
-          - name: validation_status
-            description: "Status of data validation (PASSED, FAILED, WARNING)"
-
+          - name: VALIDATION_STATUS
+            description: "Data validation status"
+            
       - name: si_licenses
-        description: "Silver layer license assignments and entitlements"
+        description: "Silver layer license assignment data"
         columns:
-          - name: license_id
+          - name: LICENSE_ID
             description: "Unique identifier for each license"
-          - name: license_type
+          - name: LICENSE_TYPE
             description: "Type of license"
-          - name: assigned_to_user_id
+          - name: ASSIGNED_TO_USER_ID
             description: "User ID to whom license is assigned"
-          - name: start_date
+          - name: START_DATE
             description: "License validity start date"
-          - name: end_date
+          - name: END_DATE
             description: "License validity end date"
-          - name: validation_status
-            description: "Status of data validation (PASSED, FAILED, WARNING)"
+          - name: VALIDATION_STATUS
+            description: "Data validation status"
