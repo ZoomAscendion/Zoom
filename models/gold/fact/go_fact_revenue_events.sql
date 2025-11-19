@@ -13,7 +13,7 @@ WITH billing_base AS (
         be.AMOUNT,
         be.EVENT_DATE,
         be.SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_billing_events') }} be
+    FROM {{ ref('SI_Billing_Events') }} be
     WHERE be.VALIDATION_STATUS = 'PASSED'
 ),
 
@@ -21,7 +21,7 @@ user_license_mapping AS (
     SELECT 
         sl.ASSIGNED_TO_USER_ID,
         sl.LICENSE_TYPE
-    FROM {{ source('silver', 'si_licenses') }} sl
+    FROM {{ ref('SI_Licenses') }} sl
     WHERE sl.VALIDATION_STATUS = 'PASSED'
 )
 
