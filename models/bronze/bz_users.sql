@@ -1,7 +1,6 @@
 -- Bronze Layer Users Table
 -- Description: Stores user profile and subscription information from source systems
 -- Author: Data Engineering Team
--- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
