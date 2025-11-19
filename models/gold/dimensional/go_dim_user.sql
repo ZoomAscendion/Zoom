@@ -12,14 +12,10 @@ WITH source_users AS (
         EMAIL,
         COMPANY,
         PLAN_TYPE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
         LOAD_DATE,
-        UPDATE_DATE,
-        DATA_QUALITY_SCORE,
         VALIDATION_STATUS
-    FROM {{ source('silver', 'si_users') }}
+    FROM DB_POC_ZOOM.SILVER.SI_USERS
     WHERE VALIDATION_STATUS = 'PASSED'
       AND USER_ID IS NOT NULL
 ),
