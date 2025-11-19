@@ -3,8 +3,8 @@ _____________________________________________
 ## *Created on*:   
 ## *Description*: Bronze layer logical data model for Zoom Platform Analytics System supporting usage, reliability, and revenue reporting
 ## *Version*: 4
-## *Changes*: Added back Bz_Feature_Usage table to the logical data model
-## *Reason*: User requested to add dim feature table back to support feature adoption analysis and usage pattern tracking
+## *Changes*: Updated all VARCHAR fields to have a maximum limit of 1000 characters instead of 16777216
+## *Reason*: User requested to ensure that VARCHAR has a maximum limit of 1000 only for better data governance and storage optimization
 ## *Updated on*: 
 _____________________________________________
 
@@ -22,7 +22,6 @@ _____________________________________________
 | Bz_Meetings | MEETING_TOPIC | **Potentially Sensitive** | Meeting topics may contain confidential business information or personal details |
 | Bz_Support_Tickets | TICKET_TYPE | **Potentially Sensitive** | May reveal personal issues or business-sensitive problems |
 | Bz_Support_Tickets | RESOLUTION_STATUS | **Non-Sensitive** | Status information alone doesn't identify individuals but combined with other data could be sensitive |
-| Bz_Feature_Usage | FEATURE_NAME | **Non-Sensitive** | Feature names are system-level identifiers and do not contain personal information |
 
 ## 2. Bronze Layer Logical Model
 
@@ -31,26 +30,26 @@ _____________________________________________
 
 | **Column Name** | **Data Type** | **Description** |
 |-----------------|---------------|------------------|
-| USER_NAME | VARCHAR(16777216) | Display name of the user for identification and personalization purposes |
-| EMAIL | VARCHAR(16777216) | User's email address used for communication, login authentication, and account management |
-| COMPANY | VARCHAR(16777216) | Company or organization name associated with the user for business analytics and segmentation |
-| PLAN_TYPE | VARCHAR(16777216) | Subscription plan type (Basic, Pro, Business, Enterprise) for revenue analysis and feature access control |
+| USER_NAME | VARCHAR(1000) | Display name of the user for identification and personalization purposes |
+| EMAIL | VARCHAR(1000) | User's email address used for communication, login authentication, and account management |
+| COMPANY | VARCHAR(1000) | Company or organization name associated with the user for business analytics and segmentation |
+| PLAN_TYPE | VARCHAR(1000) | Subscription plan type (Basic, Pro, Business, Enterprise) for revenue analysis and feature access control |
 | LOAD_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was initially loaded into the Bronze layer |
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer |
-| SOURCE_SYSTEM | VARCHAR(16777216) | Identifier of the source system from which the data originated for data lineage tracking |
+| SOURCE_SYSTEM | VARCHAR(1000) | Identifier of the source system from which the data originated for data lineage tracking |
 
 ### 2.2 Bz_Meetings Table
 **Description**: Contains comprehensive information about video meetings conducted on the Zoom platform
 
 | **Column Name** | **Data Type** | **Description** |
 |-----------------|---------------|------------------|
-| MEETING_TOPIC | VARCHAR(16777216) | Topic or title of the meeting for content categorization and analysis |
+| MEETING_TOPIC | VARCHAR(1000) | Topic or title of the meeting for content categorization and analysis |
 | START_TIME | TIMESTAMP_NTZ(9) | Meeting start timestamp for duration calculation and usage pattern analysis |
 | END_TIME | TIMESTAMP_NTZ(9) | Meeting end timestamp for duration calculation and resource utilization tracking |
 | DURATION_MINUTES | NUMBER(38,0) | Total meeting duration in minutes for usage analytics and billing calculations |
 | LOAD_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was initially loaded into the Bronze layer |
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer |
-| SOURCE_SYSTEM | VARCHAR(16777216) | Identifier of the source system from which the data originated for data lineage tracking |
+| SOURCE_SYSTEM | VARCHAR(1000) | Identifier of the source system from which the data originated for data lineage tracking |
 
 ### 2.3 Bz_Participants Table
 **Description**: Tracks meeting participants and their engagement metrics for attendance analysis
@@ -61,43 +60,31 @@ _____________________________________________
 | LEAVE_TIME | TIMESTAMP_NTZ(9) | Timestamp when participant left the meeting for participation duration calculation |
 | LOAD_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was initially loaded into the Bronze layer |
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer |
-| SOURCE_SYSTEM | VARCHAR(16777216) | Identifier of the source system from which the data originated for data lineage tracking |
+| SOURCE_SYSTEM | VARCHAR(1000) | Identifier of the source system from which the data originated for data lineage tracking |
 
-### 2.4 Bz_Feature_Usage Table
-**Description**: Records usage of specific platform features during meetings for feature adoption analysis
-
-| **Column Name** | **Data Type** | **Description** |
-|-----------------|---------------|------------------|
-| FEATURE_NAME | VARCHAR(16777216) | Name of the feature being tracked (Screen Share, Recording, Chat, etc.) for adoption analysis |
-| USAGE_COUNT | NUMBER(38,0) | Number of times the feature was utilized during the session for usage intensity measurement |
-| USAGE_DATE | DATE | Date when feature usage occurred for temporal analysis and trend identification |
-| LOAD_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was initially loaded into the Bronze layer |
-| UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer |
-| SOURCE_SYSTEM | VARCHAR(16777216) | Identifier of the source system from which the data originated for data lineage tracking |
-
-### 2.5 Bz_Support_Tickets Table
+### 2.4 Bz_Support_Tickets Table
 **Description**: Manages customer support requests and their resolution process for service quality analysis
 
 | **Column Name** | **Data Type** | **Description** |
 |-----------------|---------------|------------------|
-| TICKET_TYPE | VARCHAR(16777216) | Type of support ticket (Technical, Billing, Feature Request, etc.) for issue categorization |
-| RESOLUTION_STATUS | VARCHAR(16777216) | Current status of ticket resolution (Open, In Progress, Resolved, Closed) for tracking progress |
+| TICKET_TYPE | VARCHAR(1000) | Type of support ticket (Technical, Billing, Feature Request, etc.) for issue categorization |
+| RESOLUTION_STATUS | VARCHAR(1000) | Current status of ticket resolution (Open, In Progress, Resolved, Closed) for tracking progress |
 | OPEN_DATE | DATE | Date when the support ticket was created for response time calculation |
 | LOAD_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was initially loaded into the Bronze layer |
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer |
-| SOURCE_SYSTEM | VARCHAR(16777216) | Identifier of the source system from which the data originated for data lineage tracking |
+| SOURCE_SYSTEM | VARCHAR(1000) | Identifier of the source system from which the data originated for data lineage tracking |
 
-### 2.6 Bz_Billing_Events Table
+### 2.5 Bz_Billing_Events Table
 **Description**: Tracks all financial transactions and billing activities for revenue analysis
 
 | **Column Name** | **Data Type** | **Description** |
 |-----------------|---------------|------------------|
-| EVENT_TYPE | VARCHAR(16777216) | Type of billing event (subscription, usage, upgrade, refund, etc.) for revenue categorization |
+| EVENT_TYPE | VARCHAR(1000) | Type of billing event (subscription, usage, upgrade, refund, etc.) for revenue categorization |
 | AMOUNT | NUMBER(10,2) | Monetary amount for the billing event in the specified currency for financial analysis |
 | EVENT_DATE | DATE | Date when the billing event occurred for revenue trend analysis |
 | LOAD_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was initially loaded into the Bronze layer |
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer |
-| SOURCE_SYSTEM | VARCHAR(16777216) | Identifier of the source system from which the data originated for data lineage tracking |
+| SOURCE_SYSTEM | VARCHAR(1000) | Identifier of the source system from which the data originated for data lineage tracking |
 
 ## 3. Audit Table Design
 
@@ -106,10 +93,10 @@ _____________________________________________
 
 | **Column Name** | **Data Type** | **Description** |
 |-----------------|---------------|------------------|
-| RECORD_ID | VARCHAR(16777216) | Unique identifier for each audit record for tracking individual processing events |
-| SOURCE_TABLE | VARCHAR(16777216) | Name of the source table being processed for identifying data lineage and processing scope |
+| RECORD_ID | VARCHAR(1000) | Unique identifier for each audit record for tracking individual processing events |
+| SOURCE_TABLE | VARCHAR(1000) | Name of the source table being processed for identifying data lineage and processing scope |
 | LOAD_TIMESTAMP | TIMESTAMP_NTZ(9) | Timestamp when the data processing operation was initiated for temporal tracking |
-| PROCESSED_BY | VARCHAR(16777216) | Identifier of the system, user, or process that performed the operation for accountability |
+| PROCESSED_BY | VARCHAR(1000) | Identifier of the system, user, or process that performed the operation for accountability |
 | PROCESSING_TIME | NUMBER(10,2) | Duration of the processing operation in seconds for performance monitoring |
 | STATUS | VARCHAR(50) | Status of the processing operation (SUCCESS, FAILED, IN_PROGRESS, PARTIAL) for quality assurance |
 
@@ -135,16 +122,8 @@ _____________________________________________
 │ - TICKET_TYPE   │         │ - JOIN_TIME     │
 │ - RESOLUTION_ST │         │ - LEAVE_TIME    │
 │ - OPEN_DATE     │         └─────────────────┘
-└─────────────────┘                   │
-         │                           │
-         │                           ▼
-         │                 ┌─────────────────┐
-         │                 │Bz_Feature_Usage │
-         │                 │                 │
-         │                 │ - FEATURE_NAME  │
-         │                 │ - USAGE_COUNT   │
-         │                 │ - USAGE_DATE    │
-         │                 └─────────────────┘
+└─────────────────┘
+         │
          │
          ▼
 ┌─────────────────┐
@@ -162,7 +141,6 @@ _____________________________________________
 |------------------|------------------|----------------------------|----------------------|
 | Bz_Users | Bz_Meetings | User Reference (HOST_ID) | One-to-Many |
 | Bz_Meetings | Bz_Participants | Meeting Reference (MEETING_ID) | One-to-Many |
-| Bz_Meetings | Bz_Feature_Usage | Meeting Reference (MEETING_ID) | One-to-Many |
 | Bz_Users | Bz_Support_Tickets | User Reference (USER_ID) | One-to-Many |
 | Bz_Users | Bz_Billing_Events | User Reference (USER_ID) | One-to-Many |
 | Bz_Users | Bz_Participants | User Reference (USER_ID) | One-to-Many |
@@ -177,11 +155,11 @@ _____________________________________________
 
 3. **Metadata Columns**: Standard metadata columns (LOAD_TIMESTAMP, UPDATE_TIMESTAMP, SOURCE_SYSTEM) are included in all tables to support data lineage, auditing, and change tracking.
 
-4. **Data Type Preservation**: Original data types from the source system are maintained to ensure data integrity during the Bronze layer ingestion process.
+4. **Data Type Optimization**: VARCHAR fields have been optimized to a maximum length of 1000 characters for better storage efficiency and data governance while maintaining adequate capacity for business data.
 
 5. **PII Classification**: Comprehensive PII classification has been implemented to support data governance and compliance requirements (GDPR, CCPA, etc.).
 
-6. **Feature Usage Table Restoration**: The Bz_Feature_Usage table has been added back to this version to support feature adoption analysis and usage pattern tracking capabilities as requested by the user.
+6. **Feature Usage Table Exclusion**: The Bz_Feature_Usage table has been removed from this version as per previous user requirements, which may impact feature adoption analysis and usage pattern tracking capabilities.
 
 ### 5.2 Assumptions Made
 
@@ -195,4 +173,6 @@ _____________________________________________
 
 5. **Relationship Preservation**: While key fields are removed, the logical relationships between entities are preserved through the conceptual model for Silver layer processing.
 
-6. **Feature Usage Analytics**: Assumed that feature usage tracking is critical for business intelligence and product development decisions, justifying the restoration of the dedicated feature usage table.
+6. **VARCHAR Length Sufficiency**: Assumed that 1000 characters will be sufficient for all text-based fields based on typical business data requirements while providing storage optimization benefits.
+
+7. **Feature Usage Alternative**: Assumed that feature usage information can be derived from other sources or captured through alternative methods if needed for downstream analytics, given the exclusion of the dedicated feature usage table.
