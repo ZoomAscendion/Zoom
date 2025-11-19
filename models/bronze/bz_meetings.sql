@@ -1,7 +1,6 @@
 -- Bronze Layer Meetings Table
 -- Description: Stores meeting information and session details
 -- Author: Data Engineering Team
--- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
