@@ -11,7 +11,7 @@ WITH source_meetings AS (
         START_TIME,
         DATA_QUALITY_SCORE,
         SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_meetings') }}
+    FROM {{ ref('SI_Meetings') }}
     WHERE VALIDATION_STATUS = 'PASSED'
 )
 
