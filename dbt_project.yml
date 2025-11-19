@@ -2,8 +2,10 @@ name: 'zoom_bronze_pipeline'
 version: '1.0.0'
 config-version: 2
 
+# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_bronze_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -16,12 +18,38 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
   zoom_bronze_pipeline:
+    # Config indicated by + and applies to all files under models/bronze/
     bronze:
       +materialized: table
-      +on_schema_change: "fail"
+      +tags: ["bronze"]
 
+# Global configurations
 vars:
-  source_schema: 'RAW'
-  target_schema: 'BRONZE'
+  # DBT project variables
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
+
+# Seeds configuration
+seeds:
+  zoom_bronze_pipeline:
+    +quote_columns: false
+
+# Snapshots configuration
+snapshots:
+  zoom_bronze_pipeline:
+    +target_schema: snapshots
+
+# Tests configuration
+tests:
+  zoom_bronze_pipeline:
+    +store_failures: true
+    +severity: warn
+
+# Documentation configuration
+docs:
+  generate: true
+  serve:
+    port: 8080
