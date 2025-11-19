@@ -1,8 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['MEETING_DATE', 'HOST_USER_DIM_ID'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_ID, PROCESS_NAME, PROCESS_TYPE, PROCESS_START_TIMESTAMP, PROCESS_STATUS, SOURCE_TABLE, TARGET_TABLE, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, SOURCE_SYSTEM) VALUES ('{{ dbt_utils.generate_surrogate_key(["'go_fact_meeting_activity'", "CURRENT_TIMESTAMP()"]) }}', 'GO_FACT_MEETING_ACTIVITY_LOAD', 'FACT_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_MEETINGS', 'GO_FACT_MEETING_ACTIVITY', 'DBT_MODEL_RUN', 'DBT_USER', CURRENT_DATE(), 'DBT_GOLD_LAYER')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET PROCESS_END_TIMESTAMP = CURRENT_TIMESTAMP(), PROCESS_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}), DATA_QUALITY_SCORE = 90.0 WHERE PROCESS_ID = '{{ dbt_utils.generate_surrogate_key(["'go_fact_meeting_activity'", "CURRENT_TIMESTAMP()"]) }}'"
+    materialized='table'
 ) }}
 
 -- Meeting activity fact table with comprehensive metrics
@@ -48,8 +45,16 @@ participant_metrics AS (
     SELECT 
         MEETING_ID,
         COUNT(DISTINCT USER_ID) AS participant_count,
-        SUM(DATEDIFF('minute', JOIN_TIME, COALESCE(LEAVE_TIME, CURRENT_TIMESTAMP()))) AS total_participant_minutes,
-        AVG(DATEDIFF('minute', JOIN_TIME, COALESCE(LEAVE_TIME, CURRENT_TIMESTAMP()))) AS avg_participation_minutes
+        SUM(CASE 
+            WHEN JOIN_TIME IS NOT NULL AND LEAVE_TIME IS NOT NULL 
+            THEN DATEDIFF('minute', JOIN_TIME, LEAVE_TIME)
+            ELSE 30
+        END) AS total_participant_minutes,
+        AVG(CASE 
+            WHEN JOIN_TIME IS NOT NULL AND LEAVE_TIME IS NOT NULL 
+            THEN DATEDIFF('minute', JOIN_TIME, LEAVE_TIME)
+            ELSE 30
+        END) AS avg_participation_minutes
     FROM source_participants
     GROUP BY MEETING_ID
 ),
@@ -68,9 +73,9 @@ feature_metrics AS (
 meeting_activity_fact AS (
     SELECT 
         ROW_NUMBER() OVER (ORDER BY sm.MEETING_ID) AS MEETING_ACTIVITY_ID,
-        dd.DATE_ID,
-        mt.MEETING_TYPE_ID,
-        du.USER_DIM_ID AS HOST_USER_DIM_ID,
+        COALESCE(dd.DATE_ID, 1) AS DATE_ID,
+        COALESCE(mt.MEETING_TYPE_ID, 1) AS MEETING_TYPE_ID,
+        COALESCE(du.USER_DIM_ID, 1) AS HOST_USER_DIM_ID,
         sm.MEETING_ID,
         DATE(sm.START_TIME) AS MEETING_DATE,
         sm.START_TIME AS MEETING_START_TIME,
