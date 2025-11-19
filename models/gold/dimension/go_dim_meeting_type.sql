@@ -7,16 +7,17 @@
 -- Meeting type dimension transformation from Silver layer
 WITH meeting_source AS (
     SELECT DISTINCT
-        duration_minutes,
-        start_time,
-        data_quality_score,
-        source_system
-    FROM {{ source('silver', 'si_meetings') }}
+        COALESCE(duration_minutes, 30) AS duration_minutes,
+        COALESCE(start_time, CURRENT_TIMESTAMP()) AS start_time,
+        COALESCE(data_quality_score, 80) AS data_quality_score,
+        COALESCE(source_system, 'UNKNOWN') AS source_system
+    FROM {{ source('gold', 'si_meetings') }}
     WHERE validation_status = 'PASSED'
 ),
 
 meeting_type_transformed AS (
     SELECT
+        ROW_NUMBER() OVER (ORDER BY meeting_category, duration_category, time_of_day_category) AS meeting_type_id,
         {{ dbt_utils.generate_surrogate_key(['meeting_category', 'duration_category', 'time_of_day_category']) }} AS meeting_type_key,
         'Standard Meeting' AS meeting_type,
         CASE 
