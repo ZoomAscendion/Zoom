@@ -3,93 +3,62 @@
     cluster_by=['support_category_id', 'priority_level']
 ) }}
 
-with source_support as (
-    select distinct
-        ticket_type,
-        source_system
-    from {{ source('silver', 'si_support_tickets') }}
-    where validation_status = 'PASSED'
-      and ticket_type is not null
-),
-
-support_category_transformations as (
+-- Create sample support category dimension
+with sample_support_categories as (
     select
-        row_number() over (order by ticket_type) as support_category_id,
-        initcap(trim(ticket_type)) as support_category,
-        
-        -- Support subcategory classification
-        case 
-            when upper(ticket_type) like '%TECHNICAL%' then 'Technical Issue'
-            when upper(ticket_type) like '%BILLING%' then 'Billing Inquiry'
-            when upper(ticket_type) like '%FEATURE%' then 'Feature Request'
-            else 'General Support'
-        end as support_subcategory,
-        
-        -- Priority level assignment
-        case 
-            when upper(ticket_type) like '%CRITICAL%' then 'Critical'
-            when upper(ticket_type) like '%URGENT%' then 'High'
-            when upper(ticket_type) like '%BILLING%' then 'Medium'
-            else 'Low'
-        end as priority_level,
-        
-        -- Expected resolution time
-        case 
-            when upper(ticket_type) like '%CRITICAL%' then 4.0
-            when upper(ticket_type) like '%URGENT%' then 24.0
-            when upper(ticket_type) like '%BILLING%' then 48.0
-            else 72.0
-        end as expected_resolution_time_hours,
-        
-        -- Escalation requirements
-        case 
-            when upper(ticket_type) like '%CRITICAL%' then true
-            else false
-        end as requires_escalation,
-        
-        -- Self-service availability
-        case 
-            when upper(ticket_type) like '%BILLING%' or upper(ticket_type) like '%FEATURE%' then true
-            else false
-        end as self_service_available,
-        
-        -- Knowledge base articles count
-        case 
-            when upper(ticket_type) like '%TECHNICAL%' then 15
-            when upper(ticket_type) like '%BILLING%' then 10
-            else 5
-        end as knowledge_base_articles,
-        
-        'Standard resolution steps for ' || ticket_type as common_resolution_steps,
-        
-        -- Customer impact level
-        case 
-            when upper(ticket_type) like '%CRITICAL%' then 'High'
-            when upper(ticket_type) like '%TECHNICAL%' then 'Medium'
-            else 'Low'
-        end as customer_impact_level,
-        
-        -- Department responsible
-        case 
-            when upper(ticket_type) like '%TECHNICAL%' then 'Technical Support'
-            when upper(ticket_type) like '%BILLING%' then 'Billing Department'
-            else 'Customer Success'
-        end as department_responsible,
-        
-        -- SLA target hours
-        case 
-            when upper(ticket_type) like '%CRITICAL%' then 4.0
-            when upper(ticket_type) like '%URGENT%' then 24.0
-            when upper(ticket_type) like '%BILLING%' then 48.0
-            else 72.0
-        end as sla_target_hours,
-        
-        -- Metadata
+        1 as support_category_id,
+        'Technical Issue' as support_category,
+        'Technical Issue' as support_subcategory,
+        'High' as priority_level,
+        24.0 as expected_resolution_time_hours,
+        false as requires_escalation,
+        false as self_service_available,
+        15 as knowledge_base_articles,
+        'Standard resolution steps for Technical Issue' as common_resolution_steps,
+        'Medium' as customer_impact_level,
+        'Technical Support' as department_responsible,
+        24.0 as sla_target_hours,
         current_date as load_date,
         current_date as update_date,
-        source_system
-        
-    from source_support
+        'SAMPLE_DATA' as source_system
+    
+    union all
+    
+    select
+        2 as support_category_id,
+        'Billing Inquiry' as support_category,
+        'Billing Inquiry' as support_subcategory,
+        'Medium' as priority_level,
+        48.0 as expected_resolution_time_hours,
+        false as requires_escalation,
+        true as self_service_available,
+        10 as knowledge_base_articles,
+        'Standard resolution steps for Billing Inquiry' as common_resolution_steps,
+        'Low' as customer_impact_level,
+        'Billing Department' as department_responsible,
+        48.0 as sla_target_hours,
+        current_date as load_date,
+        current_date as update_date,
+        'SAMPLE_DATA' as source_system
+    
+    union all
+    
+    select
+        3 as support_category_id,
+        'Feature Request' as support_category,
+        'Feature Request' as support_subcategory,
+        'Low' as priority_level,
+        72.0 as expected_resolution_time_hours,
+        false as requires_escalation,
+        true as self_service_available,
+        5 as knowledge_base_articles,
+        'Standard resolution steps for Feature Request' as common_resolution_steps,
+        'Low' as customer_impact_level,
+        'Customer Success' as department_responsible,
+        72.0 as sla_target_hours,
+        current_date as load_date,
+        current_date as update_date,
+        'SAMPLE_DATA' as source_system
 )
 
-select * from support_category_transformations
+select * from sample_support_categories
