@@ -29,8 +29,7 @@
     CURRENT_DATE() AS load_date,
     CURRENT_DATE() AS update_date,
     'DBT_GOLD_PIPELINE' AS source_system
-"
-
+",
     post_hook="UPDATE {{ ref('go_audit_log') }} SET execution_end_timestamp = CURRENT_TIMESTAMP(), execution_status = 'SUCCESS', records_processed = (SELECT COUNT(*) FROM {{ this }}), execution_duration_seconds = DATEDIFF('second', execution_start_timestamp, CURRENT_TIMESTAMP()) WHERE process_name = 'GO_DIM_MEETING_TYPE' AND execution_status = 'RUNNING'"
 ) }}
 
