@@ -1,8 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['TRANSACTION_DATE', 'USER_DIM_ID'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_ID, PROCESS_NAME, PROCESS_TYPE, PROCESS_START_TIMESTAMP, PROCESS_STATUS, SOURCE_TABLE, TARGET_TABLE, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, SOURCE_SYSTEM) VALUES ('{{ dbt_utils.generate_surrogate_key(["'go_fact_revenue_events'", "CURRENT_TIMESTAMP()"]) }}', 'GO_FACT_REVENUE_EVENTS_LOAD', 'FACT_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_BILLING_EVENTS', 'GO_FACT_REVENUE_EVENTS', 'DBT_MODEL_RUN', 'DBT_USER', CURRENT_DATE(), 'DBT_GOLD_LAYER')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET PROCESS_END_TIMESTAMP = CURRENT_TIMESTAMP(), PROCESS_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}), DATA_QUALITY_SCORE = 90.0 WHERE PROCESS_ID = '{{ dbt_utils.generate_surrogate_key(["'go_fact_revenue_events'", "CURRENT_TIMESTAMP()"]) }}'"
+    materialized='table'
 ) }}
 
 -- Revenue events fact table with financial metrics
@@ -33,9 +30,9 @@ source_licenses AS (
 revenue_events_fact AS (
     SELECT 
         ROW_NUMBER() OVER (ORDER BY be.EVENT_ID) AS REVENUE_EVENT_ID,
-        dd.DATE_ID,
-        dl.LICENSE_ID,
-        du.USER_DIM_ID,
+        COALESCE(dd.DATE_ID, 1) AS DATE_ID,
+        COALESCE(dl.LICENSE_ID, 1) AS LICENSE_ID,
+        COALESCE(du.USER_DIM_ID, 1) AS USER_DIM_ID,
         be.EVENT_ID AS BILLING_EVENT_ID,
         be.EVENT_DATE AS TRANSACTION_DATE,
         be.EVENT_DATE::TIMESTAMP_NTZ AS TRANSACTION_TIMESTAMP,
