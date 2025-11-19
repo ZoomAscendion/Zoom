@@ -9,7 +9,7 @@ WITH source_support AS (
     SELECT DISTINCT
         TICKET_TYPE,
         SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_support_tickets') }}
+    FROM {{ ref('SI_Support_Tickets') }}
     WHERE VALIDATION_STATUS = 'PASSED'
       AND TICKET_TYPE IS NOT NULL
 )
