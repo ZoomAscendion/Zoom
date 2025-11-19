@@ -18,7 +18,7 @@ WITH source_users AS (
         SOURCE_SYSTEM,
         DATA_QUALITY_SCORE,
         VALIDATION_STATUS
-    FROM {{ source('silver', 'si_users') }}
+    FROM {{ source('gold_existing', 'si_users') }}
     WHERE VALIDATION_STATUS = 'PASSED'
       AND DATA_QUALITY_SCORE >= 70
 ),
