@@ -1,8 +1,8 @@
-name: 'zoom_analytics_gold'
+name: 'zoom_gold_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_analytics'
+profile: 'zoom_gold_pipeline'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,11 +17,11 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_analytics_gold:
-    +materialized: table
+  zoom_gold_pipeline:
     gold:
       +materialized: table
-
-vars:
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
+      +on_schema_change: "fail"
+      dimension:
+        +materialized: table
+      fact:
+        +materialized: table
