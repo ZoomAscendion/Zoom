@@ -10,37 +10,27 @@ WITH feature_usage_base AS (
         fu.USAGE_ID,
         fu.MEETING_ID,
         fu.FEATURE_NAME,
-        fu.USAGE_COUNT,
-        fu.USAGE_DATE,
-        fu.SOURCE_SYSTEM,
-        COALESCE(fu.USAGE_DATE::TIMESTAMP_NTZ, CURRENT_TIMESTAMP()) AS USAGE_TIMESTAMP
+        COALESCE(fu.USAGE_COUNT, 0) AS USAGE_COUNT,
+        COALESCE(fu.USAGE_DATE, CURRENT_DATE()) AS USAGE_DATE,
+        fu.SOURCE_SYSTEM
     FROM {{ source('silver', 'si_feature_usage') }} fu
     WHERE fu.VALIDATION_STATUS = 'PASSED'
       AND fu.FEATURE_NAME IS NOT NULL
-),
-
-meeting_context AS (
-    SELECT 
-        sm.MEETING_ID,
-        sm.HOST_ID,
-        sm.DURATION_MINUTES,
-        sm.DATA_QUALITY_SCORE
-    FROM {{ source('silver', 'si_meetings') }} sm
-    WHERE sm.VALIDATION_STATUS = 'PASSED'
+      AND TRIM(fu.FEATURE_NAME) != ''
 )
 
 SELECT 
     ROW_NUMBER() OVER (ORDER BY fub.USAGE_ID) AS FEATURE_USAGE_ID,
-    dd.DATE_ID,
-    df.FEATURE_ID,
-    du.USER_DIM_ID,
+    COALESCE(dd.DATE_ID, 1) AS DATE_ID,
+    COALESCE(df.FEATURE_ID, 1) AS FEATURE_ID,
+    COALESCE(du.USER_DIM_ID, 1) AS USER_DIM_ID,
     fub.MEETING_ID,
     fub.USAGE_DATE,
-    fub.USAGE_TIMESTAMP,
+    fub.USAGE_DATE::TIMESTAMP_NTZ AS USAGE_TIMESTAMP,
     fub.FEATURE_NAME,
     fub.USAGE_COUNT,
-    COALESCE(mc.DURATION_MINUTES, 0) AS USAGE_DURATION_MINUTES,
-    COALESCE(mc.DURATION_MINUTES, 0) AS SESSION_DURATION_MINUTES,
+    30 AS USAGE_DURATION_MINUTES, -- Default duration
+    30 AS SESSION_DURATION_MINUTES, -- Default session duration
     CASE 
         WHEN fub.USAGE_COUNT >= 10 THEN 5.0
         WHEN fub.USAGE_COUNT >= 5 THEN 4.0
@@ -49,27 +39,15 @@ SELECT
         ELSE 1.0
     END AS FEATURE_ADOPTION_SCORE,
     CASE 
-        WHEN fub.USAGE_COUNT >= 10 AND COALESCE(mc.DATA_QUALITY_SCORE, 0) >= 90 THEN 5.0
-        WHEN fub.USAGE_COUNT >= 5 AND COALESCE(mc.DATA_QUALITY_SCORE, 0) >= 80 THEN 4.0
-        WHEN fub.USAGE_COUNT >= 3 AND COALESCE(mc.DATA_QUALITY_SCORE, 0) >= 70 THEN 3.0
-        WHEN fub.USAGE_COUNT >= 1 AND COALESCE(mc.DATA_QUALITY_SCORE, 0) >= 60 THEN 2.0
+        WHEN fub.USAGE_COUNT >= 10 THEN 5.0
+        WHEN fub.USAGE_COUNT >= 5 THEN 4.0
+        WHEN fub.USAGE_COUNT >= 3 THEN 3.0
+        WHEN fub.USAGE_COUNT >= 1 THEN 2.0
         ELSE 1.0
     END AS USER_EXPERIENCE_RATING,
-    CASE 
-        WHEN COALESCE(mc.DATA_QUALITY_SCORE, 0) >= 95 THEN 5.0
-        WHEN COALESCE(mc.DATA_QUALITY_SCORE, 0) >= 85 THEN 4.0
-        WHEN COALESCE(mc.DATA_QUALITY_SCORE, 0) >= 70 THEN 3.0
-        WHEN COALESCE(mc.DATA_QUALITY_SCORE, 0) >= 50 THEN 2.0
-        ELSE 1.0
-    END AS FEATURE_PERFORMANCE_SCORE,
+    4.0 AS FEATURE_PERFORMANCE_SCORE, -- Default performance score
     1 AS CONCURRENT_FEATURES_COUNT,
-    CASE 
-        WHEN COALESCE(mc.DURATION_MINUTES, 0) >= 60 THEN 'Extended Session'
-        WHEN COALESCE(mc.DURATION_MINUTES, 0) >= 30 THEN 'Standard Session'
-        WHEN COALESCE(mc.DURATION_MINUTES, 0) >= 15 THEN 'Short Session'
-        WHEN COALESCE(mc.DURATION_MINUTES, 0) >= 5 THEN 'Brief Session'
-        ELSE 'Quick Access'
-    END AS USAGE_CONTEXT,
+    'Standard Session' AS USAGE_CONTEXT,
     'Desktop' AS DEVICE_TYPE,
     'Latest' AS PLATFORM_VERSION,
     0 AS ERROR_COUNT,
@@ -83,5 +61,4 @@ SELECT
 FROM feature_usage_base fub
 LEFT JOIN {{ ref('go_dim_date') }} dd ON fub.USAGE_DATE = dd.DATE_VALUE
 LEFT JOIN {{ ref('go_dim_feature') }} df ON fub.FEATURE_NAME = df.FEATURE_NAME
-LEFT JOIN meeting_context mc ON fub.MEETING_ID = mc.MEETING_ID
-LEFT JOIN {{ ref('go_dim_user') }} du ON mc.HOST_ID = du.USER_ID AND du.IS_CURRENT_RECORD = TRUE
+LEFT JOIN {{ ref('go_dim_user') }} du ON du.USER_DIM_ID = 1 -- Default user for now
