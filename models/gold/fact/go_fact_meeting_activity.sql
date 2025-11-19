@@ -16,7 +16,7 @@ WITH meeting_base AS (
         sm.DATA_QUALITY_SCORE,
         sm.SOURCE_SYSTEM,
         DATE(sm.START_TIME) AS meeting_date
-    FROM {{ source('silver', 'si_meetings') }} sm
+    FROM {{ ref('SI_Meetings') }} sm
     WHERE sm.VALIDATION_STATUS = 'PASSED'
 ),
 
@@ -26,7 +26,7 @@ participant_metrics AS (
         COUNT(DISTINCT sp.USER_ID) AS participant_count,
         SUM(DATEDIFF('minute', sp.JOIN_TIME, COALESCE(sp.LEAVE_TIME, CURRENT_TIMESTAMP()))) AS total_participant_minutes,
         AVG(DATEDIFF('minute', sp.JOIN_TIME, COALESCE(sp.LEAVE_TIME, CURRENT_TIMESTAMP()))) AS average_participation_minutes
-    FROM {{ source('silver', 'si_participants') }} sp
+    FROM {{ ref('SI_Participants') }} sp
     WHERE sp.VALIDATION_STATUS = 'PASSED'
     GROUP BY sp.MEETING_ID
 ),
@@ -38,7 +38,7 @@ feature_metrics AS (
         SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%SCREEN%SHARE%' THEN sf.USAGE_COUNT ELSE 0 END) AS screen_share_usage_count,
         SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%RECORD%' THEN sf.USAGE_COUNT ELSE 0 END) AS recording_usage_count,
         SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%CHAT%' THEN sf.USAGE_COUNT ELSE 0 END) AS chat_messages_count
-    FROM {{ source('silver', 'si_feature_usage') }} sf
+    FROM {{ ref('SI_Feature_Usage') }} sf
     WHERE sf.VALIDATION_STATUS = 'PASSED'
     GROUP BY sf.MEETING_ID
 )
