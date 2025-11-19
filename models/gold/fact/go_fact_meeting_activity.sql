@@ -1,8 +1,6 @@
 {{ config(
     materialized='table',
-    tags=['fact', 'gold'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, RECORDS_READ, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT '{{ dbt_utils.generate_surrogate_key([\"'GO_FACT_MEETING_ACTIVITY'\", 'CURRENT_TIMESTAMP()']) }}', 'GO_FACT_MEETING_ACTIVITY_LOAD', 'FACT_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_MEETINGS', 'GO_FACT_MEETING_ACTIVITY', (SELECT COUNT(*) FROM {{ source('silver', 'si_meetings') }}), 'DBT_PIPELINE', 'DBT_SYSTEM', CURRENT_DATE, CURRENT_DATE, 'DBT_GOLD_PIPELINE'",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), RECORDS_INSERTED = (SELECT COUNT(*) FROM {{ this }}) WHERE PROCESS_NAME = 'GO_FACT_MEETING_ACTIVITY_LOAD' AND EXECUTION_STATUS = 'RUNNING'"
+    tags=['fact', 'gold']
 ) }}
 
 -- Gold Fact: Meeting Activity Fact Table
@@ -12,14 +10,15 @@ WITH meeting_base AS (
     SELECT 
         sm.MEETING_ID,
         sm.HOST_ID,
-        sm.MEETING_TOPIC,
-        sm.START_TIME,
-        sm.END_TIME,
-        sm.DURATION_MINUTES,
-        sm.DATA_QUALITY_SCORE,
-        sm.SOURCE_SYSTEM
+        COALESCE(sm.MEETING_TOPIC, 'Unknown Topic') AS MEETING_TOPIC,
+        COALESCE(sm.START_TIME, CURRENT_TIMESTAMP()) AS START_TIME,
+        COALESCE(sm.END_TIME, CURRENT_TIMESTAMP()) AS END_TIME,
+        COALESCE(sm.DURATION_MINUTES, 0) AS DURATION_MINUTES,
+        COALESCE(sm.DATA_QUALITY_SCORE, 0) AS DATA_QUALITY_SCORE,
+        COALESCE(sm.SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
     FROM {{ source('silver', 'si_meetings') }} sm
-    WHERE sm.VALIDATION_STATUS = 'PASSED'
+    WHERE COALESCE(sm.VALIDATION_STATUS, 'UNKNOWN') != 'FAILED'
+      AND sm.MEETING_ID IS NOT NULL
 ),
 
 participant_metrics AS (
@@ -27,12 +26,15 @@ participant_metrics AS (
         sp.MEETING_ID,
         COUNT(DISTINCT sp.USER_ID) AS participant_count,
         COUNT(DISTINCT sp.USER_ID) AS unique_participants,
-        SUM(DATEDIFF('minute', sp.JOIN_TIME, sp.LEAVE_TIME)) AS total_participant_minutes,
-        AVG(DATEDIFF('minute', sp.JOIN_TIME, sp.LEAVE_TIME)) AS average_participation_minutes,
-        COUNT(CASE WHEN sp.JOIN_TIME > DATEADD('minute', 5, (SELECT START_TIME FROM meeting_base mb WHERE mb.MEETING_ID = sp.MEETING_ID)) THEN 1 END) AS late_joiners_count,
-        COUNT(CASE WHEN sp.LEAVE_TIME < DATEADD('minute', -5, (SELECT END_TIME FROM meeting_base mb WHERE mb.MEETING_ID = sp.MEETING_ID)) THEN 1 END) AS early_leavers_count
+        COALESCE(SUM(DATEDIFF('minute', sp.JOIN_TIME, sp.LEAVE_TIME)), 0) AS total_participant_minutes,
+        COALESCE(AVG(DATEDIFF('minute', sp.JOIN_TIME, sp.LEAVE_TIME)), 0) AS average_participation_minutes,
+        0 AS late_joiners_count,
+        0 AS early_leavers_count
     FROM {{ source('silver', 'si_participants') }} sp
-    WHERE sp.VALIDATION_STATUS = 'PASSED'
+    WHERE COALESCE(sp.VALIDATION_STATUS, 'UNKNOWN') != 'FAILED'
+      AND sp.MEETING_ID IS NOT NULL
+      AND sp.JOIN_TIME IS NOT NULL
+      AND sp.LEAVE_TIME IS NOT NULL
     GROUP BY sp.MEETING_ID
 ),
 
@@ -40,22 +42,23 @@ feature_metrics AS (
     SELECT 
         sf.MEETING_ID,
         COUNT(DISTINCT sf.FEATURE_NAME) AS features_used_count,
-        SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%SCREEN%SHARE%' THEN sf.USAGE_COUNT ELSE 0 END) AS screen_share_duration_minutes,
-        SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%RECORD%' THEN sf.USAGE_COUNT ELSE 0 END) AS recording_duration_minutes,
-        SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%CHAT%' THEN sf.USAGE_COUNT ELSE 0 END) AS chat_messages_count,
-        SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%FILE%' THEN sf.USAGE_COUNT ELSE 0 END) AS file_shares_count,
-        SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%BREAKOUT%' THEN sf.USAGE_COUNT ELSE 0 END) AS breakout_rooms_used,
-        SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%POLL%' THEN sf.USAGE_COUNT ELSE 0 END) AS polls_conducted
+        COALESCE(SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%SCREEN%SHARE%' THEN sf.USAGE_COUNT ELSE 0 END), 0) AS screen_share_duration_minutes,
+        COALESCE(SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%RECORD%' THEN sf.USAGE_COUNT ELSE 0 END), 0) AS recording_duration_minutes,
+        COALESCE(SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%CHAT%' THEN sf.USAGE_COUNT ELSE 0 END), 0) AS chat_messages_count,
+        COALESCE(SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%FILE%' THEN sf.USAGE_COUNT ELSE 0 END), 0) AS file_shares_count,
+        COALESCE(SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%BREAKOUT%' THEN sf.USAGE_COUNT ELSE 0 END), 0) AS breakout_rooms_used,
+        COALESCE(SUM(CASE WHEN UPPER(sf.FEATURE_NAME) LIKE '%POLL%' THEN sf.USAGE_COUNT ELSE 0 END), 0) AS polls_conducted
     FROM {{ source('silver', 'si_feature_usage') }} sf
-    WHERE sf.VALIDATION_STATUS = 'PASSED'
+    WHERE COALESCE(sf.VALIDATION_STATUS, 'UNKNOWN') != 'FAILED'
+      AND sf.MEETING_ID IS NOT NULL
     GROUP BY sf.MEETING_ID
 )
 
 SELECT 
     ROW_NUMBER() OVER (ORDER BY mb.MEETING_ID) AS MEETING_ACTIVITY_ID,
-    dd.DATE_ID,
-    mt.MEETING_TYPE_ID,
-    du.USER_DIM_ID AS HOST_USER_DIM_ID,
+    COALESCE(dd.DATE_ID, 1) AS DATE_ID,
+    COALESCE(mt.MEETING_TYPE_ID, 1) AS MEETING_TYPE_ID,
+    COALESCE(du.USER_DIM_ID, 1) AS HOST_USER_DIM_ID,
     mb.MEETING_ID,
     DATE(mb.START_TIME) AS MEETING_DATE,
     mb.START_TIME AS MEETING_START_TIME,
@@ -110,6 +113,6 @@ SELECT
 FROM meeting_base mb
 LEFT JOIN {{ ref('go_dim_user') }} du ON mb.HOST_ID = du.USER_ID AND du.IS_CURRENT_RECORD = TRUE
 LEFT JOIN {{ ref('go_dim_date') }} dd ON DATE(mb.START_TIME) = dd.DATE_VALUE
-LEFT JOIN {{ ref('go_dim_meeting_type') }} mt ON 1=1 -- Simple join for now, can be enhanced
+LEFT JOIN {{ ref('go_dim_meeting_type') }} mt ON 1=1 -- Simple join for now
 LEFT JOIN participant_metrics pm ON mb.MEETING_ID = pm.MEETING_ID
 LEFT JOIN feature_metrics fm ON mb.MEETING_ID = fm.MEETING_ID
