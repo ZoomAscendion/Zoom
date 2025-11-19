@@ -2,9 +2,7 @@
   config(
     materialized='table',
     cluster_by=['LICENSE_ID', 'LICENSE_CATEGORY'],
-    tags=['dimension', 'gold'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT '{{ dbt_utils.generate_surrogate_key(['go_dim_license', run_started_at]) }}', 'go_dim_license', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_LICENSES', 'GO_DIM_LICENSE', 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_LAYER'",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_END_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, RECORDS_PROCESSED, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT '{{ dbt_utils.generate_surrogate_key(['go_dim_license_complete', run_started_at]) }}', 'go_dim_license', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 'SUCCESS', 'SI_LICENSES', 'GO_DIM_LICENSE', (SELECT COUNT(*) FROM {{ this }}), 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_LAYER'"
+    tags=['dimension', 'gold']
   )
 }}
 
@@ -13,12 +11,12 @@
 
 WITH source_licenses AS (
     SELECT DISTINCT
-        LICENSE_TYPE,
+        COALESCE(LICENSE_TYPE, 'Unknown') AS LICENSE_TYPE,
         START_DATE,
         END_DATE,
-        SOURCE_SYSTEM
+        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
     FROM {{ source('silver', 'si_licenses') }}
-    WHERE VALIDATION_STATUS = 'PASSED'
+    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
 ),
 
 license_attributes AS (
@@ -102,7 +100,7 @@ license_attributes AS (
         'Standard license benefits for ' || LICENSE_TYPE AS LICENSE_BENEFITS,
         
         -- SCD Type 2 Fields
-        START_DATE AS EFFECTIVE_START_DATE,
+        COALESCE(START_DATE, CURRENT_DATE()) AS EFFECTIVE_START_DATE,
         COALESCE(END_DATE, '9999-12-31'::DATE) AS EFFECTIVE_END_DATE,
         TRUE AS IS_CURRENT_RECORD,
         
