@@ -1,7 +1,6 @@
 -- Bronze Layer Support Tickets Table
 -- Description: Manages customer support requests and resolution tracking
 -- Author: Data Engineering Team
--- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
