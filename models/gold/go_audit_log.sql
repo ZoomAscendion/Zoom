@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="",
-    post_hook=""
+    materialized='table'
 ) }}
 
 -- Gold layer audit log table
