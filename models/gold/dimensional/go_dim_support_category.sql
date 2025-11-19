@@ -9,7 +9,7 @@ WITH source_support AS (
     SELECT DISTINCT
         TICKET_TYPE,
         SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_support_tickets') }}
+    FROM DB_POC_ZOOM.SILVER.SI_SUPPORT_TICKETS
     WHERE VALIDATION_STATUS = 'PASSED'
       AND TICKET_TYPE IS NOT NULL
 ),
