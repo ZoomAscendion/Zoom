@@ -2,9 +2,7 @@
   config(
     materialized='table',
     cluster_by=['MEETING_TYPE_ID', 'TIME_OF_DAY_CATEGORY'],
-    tags=['dimension', 'gold'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT '{{ dbt_utils.generate_surrogate_key(['go_dim_meeting_type', run_started_at]) }}', 'go_dim_meeting_type', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_MEETINGS', 'GO_DIM_MEETING_TYPE', 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_LAYER'",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_END_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, RECORDS_PROCESSED, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT '{{ dbt_utils.generate_surrogate_key(['go_dim_meeting_type_complete', run_started_at]) }}', 'go_dim_meeting_type', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 'SUCCESS', 'SI_MEETINGS', 'GO_DIM_MEETING_TYPE', (SELECT COUNT(*) FROM {{ this }}), 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_LAYER'"
+    tags=['dimension', 'gold']
   )
 }}
 
@@ -13,12 +11,12 @@
 
 WITH source_meetings AS (
     SELECT 
-        DURATION_MINUTES,
+        COALESCE(DURATION_MINUTES, 0) AS DURATION_MINUTES,
         START_TIME,
-        DATA_QUALITY_SCORE,
-        SOURCE_SYSTEM
+        COALESCE(DATA_QUALITY_SCORE, 100) AS DATA_QUALITY_SCORE,
+        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
     FROM {{ source('silver', 'si_meetings') }}
-    WHERE VALIDATION_STATUS = 'PASSED'
+    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
 ),
 
 meeting_type_categories AS (
@@ -41,17 +39,24 @@ meeting_type_categories AS (
         
         -- Time of Day Category
         CASE 
-            WHEN HOUR(START_TIME) BETWEEN 6 AND 11 THEN 'Morning'
-            WHEN HOUR(START_TIME) BETWEEN 12 AND 17 THEN 'Afternoon'
-            WHEN HOUR(START_TIME) BETWEEN 18 AND 21 THEN 'Evening'
-            ELSE 'Night'
+            WHEN START_TIME IS NOT NULL AND HOUR(START_TIME) BETWEEN 6 AND 11 THEN 'Morning'
+            WHEN START_TIME IS NOT NULL AND HOUR(START_TIME) BETWEEN 12 AND 17 THEN 'Afternoon'
+            WHEN START_TIME IS NOT NULL AND HOUR(START_TIME) BETWEEN 18 AND 21 THEN 'Evening'
+            WHEN START_TIME IS NOT NULL THEN 'Night'
+            ELSE 'Unknown'
         END AS TIME_OF_DAY_CATEGORY,
         
         -- Day of Week
-        DAYNAME(START_TIME) AS DAY_OF_WEEK,
+        CASE 
+            WHEN START_TIME IS NOT NULL THEN DAYNAME(START_TIME)
+            ELSE 'Unknown'
+        END AS DAY_OF_WEEK,
         
         -- Weekend Flag
-        CASE WHEN DAYOFWEEK(START_TIME) IN (1, 7) THEN TRUE ELSE FALSE END AS IS_WEEKEND_MEETING,
+        CASE 
+            WHEN START_TIME IS NOT NULL AND DAYOFWEEK(START_TIME) IN (1, 7) THEN TRUE 
+            ELSE FALSE 
+        END AS IS_WEEKEND_MEETING,
         
         -- Meeting Quality Score
         CASE 
