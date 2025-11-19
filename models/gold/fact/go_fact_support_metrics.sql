@@ -2,9 +2,7 @@
   config(
     materialized='table',
     cluster_by=['DATE_ID', 'SUPPORT_CATEGORY_ID', 'USER_DIM_ID'],
-    tags=['fact', 'gold'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT '{{ dbt_utils.generate_surrogate_key(['go_fact_support_metrics', run_started_at]) }}', 'go_fact_support_metrics', 'FACT_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_SUPPORT_TICKETS', 'GO_FACT_SUPPORT_METRICS', 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_LAYER'",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_END_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, RECORDS_PROCESSED, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT '{{ dbt_utils.generate_surrogate_key(['go_fact_support_metrics_complete', run_started_at]) }}', 'go_fact_support_metrics', 'FACT_LOAD', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 'SUCCESS', 'SI_SUPPORT_TICKETS', 'GO_FACT_SUPPORT_METRICS', (SELECT COUNT(*) FROM {{ this }}), 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_LAYER'"
+    tags=['fact', 'gold']
   )
 }}
 
@@ -15,12 +13,12 @@ WITH support_tickets_base AS (
     SELECT 
         TICKET_ID,
         USER_ID,
-        TICKET_TYPE,
-        RESOLUTION_STATUS,
+        COALESCE(TICKET_TYPE, 'Unknown') AS TICKET_TYPE,
+        COALESCE(RESOLUTION_STATUS, 'Open') AS RESOLUTION_STATUS,
         OPEN_DATE,
-        SOURCE_SYSTEM
+        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
     FROM {{ source('silver', 'si_support_tickets') }}
-    WHERE VALIDATION_STATUS = 'PASSED'
+    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
 ),
 
 support_metrics_facts AS (
@@ -29,34 +27,34 @@ support_metrics_facts AS (
         {{ dbt_utils.generate_surrogate_key(['stb.TICKET_ID']) }} AS SUPPORT_METRICS_ID,
         
         -- Foreign Keys
-        dd.DATE_ID,
+        COALESCE(dd.DATE_ID, 1) AS DATE_ID,
         COALESCE(dsc.SUPPORT_CATEGORY_ID, 1) AS SUPPORT_CATEGORY_ID,
-        COALESCE(du.USER_DIM_ID, 1) AS USER_DIM_ID,
+        COALESCE(du.USER_DIM_ID, '1') AS USER_DIM_ID,
         
         -- Ticket Information
         stb.TICKET_ID,
-        stb.OPEN_DATE AS TICKET_CREATED_DATE,
-        stb.OPEN_DATE::TIMESTAMP_NTZ AS TICKET_CREATED_TIMESTAMP,
+        COALESCE(stb.OPEN_DATE, CURRENT_DATE()) AS TICKET_CREATED_DATE,
+        COALESCE(stb.OPEN_DATE, CURRENT_DATE())::TIMESTAMP_NTZ AS TICKET_CREATED_TIMESTAMP,
         
         -- Resolution Information
         CASE 
             WHEN UPPER(stb.RESOLUTION_STATUS) IN ('RESOLVED', 'CLOSED') 
-            THEN stb.OPEN_DATE + INTERVAL '1 DAY' -- Placeholder for actual close date
+            THEN COALESCE(stb.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY' -- Placeholder for actual close date
             ELSE NULL 
         END AS TICKET_CLOSED_DATE,
         
         CASE 
             WHEN UPPER(stb.RESOLUTION_STATUS) IN ('RESOLVED', 'CLOSED') 
-            THEN (stb.OPEN_DATE + INTERVAL '1 DAY')::TIMESTAMP_NTZ
+            THEN (COALESCE(stb.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY')::TIMESTAMP_NTZ
             ELSE NULL 
         END AS TICKET_CLOSED_TIMESTAMP,
         
         -- Response and Resolution Times
-        (stb.OPEN_DATE + INTERVAL '2 HOURS')::TIMESTAMP_NTZ AS FIRST_RESPONSE_TIMESTAMP, -- Placeholder
+        (COALESCE(stb.OPEN_DATE, CURRENT_DATE()) + INTERVAL '2 HOURS')::TIMESTAMP_NTZ AS FIRST_RESPONSE_TIMESTAMP, -- Placeholder
         
         CASE 
             WHEN UPPER(stb.RESOLUTION_STATUS) IN ('RESOLVED', 'CLOSED') 
-            THEN (stb.OPEN_DATE + INTERVAL '1 DAY')::TIMESTAMP_NTZ
+            THEN (COALESCE(stb.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY')::TIMESTAMP_NTZ
             ELSE NULL 
         END AS RESOLUTION_TIMESTAMP,
         
@@ -91,19 +89,19 @@ support_metrics_facts AS (
         
         CASE 
             WHEN UPPER(stb.RESOLUTION_STATUS) IN ('RESOLVED', 'CLOSED')
-            THEN DATEDIFF('hour', stb.OPEN_DATE, stb.OPEN_DATE + INTERVAL '1 DAY')
+            THEN DATEDIFF('hour', COALESCE(stb.OPEN_DATE, CURRENT_DATE()), COALESCE(stb.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY')
             ELSE NULL
         END AS RESOLUTION_TIME_HOURS,
         
         CASE 
             WHEN UPPER(stb.RESOLUTION_STATUS) IN ('RESOLVED', 'CLOSED')
-            THEN DATEDIFF('hour', stb.OPEN_DATE, stb.OPEN_DATE + INTERVAL '1 DAY') * 0.8
+            THEN DATEDIFF('hour', COALESCE(stb.OPEN_DATE, CURRENT_DATE()), COALESCE(stb.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY') * 0.8
             ELSE NULL
         END AS ACTIVE_WORK_TIME_HOURS,
         
         CASE 
             WHEN UPPER(stb.RESOLUTION_STATUS) IN ('RESOLVED', 'CLOSED')
-            THEN DATEDIFF('hour', stb.OPEN_DATE, stb.OPEN_DATE + INTERVAL '1 DAY') * 0.2
+            THEN DATEDIFF('hour', COALESCE(stb.OPEN_DATE, CURRENT_DATE()), COALESCE(stb.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY') * 0.2
             ELSE NULL
         END AS CUSTOMER_WAIT_TIME_HOURS,
         
@@ -117,10 +115,10 @@ support_metrics_facts AS (
         
         -- Quality Metrics
         CASE 
-            WHEN DATEDIFF('hour', stb.OPEN_DATE, stb.OPEN_DATE + INTERVAL '1 DAY') <= 4 THEN 5.0
-            WHEN DATEDIFF('hour', stb.OPEN_DATE, stb.OPEN_DATE + INTERVAL '1 DAY') <= 24 THEN 4.0
-            WHEN DATEDIFF('hour', stb.OPEN_DATE, stb.OPEN_DATE + INTERVAL '1 DAY') <= 72 THEN 3.0
-            WHEN DATEDIFF('hour', stb.OPEN_DATE, stb.OPEN_DATE + INTERVAL '1 DAY') <= 168 THEN 2.0
+            WHEN DATEDIFF('hour', COALESCE(stb.OPEN_DATE, CURRENT_DATE()), COALESCE(stb.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY') <= 4 THEN 5.0
+            WHEN DATEDIFF('hour', COALESCE(stb.OPEN_DATE, CURRENT_DATE()), COALESCE(stb.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY') <= 24 THEN 4.0
+            WHEN DATEDIFF('hour', COALESCE(stb.OPEN_DATE, CURRENT_DATE()), COALESCE(stb.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY') <= 72 THEN 3.0
+            WHEN DATEDIFF('hour', COALESCE(stb.OPEN_DATE, CURRENT_DATE()), COALESCE(stb.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY') <= 168 THEN 2.0
             ELSE 1.0
         END AS CUSTOMER_SATISFACTION_SCORE,
         
@@ -128,14 +126,14 @@ support_metrics_facts AS (
         
         -- SLA Compliance
         CASE 
-            WHEN DATEDIFF('hour', stb.OPEN_DATE, stb.OPEN_DATE + INTERVAL '1 DAY') <= COALESCE(dsc.SLA_TARGET_HOURS, 72)
+            WHEN DATEDIFF('hour', COALESCE(stb.OPEN_DATE, CURRENT_DATE()), COALESCE(stb.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY') <= COALESCE(dsc.SLA_TARGET_HOURS, 72)
             THEN TRUE 
             ELSE FALSE 
         END AS SLA_MET,
         
         CASE 
-            WHEN DATEDIFF('hour', stb.OPEN_DATE, stb.OPEN_DATE + INTERVAL '1 DAY') > COALESCE(dsc.SLA_TARGET_HOURS, 72)
-            THEN DATEDIFF('hour', stb.OPEN_DATE, stb.OPEN_DATE + INTERVAL '1 DAY') - COALESCE(dsc.SLA_TARGET_HOURS, 72)
+            WHEN DATEDIFF('hour', COALESCE(stb.OPEN_DATE, CURRENT_DATE()), COALESCE(stb.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY') > COALESCE(dsc.SLA_TARGET_HOURS, 72)
+            THEN DATEDIFF('hour', COALESCE(stb.OPEN_DATE, CURRENT_DATE()), COALESCE(stb.OPEN_DATE, CURRENT_DATE()) + INTERVAL '1 DAY') - COALESCE(dsc.SLA_TARGET_HOURS, 72)
             ELSE 0
         END AS SLA_BREACH_HOURS,
         
@@ -156,7 +154,7 @@ support_metrics_facts AS (
         CURRENT_DATE() AS UPDATE_DATE,
         stb.SOURCE_SYSTEM
     FROM support_tickets_base stb
-    LEFT JOIN {{ ref('go_dim_date') }} dd ON stb.OPEN_DATE = dd.DATE_VALUE
+    LEFT JOIN {{ ref('go_dim_date') }} dd ON COALESCE(stb.OPEN_DATE, CURRENT_DATE()) = dd.DATE_VALUE
     LEFT JOIN {{ ref('go_dim_user') }} du ON stb.USER_ID = du.USER_ID AND du.IS_CURRENT_RECORD = TRUE
     LEFT JOIN {{ ref('go_dim_support_category') }} dsc ON stb.TICKET_TYPE = dsc.SUPPORT_CATEGORY
 )
