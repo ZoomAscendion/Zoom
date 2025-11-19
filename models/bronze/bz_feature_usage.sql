@@ -1,7 +1,6 @@
 -- Bronze Layer Feature Usage Table
 -- Description: Records usage of platform features during meetings
 -- Author: Data Engineering Team
--- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
