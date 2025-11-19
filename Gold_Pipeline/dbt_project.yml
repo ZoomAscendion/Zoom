@@ -1,11 +1,3 @@
-# =====================================================
-# DBT PROJECT CONFIGURATION
-# Project: Zoom Platform Analytics System - Gold Layer
-# Purpose: Transform Silver Layer data into Gold Layer dimension and fact tables
-# Database: DB_POC_ZOOM
-# Target Schema: GOLD
-# =====================================================
-
 name: 'zoom_gold_pipeline'
 version: '1.0.0'
 config-version: 2
@@ -15,168 +7,74 @@ profile: 'zoom_gold_pipeline'
 
 # These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
-analysis-paths: ["analysis"]
+analysis-paths: ["analyses"]
 test-paths: ["tests"]
-seed-paths: ["data"]
+seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+target-path: "target"
+clean-targets:
   - "target"
   - "dbt_packages"
 
 # Configuring models
 models:
   zoom_gold_pipeline:
-    # Global configurations for all models
-    +materialized: table
-    +database: DB_POC_ZOOM
-    +schema: GOLD
-    
-    # Audit log model configuration
-    go_audit_log:
+    # Config indicated by + and applies to all files under models/gold/
+    gold:
       +materialized: table
-      +pre_hook: []
-      +post_hook: []
-      +tags: ["audit", "gold_layer"]
-    
-    # Dimension models configuration
-    dimension:
-      +materialized: table
-      +pre_hook: |
-        INSERT INTO {{ ref('go_audit_log') }} (
-          AUDIT_LOG_ID,
-          PROCESS_NAME,
-          EXECUTION_START_TIMESTAMP,
-          EXECUTION_STATUS,
-          TARGET_TABLE_NAME,
-          EXECUTED_BY,
-          LOAD_DATE,
-          SOURCE_SYSTEM
-        )
-        VALUES (
-          '{{ invocation_id }}',
-          'DIMENSION_LOAD_{{ this.name }}',
-          CURRENT_TIMESTAMP(),
-          'RUNNING',
-          '{{ this }}',
-          'DBT_GOLD_PIPELINE',
-          CURRENT_DATE(),
-          'DBT_TRANSFORMATION'
-        )
-      +post_hook: |
-        UPDATE {{ ref('go_audit_log') }}
-        SET 
-          EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(),
-          EXECUTION_STATUS = 'SUCCESS',
-          RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
-          UPDATE_DATE = CURRENT_DATE()
-        WHERE AUDIT_LOG_ID = '{{ invocation_id }}'
-          AND PROCESS_NAME = 'DIMENSION_LOAD_{{ this.name }}'
-      +tags: ["dimension", "gold_layer"]
-    
-    # Fact models configuration
-    fact:
-      +materialized: table
-      +pre_hook: |
-        INSERT INTO {{ ref('go_audit_log') }} (
-          AUDIT_LOG_ID,
-          PROCESS_NAME,
-          EXECUTION_START_TIMESTAMP,
-          EXECUTION_STATUS,
-          TARGET_TABLE_NAME,
-          EXECUTED_BY,
-          LOAD_DATE,
-          SOURCE_SYSTEM
-        )
-        VALUES (
-          '{{ invocation_id }}',
-          'FACT_LOAD_{{ this.name }}',
-          CURRENT_TIMESTAMP(),
-          'RUNNING',
-          '{{ this }}',
-          'DBT_GOLD_PIPELINE',
-          CURRENT_DATE(),
-          'DBT_TRANSFORMATION'
-        )
-      +post_hook: |
-        UPDATE {{ ref('go_audit_log') }}
-        SET 
-          EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(),
-          EXECUTION_STATUS = 'SUCCESS',
-          RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
-          UPDATE_DATE = CURRENT_DATE()
-        WHERE AUDIT_LOG_ID = '{{ invocation_id }}'
-          AND PROCESS_NAME = 'FACT_LOAD_{{ this.name }}'
-      +tags: ["fact", "gold_layer"]
+      +schema: gold
+      +pre-hook: |
+        {% if this.name != 'go_audit_log' %}
+          INSERT INTO {{ ref('go_audit_log') }} 
+          (audit_id, table_name, operation_type, operation_timestamp, record_count, user_name, session_id, source_system)
+          VALUES 
+          ({{ generate_uuid() }}, '{{ this.name }}', 'PRE_LOAD', CURRENT_TIMESTAMP(), 0, CURRENT_USER(), CURRENT_SESSION(), 'DBT_GOLD_PIPELINE')
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'go_audit_log' %}
+          INSERT INTO {{ ref('go_audit_log') }} 
+          (audit_id, table_name, operation_type, operation_timestamp, record_count, user_name, session_id, source_system)
+          VALUES 
+          ({{ generate_uuid() }}, '{{ this.name }}', 'POST_LOAD', CURRENT_TIMESTAMP(), (SELECT COUNT(*) FROM {{ this }}), CURRENT_USER(), CURRENT_SESSION(), 'DBT_GOLD_PIPELINE')
+        {% endif %}
+      dimension:
+        +materialized: table
+      fact:
+        +materialized: table
 
 # Global variables
 vars:
-  # Date range for initial load
+  # Date range for date dimension
   start_date: '2020-01-01'
   end_date: '2030-12-31'
   
-  # Fiscal year settings
-  fiscal_year_start_month: 4  # April
+  # Source system identifier
+  source_system: 'ZOOM_SILVER_LAYER'
   
-  # Data quality thresholds
-  min_data_quality_score: 70
-  
-  # Audit settings
+  # Audit configuration
   enable_audit_logging: true
-  
-  # Performance settings
-  batch_size: 10000
+
+# Macros for common transformations
+macros:
+  zoom_gold_pipeline:
+    +materialized: view
 
 # Seeds configuration
 seeds:
   zoom_gold_pipeline:
-    +database: DB_POC_ZOOM
-    +schema: GOLD
+    +schema: gold
+    +materialized: table
 
 # Snapshots configuration
 snapshots:
   zoom_gold_pipeline:
-    +target_database: DB_POC_ZOOM
-    +target_schema: GOLD
+    +target_schema: gold
+    +strategy: timestamp
+    +updated_at: update_timestamp
 
 # Test configurations
 tests:
   +store_failures: true
-  +database: DB_POC_ZOOM
-  +schema: GOLD
-
-# Documentation
-docs:
-  generate: true
-
-# Dispatch configuration for packages
-dispatch:
-  - macro_namespace: dbt_utils
-    search_order: ['zoom_gold_pipeline', 'dbt_utils']
-
-# On-run-start and on-run-end hooks
-on-run-start:
-  - "{{ log('Starting Gold Layer Pipeline Execution', info=True) }}"
-  - "CREATE SCHEMA IF NOT EXISTS {{ target.schema }}"
-
-on-run-end:
-  - "{{ log('Gold Layer Pipeline Execution Completed', info=True) }}"
-  - |
-    {% if execute %}
-      {{ log('Models executed: ' ~ graph.nodes.values() | selectattr('resource_type', 'equalto', 'model') | list | length, info=True) }}
-    {% endif %}
-
-# Quoting configuration for Snowflake
-quoting:
-  database: false
-  schema: false
-  identifier: false
-
-# Require dbt version
-require-dbt-version: [">=1.0.0", "<2.0.0"]
-
-# =====================================================
-# END OF DBT PROJECT CONFIGURATION
-# =====================================================
+  +schema: gold_tests
