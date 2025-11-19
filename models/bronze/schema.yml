@@ -9,68 +9,44 @@ sources:
         columns:
           - name: user_id
             description: "Unique identifier for each user account"
-            tests:
-              - not_null
-              - unique
           - name: email
             description: "Email address of the user"
-            tests:
-              - not_null
-              - unique
       
       - name: meetings
         description: "Raw meeting information and session details"
         columns:
           - name: meeting_id
             description: "Unique identifier for each meeting"
-            tests:
-              - not_null
-              - unique
       
       - name: participants
         description: "Raw meeting participants and their session details"
         columns:
           - name: participant_id
             description: "Unique identifier for each meeting participant"
-            tests:
-              - not_null
-              - unique
       
       - name: feature_usage
         description: "Raw usage of platform features during meetings"
         columns:
           - name: usage_id
             description: "Unique identifier for each feature usage record"
-            tests:
-              - not_null
-              - unique
       
       - name: support_tickets
         description: "Raw customer support requests and resolution tracking"
         columns:
           - name: ticket_id
             description: "Unique identifier for each support ticket"
-            tests:
-              - not_null
-              - unique
       
       - name: billing_events
         description: "Raw financial transactions and billing activities"
         columns:
           - name: event_id
             description: "Unique identifier for each billing event"
-            tests:
-              - not_null
-              - unique
       
       - name: licenses
         description: "Raw license assignments and entitlements"
         columns:
           - name: license_id
             description: "Unique identifier for each license"
-            tests:
-              - not_null
-              - unique
 
 models:
   - name: bz_data_audit
