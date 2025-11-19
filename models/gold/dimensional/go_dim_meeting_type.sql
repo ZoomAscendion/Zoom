@@ -11,7 +11,7 @@ WITH source_meetings AS (
         START_TIME,
         DATA_QUALITY_SCORE,
         SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_meetings') }}
+    FROM DB_POC_ZOOM.SILVER.SI_MEETINGS
     WHERE VALIDATION_STATUS = 'PASSED'
       AND DURATION_MINUTES IS NOT NULL
       AND START_TIME IS NOT NULL
