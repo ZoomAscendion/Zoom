@@ -13,7 +13,7 @@ WITH source_support AS (
         st.RESOLUTION_STATUS,
         st.OPEN_DATE,
         st.SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_support_tickets') }} st
+    FROM {{ source('gold_existing', 'si_support_tickets') }} st
     WHERE st.VALIDATION_STATUS = 'PASSED'
       AND st.DATA_QUALITY_SCORE >= 70
 ),
