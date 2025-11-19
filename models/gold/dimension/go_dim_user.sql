@@ -1,58 +1,59 @@
 {{ config(
     materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (process_name, source_table, target_table, process_status, start_time, load_date, source_system) VALUES ('go_dim_user', 'SI_USERS', 'go_dim_user', 'STARTED', CURRENT_TIMESTAMP(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET process_status = 'COMPLETED', end_time = CURRENT_TIMESTAMP() WHERE target_table = 'go_dim_user' AND process_status = 'STARTED'"
+    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (audit_log_id, process_name, process_type, execution_start_timestamp, execution_status, source_table_name, target_table_name, process_trigger, executed_by, load_date, source_system) VALUES ('{{ dbt_utils.generate_surrogate_key(['GO_DIM_USER', run_started_at]) }}', 'GO_DIM_USER_LOAD', 'DBT_MODEL', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_USERS', 'GO_DIM_USER', 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
+    post_hook="UPDATE {{ ref('go_audit_log') }} SET execution_end_timestamp = CURRENT_TIMESTAMP(), execution_status = 'SUCCESS', records_processed = (SELECT COUNT(*) FROM {{ this }}), execution_duration_seconds = DATEDIFF('second', execution_start_timestamp, CURRENT_TIMESTAMP()) WHERE audit_log_id = '{{ dbt_utils.generate_surrogate_key(['GO_DIM_USER', run_started_at]) }}'"
 ) }}
 
--- User dimension with enhanced attributes
-WITH source_users AS (
+-- User dimension transformation from Silver layer
+WITH user_source AS (
     SELECT 
         user_id,
         user_name,
         email,
         company,
         plan_type,
-        load_date,
-        COALESCE(validation_status, 'UNKNOWN') AS validation_status,
-        COALESCE(data_quality_score, 0) AS data_quality_score,
+        load_timestamp,
+        validation_status,
         source_system
     FROM {{ source('silver', 'si_users') }}
-    WHERE user_id IS NOT NULL
+    WHERE validation_status = 'PASSED'
 ),
 
-transformed_users AS (
-    SELECT 
-        ROW_NUMBER() OVER (ORDER BY user_id) AS user_dim_id,
+user_transformed AS (
+    SELECT
+        {{ dbt_utils.generate_surrogate_key(['user_id']) }} AS user_key,
         user_id,
-        INITCAP(COALESCE(TRIM(user_name), 'Unknown User')) AS user_name,
+        INITCAP(TRIM(user_name)) AS user_name,
+        UPPER(SUBSTRING(email, POSITION('@' IN email) + 1)) AS email_domain,
+        INITCAP(TRIM(company)) AS company,
         CASE 
-            WHEN email IS NOT NULL AND POSITION('@' IN email) > 0 
-            THEN UPPER(SUBSTRING(email, POSITION('@' IN email) + 1))
-            ELSE 'UNKNOWN.COM'
-        END AS email_domain,
-        INITCAP(COALESCE(TRIM(company), 'Unknown Company')) AS company,
-        CASE 
-            WHEN UPPER(COALESCE(plan_type, '')) IN ('FREE', 'BASIC') THEN 'Basic'
-            WHEN UPPER(COALESCE(plan_type, '')) IN ('PRO', 'PROFESSIONAL') THEN 'Pro'
-            WHEN UPPER(COALESCE(plan_type, '')) IN ('BUSINESS', 'ENTERPRISE') THEN 'Enterprise'
+            WHEN UPPER(plan_type) IN ('FREE', 'BASIC') THEN 'Basic'
+            WHEN UPPER(plan_type) IN ('PRO', 'PROFESSIONAL') THEN 'Pro'
+            WHEN UPPER(plan_type) IN ('BUSINESS', 'ENTERPRISE') THEN 'Enterprise'
             ELSE 'Unknown'
         END AS plan_type,
         CASE 
-            WHEN UPPER(COALESCE(plan_type, '')) = 'FREE' THEN 'Free'
-            WHEN UPPER(COALESCE(plan_type, '')) IN ('BASIC', 'PRO', 'PROFESSIONAL', 'BUSINESS', 'ENTERPRISE') THEN 'Paid'
-            ELSE 'Unknown'
+            WHEN UPPER(plan_type) = 'FREE' THEN 'Free'
+            ELSE 'Paid'
         END AS plan_category,
-        COALESCE(load_date, CURRENT_DATE()) AS registration_date,
+        DATE(load_timestamp) AS registration_date,
         CASE 
-            WHEN validation_status = 'PASSED' AND data_quality_score >= 90 THEN 'Active'
-            WHEN validation_status = 'PASSED' AND data_quality_score >= 70 THEN 'Active - Low Quality'
+            WHEN validation_status = 'PASSED' THEN 'Active'
             ELSE 'Inactive'
         END AS user_status,
-        'Unknown' AS geographic_region,
-        'Other' AS industry_sector,
+        CASE 
+            WHEN UPPER(SUBSTRING(email, POSITION('@' IN email) + 1)) LIKE '%.COM' THEN 'North America'
+            WHEN UPPER(SUBSTRING(email, POSITION('@' IN email) + 1)) LIKE '%.UK' OR UPPER(SUBSTRING(email, POSITION('@' IN email) + 1)) LIKE '%.EU' THEN 'Europe'
+            ELSE 'Unknown'
+        END AS geographic_region,
+        CASE 
+            WHEN UPPER(company) LIKE '%TECH%' OR UPPER(company) LIKE '%SOFTWARE%' THEN 'Technology'
+            WHEN UPPER(company) LIKE '%BANK%' OR UPPER(company) LIKE '%FINANCE%' THEN 'Financial Services'
+            ELSE 'Unknown'
+        END AS industry_sector,
         'Standard User' AS user_role,
         CASE 
-            WHEN UPPER(COALESCE(plan_type, '')) = 'FREE' THEN 'Individual'
+            WHEN UPPER(plan_type) = 'FREE' THEN 'Individual'
             ELSE 'Business'
         END AS account_type,
         'English' AS language_preference,
@@ -62,7 +63,7 @@ transformed_users AS (
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date,
         source_system
-    FROM source_users
+    FROM user_source
 )
 
-SELECT * FROM transformed_users
+SELECT * FROM user_transformed
