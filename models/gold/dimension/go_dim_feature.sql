@@ -9,7 +9,7 @@ WITH source_features AS (
     SELECT DISTINCT
         FEATURE_NAME,
         SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_feature_usage') }}
+    FROM {{ source('gold_existing', 'si_feature_usage') }}
     WHERE VALIDATION_STATUS = 'PASSED'
       AND FEATURE_NAME IS NOT NULL
       AND TRIM(FEATURE_NAME) != ''
