@@ -21,22 +21,6 @@ models:
     +materialized: table
     gold:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'go_audit_log' %}
-          INSERT INTO {{ ref('go_audit_log') }} (
-            process_name, source_table, target_table, process_status, 
-            start_time, load_date, source_system
-          ) VALUES (
-            '{{ this.name }}', 'SILVER_LAYER', '{{ this.name }}', 'STARTED', 
-            CURRENT_TIMESTAMP(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE'
-          )
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'go_audit_log' %}
-          UPDATE {{ ref('go_audit_log') }} 
-          SET process_status = 'COMPLETED', end_time = CURRENT_TIMESTAMP()
-          WHERE target_table = '{{ this.name }}' AND process_status = 'STARTED'
-        {% endif %}
 
 vars:
   start_date: '2020-01-01'
