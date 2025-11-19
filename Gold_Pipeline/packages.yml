@@ -1,0 +1,60 @@
+# =====================================================
+# DBT PACKAGES CONFIGURATION
+# Project: Zoom Platform Analytics System - Gold Layer
+# Purpose: Define external packages for enhanced functionality
+# =====================================================
+
+packages:
+  # dbt-utils: Essential utilities for dbt projects
+  - package: dbt-labs/dbt_utils
+    version: 1.1.1
+  
+  # dbt-expectations: Data quality testing framework
+  - package: calogica/dbt_expectations
+    version: 0.10.1
+  
+  # dbt-audit-helper: Audit and comparison utilities
+  - package: dbt-labs/audit_helper
+    version: 0.9.0
+  
+  # Snowflake-specific utilities
+  - package: dbt-labs/snowflake_utils
+    version: 0.2.0
+
+# =====================================================
+# PACKAGE DESCRIPTIONS AND USAGE
+# =====================================================
+
+# dbt_utils:
+# - Provides essential macros for data transformations
+# - Used for: surrogate_key, generate_series, pivot, etc.
+# - Documentation: https://github.com/dbt-labs/dbt-utils
+
+# dbt_expectations:
+# - Advanced data quality testing framework
+# - Used for: expect_column_values_to_be_unique, expect_table_row_count_to_be_between, etc.
+# - Documentation: https://github.com/calogica/dbt-expectations
+
+# audit_helper:
+# - Utilities for auditing and comparing datasets
+# - Used for: compare_relations, compare_column_values, etc.
+# - Documentation: https://github.com/dbt-labs/dbt-audit-helper
+
+# snowflake_utils:
+# - Snowflake-specific utilities and macros
+# - Used for: Snowflake-optimized transformations
+# - Documentation: https://github.com/dbt-labs/dbt-snowflake-utils
+
+# =====================================================
+# INSTALLATION INSTRUCTIONS
+# =====================================================
+
+# To install these packages, run:
+# dbt deps
+
+# This will download and install all specified packages
+# into the dbt_packages directory
+
+# =====================================================
+# END OF PACKAGES CONFIGURATION
+# =====================================================
