@@ -2,9 +2,7 @@
   config(
     materialized='table',
     cluster_by=['SUPPORT_CATEGORY_ID', 'PRIORITY_LEVEL'],
-    tags=['dimension', 'gold'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT '{{ dbt_utils.generate_surrogate_key(['go_dim_support_category', run_started_at]) }}', 'go_dim_support_category', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_SUPPORT_TICKETS', 'GO_DIM_SUPPORT_CATEGORY', 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_LAYER'",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_END_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, RECORDS_PROCESSED, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT '{{ dbt_utils.generate_surrogate_key(['go_dim_support_category_complete', run_started_at]) }}', 'go_dim_support_category', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 'SUCCESS', 'SI_SUPPORT_TICKETS', 'GO_DIM_SUPPORT_CATEGORY', (SELECT COUNT(*) FROM {{ this }}), 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_LAYER'"
+    tags=['dimension', 'gold']
   )
 }}
 
@@ -13,10 +11,10 @@
 
 WITH source_tickets AS (
     SELECT DISTINCT
-        TICKET_TYPE,
-        SOURCE_SYSTEM
+        COALESCE(TICKET_TYPE, 'Unknown') AS TICKET_TYPE,
+        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
     FROM {{ source('silver', 'si_support_tickets') }}
-    WHERE VALIDATION_STATUS = 'PASSED'
+    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
       AND TICKET_TYPE IS NOT NULL
 ),
 
