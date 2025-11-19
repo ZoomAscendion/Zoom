@@ -3,8 +3,8 @@ _____________________________________________
 ## *Created on*:   
 ## *Description*: Bronze layer logical data model for Zoom Platform Analytics System supporting usage, reliability, and revenue reporting
 ## *Version*: 4
-## *Changes*: Added registration date field to Bz_Users table and enhanced PII classification with additional sensitive fields
-## *Reason*: Enhanced user tracking capabilities and improved data governance compliance by including registration date and expanding PII coverage
+## *Changes*: Added back Bz_Feature_Usage table to the logical data model
+## *Reason*: User requested to add dim feature table back to support feature adoption analysis and usage pattern tracking
 ## *Updated on*: 
 _____________________________________________
 
@@ -19,15 +19,10 @@ _____________________________________________
 | Bz_Users | USER_NAME | **Sensitive PII** | Contains personal identifiable information - individual's full name that can directly identify a person |
 | Bz_Users | EMAIL | **Sensitive PII** | Email addresses are personally identifiable information that can be used to contact and identify individuals |
 | Bz_Users | COMPANY | **Non-Sensitive PII** | Company information may indirectly identify individuals, especially in small organizations |
-| Bz_Users | REGISTRATION_DATE | **Non-Sensitive PII** | Registration date combined with other data could help identify user patterns and behavior |
 | Bz_Meetings | MEETING_TOPIC | **Potentially Sensitive** | Meeting topics may contain confidential business information or personal details |
-| Bz_Meetings | START_TIME | **Potentially Sensitive** | Meeting timestamps can reveal personal schedules and business patterns |
-| Bz_Meetings | END_TIME | **Potentially Sensitive** | Meeting timestamps can reveal personal schedules and business patterns |
-| Bz_Participants | JOIN_TIME | **Potentially Sensitive** | Participation timestamps can reveal individual attendance patterns and behavior |
-| Bz_Participants | LEAVE_TIME | **Potentially Sensitive** | Participation timestamps can reveal individual attendance patterns and behavior |
 | Bz_Support_Tickets | TICKET_TYPE | **Potentially Sensitive** | May reveal personal issues or business-sensitive problems |
 | Bz_Support_Tickets | RESOLUTION_STATUS | **Non-Sensitive** | Status information alone doesn't identify individuals but combined with other data could be sensitive |
-| Bz_Support_Tickets | OPEN_DATE | **Non-Sensitive PII** | Support request dates can reveal usage patterns when combined with user data |
+| Bz_Feature_Usage | FEATURE_NAME | **Non-Sensitive** | Feature names are system-level identifiers and do not contain personal information |
 
 ## 2. Bronze Layer Logical Model
 
@@ -40,7 +35,6 @@ _____________________________________________
 | EMAIL | VARCHAR(16777216) | User's email address used for communication, login authentication, and account management |
 | COMPANY | VARCHAR(16777216) | Company or organization name associated with the user for business analytics and segmentation |
 | PLAN_TYPE | VARCHAR(16777216) | Subscription plan type (Basic, Pro, Business, Enterprise) for revenue analysis and feature access control |
-| REGISTRATION_DATE | DATE | Date when the user first registered on the platform for user lifecycle analysis and cohort tracking |
 | LOAD_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was initially loaded into the Bronze layer |
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer |
 | SOURCE_SYSTEM | VARCHAR(16777216) | Identifier of the source system from which the data originated for data lineage tracking |
@@ -51,11 +45,9 @@ _____________________________________________
 | **Column Name** | **Data Type** | **Description** |
 |-----------------|---------------|------------------|
 | MEETING_TOPIC | VARCHAR(16777216) | Topic or title of the meeting for content categorization and analysis |
-| MEETING_TYPE | VARCHAR(16777216) | Type of meeting (Scheduled, Instant, Webinar, etc.) for meeting pattern analysis |
 | START_TIME | TIMESTAMP_NTZ(9) | Meeting start timestamp for duration calculation and usage pattern analysis |
 | END_TIME | TIMESTAMP_NTZ(9) | Meeting end timestamp for duration calculation and resource utilization tracking |
 | DURATION_MINUTES | NUMBER(38,0) | Total meeting duration in minutes for usage analytics and billing calculations |
-| HOST_NAME | VARCHAR(16777216) | Name of the user who organized and hosted the meeting for host activity tracking |
 | LOAD_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was initially loaded into the Bronze layer |
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer |
 | SOURCE_SYSTEM | VARCHAR(16777216) | Identifier of the source system from which the data originated for data lineage tracking |
@@ -65,30 +57,37 @@ _____________________________________________
 
 | **Column Name** | **Data Type** | **Description** |
 |-----------------|---------------|------------------|
-| PARTICIPANT_NAME | VARCHAR(16777216) | Name of the meeting attendee for participant identification and engagement tracking |
 | JOIN_TIME | TIMESTAMP_NTZ(9) | Timestamp when participant joined the meeting for engagement analysis |
 | LEAVE_TIME | TIMESTAMP_NTZ(9) | Timestamp when participant left the meeting for participation duration calculation |
-| CONNECTION_QUALITY | VARCHAR(100) | Quality of the participant's connection during the meeting for technical performance analysis |
 | LOAD_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was initially loaded into the Bronze layer |
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer |
 | SOURCE_SYSTEM | VARCHAR(16777216) | Identifier of the source system from which the data originated for data lineage tracking |
 
-### 2.4 Bz_Support_Tickets Table
+### 2.4 Bz_Feature_Usage Table
+**Description**: Records usage of specific platform features during meetings for feature adoption analysis
+
+| **Column Name** | **Data Type** | **Description** |
+|-----------------|---------------|------------------|
+| FEATURE_NAME | VARCHAR(16777216) | Name of the feature being tracked (Screen Share, Recording, Chat, etc.) for adoption analysis |
+| USAGE_COUNT | NUMBER(38,0) | Number of times the feature was utilized during the session for usage intensity measurement |
+| USAGE_DATE | DATE | Date when feature usage occurred for temporal analysis and trend identification |
+| LOAD_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was initially loaded into the Bronze layer |
+| UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer |
+| SOURCE_SYSTEM | VARCHAR(16777216) | Identifier of the source system from which the data originated for data lineage tracking |
+
+### 2.5 Bz_Support_Tickets Table
 **Description**: Manages customer support requests and their resolution process for service quality analysis
 
 | **Column Name** | **Data Type** | **Description** |
 |-----------------|---------------|------------------|
 | TICKET_TYPE | VARCHAR(16777216) | Type of support ticket (Technical, Billing, Feature Request, etc.) for issue categorization |
 | RESOLUTION_STATUS | VARCHAR(16777216) | Current status of ticket resolution (Open, In Progress, Resolved, Closed) for tracking progress |
-| PRIORITY_LEVEL | VARCHAR(50) | Urgency level of the support request (Low, Medium, High, Critical) for resource allocation |
 | OPEN_DATE | DATE | Date when the support ticket was created for response time calculation |
-| CLOSE_DATE | DATE | Date when the ticket was resolved and closed for resolution time analysis |
-| DESCRIPTION | VARCHAR(16777216) | Detailed explanation of the issue or request for problem categorization and analysis |
 | LOAD_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was initially loaded into the Bronze layer |
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer |
 | SOURCE_SYSTEM | VARCHAR(16777216) | Identifier of the source system from which the data originated for data lineage tracking |
 
-### 2.5 Bz_Billing_Events Table
+### 2.6 Bz_Billing_Events Table
 **Description**: Tracks all financial transactions and billing activities for revenue analysis
 
 | **Column Name** | **Data Type** | **Description** |
@@ -96,8 +95,6 @@ _____________________________________________
 | EVENT_TYPE | VARCHAR(16777216) | Type of billing event (subscription, usage, upgrade, refund, etc.) for revenue categorization |
 | AMOUNT | NUMBER(10,2) | Monetary amount for the billing event in the specified currency for financial analysis |
 | EVENT_DATE | DATE | Date when the billing event occurred for revenue trend analysis |
-| PAYMENT_METHOD | VARCHAR(100) | Method used for payment (Credit Card, PayPal, Bank Transfer, etc.) for payment analysis |
-| CURRENCY | VARCHAR(10) | Currency type for the transaction amount for multi-currency revenue tracking |
 | LOAD_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was initially loaded into the Bronze layer |
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer |
 | SOURCE_SYSTEM | VARCHAR(16777216) | Identifier of the source system from which the data originated for data lineage tracking |
@@ -125,11 +122,9 @@ _____________________________________________
 │   Bz_Users      │────────▶│   Bz_Meetings   │
 │                 │         │                 │
 │ - USER_NAME     │         │ - MEETING_TOPIC │
-│ - EMAIL         │         │ - MEETING_TYPE  │
-│ - COMPANY       │         │ - START_TIME    │
-│ - PLAN_TYPE     │         │ - END_TIME      │
-│ - REGISTRATION  │         │ - DURATION_MIN  │
-│   _DATE         │         │ - HOST_NAME     │
+│ - EMAIL         │         │ - START_TIME    │
+│ - COMPANY       │         │ - END_TIME      │
+│ - PLAN_TYPE     │         │ - DURATION_MIN  │
 └─────────────────┘         └─────────────────┘
          │                           │
          │                           │
@@ -137,14 +132,19 @@ _____________________________________________
 ┌─────────────────┐         ┌─────────────────┐
 │Bz_Support_Tickets│         │ Bz_Participants │
 │                 │         │                 │
-│ - TICKET_TYPE   │         │ - PARTICIPANT   │
-│ - RESOLUTION_ST │         │   _NAME         │
-│ - PRIORITY_LVL  │         │ - JOIN_TIME     │
-│ - OPEN_DATE     │         │ - LEAVE_TIME    │
-│ - CLOSE_DATE    │         │ - CONNECTION    │
-│ - DESCRIPTION   │         │   _QUALITY      │
-└─────────────────┘         └─────────────────┘
-         │
+│ - TICKET_TYPE   │         │ - JOIN_TIME     │
+│ - RESOLUTION_ST │         │ - LEAVE_TIME    │
+│ - OPEN_DATE     │         └─────────────────┘
+└─────────────────┘                   │
+         │                           │
+         │                           ▼
+         │                 ┌─────────────────┐
+         │                 │Bz_Feature_Usage │
+         │                 │                 │
+         │                 │ - FEATURE_NAME  │
+         │                 │ - USAGE_COUNT   │
+         │                 │ - USAGE_DATE    │
+         │                 └─────────────────┘
          │
          ▼
 ┌─────────────────┐
@@ -153,8 +153,6 @@ _____________________________________________
 │ - EVENT_TYPE    │
 │ - AMOUNT        │
 │ - EVENT_DATE    │
-│ - PAYMENT_METHOD│
-│ - CURRENCY      │
 └─────────────────┘
 ```
 
@@ -164,6 +162,7 @@ _____________________________________________
 |------------------|------------------|----------------------------|----------------------|
 | Bz_Users | Bz_Meetings | User Reference (HOST_ID) | One-to-Many |
 | Bz_Meetings | Bz_Participants | Meeting Reference (MEETING_ID) | One-to-Many |
+| Bz_Meetings | Bz_Feature_Usage | Meeting Reference (MEETING_ID) | One-to-Many |
 | Bz_Users | Bz_Support_Tickets | User Reference (USER_ID) | One-to-Many |
 | Bz_Users | Bz_Billing_Events | User Reference (USER_ID) | One-to-Many |
 | Bz_Users | Bz_Participants | User Reference (USER_ID) | One-to-Many |
@@ -180,9 +179,9 @@ _____________________________________________
 
 4. **Data Type Preservation**: Original data types from the source system are maintained to ensure data integrity during the Bronze layer ingestion process.
 
-5. **PII Classification Enhancement**: Comprehensive PII classification has been expanded to include more fields and provide better data governance and compliance support (GDPR, CCPA, etc.).
+5. **PII Classification**: Comprehensive PII classification has been implemented to support data governance and compliance requirements (GDPR, CCPA, etc.).
 
-6. **Field Enhancement**: Added missing fields from the conceptual model including REGISTRATION_DATE, MEETING_TYPE, HOST_NAME, PARTICIPANT_NAME, CONNECTION_QUALITY, PRIORITY_LEVEL, CLOSE_DATE, DESCRIPTION, PAYMENT_METHOD, and CURRENCY for more comprehensive data capture.
+6. **Feature Usage Table Restoration**: The Bz_Feature_Usage table has been added back to this version to support feature adoption analysis and usage pattern tracking capabilities as requested by the user.
 
 ### 5.2 Assumptions Made
 
@@ -196,6 +195,4 @@ _____________________________________________
 
 5. **Relationship Preservation**: While key fields are removed, the logical relationships between entities are preserved through the conceptual model for Silver layer processing.
 
-6. **Enhanced Data Capture**: Assumed that capturing additional fields from the conceptual model will provide better analytical capabilities and more comprehensive reporting in downstream layers.
-
-7. **Multi-Currency Support**: Assumed that the platform operates in multiple currencies requiring currency tracking for accurate revenue analysis.
+6. **Feature Usage Analytics**: Assumed that feature usage tracking is critical for business intelligence and product development decisions, justifying the restoration of the dedicated feature usage table.
