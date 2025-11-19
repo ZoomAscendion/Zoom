@@ -1,61 +1,100 @@
 {{ config(
     materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (process_name, source_table, target_table, process_status, start_time, load_date, source_system) VALUES ('go_fact_revenue_events', 'SI_BILLING_EVENTS', 'go_fact_revenue_events', 'STARTED', CURRENT_TIMESTAMP(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET process_status = 'COMPLETED', end_time = CURRENT_TIMESTAMP() WHERE target_table = 'go_fact_revenue_events' AND process_status = 'STARTED'"
+    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (audit_log_id, process_name, process_type, execution_start_timestamp, execution_status, source_table_name, target_table_name, process_trigger, executed_by, load_date, source_system) VALUES ('{{ dbt_utils.generate_surrogate_key(['GO_FACT_REVENUE_EVENTS', run_started_at]) }}', 'GO_FACT_REVENUE_EVENTS_LOAD', 'DBT_MODEL', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_BILLING_EVENTS', 'GO_FACT_REVENUE_EVENTS', 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
+    post_hook="UPDATE {{ ref('go_audit_log') }} SET execution_end_timestamp = CURRENT_TIMESTAMP(), execution_status = 'SUCCESS', records_processed = (SELECT COUNT(*) FROM {{ this }}), execution_duration_seconds = DATEDIFF('second', execution_start_timestamp, CURRENT_TIMESTAMP()) WHERE audit_log_id = '{{ dbt_utils.generate_surrogate_key(['GO_FACT_REVENUE_EVENTS', run_started_at]) }}'"
 ) }}
 
--- Revenue events fact table
-WITH source_billing AS (
+-- Revenue events fact table transformation
+WITH billing_events_base AS (
     SELECT 
-        event_id,
-        user_id,
-        event_type,
-        amount,
-        event_date,
-        source_system
-    FROM {{ source('silver', 'si_billing_events') }}
-    WHERE event_date IS NOT NULL
-      AND amount IS NOT NULL
+        be.event_id,
+        be.user_id,
+        be.event_type,
+        be.amount,
+        be.event_date,
+        be.source_system
+    FROM {{ source('silver', 'si_billing_events') }} be
+    WHERE be.validation_status = 'PASSED'
 ),
 
-revenue_events_facts AS (
+user_license_mapping AS (
     SELECT 
-        ROW_NUMBER() OVER (ORDER BY sb.event_date, sb.event_id) AS revenue_event_id,
-        dd.date_id,
-        dl.license_id,
-        du.user_dim_id,
-        sb.event_id AS billing_event_id,
-        sb.event_date AS transaction_date,
-        sb.event_date::TIMESTAMP_NTZ AS transaction_timestamp,
-        sb.event_type,
-        'Recurring Revenue' AS revenue_type,
-        sb.amount AS gross_amount,
-        sb.amount * 0.08 AS tax_amount,
+        sl.assigned_to_user_id AS user_id,
+        sl.license_type
+    FROM {{ source('silver', 'si_licenses') }} sl
+    WHERE sl.validation_status = 'PASSED'
+),
+
+revenue_events_fact AS (
+    SELECT
+        {{ dbt_utils.generate_surrogate_key(['beb.event_id']) }} AS revenue_event_id,
+        dd.date_id AS date_id,
+        dl.license_id AS license_id,
+        du.user_dim_id AS user_dim_id,
+        beb.event_id AS billing_event_id,
+        beb.event_date AS transaction_date,
+        beb.event_date::TIMESTAMP_NTZ AS transaction_timestamp,
+        beb.event_type,
+        CASE 
+            WHEN beb.event_type IN ('Subscription', 'Renewal', 'Upgrade') THEN 'Recurring'
+            WHEN beb.event_type IN ('One-time Purchase', 'Setup Fee') THEN 'One-time'
+            WHEN beb.event_type = 'Refund' THEN 'Refund'
+            ELSE 'Other'
+        END AS revenue_type,
+        beb.amount AS gross_amount,
+        beb.amount * 0.1 AS tax_amount,
         0.00 AS discount_amount,
-        sb.amount * 0.92 AS net_amount,
+        CASE 
+            WHEN beb.event_type = 'Refund' THEN -beb.amount
+            ELSE beb.amount
+        END AS net_amount,
         'USD' AS currency_code,
         1.0 AS exchange_rate,
-        sb.amount AS usd_amount,
+        beb.amount AS usd_amount,
         'Credit Card' AS payment_method,
-        12 AS subscription_period_months,
+        CASE 
+            WHEN beb.event_type IN ('Subscription', 'Renewal') THEN 12
+            ELSE 0
+        END AS subscription_period_months,
         1 AS license_quantity,
         0.00 AS proration_amount,
-        sb.amount * 0.05 AS commission_amount,
-        sb.amount / 12 AS mrr_impact,
-        sb.amount AS arr_impact,
-        sb.amount * 2.5 AS customer_lifetime_value,
-        2.0 AS churn_risk_score,
-        'Successful' AS payment_status,
-        NULL AS refund_reason,
+        beb.amount * 0.05 AS commission_amount,
+        CASE 
+            WHEN beb.event_type IN ('Subscription', 'Renewal', 'Upgrade') THEN beb.amount / 12
+            ELSE 0
+        END AS mrr_impact,
+        CASE 
+            WHEN beb.event_type IN ('Subscription', 'Renewal', 'Upgrade') THEN beb.amount
+            ELSE 0
+        END AS arr_impact,
+        beb.amount * 10 AS customer_lifetime_value,
+        CASE 
+            WHEN beb.event_type = 'Downgrade' THEN 4.0
+            WHEN beb.event_type = 'Refund' THEN 3.5
+            WHEN DATEDIFF('day', beb.event_date, CURRENT_DATE()) > 90 AND beb.event_type = 'Subscription' THEN 3.0
+            WHEN beb.amount < 0 THEN 2.5
+            ELSE 1.0
+        END AS churn_risk_score,
+        CASE 
+            WHEN beb.event_type = 'Refund' THEN 'Refunded'
+            WHEN beb.amount > 0 THEN 'Successful'
+            WHEN beb.amount = 0 THEN 'Pending'
+            ELSE 'Failed'
+        END AS payment_status,
+        CASE 
+            WHEN beb.event_type = 'Refund' THEN 'Customer Request'
+            ELSE NULL
+        END AS refund_reason,
         'Online' AS sales_channel,
         NULL AS promotion_code,
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date,
-        sb.source_system
-    FROM source_billing sb
-    LEFT JOIN {{ ref('go_dim_date') }} dd ON sb.event_date = dd.date_value
-    LEFT JOIN {{ ref('go_dim_user') }} du ON du.user_dim_id = 1  -- Simplified join
-    LEFT JOIN {{ ref('go_dim_license') }} dl ON dl.license_id = 1  -- Simplified join
+        beb.source_system
+    FROM billing_events_base beb
+    LEFT JOIN {{ ref('go_dim_date') }} dd ON beb.event_date = dd.date_value
+    LEFT JOIN {{ ref('go_dim_user') }} du ON beb.user_id = du.user_id AND du.is_current_record = TRUE
+    LEFT JOIN user_license_mapping ulm ON beb.user_id = ulm.user_id
+    LEFT JOIN {{ ref('go_dim_license') }} dl ON ulm.license_type = dl.license_type AND dl.is_current_record = TRUE
 )
 
-SELECT * FROM revenue_events_facts
+SELECT * FROM revenue_events_fact
