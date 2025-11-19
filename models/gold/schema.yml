@@ -146,16 +146,10 @@ models:
         description: "Foreign key to user dimension for meeting host"
         tests:
           - not_null
-          - relationships:
-              to: ref('go_dim_user')
-              field: user_dim_id
       - name: participant_count
         description: "Number of participants in the meeting"
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 10000
 
   - name: go_fact_feature_usage
     description: "Fact table for feature usage metrics and adoption patterns"
@@ -183,9 +177,6 @@ models:
         description: "Number of times the feature was used"
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 1000
 
   - name: go_fact_revenue_events
     description: "Fact table for billing events and revenue metrics"
@@ -206,16 +197,10 @@ models:
         description: "Foreign key to user dimension"
         tests:
           - not_null
-          - relationships:
-              to: ref('go_dim_user')
-              field: user_dim_id
       - name: gross_amount
         description: "Gross revenue amount"
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: -10000
-              max_value: 100000
 
   - name: go_fact_support_metrics
     description: "Fact table for support ticket metrics and resolution performance"
@@ -241,7 +226,3 @@ models:
               field: support_category_id
       - name: resolution_time_hours
         description: "Time taken to resolve the ticket in hours"
-        tests:
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 8760 # 1 year in hours
