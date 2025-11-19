@@ -1,23 +1,23 @@
 {{ config(
     materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (process_name, source_table, target_table, process_status, start_time, load_date, source_system) VALUES ('go_dim_support_category', 'SI_SUPPORT_TICKETS', 'go_dim_support_category', 'STARTED', CURRENT_TIMESTAMP(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET process_status = 'COMPLETED', end_time = CURRENT_TIMESTAMP() WHERE target_table = 'go_dim_support_category' AND process_status = 'STARTED'"
+    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (audit_log_id, process_name, process_type, execution_start_timestamp, execution_status, source_table_name, target_table_name, process_trigger, executed_by, load_date, source_system) VALUES ('{{ dbt_utils.generate_surrogate_key(['GO_DIM_SUPPORT_CATEGORY', run_started_at]) }}', 'GO_DIM_SUPPORT_CATEGORY_LOAD', 'DBT_MODEL', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_SUPPORT_TICKETS', 'GO_DIM_SUPPORT_CATEGORY', 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
+    post_hook="UPDATE {{ ref('go_audit_log') }} SET execution_end_timestamp = CURRENT_TIMESTAMP(), execution_status = 'SUCCESS', records_processed = (SELECT COUNT(*) FROM {{ this }}), execution_duration_seconds = DATEDIFF('second', execution_start_timestamp, CURRENT_TIMESTAMP()) WHERE audit_log_id = '{{ dbt_utils.generate_surrogate_key(['GO_DIM_SUPPORT_CATEGORY', run_started_at]) }}'"
 ) }}
 
--- Support category dimension
-WITH source_support AS (
+-- Support category dimension transformation from Silver layer
+WITH support_source AS (
     SELECT DISTINCT
-        COALESCE(TRIM(ticket_type), 'General Support') AS ticket_type,
+        ticket_type,
         source_system
     FROM {{ source('silver', 'si_support_tickets') }}
-    WHERE ticket_type IS NOT NULL
-      AND TRIM(ticket_type) != ''
+    WHERE validation_status = 'PASSED'
+      AND ticket_type IS NOT NULL
 ),
 
-transformed_support_categories AS (
-    SELECT 
-        ROW_NUMBER() OVER (ORDER BY ticket_type) AS support_category_id,
-        INITCAP(ticket_type) AS support_category,
+support_category_transformed AS (
+    SELECT
+        {{ dbt_utils.generate_surrogate_key(['ticket_type']) }} AS support_category_key,
+        INITCAP(TRIM(ticket_type)) AS support_category,
         CASE 
             WHEN UPPER(ticket_type) LIKE '%TECHNICAL%' THEN 'Technical Issue'
             WHEN UPPER(ticket_type) LIKE '%BILLING%' THEN 'Billing Inquiry'
@@ -69,7 +69,7 @@ transformed_support_categories AS (
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date,
         source_system
-    FROM source_support
+    FROM support_source
 )
 
-SELECT * FROM transformed_support_categories
+SELECT * FROM support_category_transformed
