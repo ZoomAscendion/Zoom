@@ -16,8 +16,8 @@ WITH source_feature_usage AS (
         m.HOST_ID,
         m.DURATION_MINUTES,
         m.START_TIME
-    FROM {{ source('silver', 'si_feature_usage') }} fu
-    LEFT JOIN {{ source('silver', 'si_meetings') }} m 
+    FROM {{ source('gold_existing', 'si_feature_usage') }} fu
+    LEFT JOIN {{ source('gold_existing', 'si_meetings') }} m 
         ON fu.MEETING_ID = m.MEETING_ID
     WHERE fu.VALIDATION_STATUS = 'PASSED'
       AND fu.DATA_QUALITY_SCORE >= 70
