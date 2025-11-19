@@ -15,7 +15,9 @@ What is the average meeting duration?
 This keeps the report lightweight and simple.
 
 2.Data Model (use only one Fact and one Dimension)
+
 Fact Table:
+
 FACT_TABLE
 COLUMN 1
 COLUMN 2
@@ -26,5 +28,6 @@ COLUMN 2
 COLUMN 3
 
 3.Data Attributes in the Report
+
 Meeting information (Meeting_ID, Duration_Minutes, Start_Time)
 
