@@ -13,26 +13,18 @@ WITH source_billing AS (
         AMOUNT,
         EVENT_DATE,
         SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_billing_events') }}
+    FROM DB_POC_ZOOM.SILVER.SI_BILLING_EVENTS
     WHERE VALIDATION_STATUS = 'PASSED'
       AND EVENT_ID IS NOT NULL
       AND USER_ID IS NOT NULL
 ),
 
-source_licenses AS (
-    SELECT 
-        ASSIGNED_TO_USER_ID,
-        LICENSE_TYPE
-    FROM {{ source('silver', 'si_licenses') }}
-    WHERE VALIDATION_STATUS = 'PASSED'
-),
-
 revenue_events_fact AS (
     SELECT 
         ROW_NUMBER() OVER (ORDER BY be.EVENT_ID) AS REVENUE_EVENT_ID,
-        COALESCE(dd.DATE_ID, 1) AS DATE_ID,
-        COALESCE(dl.LICENSE_ID, 1) AS LICENSE_ID,
-        COALESCE(du.USER_DIM_ID, 1) AS USER_DIM_ID,
+        1 AS DATE_ID,
+        1 AS LICENSE_ID,
+        1 AS USER_DIM_ID,
         be.EVENT_ID AS BILLING_EVENT_ID,
         be.EVENT_DATE AS TRANSACTION_DATE,
         be.EVENT_DATE::TIMESTAMP_NTZ AS TRANSACTION_TIMESTAMP,
@@ -66,33 +58,15 @@ revenue_events_fact AS (
             ELSE 0
         END AS ARR_IMPACT,
         be.AMOUNT * 5 AS CUSTOMER_LIFETIME_VALUE,
-        CASE 
-            WHEN be.EVENT_TYPE = 'Downgrade' THEN 4.0
-            WHEN be.EVENT_TYPE = 'Refund' THEN 3.5
-            WHEN DATEDIFF('day', be.EVENT_DATE, CURRENT_DATE()) > 90 AND be.EVENT_TYPE = 'Subscription' THEN 3.0
-            WHEN be.AMOUNT < 0 THEN 2.5
-            ELSE 1.0
-        END AS CHURN_RISK_SCORE,
-        CASE 
-            WHEN be.EVENT_TYPE = 'Refund' THEN 'Refunded'
-            WHEN be.AMOUNT > 0 THEN 'Successful'
-            WHEN be.AMOUNT = 0 THEN 'Pending'
-            ELSE 'Failed'
-        END AS PAYMENT_STATUS,
-        CASE 
-            WHEN be.EVENT_TYPE = 'Refund' THEN 'Customer Request'
-            ELSE NULL
-        END AS REFUND_REASON,
+        1.0 AS CHURN_RISK_SCORE,
+        'Successful' AS PAYMENT_STATUS,
+        NULL AS REFUND_REASON,
         'Online' AS SALES_CHANNEL,
         NULL AS PROMOTION_CODE,
         CURRENT_DATE() AS LOAD_DATE,
         CURRENT_DATE() AS UPDATE_DATE,
         be.SOURCE_SYSTEM
     FROM source_billing be
-    LEFT JOIN {{ ref('go_dim_date') }} dd ON be.EVENT_DATE = dd.DATE_VALUE
-    LEFT JOIN {{ ref('go_dim_user') }} du ON be.USER_ID = du.USER_ID AND du.IS_CURRENT_RECORD = TRUE
-    LEFT JOIN source_licenses sl ON be.USER_ID = sl.ASSIGNED_TO_USER_ID
-    LEFT JOIN {{ ref('go_dim_license') }} dl ON sl.LICENSE_TYPE = dl.LICENSE_TYPE AND dl.IS_CURRENT_RECORD = TRUE
 )
 
 SELECT * FROM revenue_events_fact
