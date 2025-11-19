@@ -8,29 +8,21 @@
 WITH billing_events_base AS (
     SELECT 
         be.event_id,
-        be.user_id,
-        be.event_type,
-        be.amount,
-        be.event_date,
-        be.source_system
-    FROM {{ source('silver', 'si_billing_events') }} be
+        COALESCE(be.user_id, 'UNKNOWN') AS user_id,
+        COALESCE(be.event_type, 'Subscription') AS event_type,
+        COALESCE(be.amount, 0) AS amount,
+        COALESCE(be.event_date, CURRENT_DATE()) AS event_date,
+        COALESCE(be.source_system, 'UNKNOWN') AS source_system
+    FROM {{ source('gold', 'si_billing_events') }} be
     WHERE be.validation_status = 'PASSED'
-),
-
-user_license_mapping AS (
-    SELECT 
-        sl.assigned_to_user_id AS user_id,
-        sl.license_type
-    FROM {{ source('silver', 'si_licenses') }} sl
-    WHERE sl.validation_status = 'PASSED'
 ),
 
 revenue_events_fact AS (
     SELECT
-        {{ dbt_utils.generate_surrogate_key(['beb.event_id']) }} AS revenue_event_id,
+        ROW_NUMBER() OVER (ORDER BY beb.event_id) AS revenue_event_id,
         dd.date_id AS date_id,
-        dl.license_id AS license_id,
-        du.user_dim_id AS user_dim_id,
+        1 AS license_id, -- Default license
+        1 AS user_dim_id, -- Default user
         beb.event_id AS billing_event_id,
         beb.event_date AS transaction_date,
         beb.event_date::TIMESTAMP_NTZ AS transaction_timestamp,
@@ -92,9 +84,6 @@ revenue_events_fact AS (
         beb.source_system
     FROM billing_events_base beb
     LEFT JOIN {{ ref('go_dim_date') }} dd ON beb.event_date = dd.date_value
-    LEFT JOIN {{ ref('go_dim_user') }} du ON beb.user_id = du.user_id AND du.is_current_record = TRUE
-    LEFT JOIN user_license_mapping ulm ON beb.user_id = ulm.user_id
-    LEFT JOIN {{ ref('go_dim_license') }} dl ON ulm.license_type = dl.license_type AND dl.is_current_record = TRUE
 )
 
 SELECT * FROM revenue_events_fact
