@@ -10,7 +10,7 @@ WITH source_meetings AS (
         DURATION_MINUTES,
         START_TIME,
         SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_meetings') }}
+    FROM {{ source('gold_existing', 'si_meetings') }}
     WHERE VALIDATION_STATUS = 'PASSED'
       AND DURATION_MINUTES IS NOT NULL
       AND START_TIME IS NOT NULL
