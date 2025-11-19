@@ -20,13 +20,10 @@ models:
   zoom_gold_analytics:
     gold:
       +materialized: table
-      +cluster_by: ['LOAD_DATE']
       dimensional:
         +materialized: table
-        +cluster_by: ['LOAD_DATE']
       fact:
         +materialized: table
-        +cluster_by: ['LOAD_DATE']
 
 vars:
   start_date: '2020-01-01'
