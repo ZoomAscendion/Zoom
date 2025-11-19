@@ -27,7 +27,7 @@ models:
       +materialized: table
       +pre-hook: |
         {% if this.name != 'go_audit_log' %}
-          INSERT INTO {{ var('audit_schema') }}.{{ var('audit_table') }} (
+          INSERT INTO {{ target.schema }}.GO_AUDIT_LOG (
             PROCESS_ID, PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, 
             PROCESS_START_TIME, PROCESS_STATUS, LOAD_DATE, SOURCE_SYSTEM
           ) VALUES (
@@ -43,7 +43,7 @@ models:
         {% endif %}
       +post-hook: |
         {% if this.name != 'go_audit_log' %}
-          UPDATE {{ var('audit_schema') }}.{{ var('audit_table') }} 
+          UPDATE {{ target.schema }}.GO_AUDIT_LOG 
           SET PROCESS_END_TIME = CURRENT_TIMESTAMP(), 
               PROCESS_STATUS = 'COMPLETED',
               RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }})
