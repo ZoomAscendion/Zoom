@@ -1,125 +1,101 @@
-{{
-  config(
+{{ config(
     materialized='table',
-    cluster_by=['DATE_ID', 'USER_DIM_ID', 'LICENSE_ID'],
-    tags=['fact', 'gold']
-  )
-}}
+    cluster_by=['TRANSACTION_DATE', 'USER_DIM_ID'],
+    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_ID, PROCESS_NAME, PROCESS_TYPE, PROCESS_START_TIMESTAMP, PROCESS_STATUS, SOURCE_TABLE, TARGET_TABLE, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, SOURCE_SYSTEM) VALUES ('{{ dbt_utils.generate_surrogate_key(["'go_fact_revenue_events'", "CURRENT_TIMESTAMP()"]) }}', 'GO_FACT_REVENUE_EVENTS_LOAD', 'FACT_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_BILLING_EVENTS', 'GO_FACT_REVENUE_EVENTS', 'DBT_MODEL_RUN', 'DBT_USER', CURRENT_DATE(), 'DBT_GOLD_LAYER')",
+    post_hook="UPDATE {{ ref('go_audit_log') }} SET PROCESS_END_TIMESTAMP = CURRENT_TIMESTAMP(), PROCESS_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}), DATA_QUALITY_SCORE = 90.0 WHERE PROCESS_ID = '{{ dbt_utils.generate_surrogate_key(["'go_fact_revenue_events'", "CURRENT_TIMESTAMP()"]) }}'"
+) }}
 
--- Revenue Events Fact Table
--- Captures detailed billing events and revenue metrics with dimensional relationships
+-- Revenue events fact table with financial metrics
+-- Tracks billing events, subscriptions, and revenue attribution
 
-WITH billing_events_base AS (
+WITH source_billing AS (
     SELECT 
         EVENT_ID,
         USER_ID,
-        COALESCE(EVENT_TYPE, 'Unknown') AS EVENT_TYPE,
-        COALESCE(AMOUNT, 0) AS AMOUNT,
+        EVENT_TYPE,
+        AMOUNT,
         EVENT_DATE,
-        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
+        SOURCE_SYSTEM
     FROM {{ source('silver', 'si_billing_events') }}
-    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
+    WHERE VALIDATION_STATUS = 'PASSED'
+      AND EVENT_ID IS NOT NULL
+      AND USER_ID IS NOT NULL
 ),
 
-user_license_mapping AS (
+source_licenses AS (
     SELECT 
-        ASSIGNED_TO_USER_ID AS USER_ID,
-        COALESCE(LICENSE_TYPE, 'Unknown') AS LICENSE_TYPE,
-        START_DATE,
-        END_DATE
+        ASSIGNED_TO_USER_ID,
+        LICENSE_TYPE
     FROM {{ source('silver', 'si_licenses') }}
-    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
+    WHERE VALIDATION_STATUS = 'PASSED'
 ),
 
-revenue_events_facts AS (
+revenue_events_fact AS (
     SELECT 
-        -- Surrogate Key
-        {{ dbt_utils.generate_surrogate_key(['beb.EVENT_ID']) }} AS REVENUE_EVENT_ID,
-        
-        -- Foreign Keys
-        COALESCE(dd.DATE_ID, 1) AS DATE_ID,
-        COALESCE(dl.LICENSE_ID, 1) AS LICENSE_ID,
-        COALESCE(du.USER_DIM_ID, '1') AS USER_DIM_ID,
-        
-        -- Event Information
-        beb.EVENT_ID AS BILLING_EVENT_ID,
-        COALESCE(beb.EVENT_DATE, CURRENT_DATE()) AS TRANSACTION_DATE,
-        COALESCE(beb.EVENT_DATE, CURRENT_DATE())::TIMESTAMP_NTZ AS TRANSACTION_TIMESTAMP,
-        beb.EVENT_TYPE,
-        
-        -- Revenue Classification
+        ROW_NUMBER() OVER (ORDER BY be.EVENT_ID) AS REVENUE_EVENT_ID,
+        dd.DATE_ID,
+        dl.LICENSE_ID,
+        du.USER_DIM_ID,
+        be.EVENT_ID AS BILLING_EVENT_ID,
+        be.EVENT_DATE AS TRANSACTION_DATE,
+        be.EVENT_DATE::TIMESTAMP_NTZ AS TRANSACTION_TIMESTAMP,
+        be.EVENT_TYPE,
         CASE 
-            WHEN UPPER(beb.EVENT_TYPE) IN ('SUBSCRIPTION', 'RENEWAL', 'UPGRADE') THEN 'Recurring'
-            WHEN UPPER(beb.EVENT_TYPE) IN ('ONE_TIME', 'SETUP_FEE') THEN 'One-time'
+            WHEN be.EVENT_TYPE IN ('Subscription', 'Renewal', 'Upgrade') THEN 'Recurring'
+            WHEN be.EVENT_TYPE IN ('One-time Purchase', 'Setup Fee') THEN 'One-time'
             ELSE 'Other'
         END AS REVENUE_TYPE,
-        
-        -- Financial Metrics
-        beb.AMOUNT AS GROSS_AMOUNT,
-        beb.AMOUNT * 0.08 AS TAX_AMOUNT, -- Assuming 8% tax rate
-        0.00 AS DISCOUNT_AMOUNT, -- Default value
-        beb.AMOUNT * 0.92 AS NET_AMOUNT, -- After tax
+        be.AMOUNT AS GROSS_AMOUNT,
+        be.AMOUNT * 0.08 AS TAX_AMOUNT,
+        0.00 AS DISCOUNT_AMOUNT,
+        be.AMOUNT * 0.92 AS NET_AMOUNT,
         'USD' AS CURRENCY_CODE,
         1.0 AS EXCHANGE_RATE,
-        beb.AMOUNT AS USD_AMOUNT,
-        
-        -- Payment Information
-        'Credit Card' AS PAYMENT_METHOD, -- Default value
-        12 AS SUBSCRIPTION_PERIOD_MONTHS, -- Default annual subscription
-        1 AS LICENSE_QUANTITY, -- Default quantity
-        0.00 AS PRORATION_AMOUNT, -- Default value
-        beb.AMOUNT * 0.05 AS COMMISSION_AMOUNT, -- Assuming 5% commission
-        
-        -- Revenue Impact Calculations
+        be.AMOUNT AS USD_AMOUNT,
+        'Credit Card' AS PAYMENT_METHOD,
         CASE 
-            WHEN UPPER(beb.EVENT_TYPE) IN ('SUBSCRIPTION', 'RENEWAL', 'UPGRADE') THEN beb.AMOUNT / 12
+            WHEN be.EVENT_TYPE IN ('Subscription', 'Renewal') THEN 12
+            ELSE 0
+        END AS SUBSCRIPTION_PERIOD_MONTHS,
+        1 AS LICENSE_QUANTITY,
+        0.00 AS PRORATION_AMOUNT,
+        be.AMOUNT * 0.05 AS COMMISSION_AMOUNT,
+        CASE 
+            WHEN be.EVENT_TYPE IN ('Subscription', 'Renewal', 'Upgrade') THEN be.AMOUNT / 12
             ELSE 0
         END AS MRR_IMPACT,
-        
         CASE 
-            WHEN UPPER(beb.EVENT_TYPE) IN ('SUBSCRIPTION', 'RENEWAL', 'UPGRADE') THEN beb.AMOUNT
+            WHEN be.EVENT_TYPE IN ('Subscription', 'Renewal', 'Upgrade') THEN be.AMOUNT
             ELSE 0
         END AS ARR_IMPACT,
-        
-        -- Customer Metrics
-        beb.AMOUNT * 5 AS CUSTOMER_LIFETIME_VALUE, -- Estimated CLV multiplier
-        
-        -- Churn Risk Score
+        be.AMOUNT * 5 AS CUSTOMER_LIFETIME_VALUE,
         CASE 
-            WHEN UPPER(beb.EVENT_TYPE) = 'DOWNGRADE' THEN 4.0
-            WHEN UPPER(beb.EVENT_TYPE) = 'REFUND' THEN 3.5
-            WHEN DATEDIFF('day', COALESCE(beb.EVENT_DATE, CURRENT_DATE()), CURRENT_DATE()) > 90 
-                 AND UPPER(beb.EVENT_TYPE) = 'SUBSCRIPTION' THEN 3.0
-            WHEN beb.AMOUNT < 0 THEN 2.5
+            WHEN be.EVENT_TYPE = 'Downgrade' THEN 4.0
+            WHEN be.EVENT_TYPE = 'Refund' THEN 3.5
+            WHEN DATEDIFF('day', be.EVENT_DATE, CURRENT_DATE()) > 90 AND be.EVENT_TYPE = 'Subscription' THEN 3.0
+            WHEN be.AMOUNT < 0 THEN 2.5
             ELSE 1.0
         END AS CHURN_RISK_SCORE,
-        
-        -- Payment Status
         CASE 
-            WHEN UPPER(beb.EVENT_TYPE) = 'REFUND' THEN 'Refunded'
-            WHEN beb.AMOUNT > 0 THEN 'Successful'
-            WHEN beb.AMOUNT = 0 THEN 'Pending'
+            WHEN be.EVENT_TYPE = 'Refund' THEN 'Refunded'
+            WHEN be.AMOUNT > 0 THEN 'Successful'
+            WHEN be.AMOUNT = 0 THEN 'Pending'
             ELSE 'Failed'
         END AS PAYMENT_STATUS,
-        
-        -- Additional Attributes
         CASE 
-            WHEN UPPER(beb.EVENT_TYPE) = 'REFUND' THEN 'Customer Request'
+            WHEN be.EVENT_TYPE = 'Refund' THEN 'Customer Request'
             ELSE NULL
         END AS REFUND_REASON,
-        
-        'Online' AS SALES_CHANNEL, -- Default value
-        NULL AS PROMOTION_CODE, -- Default value
-        
-        -- Metadata
+        'Online' AS SALES_CHANNEL,
+        NULL AS PROMOTION_CODE,
         CURRENT_DATE() AS LOAD_DATE,
         CURRENT_DATE() AS UPDATE_DATE,
-        beb.SOURCE_SYSTEM
-    FROM billing_events_base beb
-    LEFT JOIN {{ ref('go_dim_date') }} dd ON COALESCE(beb.EVENT_DATE, CURRENT_DATE()) = dd.DATE_VALUE
-    LEFT JOIN {{ ref('go_dim_user') }} du ON beb.USER_ID = du.USER_ID AND du.IS_CURRENT_RECORD = TRUE
-    LEFT JOIN user_license_mapping ulm ON beb.USER_ID = ulm.USER_ID
-    LEFT JOIN {{ ref('go_dim_license') }} dl ON ulm.LICENSE_TYPE = dl.LICENSE_TYPE AND dl.IS_CURRENT_RECORD = TRUE
+        be.SOURCE_SYSTEM
+    FROM source_billing be
+    LEFT JOIN {{ ref('go_dim_date') }} dd ON be.EVENT_DATE = dd.DATE_VALUE
+    LEFT JOIN {{ ref('go_dim_user') }} du ON be.USER_ID = du.USER_ID AND du.IS_CURRENT_RECORD = TRUE
+    LEFT JOIN source_licenses sl ON be.USER_ID = sl.ASSIGNED_TO_USER_ID
+    LEFT JOIN {{ ref('go_dim_license') }} dl ON sl.LICENSE_TYPE = dl.LICENSE_TYPE AND dl.IS_CURRENT_RECORD = TRUE
 )
 
-SELECT * FROM revenue_events_facts
+SELECT * FROM revenue_events_fact
