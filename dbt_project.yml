@@ -1,8 +1,8 @@
-name: 'zoom_gold_analytics'
+name: 'zoom_gold_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_gold_analytics'
+profile: 'zoom_gold_pipeline'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,14 +17,34 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_gold_analytics:
+  zoom_gold_pipeline:
     gold:
       +materialized: table
-      dimensional:
-        +materialized: table
-      fact:
-        +materialized: table
-
-vars:
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
+      +pre-hook: |
+        {% if this.name != 'go_process_audit' %}
+        INSERT INTO {{ ref('go_process_audit') }} (
+          PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, 
+          EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME,
+          LOAD_DATE, SOURCE_SYSTEM
+        )
+        VALUES (
+          '{{ this.name }}', 'DBT_MODEL', CURRENT_TIMESTAMP(),
+          'RUNNING', 'SILVER_LAYER', '{{ this.name }}',
+          CURRENT_DATE(), 'DBT_GOLD_PIPELINE'
+        )
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'go_process_audit' %}
+        UPDATE {{ ref('go_process_audit') }}
+        SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(),
+            EXECUTION_STATUS = 'SUCCESS',
+            RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
+            UPDATE_DATE = CURRENT_DATE()
+        WHERE PROCESS_NAME = '{{ this.name }}'
+          AND EXECUTION_STATUS = 'RUNNING'
+          AND EXECUTION_START_TIMESTAMP = (
+            SELECT MAX(EXECUTION_START_TIMESTAMP)
+            FROM {{ ref('go_process_audit') }}
+            WHERE PROCESS_NAME = '{{ this.name }}'
+          )
+        {% endif %}
