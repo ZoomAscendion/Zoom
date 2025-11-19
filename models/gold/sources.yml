@@ -1,0 +1,127 @@
+version: 2
+
+sources:
+  - name: silver
+    description: "Silver layer tables containing cleaned and validated data"
+    database: DB_POC_ZOOM
+    schema: SILVER
+    tables:
+      - name: si_users
+        description: "Silver layer user data with cleaned and standardized information"
+        columns:
+          - name: user_id
+            description: "Unique identifier for each user"
+          - name: user_name
+            description: "Display name of the user"
+          - name: email
+            description: "Email address of the user"
+          - name: company
+            description: "Company or organization name"
+          - name: plan_type
+            description: "Subscription plan type"
+          - name: load_timestamp
+            description: "Timestamp when record was loaded"
+          - name: validation_status
+            description: "Status of data validation"
+          - name: source_system
+            description: "Source system identifier"
+            
+      - name: si_meetings
+        description: "Silver layer meeting data with session details"
+        columns:
+          - name: meeting_id
+            description: "Unique identifier for each meeting"
+          - name: host_id
+            description: "User ID of the meeting host"
+          - name: meeting_topic
+            description: "Topic or title of the meeting"
+          - name: start_time
+            description: "Meeting start timestamp"
+          - name: end_time
+            description: "Meeting end timestamp"
+          - name: duration_minutes
+            description: "Meeting duration in minutes"
+          - name: validation_status
+            description: "Status of data validation"
+          - name: source_system
+            description: "Source system identifier"
+            
+      - name: si_participants
+        description: "Silver layer participant data"
+        columns:
+          - name: participant_id
+            description: "Unique identifier for each participant"
+          - name: meeting_id
+            description: "Reference to meeting"
+          - name: user_id
+            description: "Reference to user who participated"
+          - name: join_time
+            description: "Timestamp when participant joined"
+          - name: leave_time
+            description: "Timestamp when participant left"
+          - name: validation_status
+            description: "Status of data validation"
+            
+      - name: si_feature_usage
+        description: "Silver layer feature usage data"
+        columns:
+          - name: usage_id
+            description: "Unique identifier for each usage record"
+          - name: meeting_id
+            description: "Reference to meeting where feature was used"
+          - name: feature_name
+            description: "Name of the feature being tracked"
+          - name: usage_count
+            description: "Number of times feature was used"
+          - name: usage_date
+            description: "Date when feature usage occurred"
+          - name: validation_status
+            description: "Status of data validation"
+            
+      - name: si_support_tickets
+        description: "Silver layer support ticket data"
+        columns:
+          - name: ticket_id
+            description: "Unique identifier for each support ticket"
+          - name: user_id
+            description: "Reference to user who created the ticket"
+          - name: ticket_type
+            description: "Type of support ticket"
+          - name: resolution_status
+            description: "Current status of ticket resolution"
+          - name: open_date
+            description: "Date when ticket was opened"
+          - name: validation_status
+            description: "Status of data validation"
+            
+      - name: si_billing_events
+        description: "Silver layer billing event data"
+        columns:
+          - name: event_id
+            description: "Unique identifier for each billing event"
+          - name: user_id
+            description: "Reference to user associated with billing event"
+          - name: event_type
+            description: "Type of billing event"
+          - name: amount
+            description: "Monetary amount for the billing event"
+          - name: event_date
+            description: "Date when the billing event occurred"
+          - name: validation_status
+            description: "Status of data validation"
+            
+      - name: si_licenses
+        description: "Silver layer license data"
+        columns:
+          - name: license_id
+            description: "Unique identifier for each license"
+          - name: license_type
+            description: "Type of license"
+          - name: assigned_to_user_id
+            description: "User ID to whom license is assigned"
+          - name: start_date
+            description: "License validity start date"
+          - name: end_date
+            description: "License validity end date"
+          - name: validation_status
+            description: "Status of data validation"
