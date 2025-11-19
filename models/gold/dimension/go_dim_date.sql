@@ -15,6 +15,7 @@ WITH date_spine AS (
 
 date_dimension AS (
     SELECT
+        ROW_NUMBER() OVER (ORDER BY date_day) AS date_id,
         date_day AS date_value,
         EXTRACT(YEAR FROM date_day) AS year,
         EXTRACT(QUARTER FROM date_day) AS quarter,
