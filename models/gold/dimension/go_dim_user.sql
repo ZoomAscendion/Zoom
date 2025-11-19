@@ -2,9 +2,7 @@
   config(
     materialized='table',
     cluster_by=['USER_DIM_ID', 'EFFECTIVE_START_DATE'],
-    tags=['dimension', 'gold'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT '{{ dbt_utils.generate_surrogate_key(['go_dim_user', run_started_at]) }}', 'go_dim_user', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_USERS', 'GO_DIM_USER', 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_LAYER'",
-    post_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_END_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, RECORDS_PROCESSED, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT '{{ dbt_utils.generate_surrogate_key(['go_dim_user_complete', run_started_at]) }}', 'go_dim_user', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 'SUCCESS', 'SI_USERS', 'GO_DIM_USER', (SELECT COUNT(*) FROM {{ this }}), 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), CURRENT_DATE(), 'DBT_GOLD_LAYER'"
+    tags=['dimension', 'gold']
   )
 }}
 
@@ -24,7 +22,7 @@ WITH source_data AS (
         DATA_QUALITY_SCORE,
         VALIDATION_STATUS
     FROM {{ source('silver', 'si_users') }}
-    WHERE VALIDATION_STATUS = 'PASSED'
+    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
 ),
 
 transformed_data AS (
@@ -40,24 +38,24 @@ transformed_data AS (
         
         -- Plan Type Standardization
         CASE 
-            WHEN UPPER(PLAN_TYPE) IN ('FREE', 'BASIC') THEN 'Basic'
-            WHEN UPPER(PLAN_TYPE) IN ('PRO', 'PROFESSIONAL') THEN 'Pro'
-            WHEN UPPER(PLAN_TYPE) IN ('BUSINESS', 'ENTERPRISE') THEN 'Enterprise'
+            WHEN UPPER(COALESCE(PLAN_TYPE, 'FREE')) IN ('FREE', 'BASIC') THEN 'Basic'
+            WHEN UPPER(COALESCE(PLAN_TYPE, 'FREE')) IN ('PRO', 'PROFESSIONAL') THEN 'Pro'
+            WHEN UPPER(COALESCE(PLAN_TYPE, 'FREE')) IN ('BUSINESS', 'ENTERPRISE') THEN 'Enterprise'
             ELSE 'Unknown'
         END AS PLAN_TYPE,
         
         -- Plan Category
         CASE 
-            WHEN UPPER(PLAN_TYPE) = 'FREE' THEN 'Free'
+            WHEN UPPER(COALESCE(PLAN_TYPE, 'FREE')) = 'FREE' THEN 'Free'
             ELSE 'Paid'
         END AS PLAN_CATEGORY,
         
         -- Registration Date
-        LOAD_DATE AS REGISTRATION_DATE,
+        COALESCE(LOAD_DATE, CURRENT_DATE()) AS REGISTRATION_DATE,
         
         -- User Status
         CASE 
-            WHEN VALIDATION_STATUS = 'PASSED' THEN 'Active'
+            WHEN COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED' THEN 'Active'
             ELSE 'Inactive'
         END AS USER_STATUS,
         
@@ -81,7 +79,7 @@ transformed_data AS (
         
         -- Account Type
         CASE 
-            WHEN UPPER(PLAN_TYPE) = 'FREE' THEN 'Individual'
+            WHEN UPPER(COALESCE(PLAN_TYPE, 'FREE')) = 'FREE' THEN 'Individual'
             ELSE 'Business'
         END AS ACCOUNT_TYPE,
         
@@ -96,7 +94,7 @@ transformed_data AS (
         -- Metadata
         CURRENT_DATE() AS LOAD_DATE,
         CURRENT_DATE() AS UPDATE_DATE,
-        SOURCE_SYSTEM
+        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
     FROM source_data
 )
 
