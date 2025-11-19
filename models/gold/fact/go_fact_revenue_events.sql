@@ -1,18 +1,29 @@
 {{ config(
     materialized='table',
-    tags=['fact', 'gold'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (AUDIT_LOG_ID, PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, RECORDS_READ, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, UPDATE_DATE, SOURCE_SYSTEM) SELECT '{{ dbt_utils.generate_surrogate_key([\"'GO_FACT_REVENUE_EVENTS'\", 'CURRENT_TIMESTAMP()']) }}', 'GO_FACT_REVENUE_EVENTS_LOAD', 'FACT_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_BILLING_EVENTS', 'GO_FACT_REVENUE_EVENTS', (SELECT COUNT(*) FROM {{ source('silver', 'si_billing_events') }}), 'DBT_PIPELINE', 'DBT_SYSTEM', CURRENT_DATE, CURRENT_DATE, 'DBT_GOLD_PIPELINE'",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(), EXECUTION_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), RECORDS_INSERTED = (SELECT COUNT(*) FROM {{ this }}) WHERE PROCESS_NAME = 'GO_FACT_REVENUE_EVENTS_LOAD' AND EXECUTION_STATUS = 'RUNNING'"
+    tags=['fact', 'gold']
 ) }}
 
 -- Gold Fact: Revenue Events Fact Table
 -- Detailed billing events and revenue metrics
 
+WITH billing_base AS (
+    SELECT 
+        be.EVENT_ID,
+        be.USER_ID,
+        be.EVENT_DATE,
+        COALESCE(be.EVENT_TYPE, 'Unknown Event') AS EVENT_TYPE,
+        COALESCE(be.AMOUNT, 0) AS AMOUNT,
+        COALESCE(be.SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
+    FROM {{ source('silver', 'si_billing_events') }} be
+    WHERE COALESCE(be.VALIDATION_STATUS, 'UNKNOWN') != 'FAILED'
+      AND be.EVENT_ID IS NOT NULL
+)
+
 SELECT 
     ROW_NUMBER() OVER (ORDER BY be.EVENT_ID) AS REVENUE_EVENT_ID,
-    dd.DATE_ID,
-    dl.LICENSE_ID,
-    du.USER_DIM_ID,
+    COALESCE(dd.DATE_ID, 1) AS DATE_ID,
+    COALESCE(dl.LICENSE_ID, 1) AS LICENSE_ID,
+    COALESCE(du.USER_DIM_ID, 1) AS USER_DIM_ID,
     be.EVENT_ID AS BILLING_EVENT_ID,
     be.EVENT_DATE AS TRANSACTION_DATE,
     be.EVENT_DATE::TIMESTAMP_NTZ AS TRANSACTION_TIMESTAMP,
@@ -65,9 +76,8 @@ SELECT
     CURRENT_DATE AS LOAD_DATE,
     CURRENT_DATE AS UPDATE_DATE,
     be.SOURCE_SYSTEM
-FROM {{ source('silver', 'si_billing_events') }} be
+FROM billing_base be
 LEFT JOIN {{ ref('go_dim_user') }} du ON be.USER_ID = du.USER_ID AND du.IS_CURRENT_RECORD = TRUE
 LEFT JOIN {{ ref('go_dim_date') }} dd ON be.EVENT_DATE = dd.DATE_VALUE
 LEFT JOIN {{ source('silver', 'si_licenses') }} sl ON be.USER_ID = sl.ASSIGNED_TO_USER_ID
 LEFT JOIN {{ ref('go_dim_license') }} dl ON sl.LICENSE_TYPE = dl.LICENSE_TYPE AND dl.IS_CURRENT_RECORD = TRUE
-WHERE be.VALIDATION_STATUS = 'PASSED'
