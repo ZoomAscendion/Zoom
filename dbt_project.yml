@@ -16,30 +16,37 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+vars:
+  audit_schema: "GOLD"
+  audit_table: "GO_AUDIT_LOG"
+  source_system: "SILVER_TO_GOLD_ETL"
+
 models:
   zoom_gold_pipeline:
     gold:
       +materialized: table
       +pre-hook: |
-        {% if this.name != 'go_process_audit' %}
-        INSERT INTO {{ target.database }}.{{ target.schema }}.go_process_audit (
-          PROCESS_NAME, PROCESS_TYPE, EXECUTION_START_TIMESTAMP, 
-          EXECUTION_STATUS, SOURCE_TABLE_NAME, TARGET_TABLE_NAME,
-          LOAD_DATE, SOURCE_SYSTEM
-        )
-        VALUES (
-          '{{ this.name }}', 'DBT_MODEL', CURRENT_TIMESTAMP(),
-          'RUNNING', 'SILVER_LAYER', '{{ this.name }}',
-          CURRENT_DATE(), 'DBT_GOLD_PIPELINE'
-        )
+        {% if this.name != 'go_audit_log' %}
+          INSERT INTO {{ var('audit_schema') }}.{{ var('audit_table') }} (
+            PROCESS_ID, PROCESS_NAME, SOURCE_TABLE, TARGET_TABLE, 
+            PROCESS_START_TIME, PROCESS_STATUS, LOAD_DATE, SOURCE_SYSTEM
+          ) VALUES (
+            '{{ invocation_id }}', 
+            '{{ this.name }}', 
+            'SILVER', 
+            '{{ this.name }}', 
+            CURRENT_TIMESTAMP(), 
+            'STARTED', 
+            CURRENT_DATE(), 
+            '{{ var('source_system') }}'
+          )
         {% endif %}
       +post-hook: |
-        {% if this.name != 'go_process_audit' %}
-        UPDATE {{ target.database }}.{{ target.schema }}.go_process_audit
-        SET EXECUTION_END_TIMESTAMP = CURRENT_TIMESTAMP(),
-            EXECUTION_STATUS = 'SUCCESS',
-            RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}),
-            UPDATE_DATE = CURRENT_DATE()
-        WHERE PROCESS_NAME = '{{ this.name }}'
-          AND EXECUTION_STATUS = 'RUNNING'
+        {% if this.name != 'go_audit_log' %}
+          UPDATE {{ var('audit_schema') }}.{{ var('audit_table') }} 
+          SET PROCESS_END_TIME = CURRENT_TIMESTAMP(), 
+              PROCESS_STATUS = 'COMPLETED',
+              RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }})
+          WHERE PROCESS_ID = '{{ invocation_id }}' 
+            AND PROCESS_NAME = '{{ this.name }}'
         {% endif %}
