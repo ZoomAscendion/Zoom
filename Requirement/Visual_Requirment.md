@@ -23,7 +23,7 @@ This keeps the report lightweight and simple.
 2.Data Model ( Ensure that we use the fact table "Fact Meeting Acitivty" and 
 dimension tables "Meetings" , "Users" and "Dates" )
 
-3.KPIS needed are:
+3.KPI's needed are:
 
 Total Number of users
 
