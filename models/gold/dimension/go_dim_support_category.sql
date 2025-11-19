@@ -7,15 +7,16 @@
 -- Support category dimension transformation from Silver layer
 WITH support_source AS (
     SELECT DISTINCT
-        ticket_type,
-        source_system
-    FROM {{ source('silver', 'si_support_tickets') }}
+        COALESCE(ticket_type, 'General') AS ticket_type,
+        COALESCE(source_system, 'UNKNOWN') AS source_system
+    FROM {{ source('gold', 'si_support_tickets') }}
     WHERE validation_status = 'PASSED'
       AND ticket_type IS NOT NULL
 ),
 
 support_category_transformed AS (
     SELECT
+        ROW_NUMBER() OVER (ORDER BY ticket_type) AS support_category_id,
         {{ dbt_utils.generate_surrogate_key(['ticket_type']) }} AS support_category_key,
         INITCAP(TRIM(ticket_type)) AS support_category,
         CASE 
