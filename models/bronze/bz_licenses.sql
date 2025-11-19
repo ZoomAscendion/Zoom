@@ -1,7 +1,6 @@
 -- Bronze Layer Licenses Table
 -- Description: Manages license assignments and entitlements
 -- Author: Data Engineering Team
--- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
