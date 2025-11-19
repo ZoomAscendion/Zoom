@@ -15,7 +15,7 @@ WITH source_meetings AS (
         m.DURATION_MINUTES,
         m.SOURCE_SYSTEM,
         m.DATA_QUALITY_SCORE
-    FROM {{ source('silver', 'si_meetings') }} m
+    FROM {{ source('gold_existing', 'si_meetings') }} m
     WHERE m.VALIDATION_STATUS = 'PASSED'
       AND m.DATA_QUALITY_SCORE >= 70
 ),
@@ -29,7 +29,7 @@ participant_metrics AS (
         AVG(DATEDIFF('minute', p.JOIN_TIME, COALESCE(p.LEAVE_TIME, p.JOIN_TIME + INTERVAL '60 MINUTES'))) AS AVERAGE_PARTICIPATION_MINUTES,
         COUNT(CASE WHEN DATEDIFF('minute', sm.START_TIME, p.JOIN_TIME) > 5 THEN 1 END) AS LATE_JOINERS_COUNT,
         COUNT(CASE WHEN DATEDIFF('minute', p.LEAVE_TIME, sm.END_TIME) > 5 THEN 1 END) AS EARLY_LEAVERS_COUNT
-    FROM {{ source('silver', 'si_participants') }} p
+    FROM {{ source('gold_existing', 'si_participants') }} p
     JOIN source_meetings sm ON p.MEETING_ID = sm.MEETING_ID
     WHERE p.VALIDATION_STATUS = 'PASSED'
     GROUP BY p.MEETING_ID
@@ -42,7 +42,7 @@ feature_metrics AS (
         SUM(CASE WHEN UPPER(f.FEATURE_NAME) LIKE '%SCREEN%SHARE%' THEN f.USAGE_COUNT ELSE 0 END) AS SCREEN_SHARE_USAGE_COUNT,
         SUM(CASE WHEN UPPER(f.FEATURE_NAME) LIKE '%RECORD%' THEN f.USAGE_COUNT ELSE 0 END) AS RECORDING_USAGE_COUNT,
         SUM(CASE WHEN UPPER(f.FEATURE_NAME) LIKE '%CHAT%' THEN f.USAGE_COUNT ELSE 0 END) AS CHAT_MESSAGES_COUNT
-    FROM {{ source('silver', 'si_feature_usage') }} f
+    FROM {{ source('gold_existing', 'si_feature_usage') }} f
     WHERE f.VALIDATION_STATUS = 'PASSED'
     GROUP BY f.MEETING_ID
 ),
