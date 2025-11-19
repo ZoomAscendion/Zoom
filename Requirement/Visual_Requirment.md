@@ -7,14 +7,14 @@ This document outlines the official reporting requirements for the Zoom Platform
 1. PLATFORM USAGE & ADOPTION REPORT
 
 Business Purpose
-
 This report provides a simple overview of Zoom platform usage using meeting activity data.
 It answers three core questions:
 How many total users participated in meetings?
 How many meetings were held per user?
 What is the average meeting duration?
 This keeps the report lightweight and simple.
-Data Model (Star Schema)
+
+2.Data Model (use only one Fact and one Dimension)
 Fact Table:
 FACT_TABLE
 COLUMN 1
@@ -24,7 +24,7 @@ Dimension Tables:
 COLUMN 1
 COLUMN 2
 COLUMN 3
-Data Attributes in the Report
-User information (Number of users, meeting types, meeting topics, user names )
+
+3.Data Attributes in the Report
 Meeting information (Meeting_ID, Duration_Minutes, Start_Time)
 
