@@ -12,6 +12,7 @@ WITH feature_data AS (
     FROM {{ source('silver', 'si_feature_usage') }}
     WHERE VALIDATION_STATUS = 'PASSED'
       AND FEATURE_NAME IS NOT NULL
+      AND TRIM(FEATURE_NAME) != ''
 )
 
 SELECT 
