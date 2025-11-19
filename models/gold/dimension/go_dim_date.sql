@@ -1,14 +1,14 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (process_name, source_table, target_table, process_status, start_time, load_date, source_system) VALUES ('go_dim_date', 'SYSTEM_GENERATED', 'go_dim_date', 'STARTED', CURRENT_TIMESTAMP(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
+    post_hook="UPDATE {{ ref('go_audit_log') }} SET process_status = 'COMPLETED', end_time = CURRENT_TIMESTAMP() WHERE target_table = 'go_dim_date' AND process_status = 'STARTED'"
 ) }}
 
 -- Date dimension table for time-based analysis
--- Generates dates from 2020-01-01 to 2030-12-31
-
 WITH date_spine AS (
     SELECT 
-        DATEADD(day, ROW_NUMBER() OVER (ORDER BY 1) - 1, '{{ var("start_date") }}'::DATE) AS date_value
-    FROM TABLE(GENERATOR(ROWCOUNT => 4018))  -- 11 years of dates
+        DATEADD(day, ROW_NUMBER() OVER (ORDER BY 1) - 1, '2020-01-01'::DATE) AS date_value
+    FROM TABLE(GENERATOR(ROWCOUNT => 4018))
 ),
 
 date_dimension AS (
@@ -23,13 +23,7 @@ date_dimension AS (
         DAYOFWEEK(date_value) AS day_of_week,
         DAYNAME(date_value) AS day_name,
         CASE WHEN DAYOFWEEK(date_value) IN (1, 7) THEN TRUE ELSE FALSE END AS is_weekend,
-        CASE 
-            WHEN (MONTH(date_value) = 1 AND DAY(date_value) = 1) OR  -- New Year
-                 (MONTH(date_value) = 7 AND DAY(date_value) = 4) OR  -- Independence Day
-                 (MONTH(date_value) = 12 AND DAY(date_value) = 25)   -- Christmas
-            THEN TRUE 
-            ELSE FALSE 
-        END AS is_holiday,
+        FALSE AS is_holiday,
         CASE 
             WHEN MONTH(date_value) >= 4 THEN YEAR(date_value)
             ELSE YEAR(date_value) - 1
@@ -45,7 +39,7 @@ date_dimension AS (
         CURRENT_DATE() AS update_date,
         'SYSTEM_GENERATED' AS source_system
     FROM date_spine
-    WHERE date_value <= '{{ var("end_date") }}'::DATE
+    WHERE date_value <= '2030-12-31'::DATE
 )
 
 SELECT * FROM date_dimension
