@@ -4,16 +4,15 @@
 -- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table',
-    unique_key='record_id'
+    materialized='table'
 ) }}
 
--- Create audit table structure
+-- Create audit table with auto-increment record_id
 SELECT 
-    CAST(NULL AS NUMBER) AS record_id,
-    CAST(NULL AS VARCHAR(255)) AS source_table,
-    CAST(NULL AS TIMESTAMP_NTZ(9)) AS load_timestamp,
-    CAST(NULL AS VARCHAR(255)) AS processed_by,
-    CAST(NULL AS NUMBER(38,3)) AS processing_time,
-    CAST(NULL AS VARCHAR(50)) AS status
-WHERE 1=0  -- This ensures no data is inserted, just creates the structure
+    ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP()) AS record_id,
+    'INITIAL_SETUP' AS source_table,
+    CURRENT_TIMESTAMP() AS load_timestamp,
+    'DBT_BRONZE_PIPELINE' AS processed_by,
+    0.0 AS processing_time,
+    'SUCCESS' AS status
+WHERE FALSE  -- This ensures no data is inserted initially, just creates the structure
