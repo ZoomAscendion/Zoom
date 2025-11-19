@@ -1,11 +1,9 @@
-name: 'zoom_gold_pipeline'
+name: 'zoom_analytics_gold'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
-profile: 'zoom_gold_pipeline'
+profile: 'zoom_analytics'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -13,26 +11,13 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+target-path: "target"
+clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
-  zoom_gold_pipeline:
-    # Config indicated by + and applies to all files under models/example/
+  zoom_analytics_gold:
     gold:
       +materialized: table
-      +tags: ["gold"]
-      dimension:
-        +materialized: table
-        +tags: ["dimension", "gold"]
-      fact:
-        +materialized: table
-        +tags: ["fact", "gold"]
-
-vars:
-  # The `start_date` variable will be accessible in all resources
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
+      +on_schema_change: "fail"
