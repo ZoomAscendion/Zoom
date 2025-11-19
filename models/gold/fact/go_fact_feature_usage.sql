@@ -13,7 +13,7 @@ WITH feature_usage_base AS (
         fu.USAGE_COUNT,
         fu.USAGE_DATE,
         fu.SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_feature_usage') }} fu
+    FROM {{ ref('SI_Feature_Usage') }} fu
     WHERE fu.VALIDATION_STATUS = 'PASSED'
 ),
 
@@ -22,7 +22,7 @@ meeting_context AS (
         sm.MEETING_ID,
         sm.HOST_ID,
         sm.DURATION_MINUTES
-    FROM {{ source('silver', 'si_meetings') }} sm
+    FROM {{ ref('SI_Meetings') }} sm
     WHERE sm.VALIDATION_STATUS = 'PASSED'
 )
 
