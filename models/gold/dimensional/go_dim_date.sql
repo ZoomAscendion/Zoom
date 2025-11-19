@@ -1,8 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['DATE_VALUE', 'FISCAL_YEAR'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_ID, PROCESS_NAME, PROCESS_TYPE, PROCESS_START_TIMESTAMP, PROCESS_STATUS, SOURCE_TABLE, TARGET_TABLE, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, SOURCE_SYSTEM) VALUES ('{{ dbt_utils.generate_surrogate_key(["'go_dim_date'", "CURRENT_TIMESTAMP()"]) }}', 'GO_DIM_DATE_LOAD', 'DIMENSION_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SYSTEM_GENERATED', 'GO_DIM_DATE', 'DBT_MODEL_RUN', 'DBT_USER', CURRENT_DATE(), 'DBT_GOLD_LAYER')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET PROCESS_END_TIMESTAMP = CURRENT_TIMESTAMP(), PROCESS_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}), DATA_QUALITY_SCORE = 100.0 WHERE PROCESS_ID = '{{ dbt_utils.generate_surrogate_key(["'go_dim_date'", "CURRENT_TIMESTAMP()"]) }}'"
+    materialized='table'
 ) }}
 
 -- Date dimension table for time-based analysis
