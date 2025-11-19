@@ -7,15 +7,16 @@
 -- Feature dimension transformation from Silver layer
 WITH feature_source AS (
     SELECT DISTINCT
-        feature_name,
-        source_system
-    FROM {{ source('silver', 'si_feature_usage') }}
+        COALESCE(feature_name, 'Unknown Feature') AS feature_name,
+        COALESCE(source_system, 'UNKNOWN') AS source_system
+    FROM {{ source('gold', 'si_feature_usage') }}
     WHERE validation_status = 'PASSED'
       AND feature_name IS NOT NULL
 ),
 
 feature_transformed AS (
     SELECT
+        ROW_NUMBER() OVER (ORDER BY feature_name) AS feature_id,
         {{ dbt_utils.generate_surrogate_key(['feature_name']) }} AS feature_key,
         INITCAP(TRIM(feature_name)) AS feature_name,
         CASE 
