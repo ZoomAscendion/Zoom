@@ -1,8 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['TICKET_CREATED_DATE', 'SUPPORT_CATEGORY_ID'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_ID, PROCESS_NAME, PROCESS_TYPE, PROCESS_START_TIMESTAMP, PROCESS_STATUS, SOURCE_TABLE, TARGET_TABLE, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, SOURCE_SYSTEM) VALUES ('{{ dbt_utils.generate_surrogate_key(["'go_fact_support_metrics'", "CURRENT_TIMESTAMP()"]) }}', 'GO_FACT_SUPPORT_METRICS_LOAD', 'FACT_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_SUPPORT_TICKETS', 'GO_FACT_SUPPORT_METRICS', 'DBT_MODEL_RUN', 'DBT_USER', CURRENT_DATE(), 'DBT_GOLD_LAYER')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET PROCESS_END_TIMESTAMP = CURRENT_TIMESTAMP(), PROCESS_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}), DATA_QUALITY_SCORE = 90.0 WHERE PROCESS_ID = '{{ dbt_utils.generate_surrogate_key(["'go_fact_support_metrics'", "CURRENT_TIMESTAMP()"]) }}'"
+    materialized='table'
 ) }}
 
 -- Support metrics fact table with SLA and resolution tracking
@@ -25,9 +22,9 @@ WITH source_support AS (
 support_metrics_fact AS (
     SELECT 
         ROW_NUMBER() OVER (ORDER BY st.TICKET_ID) AS SUPPORT_METRICS_ID,
-        dd.DATE_ID,
-        dsc.SUPPORT_CATEGORY_ID,
-        du.USER_DIM_ID,
+        COALESCE(dd.DATE_ID, 1) AS DATE_ID,
+        COALESCE(dsc.SUPPORT_CATEGORY_ID, 1) AS SUPPORT_CATEGORY_ID,
+        COALESCE(du.USER_DIM_ID, 1) AS USER_DIM_ID,
         st.TICKET_ID,
         st.OPEN_DATE AS TICKET_CREATED_DATE,
         st.OPEN_DATE::TIMESTAMP_NTZ AS TICKET_CREATED_TIMESTAMP,
