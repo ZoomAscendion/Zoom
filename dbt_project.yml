@@ -1,11 +1,9 @@
-name: 'zoom_gold_layer'
+name: 'zoom_analytics_gold'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
-profile: 'zoom_gold_layer'
+profile: 'zoom_analytics'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -18,56 +16,28 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
-  zoom_gold_layer:
-    # Config indicated by + and applies to all files under models/gold/
+  zoom_analytics_gold:
+    +materialized: table
     gold:
       +materialized: table
-      +tags: ["gold"]
-      # Audit log must run first
-      go_audit_log:
-        +pre_hook: []
-        +post_hook: []
-      # Dimensions run after audit log
-      dimension:
-        +materialized: table
-        +tags: ["dimension", "gold"]
-      # Facts run after dimensions
-      fact:
-        +materialized: table
-        +tags: ["fact", "gold"]
+      +pre-hook: |
+        {% if this.name != 'go_audit_log' %}
+          INSERT INTO {{ ref('go_audit_log') }} (
+            process_name, source_table, target_table, process_status, 
+            start_time, load_date, source_system
+          ) VALUES (
+            '{{ this.name }}', 'SILVER_LAYER', '{{ this.name }}', 'STARTED', 
+            CURRENT_TIMESTAMP(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE'
+          )
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'go_audit_log' %}
+          UPDATE {{ ref('go_audit_log') }} 
+          SET process_status = 'COMPLETED', end_time = CURRENT_TIMESTAMP()
+          WHERE target_table = '{{ this.name }}' AND process_status = 'STARTED'
+        {% endif %}
 
-# Global configurations
 vars:
-  # Database and schema configurations
-  source_database: 'DB_POC_ZOOM'
-  source_schema: 'SILVER'
-  target_database: 'DB_POC_ZOOM'
-  target_schema: 'GOLD'
-  
-  # Data quality configurations
-  data_quality_threshold: 70
-  audit_retention_days: 365
-  
-  # Business rule configurations
-  fiscal_year_start_month: 4
-  default_currency: 'USD'
-  sla_default_hours: 72
-
-# Snapshot configurations
-snapshots:
-  zoom_gold_layer:
-    +target_schema: GOLD_SNAPSHOTS
-    +strategy: timestamp
-    +updated_at: UPDATE_DATE
-
-# Seeds configurations
-seeds:
-  zoom_gold_layer:
-    +schema: GOLD_REFERENCE
-
-# Test configurations
-tests:
-  +store_failures: true
-  +schema: GOLD_TEST_RESULTS
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
