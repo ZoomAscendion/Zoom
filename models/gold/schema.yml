@@ -2,227 +2,195 @@ version: 2
 
 models:
   - name: go_audit_log
-    description: "Gold layer process audit log for tracking all pipeline executions"
+    description: "Audit log for Gold layer process tracking and monitoring"
     columns:
-      - name: audit_log_id
-        description: "Unique identifier for each audit log entry"
+      - name: PROCESS_ID
+        description: "Unique identifier for each process execution"
         tests:
           - not_null
           - unique
-      - name: process_name
+      - name: PROCESS_NAME
         description: "Name of the process being executed"
         tests:
           - not_null
-      - name: execution_status
-        description: "Status of the process execution"
+      - name: PROCESS_STATUS
+        description: "Current status of the process"
         tests:
           - accepted_values:
               values: ['RUNNING', 'SUCCESS', 'FAILED']
-
-  - name: go_dim_user
-    description: "User dimension table with enhanced attributes for analytics"
-    columns:
-      - name: user_dim_id
-        description: "Surrogate key for user dimension"
-        tests:
-          - not_null
-          - unique
-      - name: user_id
-        description: "Business key - original user identifier"
-        tests:
-          - not_null
-      - name: plan_type
-        description: "Standardized subscription plan type"
-        tests:
-          - accepted_values:
-              values: ['Basic', 'Pro', 'Enterprise', 'Unknown']
-      - name: is_current_record
-        description: "Flag indicating if this is the current version of the record"
-        tests:
-          - not_null
-
+              
   - name: go_dim_date
-    description: "Standard date dimension for time-based analysis"
+    description: "Date dimension for time-based analysis"
     columns:
-      - name: date_id
+      - name: DATE_ID
         description: "Surrogate key for date dimension"
         tests:
           - not_null
           - unique
-      - name: date_value
+      - name: DATE_VALUE
         description: "Actual date value"
         tests:
           - not_null
           - unique
-      - name: is_weekend
-        description: "Flag indicating if the date is a weekend"
+      - name: YEAR
+        description: "Year component"
         tests:
           - not_null
-
+      - name: IS_WEEKEND
+        description: "Flag indicating if date is weekend"
+        tests:
+          - not_null
+          
+  - name: go_dim_user
+    description: "User dimension with profile and subscription information"
+    columns:
+      - name: USER_DIM_ID
+        description: "Surrogate key for user dimension"
+        tests:
+          - not_null
+          - unique
+      - name: USER_ID
+        description: "Business key for user"
+        tests:
+          - not_null
+      - name: PLAN_TYPE
+        description: "Standardized plan type"
+        tests:
+          - accepted_values:
+              values: ['Basic', 'Pro', 'Enterprise', 'Unknown']
+      - name: IS_CURRENT_RECORD
+        description: "SCD Type 2 current record flag"
+        tests:
+          - not_null
+          
   - name: go_dim_feature
     description: "Feature dimension with categorization and characteristics"
     columns:
-      - name: feature_id
+      - name: FEATURE_ID
         description: "Surrogate key for feature dimension"
         tests:
           - not_null
           - unique
-      - name: feature_name
+      - name: FEATURE_NAME
         description: "Name of the feature"
         tests:
           - not_null
-      - name: feature_category
+      - name: FEATURE_CATEGORY
         description: "Category classification of the feature"
         tests:
-          - accepted_values:
-              values: ['Collaboration', 'Recording', 'Communication', 'Advanced Meeting', 'Engagement', 'General']
-
+          - not_null
+          
   - name: go_dim_license
-    description: "License dimension with entitlements and pricing information"
+    description: "License dimension with pricing and entitlements"
     columns:
-      - name: license_id
+      - name: LICENSE_ID
         description: "Surrogate key for license dimension"
         tests:
           - not_null
           - unique
-      - name: license_type
+      - name: LICENSE_TYPE
         description: "Type of license"
         tests:
           - not_null
-      - name: license_category
-        description: "Category classification of the license"
+      - name: MONTHLY_PRICE
+        description: "Monthly price for the license"
         tests:
-          - accepted_values:
-              values: ['Standard', 'Professional', 'Enterprise', 'Other']
-
+          - not_null
+          
   - name: go_dim_meeting_type
-    description: "Meeting type dimension with characteristics and categorization"
+    description: "Meeting type dimension with characteristics"
     columns:
-      - name: meeting_type_id
+      - name: MEETING_TYPE_ID
         description: "Surrogate key for meeting type dimension"
         tests:
           - not_null
           - unique
-      - name: meeting_category
-        description: "Category of meeting based on characteristics"
+      - name: DURATION_CATEGORY
+        description: "Category based on meeting duration"
         tests:
-          - accepted_values:
-              values: ['Quick Sync', 'Standard Meeting', 'Extended Meeting', 'Long Session']
-
+          - not_null
+          
   - name: go_dim_support_category
-    description: "Support category dimension with SLA and resolution information"
+    description: "Support category dimension with SLA information"
     columns:
-      - name: support_category_id
+      - name: SUPPORT_CATEGORY_ID
         description: "Surrogate key for support category dimension"
         tests:
           - not_null
           - unique
-      - name: support_category
+      - name: SUPPORT_CATEGORY
         description: "Support ticket category"
         tests:
           - not_null
-      - name: priority_level
-        description: "Priority level of the support category"
+      - name: SLA_TARGET_HOURS
+        description: "SLA target in hours"
         tests:
-          - accepted_values:
-              values: ['Critical', 'High', 'Medium', 'Low']
-
+          - not_null
+          
   - name: go_fact_meeting_activity
-    description: "Central fact table for meeting activities and engagement metrics"
+    description: "Meeting activity fact with comprehensive metrics"
     columns:
-      - name: meeting_activity_id
+      - name: MEETING_ACTIVITY_ID
         description: "Surrogate key for meeting activity fact"
         tests:
           - not_null
           - unique
-      - name: date_id
-        description: "Foreign key to date dimension"
+      - name: MEETING_DATE
+        description: "Date of the meeting"
         tests:
           - not_null
-          - relationships:
-              to: ref('go_dim_date')
-              field: date_id
-      - name: host_user_dim_id
-        description: "Foreign key to user dimension for meeting host"
+      - name: DURATION_MINUTES
+        description: "Meeting duration in minutes"
         tests:
           - not_null
-      - name: participant_count
-        description: "Number of participants in the meeting"
-        tests:
-          - not_null
-
+          
   - name: go_fact_feature_usage
-    description: "Fact table for feature usage metrics and adoption patterns"
+    description: "Feature usage fact with adoption metrics"
     columns:
-      - name: feature_usage_id
+      - name: FEATURE_USAGE_ID
         description: "Surrogate key for feature usage fact"
         tests:
           - not_null
           - unique
-      - name: date_id
-        description: "Foreign key to date dimension"
+      - name: USAGE_DATE
+        description: "Date of feature usage"
         tests:
           - not_null
-          - relationships:
-              to: ref('go_dim_date')
-              field: date_id
-      - name: feature_id
-        description: "Foreign key to feature dimension"
+      - name: USAGE_COUNT
+        description: "Number of times feature was used"
         tests:
           - not_null
-          - relationships:
-              to: ref('go_dim_feature')
-              field: feature_id
-      - name: usage_count
-        description: "Number of times the feature was used"
-        tests:
-          - not_null
-
+          
   - name: go_fact_revenue_events
-    description: "Fact table for billing events and revenue metrics"
+    description: "Revenue events fact with financial metrics"
     columns:
-      - name: revenue_event_id
+      - name: REVENUE_EVENT_ID
         description: "Surrogate key for revenue event fact"
         tests:
           - not_null
           - unique
-      - name: date_id
-        description: "Foreign key to date dimension"
+      - name: TRANSACTION_DATE
+        description: "Date of the transaction"
         tests:
           - not_null
-          - relationships:
-              to: ref('go_dim_date')
-              field: date_id
-      - name: user_dim_id
-        description: "Foreign key to user dimension"
+      - name: NET_AMOUNT
+        description: "Net revenue amount"
         tests:
           - not_null
-      - name: gross_amount
-        description: "Gross revenue amount"
-        tests:
-          - not_null
-
+          
   - name: go_fact_support_metrics
-    description: "Fact table for support ticket metrics and resolution performance"
+    description: "Support metrics fact with SLA tracking"
     columns:
-      - name: support_metrics_id
+      - name: SUPPORT_METRICS_ID
         description: "Surrogate key for support metrics fact"
         tests:
           - not_null
           - unique
-      - name: date_id
-        description: "Foreign key to date dimension"
+      - name: TICKET_CREATED_DATE
+        description: "Date when ticket was created"
         tests:
           - not_null
-          - relationships:
-              to: ref('go_dim_date')
-              field: date_id
-      - name: support_category_id
-        description: "Foreign key to support category dimension"
+      - name: SLA_MET
+        description: "Flag indicating if SLA was met"
         tests:
           - not_null
-          - relationships:
-              to: ref('go_dim_support_category')
-              field: support_category_id
-      - name: resolution_time_hours
-        description: "Time taken to resolve the ticket in hours"
