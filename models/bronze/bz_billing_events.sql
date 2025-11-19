@@ -1,7 +1,6 @@
 -- Bronze Layer Billing Events Table
 -- Description: Tracks financial transactions and billing activities
 -- Author: Data Engineering Team
--- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
