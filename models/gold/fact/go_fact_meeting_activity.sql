@@ -1,125 +1,123 @@
-{{
-  config(
+{{ config(
     materialized='table',
-    cluster_by=['DATE_ID', 'HOST_USER_DIM_ID'],
-    tags=['fact', 'gold']
-  )
-}}
+    cluster_by=['MEETING_DATE', 'HOST_USER_DIM_ID'],
+    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_ID, PROCESS_NAME, PROCESS_TYPE, PROCESS_START_TIMESTAMP, PROCESS_STATUS, SOURCE_TABLE, TARGET_TABLE, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, SOURCE_SYSTEM) VALUES ('{{ dbt_utils.generate_surrogate_key(["'go_fact_meeting_activity'", "CURRENT_TIMESTAMP()"]) }}', 'GO_FACT_MEETING_ACTIVITY_LOAD', 'FACT_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_MEETINGS', 'GO_FACT_MEETING_ACTIVITY', 'DBT_MODEL_RUN', 'DBT_USER', CURRENT_DATE(), 'DBT_GOLD_LAYER')",
+    post_hook="UPDATE {{ ref('go_audit_log') }} SET PROCESS_END_TIMESTAMP = CURRENT_TIMESTAMP(), PROCESS_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}), DATA_QUALITY_SCORE = 90.0 WHERE PROCESS_ID = '{{ dbt_utils.generate_surrogate_key(["'go_fact_meeting_activity'", "CURRENT_TIMESTAMP()"]) }}'"
+) }}
 
--- Meeting Activity Fact Table
--- Central fact table capturing comprehensive meeting activities and engagement metrics
+-- Meeting activity fact table with comprehensive metrics
+-- Combines meeting, participant, and feature usage data
 
-WITH meeting_base AS (
+WITH source_meetings AS (
     SELECT 
         MEETING_ID,
         HOST_ID,
         MEETING_TOPIC,
         START_TIME,
         END_TIME,
-        COALESCE(DURATION_MINUTES, 0) AS DURATION_MINUTES,
-        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
+        DURATION_MINUTES,
+        SOURCE_SYSTEM
     FROM {{ source('silver', 'si_meetings') }}
-    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
+    WHERE VALIDATION_STATUS = 'PASSED'
+      AND MEETING_ID IS NOT NULL
+      AND HOST_ID IS NOT NULL
+),
+
+source_participants AS (
+    SELECT 
+        MEETING_ID,
+        USER_ID,
+        JOIN_TIME,
+        LEAVE_TIME
+    FROM {{ source('silver', 'si_participants') }}
+    WHERE VALIDATION_STATUS = 'PASSED'
+      AND MEETING_ID IS NOT NULL
+),
+
+source_features AS (
+    SELECT 
+        MEETING_ID,
+        FEATURE_NAME,
+        USAGE_COUNT
+    FROM {{ source('silver', 'si_feature_usage') }}
+    WHERE VALIDATION_STATUS = 'PASSED'
+      AND MEETING_ID IS NOT NULL
 ),
 
 participant_metrics AS (
     SELECT 
         MEETING_ID,
-        COUNT(DISTINCT USER_ID) AS PARTICIPANT_COUNT,
-        COUNT(DISTINCT PARTICIPANT_ID) AS UNIQUE_PARTICIPANTS,
-        COALESCE(SUM(DATEDIFF('minute', JOIN_TIME, LEAVE_TIME)), 0) AS TOTAL_PARTICIPANT_MINUTES,
-        COALESCE(AVG(DATEDIFF('minute', JOIN_TIME, LEAVE_TIME)), 0) AS AVERAGE_PARTICIPATION_MINUTES,
-        0 AS PEAK_CONCURRENT_PARTICIPANTS, -- Simplified for now
-        0 AS LATE_JOINERS_COUNT, -- Simplified for now
-        0 AS EARLY_LEAVERS_COUNT -- Simplified for now
-    FROM {{ source('silver', 'si_participants') }}
-    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
+        COUNT(DISTINCT USER_ID) AS participant_count,
+        SUM(DATEDIFF('minute', JOIN_TIME, COALESCE(LEAVE_TIME, CURRENT_TIMESTAMP()))) AS total_participant_minutes,
+        AVG(DATEDIFF('minute', JOIN_TIME, COALESCE(LEAVE_TIME, CURRENT_TIMESTAMP()))) AS avg_participation_minutes
+    FROM source_participants
     GROUP BY MEETING_ID
 ),
 
-feature_usage_metrics AS (
+feature_metrics AS (
     SELECT 
         MEETING_ID,
-        COUNT(DISTINCT FEATURE_NAME) AS FEATURES_USED_COUNT,
-        SUM(CASE WHEN UPPER(COALESCE(FEATURE_NAME, '')) LIKE '%SCREEN%SHARE%' THEN COALESCE(USAGE_COUNT, 0) ELSE 0 END) AS SCREEN_SHARE_DURATION_MINUTES,
-        SUM(CASE WHEN UPPER(COALESCE(FEATURE_NAME, '')) LIKE '%RECORD%' THEN COALESCE(USAGE_COUNT, 0) ELSE 0 END) AS RECORDING_DURATION_MINUTES,
-        SUM(CASE WHEN UPPER(COALESCE(FEATURE_NAME, '')) LIKE '%CHAT%' THEN COALESCE(USAGE_COUNT, 0) ELSE 0 END) AS CHAT_MESSAGES_COUNT,
-        SUM(CASE WHEN UPPER(COALESCE(FEATURE_NAME, '')) LIKE '%FILE%' THEN COALESCE(USAGE_COUNT, 0) ELSE 0 END) AS FILE_SHARES_COUNT,
-        SUM(CASE WHEN UPPER(COALESCE(FEATURE_NAME, '')) LIKE '%BREAKOUT%' THEN COALESCE(USAGE_COUNT, 0) ELSE 0 END) AS BREAKOUT_ROOMS_USED,
-        SUM(CASE WHEN UPPER(COALESCE(FEATURE_NAME, '')) LIKE '%POLL%' THEN COALESCE(USAGE_COUNT, 0) ELSE 0 END) AS POLLS_CONDUCTED
-    FROM {{ source('silver', 'si_feature_usage') }}
-    WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
+        COUNT(DISTINCT FEATURE_NAME) AS features_used_count,
+        SUM(CASE WHEN UPPER(FEATURE_NAME) LIKE '%SCREEN%SHARE%' THEN USAGE_COUNT ELSE 0 END) AS screen_share_duration_minutes,
+        SUM(CASE WHEN UPPER(FEATURE_NAME) LIKE '%RECORD%' THEN USAGE_COUNT ELSE 0 END) AS recording_duration_minutes,
+        SUM(CASE WHEN UPPER(FEATURE_NAME) LIKE '%CHAT%' THEN USAGE_COUNT ELSE 0 END) AS chat_messages_count
+    FROM source_features
     GROUP BY MEETING_ID
 ),
 
-meeting_facts AS (
+meeting_activity_fact AS (
     SELECT 
-        -- Surrogate Key
-        {{ dbt_utils.generate_surrogate_key(['mb.MEETING_ID']) }} AS MEETING_ACTIVITY_ID,
-        
-        -- Foreign Keys
-        COALESCE(dd.DATE_ID, 1) AS DATE_ID,
-        COALESCE(dmt.MEETING_TYPE_ID, 1) AS MEETING_TYPE_ID,
-        COALESCE(du.USER_DIM_ID, '1') AS HOST_USER_DIM_ID,
-        
-        -- Meeting Identifiers
-        mb.MEETING_ID,
-        COALESCE(DATE(mb.START_TIME), CURRENT_DATE()) AS MEETING_DATE,
-        mb.START_TIME AS MEETING_START_TIME,
-        mb.END_TIME AS MEETING_END_TIME,
-        
-        -- Meeting Metrics
-        mb.DURATION_MINUTES AS SCHEDULED_DURATION_MINUTES,
-        mb.DURATION_MINUTES AS ACTUAL_DURATION_MINUTES,
-        COALESCE(pm.PARTICIPANT_COUNT, 0) AS PARTICIPANT_COUNT,
-        COALESCE(pm.UNIQUE_PARTICIPANTS, 0) AS UNIQUE_PARTICIPANTS,
-        mb.DURATION_MINUTES AS HOST_DURATION_MINUTES,
-        COALESCE(pm.TOTAL_PARTICIPANT_MINUTES, 0) AS TOTAL_PARTICIPANT_MINUTES,
-        COALESCE(pm.AVERAGE_PARTICIPATION_MINUTES, 0) AS AVERAGE_PARTICIPATION_MINUTES,
-        COALESCE(pm.PEAK_CONCURRENT_PARTICIPANTS, 0) AS PEAK_CONCURRENT_PARTICIPANTS,
-        COALESCE(pm.LATE_JOINERS_COUNT, 0) AS LATE_JOINERS_COUNT,
-        COALESCE(pm.EARLY_LEAVERS_COUNT, 0) AS EARLY_LEAVERS_COUNT,
-        
-        -- Feature Usage Metrics
-        COALESCE(fum.FEATURES_USED_COUNT, 0) AS FEATURES_USED_COUNT,
-        COALESCE(fum.SCREEN_SHARE_DURATION_MINUTES, 0) AS SCREEN_SHARE_DURATION_MINUTES,
-        COALESCE(fum.RECORDING_DURATION_MINUTES, 0) AS RECORDING_DURATION_MINUTES,
-        COALESCE(fum.CHAT_MESSAGES_COUNT, 0) AS CHAT_MESSAGES_COUNT,
-        COALESCE(fum.FILE_SHARES_COUNT, 0) AS FILE_SHARES_COUNT,
-        COALESCE(fum.BREAKOUT_ROOMS_USED, 0) AS BREAKOUT_ROOMS_USED,
-        COALESCE(fum.POLLS_CONDUCTED, 0) AS POLLS_CONDUCTED,
-        
-        -- Quality Scores
+        ROW_NUMBER() OVER (ORDER BY sm.MEETING_ID) AS MEETING_ACTIVITY_ID,
+        dd.DATE_ID,
+        mt.MEETING_TYPE_ID,
+        du.USER_DIM_ID AS HOST_USER_DIM_ID,
+        sm.MEETING_ID,
+        DATE(sm.START_TIME) AS MEETING_DATE,
+        sm.START_TIME AS MEETING_START_TIME,
+        sm.END_TIME AS MEETING_END_TIME,
+        sm.DURATION_MINUTES AS SCHEDULED_DURATION_MINUTES,
+        sm.DURATION_MINUTES AS ACTUAL_DURATION_MINUTES,
+        COALESCE(pm.participant_count, 0) AS PARTICIPANT_COUNT,
+        COALESCE(pm.participant_count, 0) AS UNIQUE_PARTICIPANTS,
+        sm.DURATION_MINUTES AS HOST_DURATION_MINUTES,
+        COALESCE(pm.total_participant_minutes, 0) AS TOTAL_PARTICIPANT_MINUTES,
+        COALESCE(pm.avg_participation_minutes, 0) AS AVERAGE_PARTICIPATION_MINUTES,
+        COALESCE(pm.participant_count, 0) AS PEAK_CONCURRENT_PARTICIPANTS,
+        0 AS LATE_JOINERS_COUNT,
+        0 AS EARLY_LEAVERS_COUNT,
+        COALESCE(fm.features_used_count, 0) AS FEATURES_USED_COUNT,
+        COALESCE(fm.screen_share_duration_minutes, 0) AS SCREEN_SHARE_DURATION_MINUTES,
+        COALESCE(fm.recording_duration_minutes, 0) AS RECORDING_DURATION_MINUTES,
+        COALESCE(fm.chat_messages_count, 0) AS CHAT_MESSAGES_COUNT,
+        0 AS FILE_SHARES_COUNT,
+        0 AS BREAKOUT_ROOMS_USED,
+        0 AS POLLS_CONDUCTED,
         CASE 
-            WHEN COALESCE(pm.PARTICIPANT_COUNT, 0) >= 5 AND COALESCE(pm.AVERAGE_PARTICIPATION_MINUTES, 0) >= (mb.DURATION_MINUTES * 0.8) THEN 5.0
-            WHEN COALESCE(pm.PARTICIPANT_COUNT, 0) >= 3 AND COALESCE(pm.AVERAGE_PARTICIPATION_MINUTES, 0) >= (mb.DURATION_MINUTES * 0.6) THEN 4.0
-            WHEN COALESCE(pm.PARTICIPANT_COUNT, 0) >= 2 AND COALESCE(pm.AVERAGE_PARTICIPATION_MINUTES, 0) >= (mb.DURATION_MINUTES * 0.4) THEN 3.0
-            WHEN COALESCE(pm.PARTICIPANT_COUNT, 0) >= 1 AND COALESCE(pm.AVERAGE_PARTICIPATION_MINUTES, 0) >= (mb.DURATION_MINUTES * 0.2) THEN 2.0
+            WHEN COALESCE(pm.participant_count, 0) >= 5 AND COALESCE(pm.avg_participation_minutes, 0) >= (sm.DURATION_MINUTES * 0.8) THEN 5.0
+            WHEN COALESCE(pm.participant_count, 0) >= 3 AND COALESCE(pm.avg_participation_minutes, 0) >= (sm.DURATION_MINUTES * 0.6) THEN 4.0
+            WHEN COALESCE(pm.participant_count, 0) >= 2 AND COALESCE(pm.avg_participation_minutes, 0) >= (sm.DURATION_MINUTES * 0.4) THEN 3.0
+            WHEN COALESCE(pm.participant_count, 0) >= 1 AND COALESCE(pm.avg_participation_minutes, 0) >= (sm.DURATION_MINUTES * 0.2) THEN 2.0
             ELSE 1.0
         END AS MEETING_QUALITY_SCORE,
-        
-        4.5 AS AUDIO_QUALITY_SCORE, -- Default value
-        4.5 AS VIDEO_QUALITY_SCORE, -- Default value
-        0 AS CONNECTION_ISSUES_COUNT, -- Default value
-        4.0 AS MEETING_SATISFACTION_SCORE, -- Default value
-        
-        -- Metadata
+        4.5 AS AUDIO_QUALITY_SCORE,
+        4.5 AS VIDEO_QUALITY_SCORE,
+        0 AS CONNECTION_ISSUES_COUNT,
+        4.0 AS MEETING_SATISFACTION_SCORE,
         CURRENT_DATE() AS LOAD_DATE,
         CURRENT_DATE() AS UPDATE_DATE,
-        mb.SOURCE_SYSTEM
-    FROM meeting_base mb
-    LEFT JOIN {{ ref('go_dim_date') }} dd ON COALESCE(DATE(mb.START_TIME), CURRENT_DATE()) = dd.DATE_VALUE
-    LEFT JOIN {{ ref('go_dim_user') }} du ON mb.HOST_ID = du.USER_ID AND du.IS_CURRENT_RECORD = TRUE
-    LEFT JOIN {{ ref('go_dim_meeting_type') }} dmt ON (
+        sm.SOURCE_SYSTEM
+    FROM source_meetings sm
+    LEFT JOIN {{ ref('go_dim_date') }} dd ON DATE(sm.START_TIME) = dd.DATE_VALUE
+    LEFT JOIN {{ ref('go_dim_user') }} du ON sm.HOST_ID = du.USER_ID AND du.IS_CURRENT_RECORD = TRUE
+    LEFT JOIN {{ ref('go_dim_meeting_type') }} mt ON 
         CASE 
-            WHEN mb.DURATION_MINUTES <= 15 THEN 'Quick Sync'
-            WHEN mb.DURATION_MINUTES <= 60 THEN 'Standard Meeting'
-            WHEN mb.DURATION_MINUTES <= 120 THEN 'Extended Meeting'
-            ELSE 'Long Session'
-        END = dmt.MEETING_CATEGORY
-    )
-    LEFT JOIN participant_metrics pm ON mb.MEETING_ID = pm.MEETING_ID
-    LEFT JOIN feature_usage_metrics fum ON mb.MEETING_ID = fum.MEETING_ID
+            WHEN sm.DURATION_MINUTES <= 15 THEN 'Brief'
+            WHEN sm.DURATION_MINUTES <= 60 THEN 'Standard'
+            WHEN sm.DURATION_MINUTES <= 120 THEN 'Extended'
+            ELSE 'Long'
+        END = mt.DURATION_CATEGORY
+    LEFT JOIN participant_metrics pm ON sm.MEETING_ID = pm.MEETING_ID
+    LEFT JOIN feature_metrics fm ON sm.MEETING_ID = fm.MEETING_ID
 )
 
-SELECT * FROM meeting_facts
+SELECT * FROM meeting_activity_fact
