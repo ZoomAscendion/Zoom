@@ -13,30 +13,37 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
+# Model configurations
 models:
   zoom_bronze_pipeline:
-    # Config indicated by + and applies to all files under models/bronze/
+    # Configuration for bronze layer models
     bronze:
       +materialized: table
       +tags: ["bronze"]
+      +on_schema_change: "fail"
 
-# Global configurations
-vars:
-  # The `start_date` variable will be accessible in all resources
-  start_date: '2020-01-01'
+# Test configurations
+tests:
+  +store_failures: true
+  +severity: warn
 
-# Seeds configuration
-seeds:
-  zoom_bronze_pipeline:
-    +quote_columns: false
-
-# Snapshots configuration
+# Snapshot configurations
 snapshots:
   zoom_bronze_pipeline:
     +target_schema: snapshots
+
+# Seed configurations
+seeds:
+  zoom_bronze_pipeline:
+    +schema: seeds
+
+# Variables
+vars:
+  # Set the timezone for timestamp operations
+  timezone: 'UTC'
+  # Set the batch size for processing
+  batch_size: 10000
