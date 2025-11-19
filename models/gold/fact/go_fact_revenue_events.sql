@@ -13,7 +13,7 @@ WITH source_billing AS (
         be.AMOUNT,
         be.EVENT_DATE,
         be.SOURCE_SYSTEM
-    FROM {{ source('silver', 'si_billing_events') }} be
+    FROM {{ source('gold_existing', 'si_billing_events') }} be
     WHERE be.VALIDATION_STATUS = 'PASSED'
       AND be.DATA_QUALITY_SCORE >= 70
       AND be.AMOUNT IS NOT NULL
@@ -25,7 +25,7 @@ user_license_mapping AS (
         l.LICENSE_TYPE,
         l.START_DATE,
         l.END_DATE
-    FROM {{ source('silver', 'si_licenses') }} l
+    FROM {{ source('gold_existing', 'si_licenses') }} l
     WHERE l.VALIDATION_STATUS = 'PASSED'
 ),
 
