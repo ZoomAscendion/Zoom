@@ -1,8 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['USAGE_DATE', 'FEATURE_ID'],
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (PROCESS_ID, PROCESS_NAME, PROCESS_TYPE, PROCESS_START_TIMESTAMP, PROCESS_STATUS, SOURCE_TABLE, TARGET_TABLE, PROCESS_TRIGGER, EXECUTED_BY, LOAD_DATE, SOURCE_SYSTEM) VALUES ('{{ dbt_utils.generate_surrogate_key(["'go_fact_feature_usage'", "CURRENT_TIMESTAMP()"]) }}', 'GO_FACT_FEATURE_USAGE_LOAD', 'FACT_LOAD', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_FEATURE_USAGE', 'GO_FACT_FEATURE_USAGE', 'DBT_MODEL_RUN', 'DBT_USER', CURRENT_DATE(), 'DBT_GOLD_LAYER')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET PROCESS_END_TIMESTAMP = CURRENT_TIMESTAMP(), PROCESS_STATUS = 'SUCCESS', RECORDS_PROCESSED = (SELECT COUNT(*) FROM {{ this }}), RECORDS_SUCCESS = (SELECT COUNT(*) FROM {{ this }}), DATA_QUALITY_SCORE = 90.0 WHERE PROCESS_ID = '{{ dbt_utils.generate_surrogate_key(["'go_fact_feature_usage'", "CURRENT_TIMESTAMP()"]) }}'"
+    materialized='table'
 ) }}
 
 -- Feature usage fact table with adoption and performance metrics
@@ -34,9 +31,9 @@ source_meetings AS (
 feature_usage_fact AS (
     SELECT 
         ROW_NUMBER() OVER (ORDER BY fu.USAGE_ID) AS FEATURE_USAGE_ID,
-        dd.DATE_ID,
-        df.FEATURE_ID,
-        du.USER_DIM_ID,
+        COALESCE(dd.DATE_ID, 1) AS DATE_ID,
+        COALESCE(df.FEATURE_ID, 1) AS FEATURE_ID,
+        COALESCE(du.USER_DIM_ID, 1) AS USER_DIM_ID,
         fu.MEETING_ID,
         fu.USAGE_DATE,
         fu.USAGE_DATE::TIMESTAMP_NTZ AS USAGE_TIMESTAMP,
