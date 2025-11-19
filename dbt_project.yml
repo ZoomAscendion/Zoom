@@ -1,9 +1,11 @@
-name: 'zoom_gold_analytics'
+name: 'zoom_bronze_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_gold_analytics'
+# This setting configures which "profile" dbt uses for this project.
+profile: 'zoom_bronze_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -11,16 +13,50 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"
-clean-targets:
+target-path: "target"  # directory which will store compiled SQL files
+clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
-  zoom_gold_analytics:
-    gold:
+  zoom_bronze_pipeline:
+    # Config indicated by + and applies to all files under models/bronze/
+    bronze:
       +materialized: table
-      dimension:
-        +materialized: table
-      fact:
-        +materialized: table
+      +on_schema_change: "fail"
+      +pre_hook: |
+        {% if this.name != 'bz_data_audit' %}
+          INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) 
+          VALUES ('{{ this.name | upper }}', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0, 'STARTED')
+        {% endif %}
+      +post_hook: |
+        {% if this.name != 'bz_data_audit' %}
+          INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) 
+          VALUES ('{{ this.name | upper }}', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 
+                  DATEDIFF('second', 
+                    (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} 
+                     WHERE source_table = '{{ this.name | upper }}' AND status = 'STARTED'), 
+                    CURRENT_TIMESTAMP()), 'SUCCESS')
+        {% endif %}
+
+# Set a custom schema for different environments
+vars:
+  # The `start_date` variable will be accessible in all resources
+  start_date: '2024-01-01'
+  # The `end_date` variable will be accessible in all resources  
+  end_date: '2024-12-31'
+
+# Configure seeds
+seeds:
+  zoom_bronze_pipeline:
+    +column_types:
+      id: varchar(50)
+      created_at: timestamp
+
+# Configure snapshots
+snapshots:
+  zoom_bronze_pipeline:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: updated_at
