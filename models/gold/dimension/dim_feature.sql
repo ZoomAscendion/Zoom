@@ -3,59 +3,59 @@
     cluster_by=['feature_id', 'feature_category']
 ) }}
 
-with source_features as (
-    select distinct
-        feature_name,
-        source_system
-    from {{ source('silver', 'si_feature_usage') }}
-    where validation_status = 'PASSED'
-      and feature_name is not null
-),
-
-feature_transformations as (
+-- Create sample feature dimension
+with sample_features as (
     select
-        row_number() over (order by feature_name) as feature_id,
-        initcap(trim(feature_name)) as feature_name,
-        
-        -- Feature categorization
-        case 
-            when upper(feature_name) like '%SCREEN%SHARE%' then 'Collaboration'
-            when upper(feature_name) like '%RECORD%' then 'Recording'
-            when upper(feature_name) like '%CHAT%' then 'Communication'
-            when upper(feature_name) like '%BREAKOUT%' then 'Advanced Meeting'
-            when upper(feature_name) like '%POLL%' then 'Engagement'
-            else 'General'
-        end as feature_category,
-        
-        case 
-            when upper(feature_name) like '%BASIC%' then 'Core'
-            when upper(feature_name) like '%ADVANCED%' then 'Advanced'
-            else 'Standard'
-        end as feature_type,
-        
-        case 
-            when upper(feature_name) like '%BREAKOUT%' or upper(feature_name) like '%POLL%' then 'High'
-            when upper(feature_name) like '%RECORD%' then 'Medium'
-            else 'Low'
-        end as feature_complexity,
-        
-        case 
-            when upper(feature_name) like '%RECORD%' or upper(feature_name) like '%BREAKOUT%' then true
-            else false
-        end as is_premium_feature,
-        
+        1 as feature_id,
+        'Screen Share' as feature_name,
+        'Collaboration' as feature_category,
+        'Standard' as feature_type,
+        'Medium' as feature_complexity,
+        true as is_premium_feature,
+        '2020-01-01'::date as feature_release_date,
+        'Active' as feature_status,
+        'High' as usage_frequency_category,
+        'Screen sharing functionality for meetings' as feature_description,
+        'All Users' as target_user_segment,
+        current_date as load_date,
+        current_date as update_date,
+        'SAMPLE_DATA' as source_system
+    
+    union all
+    
+    select
+        2 as feature_id,
+        'Recording' as feature_name,
+        'Recording' as feature_category,
+        'Advanced' as feature_type,
+        'High' as feature_complexity,
+        true as is_premium_feature,
         '2020-01-01'::date as feature_release_date,
         'Active' as feature_status,
         'Medium' as usage_frequency_category,
-        'Feature usage tracking for ' || feature_name as feature_description,
-        'All Users' as target_user_segment,
-        
-        -- Metadata
+        'Meeting recording functionality' as feature_description,
+        'Pro Users' as target_user_segment,
         current_date as load_date,
         current_date as update_date,
-        source_system
-        
-    from source_features
+        'SAMPLE_DATA' as source_system
+    
+    union all
+    
+    select
+        3 as feature_id,
+        'Chat' as feature_name,
+        'Communication' as feature_category,
+        'Core' as feature_type,
+        'Low' as feature_complexity,
+        false as is_premium_feature,
+        '2020-01-01'::date as feature_release_date,
+        'Active' as feature_status,
+        'High' as usage_frequency_category,
+        'In-meeting chat functionality' as feature_description,
+        'All Users' as target_user_segment,
+        current_date as load_date,
+        current_date as update_date,
+        'SAMPLE_DATA' as source_system
 )
 
-select * from feature_transformations
+select * from sample_features
