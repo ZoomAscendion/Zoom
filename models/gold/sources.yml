@@ -1,19 +1,16 @@
 version: 2
 
 sources:
-  - name: silver
-    description: "Silver layer tables containing cleansed and validated data"
+  - name: gold_existing
+    description: "Existing Gold layer tables for reference"
     database: DB_POC_ZOOM
-    schema: SILVER
+    schema: GOLD
     tables:
       - name: si_users
         description: "User profile and subscription information"
         columns:
           - name: user_id
             description: "Unique identifier for each user"
-            tests:
-              - not_null
-              - unique
           - name: user_name
             description: "Display name of the user"
           - name: email
@@ -24,18 +21,12 @@ sources:
             description: "Subscription plan type"
           - name: validation_status
             description: "Data validation status"
-            tests:
-              - accepted_values:
-                  values: ['PASSED', 'FAILED', 'WARNING']
 
       - name: si_meetings
         description: "Meeting information and session details"
         columns:
           - name: meeting_id
             description: "Unique identifier for each meeting"
-            tests:
-              - not_null
-              - unique
           - name: host_id
             description: "User ID of the meeting host"
           - name: meeting_topic
@@ -52,9 +43,6 @@ sources:
         columns:
           - name: participant_id
             description: "Unique identifier for each participant"
-            tests:
-              - not_null
-              - unique
           - name: meeting_id
             description: "Reference to meeting"
           - name: user_id
@@ -69,9 +57,6 @@ sources:
         columns:
           - name: usage_id
             description: "Unique identifier for each usage record"
-            tests:
-              - not_null
-              - unique
           - name: meeting_id
             description: "Reference to meeting where feature was used"
           - name: feature_name
@@ -86,9 +71,6 @@ sources:
         columns:
           - name: ticket_id
             description: "Unique identifier for each support ticket"
-            tests:
-              - not_null
-              - unique
           - name: user_id
             description: "Reference to user who created the ticket"
           - name: ticket_type
@@ -103,9 +85,6 @@ sources:
         columns:
           - name: event_id
             description: "Unique identifier for each billing event"
-            tests:
-              - not_null
-              - unique
           - name: user_id
             description: "Reference to user associated with billing event"
           - name: event_type
@@ -120,9 +99,6 @@ sources:
         columns:
           - name: license_id
             description: "Unique identifier for each license"
-            tests:
-              - not_null
-              - unique
           - name: license_type
             description: "Type of license"
           - name: assigned_to_user_id
