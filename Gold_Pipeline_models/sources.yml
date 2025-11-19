@@ -1,0 +1,321 @@
+# =====================================================
+# SOURCES CONFIGURATION
+# Project: Zoom Platform Analytics System - Gold Layer
+# Purpose: Define Silver layer sources for Gold layer transformations
+# Database: DB_POC_ZOOM
+# Source Schema: SILVER
+# =====================================================
+
+version: 2
+
+sources:
+  - name: silver_layer
+    description: "Silver layer tables containing cleansed and standardized data from Bronze layer"
+    database: DB_POC_ZOOM
+    schema: SILVER
+    
+    # Source freshness configuration
+    freshness:
+      warn_after: {count: 12, period: hour}
+      error_after: {count: 24, period: hour}
+    
+    # Loader information
+    loader: "Bronze to Silver ETL Pipeline"
+    
+    # Silver layer tables
+    tables:
+      # Users table
+      - name: SI_USERS
+        description: "Cleansed and standardized user profile and subscription information"
+        columns:
+          - name: USER_ID
+            description: "Unique identifier for each user account"
+            tests:
+              - not_null
+              - unique
+          - name: USER_NAME
+            description: "Display name of the user (cleaned and standardized format)"
+          - name: EMAIL
+            description: "Email address of the user (validated and standardized)"
+            tests:
+              - not_null
+          - name: COMPANY
+            description: "Company or organization name (cleaned and standardized)"
+          - name: PLAN_TYPE
+            description: "Subscription plan type (standardized values)"
+            tests:
+              - accepted_values:
+                  values: ['Basic', 'Pro', 'Enterprise', 'Free']
+          - name: LOAD_TIMESTAMP
+            description: "Timestamp when record was processed into Silver layer"
+          - name: UPDATE_TIMESTAMP
+            description: "Timestamp when record was last updated"
+          - name: SOURCE_SYSTEM
+            description: "Source system from which data originated"
+          - name: LOAD_DATE
+            description: "Date when record was processed into Silver layer"
+          - name: UPDATE_DATE
+            description: "Date when record was last updated"
+          - name: DATA_QUALITY_SCORE
+            description: "Quality score from validation process (0-100)"
+          - name: VALIDATION_STATUS
+            description: "Status of data validation (PASSED, FAILED, WARNING)"
+            tests:
+              - accepted_values:
+                  values: ['PASSED', 'FAILED', 'WARNING']
+      
+      # Meetings table
+      - name: SI_MEETINGS
+        description: "Cleansed and standardized meeting information and session details"
+        columns:
+          - name: MEETING_ID
+            description: "Unique identifier for each meeting"
+            tests:
+              - not_null
+              - unique
+          - name: HOST_ID
+            description: "User ID of the meeting host"
+            tests:
+              - not_null
+          - name: MEETING_TOPIC
+            description: "Topic or title of the meeting (cleaned and standardized)"
+          - name: START_TIME
+            description: "Meeting start timestamp (standardized timezone)"
+            tests:
+              - not_null
+          - name: END_TIME
+            description: "Meeting end timestamp (standardized timezone)"
+          - name: DURATION_MINUTES
+            description: "Meeting duration in minutes (validated and calculated)"
+            tests:
+              - not_null
+              - dbt_expectations.expect_column_values_to_be_between:
+                  min_value: 0
+                  max_value: 1440  # 24 hours
+          - name: LOAD_TIMESTAMP
+            description: "Timestamp when record was processed into Silver layer"
+          - name: UPDATE_TIMESTAMP
+            description: "Timestamp when record was last updated"
+          - name: SOURCE_SYSTEM
+            description: "Source system from which data originated"
+          - name: LOAD_DATE
+            description: "Date when record was processed into Silver layer"
+          - name: UPDATE_DATE
+            description: "Date when record was last updated"
+          - name: DATA_QUALITY_SCORE
+            description: "Quality score from validation process (0-100)"
+          - name: VALIDATION_STATUS
+            description: "Status of data validation (PASSED, FAILED, WARNING)"
+      
+      # Participants table
+      - name: SI_PARTICIPANTS
+        description: "Cleansed and standardized meeting participants and their session details"
+        columns:
+          - name: PARTICIPANT_ID
+            description: "Unique identifier for each meeting participant"
+            tests:
+              - not_null
+              - unique
+          - name: MEETING_ID
+            description: "Reference to meeting"
+            tests:
+              - not_null
+          - name: USER_ID
+            description: "Reference to user who participated"
+            tests:
+              - not_null
+          - name: JOIN_TIME
+            description: "Timestamp when participant joined meeting (standardized timezone)"
+          - name: LEAVE_TIME
+            description: "Timestamp when participant left meeting (standardized timezone)"
+          - name: LOAD_TIMESTAMP
+            description: "Timestamp when record was processed into Silver layer"
+          - name: UPDATE_TIMESTAMP
+            description: "Timestamp when record was last updated"
+          - name: SOURCE_SYSTEM
+            description: "Source system from which data originated"
+          - name: LOAD_DATE
+            description: "Date when record was processed into Silver layer"
+          - name: UPDATE_DATE
+            description: "Date when record was last updated"
+          - name: DATA_QUALITY_SCORE
+            description: "Quality score from validation process (0-100)"
+          - name: VALIDATION_STATUS
+            description: "Status of data validation (PASSED, FAILED, WARNING)"
+      
+      # Feature Usage table
+      - name: SI_FEATURE_USAGE
+        description: "Cleansed and standardized platform feature usage during meetings"
+        columns:
+          - name: USAGE_ID
+            description: "Unique identifier for each feature usage record"
+            tests:
+              - not_null
+              - unique
+          - name: MEETING_ID
+            description: "Reference to meeting where feature was used"
+          - name: FEATURE_NAME
+            description: "Name of the feature being tracked (standardized naming)"
+            tests:
+              - not_null
+          - name: USAGE_COUNT
+            description: "Number of times feature was used (validated)"
+            tests:
+              - not_null
+              - dbt_expectations.expect_column_values_to_be_between:
+                  min_value: 0
+                  max_value: 10000
+          - name: USAGE_DATE
+            description: "Date when feature usage occurred (standardized format)"
+            tests:
+              - not_null
+          - name: LOAD_TIMESTAMP
+            description: "Timestamp when record was processed into Silver layer"
+          - name: UPDATE_TIMESTAMP
+            description: "Timestamp when record was last updated"
+          - name: SOURCE_SYSTEM
+            description: "Source system from which data originated"
+          - name: LOAD_DATE
+            description: "Date when record was processed into Silver layer"
+          - name: UPDATE_DATE
+            description: "Date when record was last updated"
+          - name: DATA_QUALITY_SCORE
+            description: "Quality score from validation process (0-100)"
+          - name: VALIDATION_STATUS
+            description: "Status of data validation (PASSED, FAILED, WARNING)"
+      
+      # Support Tickets table
+      - name: SI_SUPPORT_TICKETS
+        description: "Cleansed and standardized customer support requests and resolution tracking"
+        columns:
+          - name: TICKET_ID
+            description: "Unique identifier for each support ticket"
+            tests:
+              - not_null
+              - unique
+          - name: USER_ID
+            description: "Reference to user who created the ticket"
+            tests:
+              - not_null
+          - name: TICKET_TYPE
+            description: "Type of support ticket (standardized categories)"
+            tests:
+              - not_null
+          - name: RESOLUTION_STATUS
+            description: "Current status of ticket resolution (standardized values)"
+            tests:
+              - accepted_values:
+                  values: ['Open', 'In Progress', 'Resolved', 'Closed', 'Escalated']
+          - name: OPEN_DATE
+            description: "Date when ticket was opened (standardized format)"
+            tests:
+              - not_null
+          - name: LOAD_TIMESTAMP
+            description: "Timestamp when record was processed into Silver layer"
+          - name: UPDATE_TIMESTAMP
+            description: "Timestamp when record was last updated"
+          - name: SOURCE_SYSTEM
+            description: "Source system from which data originated"
+          - name: LOAD_DATE
+            description: "Date when record was processed into Silver layer"
+          - name: UPDATE_DATE
+            description: "Date when record was last updated"
+          - name: DATA_QUALITY_SCORE
+            description: "Quality score from validation process (0-100)"
+          - name: VALIDATION_STATUS
+            description: "Status of data validation (PASSED, FAILED, WARNING)"
+      
+      # Billing Events table
+      - name: SI_BILLING_EVENTS
+        description: "Cleansed and standardized financial transactions and billing activities"
+        columns:
+          - name: EVENT_ID
+            description: "Unique identifier for each billing event"
+            tests:
+              - not_null
+              - unique
+          - name: USER_ID
+            description: "Reference to user associated with billing event"
+            tests:
+              - not_null
+          - name: EVENT_TYPE
+            description: "Type of billing event (standardized categories)"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['Subscription', 'Renewal', 'Upgrade', 'Downgrade', 'Refund', 'One-time Purchase']
+          - name: AMOUNT
+            description: "Monetary amount for the billing event (validated and standardized)"
+            tests:
+              - not_null
+              - dbt_expectations.expect_column_values_to_be_between:
+                  min_value: -10000
+                  max_value: 100000
+          - name: EVENT_DATE
+            description: "Date when the billing event occurred (standardized format)"
+            tests:
+              - not_null
+          - name: LOAD_TIMESTAMP
+            description: "Timestamp when record was processed into Silver layer"
+          - name: UPDATE_TIMESTAMP
+            description: "Timestamp when record was last updated"
+          - name: SOURCE_SYSTEM
+            description: "Source system from which data originated"
+          - name: LOAD_DATE
+            description: "Date when record was processed into Silver layer"
+          - name: UPDATE_DATE
+            description: "Date when record was last updated"
+          - name: DATA_QUALITY_SCORE
+            description: "Quality score from validation process (0-100)"
+          - name: VALIDATION_STATUS
+            description: "Status of data validation (PASSED, FAILED, WARNING)"
+      
+      # Licenses table
+      - name: SI_LICENSES
+        description: "Cleansed and standardized license assignments and entitlements"
+        columns:
+          - name: LICENSE_ID
+            description: "Unique identifier for each license"
+            tests:
+              - not_null
+              - unique
+          - name: LICENSE_TYPE
+            description: "Type of license (standardized categories)"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['Basic', 'Pro', 'Enterprise', 'Free']
+          - name: ASSIGNED_TO_USER_ID
+            description: "User ID to whom license is assigned"
+          - name: START_DATE
+            description: "License validity start date (standardized format)"
+            tests:
+              - not_null
+          - name: END_DATE
+            description: "License validity end date (standardized format)"
+          - name: LOAD_TIMESTAMP
+            description: "Timestamp when record was processed into Silver layer"
+          - name: UPDATE_TIMESTAMP
+            description: "Timestamp when record was last updated"
+          - name: SOURCE_SYSTEM
+            description: "Source system from which data originated"
+          - name: LOAD_DATE
+            description: "Date when record was processed into Silver layer"
+          - name: UPDATE_DATE
+            description: "Date when record was last updated"
+          - name: DATA_QUALITY_SCORE
+            description: "Quality score from validation process (0-100)"
+          - name: VALIDATION_STATUS
+            description: "Status of data validation (PASSED, FAILED, WARNING)"
+
+# =====================================================
+# SOURCE TESTING CONFIGURATION
+# =====================================================
+
+# Additional source-level tests can be defined here
+# These tests will run against the source tables to ensure
+# data quality before transformation to Gold layer
+
+# =====================================================
+# END OF SOURCES CONFIGURATION
+# =====================================================
