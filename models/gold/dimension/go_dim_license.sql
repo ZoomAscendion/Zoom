@@ -1,24 +1,24 @@
 {{ config(
     materialized='table',
-    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (process_name, source_table, target_table, process_status, start_time, load_date, source_system) VALUES ('go_dim_license', 'SI_LICENSES', 'go_dim_license', 'STARTED', CURRENT_TIMESTAMP(), CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
-    post_hook="UPDATE {{ ref('go_audit_log') }} SET process_status = 'COMPLETED', end_time = CURRENT_TIMESTAMP() WHERE target_table = 'go_dim_license' AND process_status = 'STARTED'"
+    pre_hook="INSERT INTO {{ ref('go_audit_log') }} (audit_log_id, process_name, process_type, execution_start_timestamp, execution_status, source_table_name, target_table_name, process_trigger, executed_by, load_date, source_system) VALUES ('{{ dbt_utils.generate_surrogate_key(['GO_DIM_LICENSE', run_started_at]) }}', 'GO_DIM_LICENSE_LOAD', 'DBT_MODEL', CURRENT_TIMESTAMP(), 'RUNNING', 'SI_LICENSES', 'GO_DIM_LICENSE', 'DBT_RUN', 'DBT_SYSTEM', CURRENT_DATE(), 'DBT_GOLD_PIPELINE')",
+    post_hook="UPDATE {{ ref('go_audit_log') }} SET execution_end_timestamp = CURRENT_TIMESTAMP(), execution_status = 'SUCCESS', records_processed = (SELECT COUNT(*) FROM {{ this }}), execution_duration_seconds = DATEDIFF('second', execution_start_timestamp, CURRENT_TIMESTAMP()) WHERE audit_log_id = '{{ dbt_utils.generate_surrogate_key(['GO_DIM_LICENSE', run_started_at]) }}'"
 ) }}
 
--- License dimension with pricing information
-WITH source_licenses AS (
+-- License dimension transformation from Silver layer
+WITH license_source AS (
     SELECT DISTINCT
-        COALESCE(TRIM(license_type), 'Unknown License') AS license_type,
+        license_type,
         start_date,
         end_date,
         source_system
     FROM {{ source('silver', 'si_licenses') }}
-    WHERE license_type IS NOT NULL
+    WHERE validation_status = 'PASSED'
 ),
 
-transformed_licenses AS (
-    SELECT 
-        ROW_NUMBER() OVER (ORDER BY license_type) AS license_id,
-        INITCAP(license_type) AS license_type,
+license_transformed AS (
+    SELECT
+        {{ dbt_utils.generate_surrogate_key(['license_type']) }} AS license_key,
+        INITCAP(TRIM(license_type)) AS license_type,
         CASE 
             WHEN UPPER(license_type) LIKE '%BASIC%' THEN 'Standard'
             WHEN UPPER(license_type) LIKE '%PRO%' THEN 'Professional'
@@ -74,13 +74,13 @@ transformed_licenses AS (
             ELSE 0.00
         END AS annual_price,
         'Standard license benefits for ' || license_type AS license_benefits,
-        COALESCE(start_date, '1900-01-01'::DATE) AS effective_start_date,
-        COALESCE(end_date, '9999-12-31'::DATE) AS effective_end_date,
+        start_date AS effective_start_date,
+        end_date AS effective_end_date,
         TRUE AS is_current_record,
         CURRENT_DATE() AS load_date,
         CURRENT_DATE() AS update_date,
         source_system
-    FROM source_licenses
+    FROM license_source
 )
 
-SELECT * FROM transformed_licenses
+SELECT * FROM license_transformed
