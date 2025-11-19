@@ -1,8 +1,8 @@
-name: 'zoom_gold_pipeline'
+name: 'zoom_gold_analytics'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_gold_pipeline'
+profile: 'zoom_gold_analytics'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,6 +17,17 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_gold_pipeline:
+  zoom_gold_analytics:
     gold:
       +materialized: table
+      +cluster_by: ['LOAD_DATE']
+      dimension:
+        +materialized: table
+        +cluster_by: ['LOAD_DATE']
+      fact:
+        +materialized: table
+        +cluster_by: ['LOAD_DATE']
+
+vars:
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
