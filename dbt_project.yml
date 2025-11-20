@@ -2,8 +2,10 @@ name: 'zoom_bronze_pipeline'
 version: '1.0.0'
 config-version: 2
 
+# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_bronze_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -15,8 +17,38 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Model configurations
 models:
   zoom_bronze_pipeline:
+    # Configuration for bronze layer models
     bronze:
       +materialized: table
+      +tags: ["bronze"]
       +on_schema_change: "fail"
+      
+# Source configurations
+sources:
+  zoom_bronze_pipeline:
+    raw_layer:
+      +enabled: true
+
+# Test configurations
+tests:
+  +store_failures: true
+  +severity: 'warn'
+
+# Snapshot configurations
+snapshots:
+  zoom_bronze_pipeline:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: updated_timestamp
+
+# Variables
+vars:
+  # Set the timezone for timestamp operations
+  timezone: 'UTC'
+  # Set the batch size for processing
+  batch_size: 10000
+  # Enable audit logging
+  enable_audit_logging: true
