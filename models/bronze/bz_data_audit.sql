@@ -8,9 +8,9 @@
     unique_key='record_id'
 ) }}
 
+-- Create audit table structure with auto-increment record_id
 SELECT 
-    -- Auto-incrementing record ID will be handled by Snowflake AUTOINCREMENT
-    NULL::NUMBER as record_id,
+    ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP()) as record_id,
     'AUDIT_INITIALIZATION'::VARCHAR(255) as source_table,
     CURRENT_TIMESTAMP()::TIMESTAMP_NTZ(9) as load_timestamp,
     'DBT_BRONZE_PIPELINE'::VARCHAR(255) as processed_by,
