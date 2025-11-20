@@ -1,9 +1,9 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*: 2024-12-19
+## *Created on*: 20-11-2025
 ## *Description*: Conceptual data model for Zoom Platform Analytics System
 ## *Version*: 1
-## *Updated on*: 2024-12-19
+## *Updated on*: 20-11-2025
 _____________________________________________
 
 # Conceptual Data Model - Zoom Platform Analytics System
