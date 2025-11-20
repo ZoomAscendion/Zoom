@@ -5,9 +5,7 @@
 
 {{ config(
     materialized='table',
-    tags=['bronze', 'licenses'],
-    pre_hook="{% if this.name != 'bz_data_audit' %}INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, status) SELECT 'BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_USER', 'STARTED'{% endif %}",
-    post_hook="{% if this.name != 'bz_data_audit' %}INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_USER', 1.0, 'SUCCESS'{% endif %}"
+    tags=['bronze', 'licenses']
 ) }}
 
 -- CTE to select and filter raw data
