@@ -4,9 +4,7 @@
 -- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table',
-    pre_hook="{{ log_audit_start('BZ_PARTICIPANTS') }}",
-    post_hook="{{ log_audit_success('BZ_PARTICIPANTS') }}"
+    materialized='table'
 ) }}
 
 WITH source_data AS (
@@ -37,7 +35,7 @@ deduped_data AS (
         SOURCE_SYSTEM,
         ROW_NUMBER() OVER (
             PARTITION BY PARTICIPANT_ID 
-            ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC
+            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
         ) AS rn
     FROM source_data
 )
