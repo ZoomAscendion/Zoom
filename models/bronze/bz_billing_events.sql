@@ -6,20 +6,8 @@
 {{ config(
     materialized='table',
     unique_key='event_id',
-    pre_hook="
-        {% if this.name != 'bz_data_audit' %}
-        INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status)
-        SELECT 'BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'DBT_PIPELINE', 0, 'STARTED'
-        {% endif %}
-    ",
-    post_hook="
-        {% if this.name != 'bz_data_audit' %}
-        INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status)
-        SELECT 'BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'DBT_PIPELINE', DATEDIFF('second', 
-            (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_BILLING_EVENTS' AND status = 'STARTED'), 
-            CURRENT_TIMESTAMP()), 'SUCCESS'
-        {% endif %}
-    "
+    pre_hook="INSERT INTO {{ this.database }}.{{ this.schema }}.bz_data_audit (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'DBT_PIPELINE', 0, 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
+    post_hook="INSERT INTO {{ this.database }}.{{ this.schema }}.bz_data_audit (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'DBT_PIPELINE', 1.0, 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
 ) }}
 
 WITH source_data AS (
