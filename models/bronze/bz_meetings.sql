@@ -1,7 +1,6 @@
 -- Bronze Layer Meetings Model
 -- Description: Transforms raw meeting data to bronze layer with data quality checks
 -- Author: Data Engineering Team
--- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
@@ -15,16 +14,16 @@ WITH raw_meetings_filtered AS (
         HOST_ID,
         MEETING_TOPIC,
         START_TIME,
-        -- Convert END_TIME from VARCHAR to TIMESTAMP_NTZ if not null
+        -- Handle END_TIME conversion safely
         CASE 
-            WHEN END_TIME IS NOT NULL AND END_TIME != '' 
-            THEN TRY_TO_TIMESTAMP_NTZ(END_TIME)
+            WHEN END_TIME IS NOT NULL AND TRIM(END_TIME) != '' 
+            THEN TRY_CAST(END_TIME AS TIMESTAMP_NTZ)
             ELSE NULL 
         END as END_TIME,
-        -- Convert DURATION_MINUTES from VARCHAR to NUMBER if not null
+        -- Handle DURATION_MINUTES conversion safely
         CASE 
-            WHEN DURATION_MINUTES IS NOT NULL AND DURATION_MINUTES != '' 
-            THEN TRY_TO_NUMBER(DURATION_MINUTES)
+            WHEN DURATION_MINUTES IS NOT NULL AND TRIM(DURATION_MINUTES) != '' 
+            THEN TRY_CAST(DURATION_MINUTES AS NUMBER)
             ELSE NULL 
         END as DURATION_MINUTES,
         LOAD_TIMESTAMP,
