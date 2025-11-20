@@ -2,7 +2,7 @@ name: 'zoom_bronze_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_bronze_pipeline'
+profile: 'zoom_bronze'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -21,3 +21,7 @@ models:
     bronze:
       +materialized: table
       +on_schema_change: "fail"
+
+vars:
+  source_schema: 'RAW'
+  target_schema: 'BRONZE'
