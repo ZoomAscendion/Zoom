@@ -1,7 +1,6 @@
 -- Bronze Layer Billing Events Model
 -- Description: Transforms raw billing event data to bronze layer with data quality checks
 -- Author: Data Engineering Team
--- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
@@ -14,10 +13,10 @@ WITH raw_billing_events_filtered AS (
         EVENT_ID,
         USER_ID,
         EVENT_TYPE,
-        -- Convert AMOUNT from VARCHAR to NUMBER(10,2) if not null
+        -- Handle AMOUNT conversion safely
         CASE 
-            WHEN AMOUNT IS NOT NULL AND AMOUNT != '' 
-            THEN TRY_TO_NUMBER(AMOUNT, 10, 2)
+            WHEN AMOUNT IS NOT NULL AND TRIM(AMOUNT) != '' 
+            THEN TRY_CAST(AMOUNT AS NUMBER(10,2))
             ELSE NULL 
         END as AMOUNT,
         EVENT_DATE,
