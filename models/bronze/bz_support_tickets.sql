@@ -1,7 +1,6 @@
 -- Bronze Layer Support Tickets Model
 -- Description: Transforms raw support ticket data to bronze layer with data quality checks
 -- Author: Data Engineering Team
--- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
