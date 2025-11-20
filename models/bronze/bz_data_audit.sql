@@ -8,8 +8,9 @@
     unique_key='record_id'
 ) }}
 
+-- Create audit table structure with auto-incrementing record_id
 SELECT 
-    ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP()) as record_id,
+    1 as record_id,
     'BZ_DATA_AUDIT' as source_table,
     CURRENT_TIMESTAMP() as load_timestamp,
     'DBT_BRONZE_PIPELINE' as processed_by,
