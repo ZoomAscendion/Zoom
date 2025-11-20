@@ -1,7 +1,6 @@
 -- Bronze Layer Participants Model
 -- Description: Transforms raw participant data to bronze layer with data quality checks
 -- Author: Data Engineering Team
--- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
@@ -14,10 +13,10 @@ WITH raw_participants_filtered AS (
         PARTICIPANT_ID,
         MEETING_ID,
         USER_ID,
-        -- Convert JOIN_TIME from VARCHAR to TIMESTAMP_NTZ if not null
+        -- Handle JOIN_TIME conversion safely
         CASE 
-            WHEN JOIN_TIME IS NOT NULL AND JOIN_TIME != '' 
-            THEN TRY_TO_TIMESTAMP_NTZ(JOIN_TIME)
+            WHEN JOIN_TIME IS NOT NULL AND TRIM(JOIN_TIME) != '' 
+            THEN TRY_CAST(JOIN_TIME AS TIMESTAMP_NTZ)
             ELSE NULL 
         END as JOIN_TIME,
         LEAVE_TIME,
