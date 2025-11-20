@@ -7,19 +7,17 @@
     materialized='table',
     tags=['bronze', 'feature_usage'],
     pre_hook="
-        {% if this.name != 'bz_data_audit' %}
         INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS)
-        VALUES ('BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED')
-        {% endif %}
+        SELECT 'BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED'
+        WHERE NOT EXISTS (SELECT 1 FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_FEATURE_USAGE' AND STATUS = 'STARTED' AND LOAD_TIMESTAMP > CURRENT_TIMESTAMP() - INTERVAL '1 MINUTE')
     ",
     post_hook="
-        {% if this.name != 'bz_data_audit' %}
         INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
-        VALUES ('BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 
-                DATEDIFF('second', 
-                    (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_FEATURE_USAGE' AND STATUS = 'STARTED'), 
-                    CURRENT_TIMESTAMP()), 'SUCCESS')
-        {% endif %}
+        SELECT 'BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 
+               DATEDIFF('second', 
+                   (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_FEATURE_USAGE' AND STATUS = 'STARTED'), 
+                   CURRENT_TIMESTAMP()), 'SUCCESS'
+        WHERE NOT EXISTS (SELECT 1 FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_FEATURE_USAGE' AND STATUS = 'SUCCESS' AND LOAD_TIMESTAMP > CURRENT_TIMESTAMP() - INTERVAL '1 MINUTE')
     "
 ) }}
 
