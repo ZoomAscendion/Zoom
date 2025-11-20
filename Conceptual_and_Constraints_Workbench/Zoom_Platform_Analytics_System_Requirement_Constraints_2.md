@@ -1,9 +1,9 @@
 ____________________________________________
 ## *Author*: AAVA
-## *Created on*: 2024-12-19
+## *Created on*: 20-11-2025
 ## *Description*: Model data constraints and business rules for Zoom Platform Analytics System
 ## *Version*: 2
-## *Updated on*: 2024-12-19
+## *Updated on*: 20-11-2025
 ## *Changes*: Enhanced constraints with additional business rules and refined data expectations based on comprehensive requirements analysis
 ## *Reason*: Update requested to improve constraint completeness and alignment with reporting requirements
 ____________________________________________
