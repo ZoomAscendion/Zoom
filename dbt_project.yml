@@ -6,6 +6,8 @@ config-version: 2
 profile: 'zoom_bronze_pipeline'
 
 # These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -13,37 +15,32 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-clean-targets:
+target-path: "target"  # directory which will store compiled SQL files
+clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
-# Model configurations
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+
 models:
   zoom_bronze_pipeline:
-    # Configuration for bronze layer models
+    # Config indicated by + and applies to all files under models/bronze/
     bronze:
       +materialized: table
       +tags: ["bronze"]
       +on_schema_change: "fail"
 
-# Test configurations
-tests:
-  +store_failures: true
-  +severity: warn
+vars:
+  # The `start_date` variable will be accessible in all resources
+  start_date: '2020-01-01'
 
-# Snapshot configurations
+# Seeds configuration
+seeds:
+  zoom_bronze_pipeline:
+    +quote_columns: false
+
+# Snapshots configuration
 snapshots:
   zoom_bronze_pipeline:
     +target_schema: snapshots
-
-# Seed configurations
-seeds:
-  zoom_bronze_pipeline:
-    +schema: seeds
-
-# Variables
-vars:
-  # Set the timezone for timestamp operations
-  timezone: 'UTC'
-  # Set the batch size for processing
-  batch_size: 10000
