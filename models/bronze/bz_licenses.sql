@@ -1,7 +1,6 @@
 -- Bronze Layer Licenses Model
 -- Description: Transforms raw license data to bronze layer with data quality checks
 -- Author: Data Engineering Team
--- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
@@ -15,10 +14,10 @@ WITH raw_licenses_filtered AS (
         LICENSE_TYPE,
         ASSIGNED_TO_USER_ID,
         START_DATE,
-        -- Convert END_DATE from VARCHAR to DATE if not null
+        -- Handle END_DATE conversion safely
         CASE 
-            WHEN END_DATE IS NOT NULL AND END_DATE != '' 
-            THEN TRY_TO_DATE(END_DATE)
+            WHEN END_DATE IS NOT NULL AND TRIM(END_DATE) != '' 
+            THEN TRY_CAST(END_DATE AS DATE)
             ELSE NULL 
         END as END_DATE,
         LOAD_TIMESTAMP,
