@@ -7,22 +7,28 @@
     materialized='table',
     unique_key='usage_id',
     pre_hook="
-        {% if this.name != 'bz_data_audit' %}
         INSERT INTO {{ ref('bz_data_audit') }} 
-        (source_table, load_timestamp, processed_by, processing_time, status)
-        VALUES ('BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0, 'STARTED')
-        {% endif %}
+        (record_id, source_table, load_timestamp, processed_by, processing_time, status)
+        SELECT 
+            COALESCE((SELECT MAX(record_id) FROM {{ ref('bz_data_audit') }}), 0) + 1,
+            'BZ_FEATURE_USAGE', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_BRONZE_PIPELINE', 
+            0, 
+            'STARTED'
     ",
     post_hook="
-        {% if this.name != 'bz_data_audit' %}
         INSERT INTO {{ ref('bz_data_audit') }} 
-        (source_table, load_timestamp, processed_by, processing_time, status)
-        VALUES ('BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 
-                DATEDIFF('second', 
-                    (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_FEATURE_USAGE' AND status = 'STARTED'), 
-                    CURRENT_TIMESTAMP()), 
-                'SUCCESS')
-        {% endif %}
+        (record_id, source_table, load_timestamp, processed_by, processing_time, status)
+        SELECT 
+            COALESCE((SELECT MAX(record_id) FROM {{ ref('bz_data_audit') }}), 0) + 1,
+            'BZ_FEATURE_USAGE', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_BRONZE_PIPELINE', 
+            DATEDIFF('second', 
+                (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_FEATURE_USAGE' AND status = 'STARTED'), 
+                CURRENT_TIMESTAMP()), 
+            'SUCCESS'
     "
 ) }}
 
