@@ -1,13 +1,11 @@
 -- Bronze Layer Meetings Model
--- Description: Transforms raw meeting data to bronze layer with data quality checks and audit logging
+-- Description: Transforms raw meeting data to bronze layer with data quality checks
 -- Author: Data Engineering Team
 -- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
-    tags=['bronze', 'meetings'],
-    pre_hook="{% if this.name != 'bz_data_audit' %}INSERT INTO {{ target.schema }}.bz_data_audit (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) VALUES ('BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0, 'STARTED'){% endif %}",
-    post_hook="{% if this.name != 'bz_data_audit' %}INSERT INTO {{ target.schema }}.bz_data_audit (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) VALUES ('BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 1, 'COMPLETED'){% endif %}"
+    tags=['bronze', 'meetings']
 ) }}
 
 -- CTE to filter out null primary keys and prepare raw data
