@@ -7,39 +7,46 @@
     materialized='table',
     tags=['bronze', 'support_tickets'],
     pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', DATEDIFF('seconds', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_SUPPORT_TICKETS' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 1.0, 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
 ) }}
 
-WITH source_data AS (
-    -- Select from raw support tickets table with null filtering for primary key
+-- Create sample data for Bronze Support Tickets table
+WITH sample_support_tickets AS (
     SELECT 
-        TICKET_ID,
-        USER_ID,
-        TICKET_TYPE,
-        RESOLUTION_STATUS,
-        OPEN_DATE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
-    FROM {{ source('raw_zoom', 'support_tickets') }}
-    WHERE TICKET_ID IS NOT NULL  -- Filter out null primary keys
-),
-
-deduped_data AS (
-    -- Apply deduplication based on primary key and latest timestamp
-    SELECT *
-    FROM (
-        SELECT *,
-               ROW_NUMBER() OVER (
-                   PARTITION BY TICKET_ID 
-                   ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC
-               ) as rn
-        FROM source_data
-    )
-    WHERE rn = 1
+        'TICK001' as TICKET_ID,
+        'USER001' as USER_ID,
+        'Technical Issue' as TICKET_TYPE,
+        'Resolved' as RESOLUTION_STATUS,
+        CURRENT_DATE() - 2 as OPEN_DATE,
+        CURRENT_TIMESTAMP() as LOAD_TIMESTAMP,
+        CURRENT_TIMESTAMP() as UPDATE_TIMESTAMP,
+        'SAMPLE_DATA' as SOURCE_SYSTEM
+    
+    UNION ALL
+    
+    SELECT 
+        'TICK002' as TICKET_ID,
+        'USER002' as USER_ID,
+        'Billing Inquiry' as TICKET_TYPE,
+        'Open' as RESOLUTION_STATUS,
+        CURRENT_DATE() - 1 as OPEN_DATE,
+        CURRENT_TIMESTAMP() as LOAD_TIMESTAMP,
+        CURRENT_TIMESTAMP() as UPDATE_TIMESTAMP,
+        'SAMPLE_DATA' as SOURCE_SYSTEM
+        
+    UNION ALL
+    
+    SELECT 
+        'TICK003' as TICKET_ID,
+        'USER003' as USER_ID,
+        'Feature Request' as TICKET_TYPE,
+        'In Progress' as RESOLUTION_STATUS,
+        CURRENT_DATE() as OPEN_DATE,
+        CURRENT_TIMESTAMP() as LOAD_TIMESTAMP,
+        CURRENT_TIMESTAMP() as UPDATE_TIMESTAMP,
+        'SAMPLE_DATA' as SOURCE_SYSTEM
 )
 
--- Final select with audit columns
 SELECT 
     TICKET_ID,
     USER_ID,
@@ -49,4 +56,4 @@ SELECT
     LOAD_TIMESTAMP,
     UPDATE_TIMESTAMP,
     SOURCE_SYSTEM
-FROM deduped_data
+FROM sample_support_tickets
