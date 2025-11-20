@@ -8,12 +8,12 @@
     tags=['bronze', 'audit']
 ) }}
 
--- Create audit log table with explicit column definitions
+-- Create audit log table with explicit column definitions and auto-increment
 SELECT 
-    CAST(NULL AS NUMBER) AS record_id,
-    CAST(NULL AS VARCHAR(255)) AS source_table,
-    CAST(NULL AS TIMESTAMP_NTZ(9)) AS load_timestamp,
-    CAST(NULL AS VARCHAR(255)) AS processed_by,
-    CAST(NULL AS NUMBER(38,3)) AS processing_time,
-    CAST(NULL AS VARCHAR(50)) AS status
+    ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP()) AS record_id,
+    CAST('INITIAL_SETUP' AS VARCHAR(255)) AS source_table,
+    CURRENT_TIMESTAMP() AS load_timestamp,
+    CAST('DBT_BRONZE_PIPELINE' AS VARCHAR(255)) AS processed_by,
+    CAST(0.0 AS NUMBER(38,3)) AS processing_time,
+    CAST('SUCCESS' AS VARCHAR(50)) AS status
 WHERE 1=0  -- This creates the table structure without any data
