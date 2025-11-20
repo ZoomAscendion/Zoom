@@ -21,18 +21,22 @@ clean-targets:
 # Configuring models
 models:
   zoom_bronze_pipeline:
+    # Config indicated by + and applies to all files under models/bronze/
     bronze:
       +materialized: table
       +tags: ["bronze"]
-      +on_schema_change: "fail"
 
+# Global configurations
 vars:
+  # The `start_date` variable will be accessible in all resources
   start_date: '2020-01-01'
 
+# Seeds configuration
 seeds:
   zoom_bronze_pipeline:
     +quote_columns: false
 
+# Snapshots configuration
 snapshots:
   zoom_bronze_pipeline:
     +target_schema: snapshots
