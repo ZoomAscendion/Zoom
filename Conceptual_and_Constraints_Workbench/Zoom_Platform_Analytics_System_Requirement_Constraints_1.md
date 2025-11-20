@@ -1,9 +1,9 @@
 ____________________________________________
 ## *Author*: AAVA
-## *Created on*: 2024-12-19
+## *Created on*: 20-11-2025
 ## *Description*: Model data constraints and business rules for Zoom Platform Analytics System
 ## *Version*: 1
-## *Updated on*: 2024-12-19
+## *Updated on*: 20-11-2025
 ____________________________________________
 
 # Model Data Constraints - Zoom Platform Analytics System
