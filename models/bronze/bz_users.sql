@@ -1,28 +1,42 @@
--- Bronze Layer Users Table
--- Description: Stores user profile and subscription information from source systems
+-- Bronze Layer Users Model
+-- Description: Raw user profile and subscription information from source systems
 -- Author: Data Engineering Team
 -- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
     unique_key='user_id',
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (record_id, source_table, load_timestamp, processed_by, processing_time, status) SELECT COALESCE((SELECT MAX(record_id) FROM {{ ref('bz_data_audit') }}), 0) + 1, 'BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0.0, 'STARTED'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (record_id, source_table, load_timestamp, processed_by, processing_time, status) SELECT COALESCE((SELECT MAX(record_id) FROM {{ ref('bz_data_audit') }}), 0) + 1, 'BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_USERS' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS'"
+    pre_hook="
+        {% if not is_incremental() %}
+            INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
+            SELECT 'BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0.0, 'STARTED'
+        {% endif %}
+    ",
+    post_hook="
+        {% if not is_incremental() %}
+            INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
+            SELECT 'BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 
+                   DATEDIFF('second', 
+                       (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_USERS' AND STATUS = 'STARTED'),
+                       CURRENT_TIMESTAMP()
+                   ), 'SUCCESS'
+        {% endif %}
+    "
 ) }}
 
 WITH source_data AS (
     -- Select from raw users table with null filtering for primary key
     SELECT 
-        user_id,
-        user_name,
-        email,
-        company,
-        plan_type,
-        load_timestamp,
-        update_timestamp,
-        source_system
-    FROM {{ source('raw', 'users') }}
-    WHERE user_id IS NOT NULL  -- Filter out null primary keys
+        USER_ID,
+        USER_NAME,
+        EMAIL,
+        COMPANY,
+        PLAN_TYPE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('raw_schema', 'users') }}
+    WHERE USER_ID IS NOT NULL  -- Filter out records with null primary key
 ),
 
 deduped_data AS (
@@ -31,22 +45,22 @@ deduped_data AS (
     FROM (
         SELECT *,
                ROW_NUMBER() OVER (
-                   PARTITION BY user_id 
-                   ORDER BY update_timestamp DESC, load_timestamp DESC
-               ) as row_num
+                   PARTITION BY USER_ID 
+                   ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC
+               ) as rn
         FROM source_data
     )
-    WHERE row_num = 1
+    WHERE rn = 1
 )
 
--- Final select with 1-1 mapping from raw to bronze
+-- Final selection with 1-1 mapping from raw to bronze
 SELECT 
-    user_id,
-    user_name,
-    email,
-    company,
-    plan_type,
-    load_timestamp,
-    update_timestamp,
-    source_system
+    USER_ID,
+    USER_NAME,
+    EMAIL,
+    COMPANY,
+    PLAN_TYPE,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM
 FROM deduped_data
