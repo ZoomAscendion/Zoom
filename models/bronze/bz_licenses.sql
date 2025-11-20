@@ -1,28 +1,42 @@
--- Bronze Layer Licenses Table
--- Description: Manages license assignments and entitlements
+-- Bronze Layer Licenses Model
+-- Description: Raw license assignments and entitlements from source systems
 -- Author: Data Engineering Team
 -- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
     unique_key='license_id',
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (record_id, source_table, load_timestamp, processed_by, processing_time, status) SELECT COALESCE((SELECT MAX(record_id) FROM {{ ref('bz_data_audit') }}), 0) + 1, 'BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0.0, 'STARTED'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (record_id, source_table, load_timestamp, processed_by, processing_time, status) SELECT COALESCE((SELECT MAX(record_id) FROM {{ ref('bz_data_audit') }}), 0) + 1, 'BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_LICENSES' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS'"
+    pre_hook="
+        {% if not is_incremental() %}
+            INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
+            SELECT 'BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0.0, 'STARTED'
+        {% endif %}
+    ",
+    post_hook="
+        {% if not is_incremental() %}
+            INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
+            SELECT 'BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 
+                   DATEDIFF('second', 
+                       (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_LICENSES' AND STATUS = 'STARTED'),
+                       CURRENT_TIMESTAMP()
+                   ), 'SUCCESS'
+        {% endif %}
+    "
 ) }}
 
 WITH source_data AS (
     -- Select from raw licenses table with null filtering for primary key
     SELECT 
-        license_id,
-        license_type,
-        assigned_to_user_id,
-        start_date,
-        TRY_CAST(end_date AS DATE) as end_date,
-        load_timestamp,
-        update_timestamp,
-        source_system
-    FROM {{ source('raw', 'licenses') }}
-    WHERE license_id IS NOT NULL  -- Filter out null primary keys
+        LICENSE_ID,
+        LICENSE_TYPE,
+        ASSIGNED_TO_USER_ID,
+        START_DATE,
+        TRY_CAST(END_DATE AS DATE) as END_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('raw_schema', 'licenses') }}
+    WHERE LICENSE_ID IS NOT NULL  -- Filter out records with null primary key
 ),
 
 deduped_data AS (
@@ -31,22 +45,22 @@ deduped_data AS (
     FROM (
         SELECT *,
                ROW_NUMBER() OVER (
-                   PARTITION BY license_id 
-                   ORDER BY update_timestamp DESC, load_timestamp DESC
-               ) as row_num
+                   PARTITION BY LICENSE_ID 
+                   ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC
+               ) as rn
         FROM source_data
     )
-    WHERE row_num = 1
+    WHERE rn = 1
 )
 
--- Final select with 1-1 mapping from raw to bronze
+-- Final selection with 1-1 mapping from raw to bronze
 SELECT 
-    license_id,
-    license_type,
-    assigned_to_user_id,
-    start_date,
-    end_date,
-    load_timestamp,
-    update_timestamp,
-    source_system
+    LICENSE_ID,
+    LICENSE_TYPE,
+    ASSIGNED_TO_USER_ID,
+    START_DATE,
+    END_DATE,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM
 FROM deduped_data
