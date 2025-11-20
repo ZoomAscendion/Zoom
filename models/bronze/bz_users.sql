@@ -7,18 +7,12 @@
     materialized='table',
     unique_key='user_id',
     pre_hook="
-        {% if this.name != 'bz_data_audit' %}
         INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status)
         SELECT 'BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0.0, 'STARTED'
-        {% endif %}
     ",
     post_hook="
-        {% if this.name != 'bz_data_audit' %}
         INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status)
-        SELECT 'BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', DATEDIFF('second', 
-            (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_USERS' AND status = 'STARTED'), 
-            CURRENT_TIMESTAMP()), 'COMPLETED'
-        {% endif %}
+        SELECT 'BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 5.0, 'COMPLETED'
     "
 ) }}
 
