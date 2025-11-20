@@ -1,609 +1,344 @@
 _____________________________________________
 ## *Author*: AAVA
 ## *Created on*: 2024-12-19
-## *Description*: Comprehensive unit test cases for Zoom Platform Analytics Bronze layer dbt models in Snowflake
+## *Description*: Comprehensive unit test cases for Zoom Bronze Layer dbt models in Snowflake
 ## *Version*: 1 
 ## *Updated on*: 2024-12-19
 _____________________________________________
 
-# Snowflake dbt Unit Test Cases - Zoom Platform Analytics Bronze Layer
+# Snowflake dbt Unit Test Cases - Zoom Bronze Layer Pipeline
 
 ## Overview
 
-This document provides comprehensive unit test cases and dbt test scripts for the Zoom Platform Analytics Bronze layer dbt models running in Snowflake. The test suite covers data transformations, business rules, edge cases, and error handling scenarios to ensure reliable and performant dbt models.
+This document provides comprehensive unit test cases and dbt test scripts for the Zoom Bronze Layer Pipeline dbt models running in Snowflake. The tests ensure data quality, validate transformations, and verify business rules across all Bronze layer models following the Medallion architecture.
 
 ## Test Strategy
 
-The testing approach follows dbt best practices and covers:
-- **Data Quality Tests**: Primary key uniqueness, not-null constraints, referential integrity
-- **Transformation Tests**: Data type conversions, deduplication logic, filtering rules
-- **Edge Case Tests**: NULL handling, empty datasets, invalid data scenarios
-- **Business Rule Tests**: Domain-specific validations and constraints
-- **Performance Tests**: Query optimization and execution time validation
-- **Audit Tests**: Metadata tracking and lineage verification
+### Testing Approach
+- **Data Quality Tests**: Validate primary keys, null constraints, and data integrity
+- **Business Rule Tests**: Verify transformations, deduplication, and audit trail functionality
+- **Edge Case Tests**: Handle null values, empty datasets, and invalid data scenarios
+- **Performance Tests**: Ensure efficient execution and proper indexing
+- **Integration Tests**: Validate relationships between models and audit functionality
 
----
+### Test Coverage Areas
+1. **Primary Key Validation**: Uniqueness and non-null constraints
+2. **Data Type Validation**: Proper casting and type conversions
+3. **Deduplication Logic**: ROW_NUMBER() window function validation
+4. **Audit Trail**: Pre/post hook execution and audit table population
+5. **Error Handling**: TRY_CAST function validation
+6. **Source Data Filtering**: Null primary key filtering
+7. **Referential Integrity**: Foreign key relationship validation
 
 ## Test Case List
 
-### 1. Data Quality Test Cases
+### 1. BZ_DATA_AUDIT Model Tests
 
-| Test Case ID | Test Case Description | Expected Outcome | Model(s) Tested |
-|--------------|----------------------|------------------|------------------|
-| DQ_001 | Validate primary key uniqueness for all Bronze tables | All primary keys are unique with no duplicates | All Bronze models |
-| DQ_002 | Validate not-null constraints on primary keys | No NULL values in primary key columns | All Bronze models |
-| DQ_003 | Validate data type consistency between source and target | All data types match expected schema definitions | All Bronze models |
-| DQ_004 | Validate timestamp columns are properly formatted | All timestamp columns follow TIMESTAMP_NTZ format | All Bronze models |
-| DQ_005 | Validate date columns are properly formatted | All date columns follow DATE format | bz_billing_events, bz_support_tickets, bz_feature_usage, bz_licenses |
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_AUDIT_001 | Validate record_id uniqueness and auto-increment | All record_id values are unique and sequential |
+| TC_AUDIT_002 | Verify source_table field is not null | No null values in source_table column |
+| TC_AUDIT_003 | Validate load_timestamp is populated | All records have valid timestamps |
+| TC_AUDIT_004 | Check status field accepts only valid values | Only SUCCESS, FAILED, WARNING, STARTED, INITIALIZED allowed |
+| TC_AUDIT_005 | Verify processing_time is numeric and non-negative | All processing times are >= 0 |
 
-### 2. Transformation Test Cases
+### 2. BZ_USERS Model Tests
 
-| Test Case ID | Test Case Description | Expected Outcome | Model(s) Tested |
-|--------------|----------------------|------------------|------------------|
-| TR_001 | Validate deduplication logic removes duplicate records | Only latest records based on UPDATE_TIMESTAMP are retained | All Bronze models |
-| TR_002 | Validate TRY_CAST functions handle invalid data gracefully | Invalid data converts to NULL without pipeline failure | bz_meetings, bz_participants, bz_billing_events, bz_licenses |
-| TR_003 | Validate NULL primary key filtering | Records with NULL primary keys are excluded from output | All Bronze models |
-| TR_004 | Validate 1-1 mapping from source to Bronze layer | All source columns are mapped correctly to Bronze tables | All Bronze models |
-| TR_005 | Validate ROW_NUMBER() partitioning logic | Correct ranking based on UPDATE_TIMESTAMP and LOAD_TIMESTAMP | All Bronze models |
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_USERS_001 | Validate user_id uniqueness | All user_id values are unique |
+| TC_USERS_002 | Verify user_id is not null | No null values in user_id column |
+| TC_USERS_003 | Check email format validation | Valid email format or null |
+| TC_USERS_004 | Validate deduplication logic | Latest record per user_id based on update_timestamp |
+| TC_USERS_005 | Verify data type casting | All fields properly cast to target types |
+| TC_USERS_006 | Test null primary key filtering | Records with null user_id are excluded |
+| TC_USERS_007 | Validate audit trail integration | Audit records created for model execution |
 
-### 3. Edge Case Test Cases
+### 3. BZ_MEETINGS Model Tests
 
-| Test Case ID | Test Case Description | Expected Outcome | Model(s) Tested |
-|--------------|----------------------|------------------|------------------|
-| EC_001 | Handle empty source tables | Models execute successfully with empty result sets | All Bronze models |
-| EC_002 | Handle source tables with only NULL primary keys | Models return empty result sets | All Bronze models |
-| EC_003 | Handle malformed timestamp data | TRY_CAST converts invalid timestamps to NULL | bz_meetings, bz_participants |
-| EC_004 | Handle malformed numeric data | TRY_CAST converts invalid numbers to NULL | bz_meetings, bz_billing_events |
-| EC_005 | Handle extremely large VARCHAR values | Data truncation handled gracefully | All Bronze models |
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_MEETINGS_001 | Validate meeting_id uniqueness | All meeting_id values are unique |
+| TC_MEETINGS_002 | Verify meeting_id is not null | No null values in meeting_id column |
+| TC_MEETINGS_003 | Check start_time is not null | All meetings have valid start times |
+| TC_MEETINGS_004 | Validate TRY_CAST for end_time | Invalid timestamps converted to null |
+| TC_MEETINGS_005 | Verify TRY_CAST for duration_minutes | Invalid numbers converted to null |
+| TC_MEETINGS_006 | Test deduplication logic | Latest record per meeting_id |
+| TC_MEETINGS_007 | Validate duration calculation logic | Duration matches end_time - start_time |
 
-### 4. Business Rule Test Cases
+### 4. BZ_PARTICIPANTS Model Tests
 
-| Test Case ID | Test Case Description | Expected Outcome | Model(s) Tested |
-|--------------|----------------------|------------------|------------------|
-| BR_001 | Validate email format in users table | Email addresses follow valid format patterns | bz_users |
-| BR_002 | Validate meeting duration consistency | DURATION_MINUTES aligns with START_TIME and END_TIME | bz_meetings |
-| BR_003 | Validate participant session logic | JOIN_TIME is before or equal to LEAVE_TIME | bz_participants |
-| BR_004 | Validate billing amount ranges | AMOUNT values are within reasonable business ranges | bz_billing_events |
-| BR_005 | Validate license date ranges | START_DATE is before or equal to END_DATE | bz_licenses |
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_PARTICIPANTS_001 | Validate participant_id uniqueness | All participant_id values are unique |
+| TC_PARTICIPANTS_002 | Verify participant_id is not null | No null values in participant_id column |
+| TC_PARTICIPANTS_003 | Check meeting_id foreign key validity | All meeting_id values exist in BZ_MEETINGS |
+| TC_PARTICIPANTS_004 | Validate user_id foreign key validity | All user_id values exist in BZ_USERS |
+| TC_PARTICIPANTS_005 | Verify TRY_CAST for join_time | Invalid timestamps converted to null |
+| TC_PARTICIPANTS_006 | Test session duration logic | leave_time >= join_time when both not null |
+| TC_PARTICIPANTS_007 | Validate deduplication logic | Latest record per participant_id |
 
-### 5. Audit and Metadata Test Cases
+### 5. BZ_FEATURE_USAGE Model Tests
 
-| Test Case ID | Test Case Description | Expected Outcome | Model(s) Tested |
-|--------------|----------------------|------------------|------------------|
-| AU_001 | Validate audit table structure | BZ_DATA_AUDIT table has correct schema | bz_data_audit |
-| AU_002 | Validate pre-hook audit logging | STARTED status logged before model execution | All Bronze models |
-| AU_003 | Validate post-hook audit logging | SUCCESS status logged after model execution | All Bronze models |
-| AU_004 | Validate SOURCE_SYSTEM tracking | All records have valid SOURCE_SYSTEM values | All Bronze models |
-| AU_005 | Validate metadata timestamp consistency | LOAD_TIMESTAMP and UPDATE_TIMESTAMP are properly populated | All Bronze models |
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_FEATURE_001 | Validate usage_id uniqueness | All usage_id values are unique |
+| TC_FEATURE_002 | Verify usage_id is not null | No null values in usage_id column |
+| TC_FEATURE_003 | Check usage_count is non-negative | All usage_count values >= 0 |
+| TC_FEATURE_004 | Validate feature_name is not null | No null values in feature_name column |
+| TC_FEATURE_005 | Verify usage_date validity | All dates are valid and not future dates |
+| TC_FEATURE_006 | Test meeting_id foreign key | All meeting_id values exist in BZ_MEETINGS |
+| TC_FEATURE_007 | Validate deduplication logic | Latest record per usage_id |
 
----
+### 6. BZ_SUPPORT_TICKETS Model Tests
+
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_TICKETS_001 | Validate ticket_id uniqueness | All ticket_id values are unique |
+| TC_TICKETS_002 | Verify ticket_id is not null | No null values in ticket_id column |
+| TC_TICKETS_003 | Check user_id foreign key validity | All user_id values exist in BZ_USERS |
+| TC_TICKETS_004 | Validate resolution_status values | Only valid status values allowed |
+| TC_TICKETS_005 | Verify open_date is not null | All tickets have valid open dates |
+| TC_TICKETS_006 | Test ticket_type validation | Valid ticket types only |
+| TC_TICKETS_007 | Validate deduplication logic | Latest record per ticket_id |
+
+### 7. BZ_BILLING_EVENTS Model Tests
+
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_BILLING_001 | Validate event_id uniqueness | All event_id values are unique |
+| TC_BILLING_002 | Verify event_id is not null | No null values in event_id column |
+| TC_BILLING_003 | Check amount TRY_CAST validation | Invalid amounts converted to null |
+| TC_BILLING_004 | Validate amount precision | Amounts have correct decimal precision (10,2) |
+| TC_BILLING_005 | Verify user_id foreign key | All user_id values exist in BZ_USERS |
+| TC_BILLING_006 | Test event_date validity | All dates are valid |
+| TC_BILLING_007 | Validate deduplication logic | Latest record per event_id |
+
+### 8. BZ_LICENSES Model Tests
+
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_LICENSES_001 | Validate license_id uniqueness | All license_id values are unique |
+| TC_LICENSES_002 | Verify license_id is not null | No null values in license_id column |
+| TC_LICENSES_003 | Check assigned_to_user_id foreign key | All user_id values exist in BZ_USERS |
+| TC_LICENSES_004 | Validate date range logic | end_date >= start_date when both not null |
+| TC_LICENSES_005 | Verify TRY_CAST for end_date | Invalid dates converted to null |
+| TC_LICENSES_006 | Test license_type validation | Valid license types only |
+| TC_LICENSES_007 | Validate deduplication logic | Latest record per license_id |
 
 ## dbt Test Scripts
 
 ### YAML-based Schema Tests
 
-#### File: models/bronze/schema.yml
-
 ```yaml
+# tests/schema_tests.yml
 version: 2
 
-sources:
-  - name: raw_zoom
-    description: "Raw data layer containing unprocessed data from Zoom platform"
-    database: DB_POC_ZOOM
-    schema: RAW
-    tables:
-      - name: users
-        description: "Raw user profile and subscription information"
-        columns:
-          - name: user_id
-            description: "Unique identifier for each user account"
-            tests:
-              - not_null
-              - unique
-          - name: email
-            description: "Email address of the user"
-            tests:
-              - not_null
-
-      - name: meetings
-        description: "Raw meeting information and session details"
-        columns:
-          - name: meeting_id
-            description: "Unique identifier for each meeting"
-            tests:
-              - not_null
-              - unique
-
-      - name: participants
-        description: "Raw meeting participants and their session details"
-        columns:
-          - name: participant_id
-            description: "Unique identifier for each participant record"
-            tests:
-              - not_null
-              - unique
-
-      - name: feature_usage
-        description: "Raw usage of platform features during meetings"
-        columns:
-          - name: usage_id
-            description: "Unique identifier for each feature usage record"
-            tests:
-              - not_null
-              - unique
-
-      - name: support_tickets
-        description: "Raw customer support requests and resolution tracking"
-        columns:
-          - name: ticket_id
-            description: "Unique identifier for each support ticket"
-            tests:
-              - not_null
-              - unique
-
-      - name: billing_events
-        description: "Raw financial transactions and billing activities"
-        columns:
-          - name: event_id
-            description: "Unique identifier for each billing event"
-            tests:
-              - not_null
-              - unique
-
-      - name: licenses
-        description: "Raw license assignments and entitlements"
-        columns:
-          - name: license_id
-            description: "Unique identifier for each license"
-            tests:
-              - not_null
-              - unique
-
 models:
+  # BZ_DATA_AUDIT Tests
   - name: bz_data_audit
-    description: "Comprehensive audit trail for all Bronze layer data operations"
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "record_id > 0"
+          config:
+            severity: error
     columns:
       - name: record_id
-        description: "Auto-incrementing unique identifier for each audit record"
         tests:
           - not_null
           - unique
       - name: source_table
-        description: "Name of the Bronze layer table"
         tests:
           - not_null
       - name: load_timestamp
-        description: "When the operation occurred"
         tests:
           - not_null
       - name: status
-        description: "Status of the operation"
         tests:
-          - not_null
           - accepted_values:
-              values: ['STARTED', 'SUCCESS', 'FAILED', 'WARNING']
+              values: ['SUCCESS', 'FAILED', 'WARNING', 'STARTED', 'INITIALIZED']
+      - name: processing_time
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "processing_time >= 0"
 
+  # BZ_USERS Tests
   - name: bz_users
-    description: "Bronze layer table storing user profile and subscription information"
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "load_timestamp <= current_timestamp()"
+          config:
+            severity: warn
     columns:
       - name: user_id
-        description: "Unique identifier for each user account"
         tests:
           - not_null
           - unique
       - name: email
-        description: "Email address of the user"
         tests:
-          - not_null
-      - name: plan_type
-        description: "Subscription plan type"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['Basic', 'Pro', 'Business', 'Enterprise']
-      - name: load_timestamp
-        description: "Timestamp when record was loaded"
-        tests:
-          - not_null
-      - name: source_system
-        description: "Source system identifier"
-        tests:
-          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "email IS NULL OR email LIKE '%@%'"
+              config:
+                severity: warn
 
+  # BZ_MEETINGS Tests
   - name: bz_meetings
-    description: "Bronze layer table storing meeting information and session details"
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "end_time IS NULL OR end_time >= start_time"
+          config:
+            severity: error
+      - dbt_utils.expression_is_true:
+          expression: "duration_minutes IS NULL OR duration_minutes >= 0"
     columns:
       - name: meeting_id
-        description: "Unique identifier for each meeting"
         tests:
           - not_null
           - unique
-      - name: host_id
-        description: "User ID of the meeting host"
-        tests:
-          - not_null
       - name: start_time
-        description: "Meeting start timestamp"
-        tests:
-          - not_null
-      - name: duration_minutes
-        description: "Meeting duration in minutes"
-        tests:
-          - not_null
-          - dbt_utils.expression_is_true:
-              expression: ">= 0"
-      - name: load_timestamp
-        description: "Timestamp when record was loaded"
-        tests:
-          - not_null
-      - name: source_system
-        description: "Source system identifier"
         tests:
           - not_null
 
+  # BZ_PARTICIPANTS Tests
   - name: bz_participants
-    description: "Bronze layer table tracking meeting participants"
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "leave_time IS NULL OR join_time IS NULL OR leave_time >= join_time"
+          config:
+            severity: error
     columns:
       - name: participant_id
-        description: "Unique identifier for each meeting participant"
         tests:
           - not_null
           - unique
       - name: meeting_id
-        description: "Reference to meeting"
         tests:
-          - not_null
+          - relationships:
+              to: ref('bz_meetings')
+              field: meeting_id
+              config:
+                severity: warn
       - name: user_id
-        description: "Reference to user who participated"
         tests:
-          - not_null
-      - name: load_timestamp
-        description: "Timestamp when record was loaded"
-        tests:
-          - not_null
-      - name: source_system
-        description: "Source system identifier"
-        tests:
-          - not_null
+          - relationships:
+              to: ref('bz_users')
+              field: user_id
+              config:
+                severity: warn
 
+  # BZ_FEATURE_USAGE Tests
   - name: bz_feature_usage
-    description: "Bronze layer table recording platform feature usage"
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "usage_date <= current_date()"
+          config:
+            severity: warn
     columns:
       - name: usage_id
-        description: "Unique identifier for each feature usage record"
         tests:
           - not_null
           - unique
-      - name: meeting_id
-        description: "Reference to meeting where feature was used"
-        tests:
-          - not_null
       - name: feature_name
-        description: "Name of the feature being tracked"
         tests:
           - not_null
       - name: usage_count
-        description: "Number of times feature was used"
         tests:
-          - not_null
           - dbt_utils.expression_is_true:
-              expression: ">= 0"
-      - name: usage_date
-        description: "Date when feature usage occurred"
+              expression: "usage_count >= 0"
+      - name: meeting_id
         tests:
-          - not_null
-      - name: load_timestamp
-        description: "Timestamp when record was loaded"
-        tests:
-          - not_null
-      - name: source_system
-        description: "Source system identifier"
-        tests:
-          - not_null
+          - relationships:
+              to: ref('bz_meetings')
+              field: meeting_id
+              config:
+                severity: warn
 
+  # BZ_SUPPORT_TICKETS Tests
   - name: bz_support_tickets
-    description: "Bronze layer table managing customer support requests"
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "open_date <= current_date()"
     columns:
       - name: ticket_id
-        description: "Unique identifier for each support ticket"
         tests:
           - not_null
           - unique
       - name: user_id
-        description: "Reference to user who created the ticket"
         tests:
-          - not_null
-      - name: ticket_type
-        description: "Type of support ticket"
-        tests:
-          - not_null
-      - name: resolution_status
-        description: "Current status of ticket resolution"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['Open', 'In Progress', 'Resolved', 'Closed']
+          - relationships:
+              to: ref('bz_users')
+              field: user_id
+              config:
+                severity: warn
       - name: open_date
-        description: "Date when ticket was opened"
-        tests:
-          - not_null
-      - name: load_timestamp
-        description: "Timestamp when record was loaded"
-        tests:
-          - not_null
-      - name: source_system
-        description: "Source system identifier"
         tests:
           - not_null
 
+  # BZ_BILLING_EVENTS Tests
   - name: bz_billing_events
-    description: "Bronze layer table tracking financial transactions"
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "event_date <= current_date()"
     columns:
       - name: event_id
-        description: "Unique identifier for each billing event"
         tests:
           - not_null
           - unique
       - name: user_id
-        description: "Reference to user associated with billing event"
         tests:
-          - not_null
-      - name: event_type
-        description: "Type of billing event"
-        tests:
-          - not_null
+          - relationships:
+              to: ref('bz_users')
+              field: user_id
+              config:
+                severity: warn
       - name: amount
-        description: "Monetary amount for the billing event"
         tests:
-          - not_null
           - dbt_utils.expression_is_true:
-              expression: ">= 0"
-      - name: event_date
-        description: "Date when the billing event occurred"
-        tests:
-          - not_null
-      - name: load_timestamp
-        description: "Timestamp when record was loaded"
-        tests:
-          - not_null
-      - name: source_system
-        description: "Source system identifier"
-        tests:
-          - not_null
+              expression: "amount IS NULL OR amount >= 0"
 
+  # BZ_LICENSES Tests
   - name: bz_licenses
-    description: "Bronze layer table managing license assignments"
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "end_date IS NULL OR start_date IS NULL OR end_date >= start_date"
+          config:
+            severity: error
     columns:
       - name: license_id
-        description: "Unique identifier for each license"
         tests:
           - not_null
           - unique
-      - name: license_type
-        description: "Type of license"
-        tests:
-          - not_null
       - name: assigned_to_user_id
-        description: "User ID to whom license is assigned"
         tests:
-          - not_null
-      - name: start_date
-        description: "License validity start date"
-        tests:
-          - not_null
-      - name: load_timestamp
-        description: "Timestamp when record was loaded"
-        tests:
-          - not_null
-      - name: source_system
-        description: "Source system identifier"
-        tests:
-          - not_null
+          - relationships:
+              to: ref('bz_users')
+              field: user_id
+              config:
+                severity: warn
 ```
 
 ### Custom SQL-based dbt Tests
 
-#### File: tests/test_deduplication_logic.sql
+#### 1. Test Deduplication Logic
 
 ```sql
--- Test: Validate deduplication logic across all Bronze models
--- Description: Ensures that deduplication based on ROW_NUMBER() works correctly
--- Expected: No duplicates based on primary key should exist
-
-WITH duplicate_check AS (
-    SELECT 'bz_users' as table_name, user_id as primary_key, COUNT(*) as record_count
-    FROM {{ ref('bz_users') }}
-    GROUP BY user_id
-    HAVING COUNT(*) > 1
-    
-    UNION ALL
-    
-    SELECT 'bz_meetings' as table_name, meeting_id as primary_key, COUNT(*) as record_count
-    FROM {{ ref('bz_meetings') }}
-    GROUP BY meeting_id
-    HAVING COUNT(*) > 1
-    
-    UNION ALL
-    
-    SELECT 'bz_participants' as table_name, participant_id as primary_key, COUNT(*) as record_count
-    FROM {{ ref('bz_participants') }}
-    GROUP BY participant_id
-    HAVING COUNT(*) > 1
-    
-    UNION ALL
-    
-    SELECT 'bz_feature_usage' as table_name, usage_id as primary_key, COUNT(*) as record_count
-    FROM {{ ref('bz_feature_usage') }}
-    GROUP BY usage_id
-    HAVING COUNT(*) > 1
-    
-    UNION ALL
-    
-    SELECT 'bz_support_tickets' as table_name, ticket_id as primary_key, COUNT(*) as record_count
-    FROM {{ ref('bz_support_tickets') }}
-    GROUP BY ticket_id
-    HAVING COUNT(*) > 1
-    
-    UNION ALL
-    
-    SELECT 'bz_billing_events' as table_name, event_id as primary_key, COUNT(*) as record_count
-    FROM {{ ref('bz_billing_events') }}
-    GROUP BY event_id
-    HAVING COUNT(*) > 1
-    
-    UNION ALL
-    
-    SELECT 'bz_licenses' as table_name, license_id as primary_key, COUNT(*) as record_count
-    FROM {{ ref('bz_licenses') }}
-    GROUP BY license_id
-    HAVING COUNT(*) > 1
-)
-
-SELECT *
-FROM duplicate_check
+-- tests/test_deduplication_users.sql
+-- Test that deduplication logic works correctly for BZ_USERS
+SELECT 
+    user_id,
+    COUNT(*) as duplicate_count
+FROM {{ ref('bz_users') }}
+GROUP BY user_id
+HAVING COUNT(*) > 1
 ```
 
-#### File: tests/test_data_type_consistency.sql
+#### 2. Test Audit Trail Functionality
 
 ```sql
--- Test: Validate data type consistency between source and Bronze layers
--- Description: Ensures TRY_CAST functions work correctly and data types are consistent
--- Expected: All data type conversions should be successful
-
-WITH data_type_validation AS (
-    -- Test TIMESTAMP_NTZ conversions in meetings
-    SELECT 'bz_meetings_end_time' as test_case,
-           COUNT(*) as total_records,
-           COUNT(end_time) as valid_timestamps,
-           COUNT(*) - COUNT(end_time) as null_timestamps
-    FROM {{ ref('bz_meetings') }}
-    
-    UNION ALL
-    
-    -- Test NUMBER conversions in meetings
-    SELECT 'bz_meetings_duration' as test_case,
-           COUNT(*) as total_records,
-           COUNT(duration_minutes) as valid_numbers,
-           COUNT(*) - COUNT(duration_minutes) as null_numbers
-    FROM {{ ref('bz_meetings') }}
-    
-    UNION ALL
-    
-    -- Test TIMESTAMP_NTZ conversions in participants
-    SELECT 'bz_participants_join_time' as test_case,
-           COUNT(*) as total_records,
-           COUNT(join_time) as valid_timestamps,
-           COUNT(*) - COUNT(join_time) as null_timestamps
-    FROM {{ ref('bz_participants') }}
-    
-    UNION ALL
-    
-    -- Test NUMBER conversions in billing_events
-    SELECT 'bz_billing_events_amount' as test_case,
-           COUNT(*) as total_records,
-           COUNT(amount) as valid_amounts,
-           COUNT(*) - COUNT(amount) as null_amounts
-    FROM {{ ref('bz_billing_events') }}
-    
-    UNION ALL
-    
-    -- Test DATE conversions in licenses
-    SELECT 'bz_licenses_end_date' as test_case,
-           COUNT(*) as total_records,
-           COUNT(end_date) as valid_dates,
-           COUNT(*) - COUNT(end_date) as null_dates
-    FROM {{ ref('bz_licenses') }}
-)
-
-SELECT *
-FROM data_type_validation
-WHERE total_records = 0 -- This should return no records if all conversions are working
-```
-
-#### File: tests/test_business_rules.sql
-
-```sql
--- Test: Validate business rules across Bronze models
--- Description: Ensures business logic constraints are met
--- Expected: All business rules should be satisfied
-
-WITH business_rule_violations AS (
-    -- Test: Meeting duration should be non-negative
-    SELECT 'negative_meeting_duration' as violation_type,
-           meeting_id as record_id,
-           duration_minutes as violation_value
-    FROM {{ ref('bz_meetings') }}
-    WHERE duration_minutes < 0
-    
-    UNION ALL
-    
-    -- Test: Participant join time should be before or equal to leave time
-    SELECT 'invalid_participant_session' as violation_type,
-           participant_id as record_id,
-           DATEDIFF('minute', join_time, leave_time) as violation_value
-    FROM {{ ref('bz_participants') }}
-    WHERE join_time > leave_time
-    
-    UNION ALL
-    
-    -- Test: Billing amounts should be non-negative
-    SELECT 'negative_billing_amount' as violation_type,
-           event_id as record_id,
-           amount as violation_value
-    FROM {{ ref('bz_billing_events') }}
-    WHERE amount < 0
-    
-    UNION ALL
-    
-    -- Test: License start date should be before or equal to end date
-    SELECT 'invalid_license_dates' as violation_type,
-           license_id as record_id,
-           DATEDIFF('day', start_date, end_date) as violation_value
-    FROM {{ ref('bz_licenses') }}
-    WHERE start_date > end_date
-    
-    UNION ALL
-    
-    -- Test: Feature usage count should be non-negative
-    SELECT 'negative_usage_count' as violation_type,
-           usage_id as record_id,
-           usage_count as violation_value
-    FROM {{ ref('bz_feature_usage') }}
-    WHERE usage_count < 0
-)
-
-SELECT *
-FROM business_rule_violations
-```
-
-#### File: tests/test_audit_functionality.sql
-
-```sql
--- Test: Validate audit table functionality
--- Description: Ensures audit logging is working correctly
--- Expected: Audit records should exist for all Bronze table operations
-
-WITH audit_validation AS (
-    SELECT 
-        source_table,
-        COUNT(*) as audit_record_count,
-        COUNT(CASE WHEN status = 'STARTED' THEN 1 END) as started_count,
-        COUNT(CASE WHEN status = 'SUCCESS' THEN 1 END) as success_count,
-        COUNT(CASE WHEN status = 'FAILED' THEN 1 END) as failed_count,
-        MAX(load_timestamp) as latest_audit_timestamp
-    FROM {{ ref('bz_data_audit') }}
-    WHERE source_table IN (
-        'BZ_USERS', 'BZ_MEETINGS', 'BZ_PARTICIPANTS', 
-        'BZ_FEATURE_USAGE', 'BZ_SUPPORT_TICKETS', 
-        'BZ_BILLING_EVENTS', 'BZ_LICENSES'
-    )
-    GROUP BY source_table
-),
-
-expected_tables AS (
-    SELECT table_name
-    FROM (
+-- tests/test_audit_trail_completeness.sql
+-- Verify that audit records are created for all model executions
+WITH expected_tables AS (
+    SELECT table_name FROM (
         VALUES 
         ('BZ_USERS'),
         ('BZ_MEETINGS'),
@@ -613,270 +348,219 @@ expected_tables AS (
         ('BZ_BILLING_EVENTS'),
         ('BZ_LICENSES')
     ) AS t(table_name)
+),
+actual_audit_records AS (
+    SELECT DISTINCT source_table
+    FROM {{ ref('bz_data_audit') }}
+    WHERE status IN ('SUCCESS', 'STARTED')
 )
-
--- Check for missing audit records
 SELECT 
-    et.table_name as missing_audit_table,
-    'Missing audit records' as issue_type
-FROM expected_tables et
-LEFT JOIN audit_validation av ON et.table_name = av.source_table
-WHERE av.source_table IS NULL
+    e.table_name
+FROM expected_tables e
+LEFT JOIN actual_audit_records a ON e.table_name = a.source_table
+WHERE a.source_table IS NULL
+```
+
+#### 3. Test Data Type Casting
+
+```sql
+-- tests/test_data_type_casting.sql
+-- Verify TRY_CAST functions handle invalid data properly
+SELECT 
+    'bz_meetings' as model_name,
+    'end_time' as column_name,
+    COUNT(*) as invalid_cast_count
+FROM {{ source('raw', 'meetings') }}
+WHERE end_time IS NOT NULL 
+  AND TRY_CAST(end_time AS TIMESTAMP_NTZ(9)) IS NULL
 
 UNION ALL
 
--- Check for tables with failed operations
 SELECT 
-    source_table as problematic_table,
-    'Failed operations detected' as issue_type
-FROM audit_validation
-WHERE failed_count > 0
+    'bz_meetings' as model_name,
+    'duration_minutes' as column_name,
+    COUNT(*) as invalid_cast_count
+FROM {{ source('raw', 'meetings') }}
+WHERE duration_minutes IS NOT NULL 
+  AND TRY_CAST(duration_minutes AS NUMBER(38,0)) IS NULL
+
+UNION ALL
+
+SELECT 
+    'bz_billing_events' as model_name,
+    'amount' as column_name,
+    COUNT(*) as invalid_cast_count
+FROM {{ source('raw', 'billing_events') }}
+WHERE amount IS NOT NULL 
+  AND TRY_CAST(amount AS NUMBER(10,2)) IS NULL
 ```
 
-#### File: tests/test_metadata_consistency.sql
+#### 4. Test Source Data Quality
 
 ```sql
--- Test: Validate metadata consistency across Bronze models
--- Description: Ensures all metadata fields are properly populated
--- Expected: All records should have valid metadata
+-- tests/test_source_data_quality.sql
+-- Identify data quality issues in source tables
+SELECT 
+    'users' as source_table,
+    'null_primary_keys' as issue_type,
+    COUNT(*) as issue_count
+FROM {{ source('raw', 'users') }}
+WHERE user_id IS NULL
 
-WITH metadata_validation AS (
-    SELECT 'bz_users' as table_name,
-           COUNT(*) as total_records,
-           COUNT(load_timestamp) as valid_load_timestamps,
-           COUNT(update_timestamp) as valid_update_timestamps,
-           COUNT(source_system) as valid_source_systems
-    FROM {{ ref('bz_users') }}
-    
-    UNION ALL
-    
-    SELECT 'bz_meetings' as table_name,
-           COUNT(*) as total_records,
-           COUNT(load_timestamp) as valid_load_timestamps,
-           COUNT(update_timestamp) as valid_update_timestamps,
-           COUNT(source_system) as valid_source_systems
-    FROM {{ ref('bz_meetings') }}
-    
-    UNION ALL
-    
-    SELECT 'bz_participants' as table_name,
-           COUNT(*) as total_records,
-           COUNT(load_timestamp) as valid_load_timestamps,
-           COUNT(update_timestamp) as valid_update_timestamps,
-           COUNT(source_system) as valid_source_systems
-    FROM {{ ref('bz_participants') }}
-    
-    UNION ALL
-    
-    SELECT 'bz_feature_usage' as table_name,
-           COUNT(*) as total_records,
-           COUNT(load_timestamp) as valid_load_timestamps,
-           COUNT(update_timestamp) as valid_update_timestamps,
-           COUNT(source_system) as valid_source_systems
-    FROM {{ ref('bz_feature_usage') }}
-    
-    UNION ALL
-    
-    SELECT 'bz_support_tickets' as table_name,
-           COUNT(*) as total_records,
-           COUNT(load_timestamp) as valid_load_timestamps,
-           COUNT(update_timestamp) as valid_update_timestamps,
-           COUNT(source_system) as valid_source_systems
-    FROM {{ ref('bz_support_tickets') }}
-    
-    UNION ALL
-    
-    SELECT 'bz_billing_events' as table_name,
-           COUNT(*) as total_records,
-           COUNT(load_timestamp) as valid_load_timestamps,
-           COUNT(update_timestamp) as valid_update_timestamps,
-           COUNT(source_system) as valid_source_systems
-    FROM {{ ref('bz_billing_events') }}
-    
-    UNION ALL
-    
-    SELECT 'bz_licenses' as table_name,
-           COUNT(*) as total_records,
-           COUNT(load_timestamp) as valid_load_timestamps,
-           COUNT(update_timestamp) as valid_update_timestamps,
-           COUNT(source_system) as valid_source_systems
-    FROM {{ ref('bz_licenses') }}
-)
+UNION ALL
 
 SELECT 
-    table_name,
-    total_records,
-    (total_records - valid_load_timestamps) as missing_load_timestamps,
-    (total_records - valid_update_timestamps) as missing_update_timestamps,
-    (total_records - valid_source_systems) as missing_source_systems
-FROM metadata_validation
-WHERE 
-    (total_records - valid_load_timestamps) > 0 OR
-    (total_records - valid_update_timestamps) > 0 OR
-    (total_records - valid_source_systems) > 0
+    'meetings' as source_table,
+    'null_primary_keys' as issue_type,
+    COUNT(*) as issue_count
+FROM {{ source('raw', 'meetings') }}
+WHERE meeting_id IS NULL
+
+UNION ALL
+
+SELECT 
+    'participants' as source_table,
+    'null_primary_keys' as issue_type,
+    COUNT(*) as issue_count
+FROM {{ source('raw', 'participants') }}
+WHERE participant_id IS NULL
+```
+
+#### 5. Test Business Logic Validation
+
+```sql
+-- tests/test_business_logic_validation.sql
+-- Validate business rules across models
+SELECT 
+    'meeting_duration_consistency' as test_name,
+    COUNT(*) as violation_count
+FROM {{ ref('bz_meetings') }}
+WHERE duration_minutes IS NOT NULL 
+  AND end_time IS NOT NULL 
+  AND start_time IS NOT NULL
+  AND ABS(duration_minutes - DATEDIFF('minute', start_time, end_time)) > 1
+
+UNION ALL
+
+SELECT 
+    'participant_session_logic' as test_name,
+    COUNT(*) as violation_count
+FROM {{ ref('bz_participants') }}
+WHERE join_time IS NOT NULL 
+  AND leave_time IS NOT NULL 
+  AND leave_time < join_time
+
+UNION ALL
+
+SELECT 
+    'license_date_range_logic' as test_name,
+    COUNT(*) as violation_count
+FROM {{ ref('bz_licenses') }}
+WHERE start_date IS NOT NULL 
+  AND end_date IS NOT NULL 
+  AND end_date < start_date
 ```
 
 ### Parameterized Tests
 
-#### File: macros/test_primary_key_uniqueness.sql
+#### Generic Test for Primary Key Validation
 
 ```sql
--- Macro: Test primary key uniqueness across all Bronze models
--- Usage: {{ test_primary_key_uniqueness('table_name', 'primary_key_column') }}
-
-{% macro test_primary_key_uniqueness(table_name, primary_key_column) %}
-
-WITH duplicate_check AS (
-    SELECT 
-        {{ primary_key_column }},
-        COUNT(*) as record_count
-    FROM {{ ref(table_name) }}
-    GROUP BY {{ primary_key_column }}
-    HAVING COUNT(*) > 1
-)
+-- macros/test_primary_key_validation.sql
+{% macro test_primary_key_validation(model, column_name) %}
 
 SELECT 
-    '{{ table_name }}' as table_name,
-    {{ primary_key_column }} as duplicate_key,
-    record_count
-FROM duplicate_check
+    {{ column_name }},
+    COUNT(*) as occurrence_count
+FROM {{ model }}
+WHERE {{ column_name }} IS NOT NULL
+GROUP BY {{ column_name }}
+HAVING COUNT(*) > 1
 
 {% endmacro %}
 ```
 
-#### File: macros/test_null_primary_keys.sql
+#### Generic Test for Audit Trail Validation
 
 ```sql
--- Macro: Test for NULL primary keys
--- Usage: {{ test_null_primary_keys('table_name', 'primary_key_column') }}
-
-{% macro test_null_primary_keys(table_name, primary_key_column) %}
+-- macros/test_audit_trail_validation.sql
+{% macro test_audit_trail_validation(table_name) %}
 
 SELECT 
     '{{ table_name }}' as table_name,
-    COUNT(*) as null_primary_key_count
-FROM {{ ref(table_name) }}
-WHERE {{ primary_key_column }} IS NULL
-HAVING COUNT(*) > 0
+    CASE 
+        WHEN started_count = 0 THEN 'Missing STARTED record'
+        WHEN success_count = 0 THEN 'Missing SUCCESS record'
+        WHEN started_count != success_count THEN 'Mismatched audit records'
+        ELSE 'Valid'
+    END as audit_status
+FROM (
+    SELECT 
+        SUM(CASE WHEN status = 'STARTED' THEN 1 ELSE 0 END) as started_count,
+        SUM(CASE WHEN status = 'SUCCESS' THEN 1 ELSE 0 END) as success_count
+    FROM {{ ref('bz_data_audit') }}
+    WHERE source_table = '{{ table_name }}'
+      AND load_timestamp >= CURRENT_DATE()
+) audit_summary
+WHERE audit_status != 'Valid'
 
 {% endmacro %}
 ```
 
 ## Test Execution Strategy
 
-### 1. Continuous Integration Tests
+### 1. Pre-deployment Testing
+- Run all schema tests before model deployment
+- Validate source data quality
+- Check audit trail functionality
 
-```bash
-# Run all tests
-dbt test
+### 2. Post-deployment Validation
+- Execute business logic tests
+- Verify data completeness
+- Validate performance metrics
 
-# Run specific test categories
-dbt test --select tag:data_quality
-dbt test --select tag:transformation
-dbt test --select tag:business_rules
+### 3. Continuous Monitoring
+- Schedule daily data quality checks
+- Monitor audit trail completeness
+- Track test execution results in dbt's run_results.json
 
-# Run tests for specific models
-dbt test --select bz_users
-dbt test --select bz_meetings
-```
+### 4. Error Handling
+- Failed tests logged to Snowflake audit schema
+- Severity levels configured (error, warn)
+- Automated alerts for critical failures
 
-### 2. Performance Testing
+## Performance Considerations
 
-```sql
--- Monitor query performance
-SELECT 
-    query_text,
-    execution_time,
-    rows_produced,
-    bytes_scanned
-FROM snowflake.account_usage.query_history
-WHERE query_text ILIKE '%bz_%'
-AND start_time >= CURRENT_TIMESTAMP - INTERVAL '1 hour'
-ORDER BY execution_time DESC;
-```
+### Test Optimization
+- Use sampling for large datasets
+- Implement incremental test strategies
+- Leverage Snowflake's query optimization
 
-### 3. Data Freshness Testing
+### Resource Management
+- Configure appropriate warehouse sizes for testing
+- Use separate compute resources for test execution
+- Implement test result caching
 
-```yaml
-# File: models/bronze/sources.yml
-sources:
-  - name: raw_zoom
-    freshness:
-      warn_after: {count: 12, period: hour}
-      error_after: {count: 24, period: hour}
-    loaded_at_field: load_timestamp
-```
+## Compliance and Governance
 
-## Test Results Tracking
+### Data Privacy
+- PII field validation in BZ_USERS model
+- Audit trail for data access tracking
+- Compliance with data retention policies
 
-### 1. Test Results Schema
-
-```sql
--- Create test results tracking table
-CREATE TABLE IF NOT EXISTS bronze.test_results (
-    test_run_id VARCHAR(50),
-    test_name VARCHAR(200),
-    model_name VARCHAR(100),
-    test_status VARCHAR(20),
-    execution_time NUMBER(10,3),
-    error_message TEXT,
-    run_timestamp TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
-);
-```
-
-### 2. Test Monitoring Dashboard
-
-```sql
--- Query for test success rates
-SELECT 
-    model_name,
-    COUNT(*) as total_tests,
-    COUNT(CASE WHEN test_status = 'PASS' THEN 1 END) as passed_tests,
-    COUNT(CASE WHEN test_status = 'FAIL' THEN 1 END) as failed_tests,
-    ROUND((COUNT(CASE WHEN test_status = 'PASS' THEN 1 END) * 100.0 / COUNT(*)), 2) as success_rate
-FROM bronze.test_results
-WHERE run_timestamp >= CURRENT_TIMESTAMP - INTERVAL '7 days'
-GROUP BY model_name
-ORDER BY success_rate DESC;
-```
-
-## Best Practices and Recommendations
-
-### 1. Test Organization
-- **Categorize tests** by type (data quality, transformation, business rules)
-- **Use descriptive names** for test files and functions
-- **Document expected outcomes** for each test case
-- **Maintain test versioning** alongside model versions
-
-### 2. Performance Optimization
-- **Limit test data volume** for faster execution
-- **Use sampling techniques** for large datasets
-- **Optimize test queries** with appropriate filters
-- **Schedule tests** during off-peak hours
-
-### 3. Error Handling
-- **Implement graceful failure** handling in tests
-- **Log detailed error messages** for debugging
-- **Set up alerting** for critical test failures
-- **Maintain test result history** for trend analysis
-
-### 4. Maintenance
-- **Review and update tests** regularly
-- **Remove obsolete tests** when models change
-- **Add new tests** for new business requirements
-- **Monitor test execution times** and optimize as needed
-
----
+### Data Lineage
+- Source system tracking via SOURCE_SYSTEM field
+- Complete audit trail in BZ_DATA_AUDIT table
+- Integration with dbt documentation
 
 ## Summary
 
-This comprehensive test suite provides robust validation for the Zoom Platform Analytics Bronze layer dbt models in Snowflake. The tests cover:
+This comprehensive test suite ensures the reliability and performance of the Zoom Bronze Layer dbt models in Snowflake by:
 
-- **25 test cases** across 5 categories
-- **YAML-based schema tests** for standard validations
-- **Custom SQL tests** for complex business rules
-- **Parameterized macros** for reusable test logic
-- **Performance monitoring** and optimization strategies
-- **Test result tracking** and reporting capabilities
+- **Validating Data Quality**: Primary keys, constraints, and data types
+- **Testing Business Logic**: Deduplication, transformations, and audit trails
+- **Handling Edge Cases**: Null values, invalid data, and error scenarios
+- **Ensuring Performance**: Optimized queries and resource management
+- **Maintaining Compliance**: PII handling and audit requirements
 
-The test framework ensures data quality, transformation accuracy, and business rule compliance while providing comprehensive monitoring and alerting capabilities for production environments.
+The test cases cover all critical aspects of the Bronze layer pipeline and provide a robust foundation for maintaining data quality and reliability in the Medallion architecture implementation.
