@@ -1,7 +1,6 @@
 -- Bronze Layer Users Model
 -- Description: Transforms raw user data to bronze layer with data quality checks
 -- Author: Data Engineering Team
--- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
