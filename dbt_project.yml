@@ -20,7 +20,4 @@ models:
   zoom_bronze_pipeline:
     bronze:
       +materialized: table
-      +tags: ["bronze"]
-
-vars:
-  start_date: '2020-01-01'
+      +on_schema_change: "fail"
