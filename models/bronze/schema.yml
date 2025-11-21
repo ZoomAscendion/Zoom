@@ -152,10 +152,17 @@ models:
     columns:
       - name: record_id
         description: "Auto-incrementing unique identifier for each audit record"
+        tests:
+          - not_null
+          - unique
       - name: source_table
         description: "Name of the Bronze layer table"
+        tests:
+          - not_null
       - name: load_timestamp
         description: "When the operation occurred"
+        tests:
+          - not_null
       - name: processed_by
         description: "User or process that performed the operation"
       - name: processing_time
@@ -164,7 +171,7 @@ models:
         description: "Status of the operation (SUCCESS, FAILED, WARNING)"
 
   - name: bz_users
-    description: "Bronze layer table storing cleaned and validated user profile information"
+    description: "Bronze layer table storing user profile and subscription information"
     columns:
       - name: user_id
         description: "Unique identifier for each user account"
@@ -180,7 +187,7 @@ models:
       - name: company
         description: "Company or organization name"
       - name: plan_type
-        description: "Subscription plan type (Basic, Pro, Business, Enterprise)"
+        description: "Subscription plan type"
       - name: load_timestamp
         description: "Timestamp when record was loaded into Bronze layer"
       - name: update_timestamp
@@ -189,7 +196,7 @@ models:
         description: "Source system from which data originated"
 
   - name: bz_meetings
-    description: "Bronze layer table storing cleaned and validated meeting information"
+    description: "Bronze layer table storing meeting information and session details"
     columns:
       - name: meeting_id
         description: "Unique identifier for each meeting"
@@ -216,7 +223,7 @@ models:
         description: "Source system from which data originated"
 
   - name: bz_participants
-    description: "Bronze layer table storing cleaned and validated participant information"
+    description: "Bronze layer table tracking meeting participants and their session details"
     columns:
       - name: participant_id
         description: "Unique identifier for each meeting participant"
@@ -243,7 +250,7 @@ models:
         description: "Source system from which data originated"
 
   - name: bz_feature_usage
-    description: "Bronze layer table storing cleaned and validated feature usage information"
+    description: "Bronze layer table recording usage of platform features during meetings"
     columns:
       - name: usage_id
         description: "Unique identifier for each feature usage record"
@@ -268,7 +275,7 @@ models:
         description: "Source system from which data originated"
 
   - name: bz_support_tickets
-    description: "Bronze layer table storing cleaned and validated support ticket information"
+    description: "Bronze layer table managing customer support requests and resolution tracking"
     columns:
       - name: ticket_id
         description: "Unique identifier for each support ticket"
@@ -293,7 +300,7 @@ models:
         description: "Source system from which data originated"
 
   - name: bz_billing_events
-    description: "Bronze layer table storing cleaned and validated billing event information"
+    description: "Bronze layer table tracking financial transactions and billing activities"
     columns:
       - name: event_id
         description: "Unique identifier for each billing event"
@@ -318,7 +325,7 @@ models:
         description: "Source system from which data originated"
 
   - name: bz_licenses
-    description: "Bronze layer table storing cleaned and validated license information"
+    description: "Bronze layer table managing license assignments and entitlements"
     columns:
       - name: license_id
         description: "Unique identifier for each license"
