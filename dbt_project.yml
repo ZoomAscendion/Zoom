@@ -1,11 +1,9 @@
-name: 'zoom_silver_pipeline'
+name: 'zoom_bronze_pipeline'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
-profile: 'zoom_silver_pipeline'
+profile: 'zoom_bronze_pipeline'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -18,24 +16,12 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
-  zoom_silver_pipeline:
-    # Config indicated by + and applies to all files under models/silver/
-    silver:
+  zoom_bronze_pipeline:
+    bronze:
       +materialized: table
-      +on_schema_change: sync_all_columns
-      # Ensure audit log runs first
-      SI_Audit_Log:
-        +pre_hook: []
-        +post_hook: []
+      +on_schema_change: "fail"
 
 vars:
-  # dbt version
-  dbt_version: ">=1.0.0"
-  # Timezone for timestamp conversions
-  default_timezone: "UTC"
-  # Data quality thresholds
-  min_data_quality_score: 70
-  # Audit settings
-  enable_audit_logging: true
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
