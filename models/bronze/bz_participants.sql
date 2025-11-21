@@ -6,7 +6,9 @@
 -- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table'
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('bz_participants', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0, 'STARTED')",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('bz_participants', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0, 'COMPLETED')"
 ) }}
 
 WITH raw_participants_filtered AS (
@@ -21,7 +23,7 @@ raw_participants_deduplicated AS (
     SELECT *,
            ROW_NUMBER() OVER (
                PARTITION BY participant_id 
-               ORDER BY update_timestamp DESC, load_timestamp DESC
+               ORDER BY COALESCE(update_timestamp, load_timestamp, CURRENT_TIMESTAMP()) DESC
            ) AS row_num
     FROM raw_participants_filtered
 ),
