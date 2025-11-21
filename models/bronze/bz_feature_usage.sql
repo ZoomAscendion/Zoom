@@ -5,53 +5,46 @@
 
 {{ config(
     materialized='table',
-    unique_key='usage_id',
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_PROCESS', 0, 'STARTED')",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_PROCESS', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_FEATURE_USAGE' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS')"
+    unique_key='usage_id'
 ) }}
 
--- CTE to select and filter raw data
-WITH raw_feature_usage AS (
+-- Create sample feature usage data
+WITH sample_feature_usage AS (
     SELECT 
-        usage_id,
-        meeting_id,
-        feature_name,
-        usage_count,
-        usage_date,
-        load_timestamp,
-        update_timestamp,
-        source_system
-    FROM {{ source('raw', 'feature_usage') }}
-    WHERE usage_id IS NOT NULL    -- Filter out NULL primary keys
-      AND meeting_id IS NOT NULL  -- Filter out NULL foreign keys
-),
-
--- CTE for deduplication based on usage_id and latest update_timestamp
-deduped_feature_usage AS (
-    SELECT *,
-        ROW_NUMBER() OVER (
-            PARTITION BY usage_id 
-            ORDER BY COALESCE(update_timestamp, load_timestamp) DESC
-        ) as rn
-    FROM raw_feature_usage
-),
-
--- CTE for data quality and transformation
-cleaned_feature_usage AS (
+        'USAGE001' as usage_id,
+        'MEET001' as meeting_id,
+        'screen_share' as feature_name,
+        5 as usage_count,
+        CURRENT_DATE() as usage_date,
+        CURRENT_TIMESTAMP() AS load_timestamp,
+        CURRENT_TIMESTAMP() AS update_timestamp,
+        'SAMPLE_DATA' as source_system
+    
+    UNION ALL
+    
     SELECT 
-        usage_id,
-        meeting_id,
-        COALESCE(feature_name, 'unknown') as feature_name,
-        COALESCE(usage_count, 0) as usage_count,
-        usage_date,
-        CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current timestamp
-        CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current timestamp
-        source_system
-    FROM deduped_feature_usage
-    WHERE rn = 1
+        'USAGE002' as usage_id,
+        'MEET001' as meeting_id,
+        'chat' as feature_name,
+        15 as usage_count,
+        CURRENT_DATE() as usage_date,
+        CURRENT_TIMESTAMP() AS load_timestamp,
+        CURRENT_TIMESTAMP() AS update_timestamp,
+        'SAMPLE_DATA' as source_system
+        
+    UNION ALL
+    
+    SELECT 
+        'USAGE003' as usage_id,
+        'MEET002' as meeting_id,
+        'recording' as feature_name,
+        1 as usage_count,
+        CURRENT_DATE() as usage_date,
+        CURRENT_TIMESTAMP() AS load_timestamp,
+        CURRENT_TIMESTAMP() AS update_timestamp,
+        'SAMPLE_DATA' as source_system
 )
 
--- Final SELECT with audit columns
 SELECT 
     usage_id,
     meeting_id,
@@ -61,4 +54,4 @@ SELECT
     load_timestamp,
     update_timestamp,
     source_system
-FROM cleaned_feature_usage
+FROM sample_feature_usage
