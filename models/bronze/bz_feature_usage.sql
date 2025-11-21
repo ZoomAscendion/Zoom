@@ -22,7 +22,7 @@ WITH raw_feature_usage AS (
         load_timestamp,
         update_timestamp,
         source_system
-    FROM {{ source('raw_schema', 'feature_usage') }}
+    FROM {{ source('raw_layer', 'feature_usage') }}
     WHERE usage_id IS NOT NULL    -- Filter out records with null primary keys
       AND meeting_id IS NOT NULL  -- Filter out records with null meeting_id
 ),
