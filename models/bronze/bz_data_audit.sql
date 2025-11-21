@@ -10,12 +10,12 @@
 
 WITH audit_base AS (
     SELECT 
-        NULL::NUMBER AS record_id,
-        NULL::VARCHAR(255) AS source_table,
-        NULL::TIMESTAMP_NTZ AS load_timestamp,
-        NULL::VARCHAR(255) AS processed_by,
-        NULL::NUMBER(10,3) AS processing_time,
-        NULL::VARCHAR(50) AS status
+        1 AS record_id,
+        'SYSTEM_INIT' AS source_table,
+        CURRENT_TIMESTAMP() AS load_timestamp,
+        'SYSTEM' AS processed_by,
+        0.0 AS processing_time,
+        'SUCCESS' AS status
     WHERE 1=0  -- This creates an empty table with the correct structure
 )
 
