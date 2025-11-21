@@ -22,7 +22,7 @@ WITH raw_billing_events AS (
         load_timestamp,
         update_timestamp,
         source_system
-    FROM {{ source('raw_schema', 'billing_events') }}
+    FROM {{ source('raw_layer', 'billing_events') }}
     WHERE event_id IS NOT NULL  -- Filter out records with null primary keys
       AND user_id IS NOT NULL  -- Filter out records with null user_id
 ),
