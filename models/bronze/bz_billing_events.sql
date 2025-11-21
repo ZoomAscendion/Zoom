@@ -7,8 +7,7 @@
 
 {{ config(
     materialized='table',
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('bz_billing_events', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0, 'STARTED')",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('bz_billing_events', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0, 'COMPLETED')"
+    post_hook="INSERT INTO {{ this.schema }}.bz_data_audit (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('bz_billing_events', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0, 'COMPLETED')"
 ) }}
 
 WITH raw_billing_events_filtered AS (
