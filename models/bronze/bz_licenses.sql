@@ -1,46 +1,66 @@
--- Bronze Layer Licenses Model
--- Description: Transforms raw license data into bronze layer with audit logging
+-- Bronze Layer Licenses Table
+-- Description: Manages license assignments and entitlements
 -- Author: Data Engineering Team
 -- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
-    tags=['bronze', 'licenses'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', DATEDIFF('seconds', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_LICENSES' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    unique_key='license_id',
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_PROCESS', 0, 'STARTED')",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_PROCESS', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_LICENSES' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS')"
 ) }}
 
 -- CTE to select and filter raw data
 WITH raw_licenses AS (
     SELECT 
-        LICENSE_ID,
-        LICENSE_TYPE,
-        ASSIGNED_TO_USER_ID,
-        START_DATE,
-        TRY_CAST(END_DATE AS DATE) as END_DATE,
-        LOAD_TIMESTAMP as RAW_LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP as RAW_UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
+        license_id,
+        license_type,
+        assigned_to_user_id,
+        start_date,
+        end_date,
+        load_timestamp,
+        update_timestamp,
+        source_system
     FROM {{ source('raw', 'licenses') }}
-    WHERE LICENSE_ID IS NOT NULL  -- Filter out records with null primary key
+    WHERE license_id IS NOT NULL  -- Filter out NULL primary keys
 ),
 
--- CTE for deduplication based on primary key
+-- CTE for deduplication based on license_id and latest update_timestamp
 deduped_licenses AS (
     SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY LICENSE_ID ORDER BY RAW_LOAD_TIMESTAMP DESC) as rn
+        ROW_NUMBER() OVER (
+            PARTITION BY license_id 
+            ORDER BY COALESCE(update_timestamp, load_timestamp) DESC
+        ) as rn
     FROM raw_licenses
+),
+
+-- CTE for data quality and transformation
+cleaned_licenses AS (
+    SELECT 
+        license_id,
+        COALESCE(license_type, 'Basic') as license_type,
+        assigned_to_user_id,
+        start_date,
+        CASE 
+            WHEN end_date IS NULL OR end_date = '' THEN NULL
+            ELSE TRY_TO_DATE(end_date)
+        END as end_date,
+        CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current timestamp
+        CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current timestamp
+        source_system
+    FROM deduped_licenses
+    WHERE rn = 1
 )
 
--- Final selection with bronze timestamp overwrite
+-- Final SELECT with audit columns
 SELECT 
-    LICENSE_ID,
-    LICENSE_TYPE,
-    ASSIGNED_TO_USER_ID,
-    START_DATE,
-    END_DATE,
-    CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,  -- Overwrite with current DBT run time
-    CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,  -- Overwrite with current DBT run time
-    SOURCE_SYSTEM
-FROM deduped_licenses
-WHERE rn = 1  -- Keep only the most recent record per LICENSE_ID
+    license_id,
+    license_type,
+    assigned_to_user_id,
+    start_date,
+    end_date,
+    load_timestamp,
+    update_timestamp,
+    source_system
+FROM cleaned_licenses
