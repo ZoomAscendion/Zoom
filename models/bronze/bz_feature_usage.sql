@@ -1,12 +1,9 @@
 -- Bronze Layer Feature Usage Table
 -- Description: Raw feature usage data tracking user interactions
 -- Author: Data Engineering Team
--- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ target.schema }}.bz_data_audit (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_USER', 0, 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ target.schema }}.bz_data_audit (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_USER', 10, 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    materialized='table'
 ) }}
 
 -- CTE to select and filter raw data
