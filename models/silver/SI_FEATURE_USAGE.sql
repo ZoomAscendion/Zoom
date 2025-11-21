@@ -16,7 +16,7 @@ WITH bronze_feature_usage AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_FEATURE_USAGE') }}
+    FROM BRONZE.BZ_FEATURE_USAGE
 ),
 
 data_quality_checks AS (
