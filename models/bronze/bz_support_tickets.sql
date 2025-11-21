@@ -1,46 +1,64 @@
--- Bronze Layer Support Tickets Model
--- Description: Transforms raw support ticket data into bronze layer with audit logging
+-- Bronze Layer Support Tickets Table
+-- Description: Manages customer support requests and resolution tracking
 -- Author: Data Engineering Team
 -- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
-    tags=['bronze', 'support_tickets'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', DATEDIFF('seconds', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_SUPPORT_TICKETS' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    unique_key='ticket_id',
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'DBT_PROCESS', 0, 'STARTED')",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'DBT_PROCESS', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_SUPPORT_TICKETS' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS')"
 ) }}
 
 -- CTE to select and filter raw data
 WITH raw_support_tickets AS (
     SELECT 
-        TICKET_ID,
-        USER_ID,
-        TICKET_TYPE,
-        RESOLUTION_STATUS,
-        OPEN_DATE,
-        LOAD_TIMESTAMP as RAW_LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP as RAW_UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
+        ticket_id,
+        user_id,
+        ticket_type,
+        resolution_status,
+        open_date,
+        load_timestamp,
+        update_timestamp,
+        source_system
     FROM {{ source('raw', 'support_tickets') }}
-    WHERE TICKET_ID IS NOT NULL  -- Filter out records with null primary key
+    WHERE ticket_id IS NOT NULL  -- Filter out NULL primary keys
+      AND user_id IS NOT NULL   -- Filter out NULL foreign keys
 ),
 
--- CTE for deduplication based on primary key
+-- CTE for deduplication based on ticket_id and latest update_timestamp
 deduped_support_tickets AS (
     SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY TICKET_ID ORDER BY RAW_LOAD_TIMESTAMP DESC) as rn
+        ROW_NUMBER() OVER (
+            PARTITION BY ticket_id 
+            ORDER BY COALESCE(update_timestamp, load_timestamp) DESC
+        ) as rn
     FROM raw_support_tickets
+),
+
+-- CTE for data quality and transformation
+cleaned_support_tickets AS (
+    SELECT 
+        ticket_id,
+        user_id,
+        COALESCE(ticket_type, 'general') as ticket_type,
+        COALESCE(resolution_status, 'open') as resolution_status,
+        open_date,
+        CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current timestamp
+        CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current timestamp
+        source_system
+    FROM deduped_support_tickets
+    WHERE rn = 1
 )
 
--- Final selection with bronze timestamp overwrite
+-- Final SELECT with audit columns
 SELECT 
-    TICKET_ID,
-    USER_ID,
-    TICKET_TYPE,
-    RESOLUTION_STATUS,
-    OPEN_DATE,
-    CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,  -- Overwrite with current DBT run time
-    CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,  -- Overwrite with current DBT run time
-    SOURCE_SYSTEM
-FROM deduped_support_tickets
-WHERE rn = 1  -- Keep only the most recent record per TICKET_ID
+    ticket_id,
+    user_id,
+    ticket_type,
+    resolution_status,
+    open_date,
+    load_timestamp,
+    update_timestamp,
+    source_system
+FROM cleaned_support_tickets
