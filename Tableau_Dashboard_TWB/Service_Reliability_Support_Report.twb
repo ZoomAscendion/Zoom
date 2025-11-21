@@ -47,8 +47,6 @@
           <map key='[COMPANY]' value='[DIM_USER].[COMPANY]' />
           <map key='[SUPPORT_CATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY]' />
           <map key='[SUPPORT_SUBCATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_SUBCATEGORY]' />
-          <map key='[YEAR]' value='[DIM_DATE].[YEAR]' />
-          <map key='[MONTH]' value='[DIM_DATE].[MONTH]' />
         </cols>
         <metadata-records>
           <metadata-record class='column'>
@@ -60,15 +58,8 @@
             <ordinal>1</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
-            <width>32</width>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>"SQL_VARCHAR"</attribute>
-              <attribute datatype='string' name='DebugWireType'>"SQL_C_CHAR"</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>"true"</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_F1A2B3C4D5E6F7A8B9C0D1E2F3A4B5C6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>TICKET_TYPE</remote-name>
@@ -79,15 +70,8 @@
             <ordinal>2</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
-            <width>16777216</width>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>"SQL_VARCHAR"</attribute>
-              <attribute datatype='string' name='DebugWireType'>"SQL_C_CHAR"</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>"true"</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_F1A2B3C4D5E6F7A8B9C0D1E2F3A4B5C6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>RESOLUTION_STATUS</remote-name>
@@ -98,15 +82,8 @@
             <ordinal>3</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
-            <width>16777216</width>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>"SQL_VARCHAR"</attribute>
-              <attribute datatype='string' name='DebugWireType'>"SQL_C_CHAR"</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>"true"</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_F1A2B3C4D5E6F7A8B9C0D1E2F3A4B5C6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>PRIORITY_LEVEL</remote-name>
@@ -117,15 +94,32 @@
             <ordinal>4</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
-            <width>8</width>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>"SQL_VARCHAR"</attribute>
-              <attribute datatype='string' name='DebugWireType'>"SQL_C_CHAR"</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>"true"</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_F1A2B3C4D5E6F7A8B9C0D1E2F3A4B5C6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>RESOLUTION_TIME_HOURS</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[RESOLUTION_TIME_HOURS]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>RESOLUTION_TIME_HOURS</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>CUSTOMER_SATISFACTION_SCORE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[CUSTOMER_SATISFACTION_SCORE]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>CUSTOMER_SATISFACTION_SCORE</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>USER_NAME</remote-name>
@@ -133,18 +127,11 @@
             <local-name>[USER_NAME]</local-name>
             <parent-name>[DIM_USER]</parent-name>
             <remote-alias>USER_NAME</remote-alias>
-            <ordinal>5</ordinal>
+            <ordinal>7</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
-            <width>16777216</width>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>"SQL_VARCHAR"</attribute>
-              <attribute datatype='string' name='DebugWireType'>"SQL_C_CHAR"</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>"true"</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_A2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>SUPPORT_CATEGORY</remote-name>
@@ -152,18 +139,11 @@
             <local-name>[SUPPORT_CATEGORY]</local-name>
             <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
             <remote-alias>SUPPORT_CATEGORY</remote-alias>
-            <ordinal>6</ordinal>
+            <ordinal>8</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
-            <width>16777216</width>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>"SQL_VARCHAR"</attribute>
-              <attribute datatype='string' name='DebugWireType'>"SQL_C_CHAR"</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>"true"</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_SUPPORT_CATEGORY_B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_SUPPORT_CATEGORY_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>SUPPORT_SUBCATEGORY</remote-name>
@@ -171,66 +151,64 @@
             <local-name>[SUPPORT_SUBCATEGORY]</local-name>
             <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
             <remote-alias>SUPPORT_SUBCATEGORY</remote-alias>
-            <ordinal>7</ordinal>
+            <ordinal>9</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
-            <width>15</width>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>"SQL_VARCHAR"</attribute>
-              <attribute datatype='string' name='DebugWireType'>"SQL_C_CHAR"</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>"true"</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_SUPPORT_CATEGORY_B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_SUPPORT_CATEGORY_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
         </metadata-records>
       </connection>
       <aliases enabled='yes' />
       <column caption='User Key' datatype='string' name='[USER_KEY]' role='dimension' type='nominal' />
+      <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+      <column caption='Support Category Key' datatype='string' name='[SUPPORT_CATEGORY_KEY]' role='dimension' type='nominal' />
       <column caption='Ticket Type' datatype='string' name='[TICKET_TYPE]' role='dimension' type='nominal' />
       <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
       <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
+      <column caption='Resolution Time Hours' datatype='integer' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='Customer Satisfaction Score' datatype='integer' name='[CUSTOMER_SATISFACTION_SCORE]' role='measure' type='quantitative' />
       <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+      <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
       <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
       <column caption='Support Subcategory' datatype='string' name='[SUPPORT_SUBCATEGORY]' role='dimension' type='nominal' />
       
       <!-- Calculated Fields for KPIs -->
-      <column caption='Number of Users' datatype='integer' name='[Calc_Number_Users_A1B2C3D4]' role='measure' type='quantitative'>
+      <column caption='Number of Users' datatype='integer' name='[Number_of_Users_Calc]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='COUNTD([USER_KEY])' />
       </column>
-      <column caption='Number of Tickets' datatype='integer' name='[Calc_Number_Tickets_B2C3D4E5]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNT([TICKET_TYPE])' />
+      <column caption='Number of Tickets' datatype='integer' name='[Number_of_Tickets_Calc]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([SUPPORT_CATEGORY_KEY])' />
       </column>
-      <column caption='Support Activities by Status' datatype='integer' name='[Calc_Support_Activities_C3D4E5F6]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNT([RESOLUTION_STATUS])' />
+      <column caption='Average Resolution Time' datatype='real' name='[Avg_Resolution_Time_Calc]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
       </column>
-      <column caption='Support Activities by Priority' datatype='integer' name='[Calc_Support_Priority_D4E5F6A7]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNT([PRIORITY_LEVEL])' />
+      <column caption='Average Customer Satisfaction' datatype='real' name='[Avg_Customer_Satisfaction_Calc]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([CUSTOMER_SATISFACTION_SCORE])' />
       </column>
       
       <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
       <semantic-values>
-        <semantic-value key='[Country].[Name]' value='"United States"' />
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
       </semantic-values>
       <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
         <objects>
-          <object caption='FACT_SUPPORT_ACTIVITY' id='FACT_SUPPORT_ACTIVITY_F1A2B3C4D5E6F7A8B9C0D1E2F3A4B5C6'>
+          <object caption='FACT_SUPPORT_ACTIVITY' id='FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6'>
             <properties context=''>
               <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
             </properties>
           </object>
-          <object caption='DIM_USER' id='DIM_USER_A2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7'>
+          <object caption='DIM_USER' id='DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7'>
             <properties context=''>
               <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' name='DIM_USER' table='[DB_POC_ZOOM].[GOLD].[DIM_USER]' type='table' />
             </properties>
           </object>
-          <object caption='DIM_SUPPORT_CATEGORY' id='DIM_SUPPORT_CATEGORY_B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8'>
+          <object caption='DIM_SUPPORT_CATEGORY' id='DIM_SUPPORT_CATEGORY_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8'>
             <properties context=''>
               <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_ZOOM].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
             </properties>
           </object>
-          <object caption='DIM_DATE' id='DIM_DATE_C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F9'>
+          <object caption='DIM_DATE' id='DIM_DATE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9'>
             <properties context=''>
               <relation connection='snowflake.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' name='DIM_DATE' table='[DB_POC_ZOOM].[GOLD].[DIM_DATE]' type='table' />
             </properties>
@@ -256,12 +234,12 @@
           <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7'>
             <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
             <column caption='Support Subcategory' datatype='string' name='[SUPPORT_SUBCATEGORY]' role='dimension' type='nominal' />
-            <column caption='Number of Users' datatype='integer' name='[Calc_Number_Users_A1B2C3D4]' role='measure' type='quantitative'>
+            <column caption='Number of Users' datatype='integer' name='[Number_of_Users_Calc]' role='measure' type='quantitative'>
               <calculation class='tableau' formula='COUNTD([USER_KEY])' />
             </column>
             <column-instance column='[SUPPORT_CATEGORY]' derivation='None' name='[none:SUPPORT_CATEGORY:nk]' pivot='key' type='nominal' />
             <column-instance column='[SUPPORT_SUBCATEGORY]' derivation='None' name='[none:SUPPORT_SUBCATEGORY:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calc_Number_Users_A1B2C3D4]' derivation='Attr' name='[attr:Calc_Number_Users_A1B2C3D4:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Number_of_Users_Calc]' derivation='None' name='[none:Number_of_Users_Calc:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
@@ -283,7 +261,7 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[attr:Calc_Number_Users_A1B2C3D4:qk]</rows>
+        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:Number_of_Users_Calc:qk]</rows>
         <cols>([federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:SUPPORT_CATEGORY:nk] / [federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:SUPPORT_SUBCATEGORY:nk])</cols>
       </table>
       <simple-id uuid='{A1B2C3D4-E5F6-A7B8-C9D0-E1F2A3B4C5D6}' />
@@ -303,11 +281,11 @@
           </datasources>
           <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7'>
             <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
-            <column caption='Support Activities by Status' datatype='integer' name='[Calc_Support_Activities_C3D4E5F6]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='COUNT([RESOLUTION_STATUS])' />
+            <column caption='Number of Tickets' datatype='integer' name='[Number_of_Tickets_Calc]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNT([SUPPORT_CATEGORY_KEY])' />
             </column>
             <column-instance column='[RESOLUTION_STATUS]' derivation='None' name='[none:RESOLUTION_STATUS:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calc_Support_Activities_C3D4E5F6]' derivation='Attr' name='[attr:Calc_Support_Activities_C3D4E5F6:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Number_of_Tickets_Calc]' derivation='None' name='[none:Number_of_Tickets_Calc:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
@@ -329,7 +307,7 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[attr:Calc_Support_Activities_C3D4E5F6:qk]</rows>
+        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:Number_of_Tickets_Calc:qk]</rows>
         <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:RESOLUTION_STATUS:nk]</cols>
       </table>
       <simple-id uuid='{B2C3D4E5-F6A7-B8C9-D0E1-F2A3B4C5D6E7}' />
@@ -349,11 +327,15 @@
           </datasources>
           <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7'>
             <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
-            <column caption='Support Activities by Priority' datatype='integer' name='[Calc_Support_Priority_D4E5F6A7]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='COUNT([PRIORITY_LEVEL])' />
+            <column caption='Number of Tickets' datatype='integer' name='[Number_of_Tickets_Calc]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNT([SUPPORT_CATEGORY_KEY])' />
+            </column>
+            <column caption='Average Resolution Time' datatype='real' name='[Avg_Resolution_Time_Calc]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
             </column>
             <column-instance column='[PRIORITY_LEVEL]' derivation='None' name='[none:PRIORITY_LEVEL:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calc_Support_Priority_D4E5F6A7]' derivation='Attr' name='[attr:Calc_Support_Priority_D4E5F6A7:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Number_of_Tickets_Calc]' derivation='None' name='[none:Number_of_Tickets_Calc:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Avg_Resolution_Time_Calc]' derivation='None' name='[none:Avg_Resolution_Time_Calc:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
@@ -374,11 +356,72 @@
               </style-rule>
             </style>
           </pane>
+          <pane id='1' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:Avg_Resolution_Time_Calc:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:PRIORITY_LEVEL:nk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
         </panes>
-        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[attr:Calc_Support_Priority_D4E5F6A7:qk]</rows>
+        <rows>([federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:Number_of_Tickets_Calc:qk] + [federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:Avg_Resolution_Time_Calc:qk])</rows>
         <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:PRIORITY_LEVEL:nk]</cols>
       </table>
       <simple-id uuid='{C3D4E5F6-A7B8-C9D0-E1F2-A3B4C5D6E7F8}' />
+    </worksheet>
+    <worksheet name='Customer Satisfaction Analysis'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Customer Satisfaction by Support Category</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Support Analytics (DB_POC_ZOOM.GOLD)' name='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7' />
+          </datasources>
+          <datasource-dependencies datasource='federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7'>
+            <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
+            <column caption='Average Customer Satisfaction' datatype='real' name='[Avg_Customer_Satisfaction_Calc]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([CUSTOMER_SATISFACTION_SCORE])' />
+            </column>
+            <column-instance column='[SUPPORT_CATEGORY]' derivation='None' name='[none:SUPPORT_CATEGORY:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Avg_Customer_Satisfaction_Calc]' derivation='None' name='[none:Avg_Customer_Satisfaction_Calc:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:Avg_Customer_Satisfaction_Calc:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:Avg_Customer_Satisfaction_Calc:qk]</rows>
+        <cols>[federated.2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7].[none:SUPPORT_CATEGORY:nk]</cols>
+      </table>
+      <simple-id uuid='{D4E5F6A7-B8C9-D0E1-F2A3-B4C5D6E7F8A9}' />
     </worksheet>
   </worksheets>
   <windows saved-dpi-scale-factor='1.5' source-height='44'>
@@ -403,7 +446,7 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{D4E5F6A7-B8C9-D0E1-F2A3-B4C5D6E7F8A9}' />
+      <simple-id uuid='{E5F6A7B8-C9D0-E1F2-A3B4-C5D6E7F8A9B0}' />
     </window>
     <window class='worksheet' name='Support Activities by Resolution Status'>
       <cards>
@@ -426,7 +469,7 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{E5F6A7B8-C9D0-E1F2-A3B4-C5D6E7F8A9B0}' />
+      <simple-id uuid='{F6A7B8C9-D0E1-F2A3-B4C5-D6E7F8A9B0C1}' />
     </window>
     <window class='worksheet' name='Support Activities by Priority'>
       <cards>
@@ -449,7 +492,30 @@
           </strip>
         </edge>
       </cards>
-      <simple-id uuid='{F6A7B8C9-D0E1-F2A3-B4C5-D6E7F8A9B0C1}' />
+      <simple-id uuid='{A7B8C9D0-E1F2-A3B4-C5D6-E7F8A9B0C1D2}' />
+    </window>
+    <window class='worksheet' name='Customer Satisfaction Analysis'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{B8C9D0E1-F2A3-B4C5-D6E7-F8A9B0C1D2E3}' />
     </window>
   </windows>
 </workbook>
