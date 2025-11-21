@@ -18,7 +18,7 @@ WITH bronze_meetings AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_MEETINGS') }}
+    FROM BRONZE.BZ_MEETINGS
 ),
 
 timestamp_cleaning AS (
