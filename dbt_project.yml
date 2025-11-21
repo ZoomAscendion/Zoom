@@ -21,20 +21,6 @@ models:
     +materialized: table
     bronze:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'bz_data_audit' %}
-          INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
-          VALUES ('{{ this.name }}', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 0, 'STARTED')
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'bz_data_audit' %}
-          UPDATE {{ ref('bz_data_audit') }}
-          SET PROCESSING_TIME = DATEDIFF('second', LOAD_TIMESTAMP, CURRENT_TIMESTAMP()),
-              STATUS = 'SUCCESS'
-          WHERE SOURCE_TABLE = '{{ this.name }}'
-            AND PROCESSED_BY = 'DBT_{{ invocation_id }}'
-            AND STATUS = 'STARTED'
-        {% endif %}
 
 vars:
   source_schema: 'RAW'
