@@ -6,8 +6,6 @@ config-version: 2
 profile: 'zoom_silver_pipeline'
 
 # These configurations specify where dbt should look for different types of files.
-# The `model-paths` config, for example, states that models in this project can be
-# found in the "models/" directory. You probably won't need to change these!
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -21,7 +19,6 @@ clean-targets:
   - "dbt_packages"
 
 # Configuring models
-# Full documentation: https://docs.getdbt.com/reference/model-configs
 models:
   zoom_silver_pipeline:
     # Config indicated by + and applies to all files under models/silver/
@@ -32,20 +29,6 @@ models:
       SI_Audit_Log:
         +pre_hook: []
         +post_hook: []
-      # All other models depend on audit log
-      +pre_hook: "INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
-      +post_hook: "INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
-
-# Set the order of execution
-model-ordering:
-  - "SI_Audit_Log"
-  - "SI_USERS"
-  - "SI_MEETINGS"
-  - "SI_PARTICIPANTS"
-  - "SI_FEATURE_USAGE"
-  - "SI_SUPPORT_TICKETS"
-  - "SI_BILLING_EVENTS"
-  - "SI_LICENSES"
 
 vars:
   # dbt version
