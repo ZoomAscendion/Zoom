@@ -1,54 +1,55 @@
--- Bronze Layer Licenses Model
--- Description: Raw license assignment and management data
+-- Bronze Layer Licenses Table
+-- Description: Manages license assignments and entitlements
 -- Source: RAW.LICENSES
--- Author: Data Engineering Team
+-- Author: DBT Data Engineer
 -- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table',
-    tags=['bronze', 'licenses'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, status) SELECT 'BZ_LICENSES', CURRENT_TIMESTAMP(), 'dbt_user', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_LICENSES', CURRENT_TIMESTAMP(), 'dbt_user', 1.0, 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    materialized='table'
 ) }}
 
--- CTE to select and filter raw data
-WITH raw_licenses AS (
+WITH source_data AS (
     SELECT 
-        license_id,
-        license_type,
-        assigned_to_user_id,
-        start_date,
-        CASE 
-            WHEN end_date IS NOT NULL AND end_date != '' 
-            THEN TRY_CAST(end_date AS DATE)
-            ELSE NULL 
-        END AS end_date,
-        load_timestamp,
-        update_timestamp,
-        source_system
+        LICENSE_ID,
+        LICENSE_TYPE,
+        ASSIGNED_TO_USER_ID,
+        START_DATE,
+        TRY_CAST(END_DATE AS DATE) AS END_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
     FROM {{ source('raw', 'licenses') }}
-    WHERE license_id IS NOT NULL  -- Filter out NULL primary keys
+    WHERE LICENSE_ID IS NOT NULL    -- Filter out NULL primary keys
+      AND LICENSE_TYPE IS NOT NULL  -- Filter out NULL required fields
+      AND START_DATE IS NOT NULL    -- Filter out NULL required fields
 ),
 
--- CTE for deduplication based on primary key and latest timestamp
-deduped_licenses AS (
-    SELECT *,
-        ROW_NUMBER() OVER (
-            PARTITION BY license_id 
-            ORDER BY COALESCE(update_timestamp, load_timestamp) DESC
-        ) AS row_num
-    FROM raw_licenses
+-- Apply deduplication based on primary key and latest timestamp
+deduped_data AS (
+    SELECT *
+    FROM (
+        SELECT *,
+               ROW_NUMBER() OVER (
+                   PARTITION BY LICENSE_ID 
+                   ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
+               ) AS row_num
+        FROM source_data
+    )
+    WHERE row_num = 1
+),
+
+-- Final transformation with Bronze timestamp overwrite
+final_data AS (
+    SELECT 
+        LICENSE_ID,
+        LICENSE_TYPE,
+        ASSIGNED_TO_USER_ID,
+        START_DATE,
+        END_DATE,
+        CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
+        CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current DBT run time
+        SOURCE_SYSTEM
+    FROM deduped_data
 )
 
--- Final selection with Bronze timestamp overwrite
-SELECT 
-    license_id,
-    license_type,
-    assigned_to_user_id,
-    start_date,
-    end_date,
-    CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
-    CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current DBT run time
-    source_system
-FROM deduped_licenses
-WHERE row_num = 1
+SELECT * FROM final_data
