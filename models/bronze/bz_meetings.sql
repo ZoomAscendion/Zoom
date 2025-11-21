@@ -1,61 +1,57 @@
--- Bronze Layer Meetings Model
--- Description: Raw meeting data including scheduling and basic meeting information
+-- Bronze Layer Meetings Table
+-- Description: Stores meeting information and session details
 -- Source: RAW.MEETINGS
--- Author: Data Engineering Team
+-- Author: DBT Data Engineer
 -- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table',
-    tags=['bronze', 'meetings'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, status) SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'dbt_user', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'dbt_user', 1.0, 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    materialized='table'
 ) }}
 
--- CTE to select and filter raw data
-WITH raw_meetings AS (
+WITH source_data AS (
     SELECT 
-        meeting_id,
-        host_id,
-        meeting_topic,
-        start_time,
-        CASE 
-            WHEN end_time IS NOT NULL AND end_time != '' 
-            THEN TRY_CAST(end_time AS TIMESTAMP_NTZ(9))
-            ELSE NULL 
-        END AS end_time,
-        CASE 
-            WHEN duration_minutes IS NOT NULL AND duration_minutes != '' 
-            THEN TRY_CAST(duration_minutes AS NUMBER(38,0))
-            ELSE NULL 
-        END AS duration_minutes,
-        load_timestamp,
-        update_timestamp,
-        source_system
+        MEETING_ID,
+        HOST_ID,
+        MEETING_TOPIC,
+        START_TIME,
+        TRY_CAST(END_TIME AS TIMESTAMP_NTZ) AS END_TIME,
+        TRY_CAST(DURATION_MINUTES AS NUMBER) AS DURATION_MINUTES,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
     FROM {{ source('raw', 'meetings') }}
-    WHERE meeting_id IS NOT NULL  -- Filter out NULL primary keys
-      AND host_id IS NOT NULL    -- Filter out NULL required fields
+    WHERE MEETING_ID IS NOT NULL  -- Filter out NULL primary keys
+      AND HOST_ID IS NOT NULL     -- Filter out NULL foreign keys
+      AND START_TIME IS NOT NULL  -- Filter out NULL required fields
 ),
 
--- CTE for deduplication based on primary key and latest timestamp
-deduped_meetings AS (
-    SELECT *,
-        ROW_NUMBER() OVER (
-            PARTITION BY meeting_id 
-            ORDER BY COALESCE(update_timestamp, load_timestamp) DESC
-        ) AS row_num
-    FROM raw_meetings
+-- Apply deduplication based on primary key and latest timestamp
+deduped_data AS (
+    SELECT *
+    FROM (
+        SELECT *,
+               ROW_NUMBER() OVER (
+                   PARTITION BY MEETING_ID 
+                   ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
+               ) AS row_num
+        FROM source_data
+    )
+    WHERE row_num = 1
+),
+
+-- Final transformation with Bronze timestamp overwrite
+final_data AS (
+    SELECT 
+        MEETING_ID,
+        HOST_ID,
+        MEETING_TOPIC,
+        START_TIME,
+        END_TIME,
+        DURATION_MINUTES,
+        CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
+        CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current DBT run time
+        SOURCE_SYSTEM
+    FROM deduped_data
 )
 
--- Final selection with Bronze timestamp overwrite
-SELECT 
-    meeting_id,
-    host_id,
-    meeting_topic,
-    start_time,
-    end_time,
-    duration_minutes,
-    CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
-    CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current DBT run time
-    source_system
-FROM deduped_meetings
-WHERE row_num = 1
+SELECT * FROM final_data
