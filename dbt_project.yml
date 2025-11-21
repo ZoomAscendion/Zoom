@@ -1,0 +1,37 @@
+name: 'zoom_bronze_pipeline'
+version: '1.0.0'
+config-version: 2
+
+profile: 'zoom_bronze_pipeline'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  zoom_bronze_pipeline:
+    +materialized: table
+    bronze:
+      +materialized: table
+      +pre-hook: |
+        {% if this.name != 'bz_data_audit' %}
+        INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
+        VALUES ('{{ this.name }}', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0, 'STARTED')
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'bz_data_audit' %}
+        INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
+        VALUES ('{{ this.name }}', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0, 'COMPLETED')
+        {% endif %}
+
+vars:
+  source_schema: 'RAW'
+  target_schema: 'BRONZE'
