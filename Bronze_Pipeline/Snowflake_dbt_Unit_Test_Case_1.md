@@ -1,1027 +1,704 @@
 _____________________________________________
 ## *Author*: AAVA
 ## *Created on*: 2024-12-19
-## *Description*: Comprehensive unit test cases for Zoom Bronze Layer dbt models in Snowflake
+## *Description*: Comprehensive unit test cases for Zoom Bronze layer dbt models in Snowflake
 ## *Version*: 1 
 ## *Updated on*: 2024-12-19
 _____________________________________________
 
-# Snowflake dbt Unit Test Cases - Zoom Bronze Layer Pipeline
+# Snowflake dbt Unit Test Cases - Zoom Bronze Layer Models
 
-## Overview
+## Description
 
-This document provides comprehensive unit test cases and dbt test scripts for the Zoom Bronze Layer pipeline running in Snowflake. The tests validate data transformations, business rules, edge cases, and error handling across all Bronze layer models including audit functionality.
+This document provides comprehensive unit test cases and dbt test scripts for the Zoom Bronze layer models running in Snowflake. The test cases cover data transformations, business rules, edge cases, and error handling scenarios to ensure reliable and performant dbt models.
 
-## Test Coverage Summary
+## Test Coverage Overview
 
-| Model | Primary Tests | Edge Case Tests | Custom Tests | Total Tests |
-|-------|---------------|-----------------|--------------|-------------|
-| bz_users | 5 | 3 | 2 | 10 |
-| bz_meetings | 6 | 4 | 3 | 13 |
-| bz_participants | 5 | 3 | 2 | 10 |
-| bz_feature_usage | 6 | 4 | 2 | 12 |
-| bz_support_tickets | 5 | 3 | 2 | 10 |
-| bz_billing_events | 6 | 4 | 3 | 13 |
-| bz_licenses | 5 | 3 | 2 | 10 |
-| bz_data_audit | 4 | 2 | 2 | 8 |
-| **Total** | **42** | **26** | **18** | **86** |
+### Models Under Test
+1. **bz_data_audit** - Bronze layer audit table
+2. **bz_users** - User profile and subscription information
+3. **bz_meetings** - Meeting information and session details
+4. **bz_participants** - Meeting participants and session tracking
+5. **bz_feature_usage** - Platform feature usage tracking
+6. **bz_support_tickets** - Customer support requests
+7. **bz_billing_events** - Financial transactions and billing
+8. **bz_licenses** - License assignments and entitlements
 
----
-
-## Test Case Specifications
-
-### 1. BZ_USERS Model Tests
-
-#### Test Case ID: BZ_USERS_001
-**Test Case Description**: Validate primary key uniqueness and not null constraints
-**Expected Outcome**: All USER_ID values are unique and not null
-
-#### Test Case ID: BZ_USERS_002
-**Test Case Description**: Validate email format and uniqueness
-**Expected Outcome**: All EMAIL values follow valid email format and are unique
-
-#### Test Case ID: BZ_USERS_003
-**Test Case Description**: Validate plan type domain values
-**Expected Outcome**: PLAN_TYPE contains only valid values (Basic, Pro, Business, Enterprise)
-
-#### Test Case ID: BZ_USERS_004
-**Test Case Description**: Validate timestamp consistency
-**Expected Outcome**: LOAD_TIMESTAMP and UPDATE_TIMESTAMP are properly populated
-
-#### Test Case ID: BZ_USERS_005
-**Test Case Description**: Validate source system tracking
-**Expected Outcome**: SOURCE_SYSTEM contains valid source identifiers
-
-#### Test Case ID: BZ_USERS_006 (Edge Case)
-**Test Case Description**: Handle null company values
-**Expected Outcome**: Records with null COMPANY are processed correctly
-
-#### Test Case ID: BZ_USERS_007 (Edge Case)
-**Test Case Description**: Handle duplicate user records
-**Expected Outcome**: Deduplication logic retains latest record based on timestamp
-
-#### Test Case ID: BZ_USERS_008 (Edge Case)
-**Test Case Description**: Handle invalid email formats
-**Expected Outcome**: Invalid emails are flagged but not rejected
-
-#### Test Case ID: BZ_USERS_009 (Custom)
-**Test Case Description**: Validate PII data handling
-**Expected Outcome**: USER_NAME and EMAIL are properly tracked as PII
-
-#### Test Case ID: BZ_USERS_010 (Custom)
-**Test Case Description**: Validate audit trail integration
-**Expected Outcome**: Each user record processing is logged in audit table
+### Test Categories
+- **Data Quality Tests**: Primary key uniqueness, not null constraints
+- **Business Logic Tests**: Data transformations, deduplication, type casting
+- **Edge Case Tests**: Null handling, empty datasets, invalid data types
+- **Referential Integrity Tests**: Foreign key relationships
+- **Performance Tests**: Large dataset handling
+- **Audit Trail Tests**: Pre/post hook validation
 
 ---
 
-### 2. BZ_MEETINGS Model Tests
-
-#### Test Case ID: BZ_MEETINGS_001
-**Test Case Description**: Validate meeting ID uniqueness
-**Expected Outcome**: All MEETING_ID values are unique and not null
-
-#### Test Case ID: BZ_MEETINGS_002
-**Test Case Description**: Validate host ID foreign key relationship
-**Expected Outcome**: All HOST_ID values reference valid users
-
-#### Test Case ID: BZ_MEETINGS_003
-**Test Case Description**: Validate meeting duration calculation
-**Expected Outcome**: DURATION_MINUTES matches calculated difference between START_TIME and END_TIME
-
-#### Test Case ID: BZ_MEETINGS_004
-**Test Case Description**: Validate timestamp logical consistency
-**Expected Outcome**: END_TIME is always after START_TIME when both are present
-
-#### Test Case ID: BZ_MEETINGS_005
-**Test Case Description**: Validate meeting topic PII handling
-**Expected Outcome**: MEETING_TOPIC is flagged as potential PII
-
-#### Test Case ID: BZ_MEETINGS_006
-**Test Case Description**: Validate source system tracking
-**Expected Outcome**: SOURCE_SYSTEM contains valid source identifiers
-
-#### Test Case ID: BZ_MEETINGS_007 (Edge Case)
-**Test Case Description**: Handle ongoing meetings (null end time)
-**Expected Outcome**: Records with null END_TIME are processed correctly
-
-#### Test Case ID: BZ_MEETINGS_008 (Edge Case)
-**Test Case Description**: Handle zero duration meetings
-**Expected Outcome**: Meetings with DURATION_MINUTES = 0 are handled appropriately
-
-#### Test Case ID: BZ_MEETINGS_009 (Edge Case)
-**Test Case Description**: Handle meetings with null topics
-**Expected Outcome**: Records with null MEETING_TOPIC are processed correctly
-
-#### Test Case ID: BZ_MEETINGS_010 (Edge Case)
-**Test Case Description**: Handle invalid duration values
-**Expected Outcome**: Negative duration values are flagged for review
-
-#### Test Case ID: BZ_MEETINGS_011 (Custom)
-**Test Case Description**: Validate meeting overlap detection
-**Expected Outcome**: Overlapping meetings for same host are identified
-
-#### Test Case ID: BZ_MEETINGS_012 (Custom)
-**Test Case Description**: Validate meeting duration thresholds
-**Expected Outcome**: Meetings exceeding 24 hours are flagged for review
-
-#### Test Case ID: BZ_MEETINGS_013 (Custom)
-**Test Case Description**: Validate audit trail for meeting operations
-**Expected Outcome**: All meeting record operations are logged in audit table
-
----
-
-### 3. BZ_PARTICIPANTS Model Tests
-
-#### Test Case ID: BZ_PARTICIPANTS_001
-**Test Case Description**: Validate participant ID uniqueness
-**Expected Outcome**: All PARTICIPANT_ID values are unique and not null
-
-#### Test Case ID: BZ_PARTICIPANTS_002
-**Test Case Description**: Validate meeting and user foreign key relationships
-**Expected Outcome**: MEETING_ID and USER_ID reference valid records
-
-#### Test Case ID: BZ_PARTICIPANTS_003
-**Test Case Description**: Validate join/leave time consistency
-**Expected Outcome**: LEAVE_TIME is after JOIN_TIME when both are present
-
-#### Test Case ID: BZ_PARTICIPANTS_004
-**Test Case Description**: Validate participant session duration
-**Expected Outcome**: Calculated session duration is reasonable
-
-#### Test Case ID: BZ_PARTICIPANTS_005
-**Test Case Description**: Validate source system tracking
-**Expected Outcome**: SOURCE_SYSTEM contains valid source identifiers
-
-#### Test Case ID: BZ_PARTICIPANTS_006 (Edge Case)
-**Test Case Description**: Handle participants still in meeting (null leave time)
-**Expected Outcome**: Records with null LEAVE_TIME are processed correctly
-
-#### Test Case ID: BZ_PARTICIPANTS_007 (Edge Case)
-**Test Case Description**: Handle multiple participant sessions per meeting
-**Expected Outcome**: Multiple sessions for same user in same meeting are handled
-
-#### Test Case ID: BZ_PARTICIPANTS_008 (Edge Case)
-**Test Case Description**: Handle invalid join/leave time combinations
-**Expected Outcome**: Invalid time combinations are flagged for review
-
-#### Test Case ID: BZ_PARTICIPANTS_009 (Custom)
-**Test Case Description**: Validate participant count per meeting
-**Expected Outcome**: Participant counts align with meeting capacity limits
-
-#### Test Case ID: BZ_PARTICIPANTS_010 (Custom)
-**Test Case Description**: Validate audit trail for participant operations
-**Expected Outcome**: All participant record operations are logged in audit table
-
----
-
-### 4. BZ_FEATURE_USAGE Model Tests
-
-#### Test Case ID: BZ_FEATURE_USAGE_001
-**Test Case Description**: Validate usage ID uniqueness
-**Expected Outcome**: All USAGE_ID values are unique and not null
-
-#### Test Case ID: BZ_FEATURE_USAGE_002
-**Test Case Description**: Validate meeting foreign key relationship
-**Expected Outcome**: All MEETING_ID values reference valid meetings
-
-#### Test Case ID: BZ_FEATURE_USAGE_003
-**Test Case Description**: Validate feature name domain values
-**Expected Outcome**: FEATURE_NAME contains only valid feature types
-
-#### Test Case ID: BZ_FEATURE_USAGE_004
-**Test Case Description**: Validate usage count constraints
-**Expected Outcome**: USAGE_COUNT is non-negative integer
-
-#### Test Case ID: BZ_FEATURE_USAGE_005
-**Test Case Description**: Validate usage date consistency
-**Expected Outcome**: USAGE_DATE aligns with meeting dates
-
-#### Test Case ID: BZ_FEATURE_USAGE_006
-**Test Case Description**: Validate source system tracking
-**Expected Outcome**: SOURCE_SYSTEM contains valid source identifiers
-
-#### Test Case ID: BZ_FEATURE_USAGE_007 (Edge Case)
-**Test Case Description**: Handle zero usage count
-**Expected Outcome**: Records with USAGE_COUNT = 0 are processed appropriately
-
-#### Test Case ID: BZ_FEATURE_USAGE_008 (Edge Case)
-**Test Case Description**: Handle unknown feature names
-**Expected Outcome**: Unknown features are flagged but not rejected
-
-#### Test Case ID: BZ_FEATURE_USAGE_009 (Edge Case)
-**Test Case Description**: Handle extremely high usage counts
-**Expected Outcome**: Unusually high usage counts are flagged for review
-
-#### Test Case ID: BZ_FEATURE_USAGE_010 (Edge Case)
-**Test Case Description**: Handle feature usage without corresponding meeting
-**Expected Outcome**: Orphaned feature usage records are identified
-
-#### Test Case ID: BZ_FEATURE_USAGE_011 (Custom)
-**Test Case Description**: Validate feature usage patterns
-**Expected Outcome**: Feature usage patterns align with meeting duration
-
-#### Test Case ID: BZ_FEATURE_USAGE_012 (Custom)
-**Test Case Description**: Validate audit trail for feature usage operations
-**Expected Outcome**: All feature usage operations are logged in audit table
-
----
-
-### 5. BZ_SUPPORT_TICKETS Model Tests
-
-#### Test Case ID: BZ_SUPPORT_TICKETS_001
-**Test Case Description**: Validate ticket ID uniqueness
-**Expected Outcome**: All TICKET_ID values are unique and not null
-
-#### Test Case ID: BZ_SUPPORT_TICKETS_002
-**Test Case Description**: Validate user foreign key relationship
-**Expected Outcome**: All USER_ID values reference valid users
-
-#### Test Case ID: BZ_SUPPORT_TICKETS_003
-**Test Case Description**: Validate ticket type domain values
-**Expected Outcome**: TICKET_TYPE contains only valid types
-
-#### Test Case ID: BZ_SUPPORT_TICKETS_004
-**Test Case Description**: Validate resolution status domain values
-**Expected Outcome**: RESOLUTION_STATUS contains only valid statuses
-
-#### Test Case ID: BZ_SUPPORT_TICKETS_005
-**Test Case Description**: Validate source system tracking
-**Expected Outcome**: SOURCE_SYSTEM contains valid source identifiers
-
-#### Test Case ID: BZ_SUPPORT_TICKETS_006 (Edge Case)
-**Test Case Description**: Handle tickets without user assignment
-**Expected Outcome**: Unassigned tickets are processed correctly
-
-#### Test Case ID: BZ_SUPPORT_TICKETS_007 (Edge Case)
-**Test Case Description**: Handle invalid ticket types
-**Expected Outcome**: Invalid ticket types are flagged but not rejected
-
-#### Test Case ID: BZ_SUPPORT_TICKETS_008 (Edge Case)
-**Test Case Description**: Handle future open dates
-**Expected Outcome**: Future OPEN_DATE values are flagged for review
-
-#### Test Case ID: BZ_SUPPORT_TICKETS_009 (Custom)
-**Test Case Description**: Validate ticket lifecycle consistency
-**Expected Outcome**: Ticket status transitions follow logical progression
-
-#### Test Case ID: BZ_SUPPORT_TICKETS_010 (Custom)
-**Test Case Description**: Validate audit trail for support ticket operations
-**Expected Outcome**: All support ticket operations are logged in audit table
-
----
-
-### 6. BZ_BILLING_EVENTS Model Tests
-
-#### Test Case ID: BZ_BILLING_EVENTS_001
-**Test Case Description**: Validate event ID uniqueness
-**Expected Outcome**: All EVENT_ID values are unique and not null
-
-#### Test Case ID: BZ_BILLING_EVENTS_002
-**Test Case Description**: Validate user foreign key relationship
-**Expected Outcome**: All USER_ID values reference valid users
-
-#### Test Case ID: BZ_BILLING_EVENTS_003
-**Test Case Description**: Validate event type domain values
-**Expected Outcome**: EVENT_TYPE contains only valid event types
-
-#### Test Case ID: BZ_BILLING_EVENTS_004
-**Test Case Description**: Validate amount constraints
-**Expected Outcome**: AMOUNT values are properly formatted and reasonable
-
-#### Test Case ID: BZ_BILLING_EVENTS_005
-**Test Case Description**: Validate event date consistency
-**Expected Outcome**: EVENT_DATE is within reasonable business date range
-
-#### Test Case ID: BZ_BILLING_EVENTS_006
-**Test Case Description**: Validate source system tracking
-**Expected Outcome**: SOURCE_SYSTEM contains valid source identifiers
-
-#### Test Case ID: BZ_BILLING_EVENTS_007 (Edge Case)
-**Test Case Description**: Handle zero amount transactions
-**Expected Outcome**: Zero amount events are processed appropriately
-
-#### Test Case ID: BZ_BILLING_EVENTS_008 (Edge Case)
-**Test Case Description**: Handle negative amounts (refunds)
-**Expected Outcome**: Negative amounts are handled correctly for refunds
-
-#### Test Case ID: BZ_BILLING_EVENTS_009 (Edge Case)
-**Test Case Description**: Handle extremely large amounts
-**Expected Outcome**: Large amounts are flagged for review
-
-#### Test Case ID: BZ_BILLING_EVENTS_010 (Edge Case)
-**Test Case Description**: Handle invalid event types
-**Expected Outcome**: Invalid event types are flagged but not rejected
-
-#### Test Case ID: BZ_BILLING_EVENTS_011 (Custom)
-**Test Case Description**: Validate billing event patterns
-**Expected Outcome**: Billing patterns align with user subscription types
-
-#### Test Case ID: BZ_BILLING_EVENTS_012 (Custom)
-**Test Case Description**: Validate currency and amount formatting
-**Expected Outcome**: Amount values follow proper decimal formatting
-
-#### Test Case ID: BZ_BILLING_EVENTS_013 (Custom)
-**Test Case Description**: Validate audit trail for billing operations
-**Expected Outcome**: All billing event operations are logged in audit table
-
----
-
-### 7. BZ_LICENSES Model Tests
-
-#### Test Case ID: BZ_LICENSES_001
-**Test Case Description**: Validate license ID uniqueness
-**Expected Outcome**: All LICENSE_ID values are unique and not null
-
-#### Test Case ID: BZ_LICENSES_002
-**Test Case Description**: Validate license type domain values
-**Expected Outcome**: LICENSE_TYPE contains only valid license types
-
-#### Test Case ID: BZ_LICENSES_003
-**Test Case Description**: Validate user assignment relationship
-**Expected Outcome**: ASSIGNED_TO_USER_ID references valid users when not null
-
-#### Test Case ID: BZ_LICENSES_004
-**Test Case Description**: Validate date range consistency
-**Expected Outcome**: END_DATE is after START_DATE when both are present
-
-#### Test Case ID: BZ_LICENSES_005
-**Test Case Description**: Validate source system tracking
-**Expected Outcome**: SOURCE_SYSTEM contains valid source identifiers
-
-#### Test Case ID: BZ_LICENSES_006 (Edge Case)
-**Test Case Description**: Handle unassigned licenses
-**Expected Outcome**: Licenses with null ASSIGNED_TO_USER_ID are processed correctly
-
-#### Test Case ID: BZ_LICENSES_007 (Edge Case)
-**Test Case Description**: Handle perpetual licenses (null end date)
-**Expected Outcome**: Licenses with null END_DATE are handled appropriately
-
-#### Test Case ID: BZ_LICENSES_008 (Edge Case)
-**Test Case Description**: Handle expired licenses
-**Expected Outcome**: Licenses with past END_DATE are identified correctly
-
-#### Test Case ID: BZ_LICENSES_009 (Custom)
-**Test Case Description**: Validate license allocation limits
-**Expected Outcome**: License assignments don't exceed organizational limits
-
-#### Test Case ID: BZ_LICENSES_010 (Custom)
-**Test Case Description**: Validate audit trail for license operations
-**Expected Outcome**: All license operations are logged in audit table
-
----
-
-### 8. BZ_DATA_AUDIT Model Tests
-
-#### Test Case ID: BZ_DATA_AUDIT_001
-**Test Case Description**: Validate audit record ID uniqueness
-**Expected Outcome**: All RECORD_ID values are unique and auto-incrementing
-
-#### Test Case ID: BZ_DATA_AUDIT_002
-**Test Case Description**: Validate audit completeness
-**Expected Outcome**: All Bronze layer operations generate audit records
-
-#### Test Case ID: BZ_DATA_AUDIT_003
-**Test Case Description**: Validate processing time accuracy
-**Expected Outcome**: PROCESSING_TIME values are reasonable and non-negative
-
-#### Test Case ID: BZ_DATA_AUDIT_004
-**Test Case Description**: Validate status domain values
-**Expected Outcome**: STATUS contains only valid values (SUCCESS, FAILED, WARNING)
-
-#### Test Case ID: BZ_DATA_AUDIT_005 (Edge Case)
-**Test Case Description**: Handle failed operations
-**Expected Outcome**: Failed operations are properly logged with error details
-
-#### Test Case ID: BZ_DATA_AUDIT_006 (Edge Case)
-**Test Case Description**: Handle concurrent operations
-**Expected Outcome**: Concurrent operations are logged without conflicts
-
-#### Test Case ID: BZ_DATA_AUDIT_007 (Custom)
-**Test Case Description**: Validate audit data retention
-**Expected Outcome**: Audit records are retained according to policy
-
-#### Test Case ID: BZ_DATA_AUDIT_008 (Custom)
-**Test Case Description**: Validate audit performance impact
-**Expected Outcome**: Audit logging doesn't significantly impact pipeline performance
+## Test Case List
+
+### 1. BZ_DATA_AUDIT Model Tests
+
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_AUDIT_001 | Validate audit table structure creation | Empty table with correct schema |
+| TC_AUDIT_002 | Test audit record insertion via pre-hooks | Audit records created for each model run |
+| TC_AUDIT_003 | Validate processing time calculation | Processing time > 0 for successful runs |
+| TC_AUDIT_004 | Test status tracking (SUCCESS/FAILED) | Correct status values recorded |
+| TC_AUDIT_005 | Validate RECORD_ID auto-increment | Sequential ID generation |
+
+### 2. BZ_USERS Model Tests
+
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_USERS_001 | Primary key uniqueness validation | No duplicate USER_ID values |
+| TC_USERS_002 | Not null constraint on USER_ID | All records have valid USER_ID |
+| TC_USERS_003 | Email format validation | Valid email addresses only |
+| TC_USERS_004 | Plan type domain validation | Only valid plan types (Basic, Pro, Business, Enterprise) |
+| TC_USERS_005 | Deduplication logic validation | Most recent record per USER_ID retained |
+| TC_USERS_006 | Timestamp overwrite validation | LOAD_TIMESTAMP = CURRENT_TIMESTAMP() |
+| TC_USERS_007 | Null USER_ID filtering | Records with null USER_ID excluded |
+| TC_USERS_008 | Source system tracking | SOURCE_SYSTEM field populated |
+
+### 3. BZ_MEETINGS Model Tests
+
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_MEETINGS_001 | Primary key uniqueness validation | No duplicate MEETING_ID values |
+| TC_MEETINGS_002 | Not null constraint on MEETING_ID | All records have valid MEETING_ID |
+| TC_MEETINGS_003 | Host ID foreign key validation | Valid HOST_ID references |
+| TC_MEETINGS_004 | Duration calculation validation | DURATION_MINUTES >= 0 |
+| TC_MEETINGS_005 | TRY_CAST validation for END_TIME | Invalid timestamps handled gracefully |
+| TC_MEETINGS_006 | TRY_CAST validation for DURATION_MINUTES | Invalid numbers converted to NULL |
+| TC_MEETINGS_007 | Deduplication logic validation | Most recent record per MEETING_ID retained |
+| TC_MEETINGS_008 | Start time validation | START_TIME <= END_TIME when both present |
+
+### 4. BZ_PARTICIPANTS Model Tests
+
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_PARTICIPANTS_001 | Primary key uniqueness validation | No duplicate PARTICIPANT_ID values |
+| TC_PARTICIPANTS_002 | Not null constraint on PARTICIPANT_ID | All records have valid PARTICIPANT_ID |
+| TC_PARTICIPANTS_003 | Meeting ID foreign key validation | Valid MEETING_ID references |
+| TC_PARTICIPANTS_004 | User ID foreign key validation | Valid USER_ID references |
+| TC_PARTICIPANTS_005 | TRY_CAST validation for JOIN_TIME | Invalid timestamps handled gracefully |
+| TC_PARTICIPANTS_006 | Session duration validation | LEAVE_TIME >= JOIN_TIME when both present |
+| TC_PARTICIPANTS_007 | Deduplication logic validation | Most recent record per PARTICIPANT_ID retained |
+
+### 5. BZ_FEATURE_USAGE Model Tests
+
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_FEATURE_001 | Primary key uniqueness validation | No duplicate USAGE_ID values |
+| TC_FEATURE_002 | Not null constraint on USAGE_ID | All records have valid USAGE_ID |
+| TC_FEATURE_003 | Meeting ID foreign key validation | Valid MEETING_ID references |
+| TC_FEATURE_004 | Feature name domain validation | Valid feature names only |
+| TC_FEATURE_005 | Usage count validation | USAGE_COUNT >= 0 |
+| TC_FEATURE_006 | Usage date validation | Valid date format |
+| TC_FEATURE_007 | Deduplication logic validation | Most recent record per USAGE_ID retained |
+
+### 6. BZ_SUPPORT_TICKETS Model Tests
+
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_TICKETS_001 | Primary key uniqueness validation | No duplicate TICKET_ID values |
+| TC_TICKETS_002 | Not null constraint on TICKET_ID | All records have valid TICKET_ID |
+| TC_TICKETS_003 | User ID foreign key validation | Valid USER_ID references |
+| TC_TICKETS_004 | Ticket type domain validation | Valid ticket types only |
+| TC_TICKETS_005 | Resolution status validation | Valid status values only |
+| TC_TICKETS_006 | Open date validation | Valid date format |
+| TC_TICKETS_007 | Deduplication logic validation | Most recent record per TICKET_ID retained |
+
+### 7. BZ_BILLING_EVENTS Model Tests
+
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_BILLING_001 | Primary key uniqueness validation | No duplicate EVENT_ID values |
+| TC_BILLING_002 | Not null constraint on EVENT_ID | All records have valid EVENT_ID |
+| TC_BILLING_003 | User ID foreign key validation | Valid USER_ID references |
+| TC_BILLING_004 | Amount validation | AMOUNT >= 0 for valid transactions |
+| TC_BILLING_005 | TRY_CAST validation for AMOUNT | Invalid amounts converted to NULL |
+| TC_BILLING_006 | Event type domain validation | Valid event types only |
+| TC_BILLING_007 | Event date validation | Valid date format |
+| TC_BILLING_008 | Deduplication logic validation | Most recent record per EVENT_ID retained |
+
+### 8. BZ_LICENSES Model Tests
+
+| Test Case ID | Test Case Description | Expected Outcome |
+|--------------|----------------------|------------------|
+| TC_LICENSES_001 | Primary key uniqueness validation | No duplicate LICENSE_ID values |
+| TC_LICENSES_002 | Not null constraint on LICENSE_ID | All records have valid LICENSE_ID |
+| TC_LICENSES_003 | License type domain validation | Valid license types only |
+| TC_LICENSES_004 | Date range validation | START_DATE <= END_DATE when both present |
+| TC_LICENSES_005 | TRY_CAST validation for END_DATE | Invalid dates converted to NULL |
+| TC_LICENSES_006 | User assignment validation | Valid USER_ID when assigned |
+| TC_LICENSES_007 | Deduplication logic validation | Most recent record per LICENSE_ID retained |
 
 ---
 
 ## dbt Test Scripts
 
-### Schema Tests (models/bronze/schema.yml)
+### YAML-based Schema Tests
 
 ```yaml
+# tests/schema.yml
 version: 2
 
-sources:
-  - name: raw
-    description: "Raw data layer containing unprocessed data from source systems"
-    tables:
-      - name: users
-        description: "Raw user account data from user management systems"
-      - name: meetings
-        description: "Raw meeting data including scheduling and basic meeting information"
-      - name: participants
-        description: "Raw participant data tracking meeting attendance"
-      - name: feature_usage
-        description: "Raw feature usage data tracking user interactions"
-      - name: support_tickets
-        description: "Raw support ticket data from customer service systems"
-      - name: billing_events
-        description: "Raw billing events data from source systems"
-      - name: licenses
-        description: "Raw license assignment and management data"
-
 models:
-  - name: bz_data_audit
-    description: "Comprehensive audit trail for all Bronze layer data operations"
-    columns:
-      - name: record_id
-        description: "Auto-incrementing unique identifier for each audit record"
-        tests:
-          - not_null
-          - unique
-      - name: source_table
-        description: "Name of the Bronze layer table"
-        tests:
-          - not_null
-      - name: load_timestamp
-        description: "When the operation occurred"
-        tests:
-          - not_null
-      - name: processed_by
-        description: "User or process that performed the operation"
-        tests:
-          - not_null
-      - name: processing_time
-        description: "Time taken to process the operation in seconds"
-        tests:
-          - not_null
-          - dbt_utils.expression_is_true:
-              expression: ">= 0"
-      - name: status
-        description: "Status of the operation (SUCCESS, FAILED, WARNING)"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['SUCCESS', 'FAILED', 'WARNING', 'STARTED']
-        
+  # BZ_USERS Tests
   - name: bz_users
-    description: "Bronze layer table storing user profile and subscription information"
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "count(*) > 0"
+          config:
+            severity: error
     columns:
       - name: user_id
-        description: "Unique identifier for each user account"
         tests:
-          - not_null
-          - unique
-      - name: user_name
-        description: "Display name of the user (PII)"
-        tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
+          - unique:
+              config:
+                severity: error
       - name: email
-        description: "Email address of the user (PII)"
         tests:
-          - not_null
-          - unique
+          - not_null:
+              config:
+                severity: error
+          - dbt_utils.expression_is_true:
+              expression: "email LIKE '%@%'"
+              config:
+                severity: warn
       - name: plan_type
-        description: "Subscription plan type"
         tests:
-          - not_null
           - accepted_values:
               values: ['Basic', 'Pro', 'Business', 'Enterprise']
+              config:
+                severity: error
       - name: load_timestamp
-        description: "Timestamp when record was loaded"
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
       - name: source_system
-        description: "Source system identifier"
         tests:
-          - not_null
-          - accepted_values:
-              values: ['user_management', 'ldap', 'sso_provider']
+          - not_null:
+              config:
+                severity: error
 
+  # BZ_MEETINGS Tests
   - name: bz_meetings
-    description: "Bronze layer table storing meeting information and session details"
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "count(*) > 0"
+          config:
+            severity: error
     columns:
       - name: meeting_id
-        description: "Unique identifier for each meeting"
         tests:
-          - not_null
-          - unique
+          - not_null:
+              config:
+                severity: error
+          - unique:
+              config:
+                severity: error
       - name: host_id
-        description: "User ID of the meeting host"
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
           - relationships:
               to: ref('bz_users')
               field: user_id
-      - name: start_time
-        description: "Meeting start timestamp"
-        tests:
-          - not_null
+              config:
+                severity: warn
       - name: duration_minutes
-        description: "Meeting duration in minutes"
         tests:
           - dbt_utils.expression_is_true:
-              expression: ">= 0"
-              condition: "duration_minutes is not null"
+              expression: "duration_minutes >= 0 OR duration_minutes IS NULL"
+              config:
+                severity: error
       - name: load_timestamp
-        description: "Timestamp when record was loaded"
         tests:
-          - not_null
-      - name: source_system
-        description: "Source system identifier"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['zoom_api', 'meeting_scheduler', 'calendar_integration']
+          - not_null:
+              config:
+                severity: error
 
+  # BZ_PARTICIPANTS Tests
   - name: bz_participants
-    description: "Bronze layer table tracking meeting participants and their session details"
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "count(*) > 0"
+          config:
+            severity: error
     columns:
       - name: participant_id
-        description: "Unique identifier for each participant session"
         tests:
-          - not_null
-          - unique
+          - not_null:
+              config:
+                severity: error
+          - unique:
+              config:
+                severity: error
       - name: meeting_id
-        description: "Reference to meeting"
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
           - relationships:
               to: ref('bz_meetings')
               field: meeting_id
+              config:
+                severity: warn
       - name: user_id
-        description: "Reference to user who participated"
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
           - relationships:
               to: ref('bz_users')
               field: user_id
-      - name: load_timestamp
-        description: "Timestamp when record was loaded"
-        tests:
-          - not_null
-      - name: source_system
-        description: "Source system identifier"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['zoom_api', 'meeting_logs', 'attendance_tracker']
+              config:
+                severity: warn
 
+  # BZ_FEATURE_USAGE Tests
   - name: bz_feature_usage
-    description: "Bronze layer table recording usage of platform features during meetings"
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "count(*) > 0"
+          config:
+            severity: error
     columns:
       - name: usage_id
-        description: "Unique identifier for each feature usage record"
         tests:
-          - not_null
-          - unique
+          - not_null:
+              config:
+                severity: error
+          - unique:
+              config:
+                severity: error
       - name: meeting_id
-        description: "Reference to meeting where feature was used"
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
           - relationships:
               to: ref('bz_meetings')
               field: meeting_id
+              config:
+                severity: warn
       - name: feature_name
-        description: "Name of the feature being tracked"
         tests:
-          - not_null
           - accepted_values:
               values: ['screen_share', 'recording', 'chat', 'breakout_rooms', 'whiteboard']
+              config:
+                severity: error
       - name: usage_count
-        description: "Number of times feature was used"
         tests:
-          - not_null
           - dbt_utils.expression_is_true:
-              expression: ">= 0"
-      - name: usage_date
-        description: "Date when feature usage occurred"
-        tests:
-          - not_null
-      - name: load_timestamp
-        description: "Timestamp when record was loaded"
-        tests:
-          - not_null
-      - name: source_system
-        description: "Source system identifier"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['zoom_client', 'web_portal', 'mobile_app']
+              expression: "usage_count >= 0"
+              config:
+                severity: error
 
+  # BZ_SUPPORT_TICKETS Tests
   - name: bz_support_tickets
-    description: "Bronze layer table managing customer support requests and resolution tracking"
     columns:
       - name: ticket_id
-        description: "Unique identifier for each support ticket"
         tests:
-          - not_null
-          - unique
+          - not_null:
+              config:
+                severity: error
+          - unique:
+              config:
+                severity: error
       - name: user_id
-        description: "Reference to user who created the ticket"
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
           - relationships:
               to: ref('bz_users')
               field: user_id
+              config:
+                severity: warn
       - name: ticket_type
-        description: "Type of support ticket"
         tests:
-          - not_null
           - accepted_values:
               values: ['technical', 'billing', 'account', 'feature_request']
+              config:
+                severity: error
       - name: resolution_status
-        description: "Current status of ticket resolution"
         tests:
-          - not_null
           - accepted_values:
               values: ['open', 'in_progress', 'resolved', 'closed']
-      - name: open_date
-        description: "Date when ticket was opened"
-        tests:
-          - not_null
-      - name: load_timestamp
-        description: "Timestamp when record was loaded"
-        tests:
-          - not_null
-      - name: source_system
-        description: "Source system identifier"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['zendesk', 'salesforce', 'support_portal']
+              config:
+                severity: error
 
+  # BZ_BILLING_EVENTS Tests
   - name: bz_billing_events
-    description: "Bronze layer table tracking financial transactions and billing activities"
     columns:
       - name: event_id
-        description: "Unique identifier for each billing event"
         tests:
-          - not_null
-          - unique
+          - not_null:
+              config:
+                severity: error
+          - unique:
+              config:
+                severity: error
       - name: user_id
-        description: "Reference to user associated with billing event"
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
           - relationships:
               to: ref('bz_users')
               field: user_id
+              config:
+                severity: warn
       - name: event_type
-        description: "Type of billing event"
         tests:
-          - not_null
           - accepted_values:
               values: ['subscription', 'usage', 'refund', 'adjustment']
+              config:
+                severity: error
       - name: amount
-        description: "Monetary amount for the billing event"
         tests:
-          - not_null
-      - name: event_date
-        description: "Date when the billing event occurred"
-        tests:
-          - not_null
-      - name: load_timestamp
-        description: "Timestamp when record was loaded"
-        tests:
-          - not_null
-      - name: source_system
-        description: "Source system identifier"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['billing_system', 'payment_gateway', 'subscription_service']
+          - dbt_utils.expression_is_true:
+              expression: "amount >= 0 OR amount IS NULL"
+              config:
+                severity: error
 
+  # BZ_LICENSES Tests
   - name: bz_licenses
-    description: "Bronze layer table managing license assignments and entitlements"
     columns:
       - name: license_id
-        description: "Unique identifier for each license"
         tests:
-          - not_null
-          - unique
+          - not_null:
+              config:
+                severity: error
+          - unique:
+              config:
+                severity: error
       - name: license_type
-        description: "Type of license"
         tests:
-          - not_null
           - accepted_values:
               values: ['Basic', 'Pro', 'Business', 'Enterprise']
+              config:
+                severity: error
       - name: assigned_to_user_id
-        description: "User ID to whom license is assigned"
         tests:
           - relationships:
               to: ref('bz_users')
               field: user_id
               config:
-                where: "assigned_to_user_id is not null"
-      - name: start_date
-        description: "License validity start date"
-        tests:
-          - not_null
-      - name: load_timestamp
-        description: "Timestamp when record was loaded"
-        tests:
-          - not_null
-      - name: source_system
-        description: "Source system identifier"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['license_management', 'admin_portal', 'billing_system']
+                severity: warn
+                where: "assigned_to_user_id IS NOT NULL"
 ```
 
-### Custom SQL Tests
+### Custom SQL-based dbt Tests
 
-#### 1. Email Format Validation Test
-**File**: `tests/test_email_format.sql`
+#### 1. Deduplication Validation Test
+
 ```sql
--- Test to validate email format in bz_users table
+-- tests/test_deduplication_bz_users.sql
+-- Test to ensure deduplication logic works correctly for bz_users
+
 SELECT 
     user_id,
-    email
+    COUNT(*) as duplicate_count
 FROM {{ ref('bz_users') }}
-WHERE email IS NOT NULL 
-  AND NOT REGEXP_LIKE(email, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+GROUP BY user_id
+HAVING COUNT(*) > 1
 ```
 
-#### 2. Meeting Duration Consistency Test
-**File**: `tests/test_meeting_duration_consistency.sql`
+#### 2. Timestamp Overwrite Validation Test
+
 ```sql
--- Test to validate meeting duration calculation consistency
+-- tests/test_timestamp_overwrite.sql
+-- Test to ensure LOAD_TIMESTAMP is overwritten with current timestamp
+
 SELECT 
-    meeting_id,
-    start_time,
-    end_time,
-    duration_minutes,
-    DATEDIFF('minute', start_time, end_time) AS calculated_duration
+    'bz_users' as table_name,
+    COUNT(*) as invalid_timestamp_count
+FROM {{ ref('bz_users') }}
+WHERE DATE(load_timestamp) != CURRENT_DATE()
+
+UNION ALL
+
+SELECT 
+    'bz_meetings' as table_name,
+    COUNT(*) as invalid_timestamp_count
 FROM {{ ref('bz_meetings') }}
-WHERE end_time IS NOT NULL 
-  AND start_time IS NOT NULL
-  AND duration_minutes IS NOT NULL
-  AND ABS(duration_minutes - DATEDIFF('minute', start_time, end_time)) > 1
-```
+WHERE DATE(load_timestamp) != CURRENT_DATE()
 
-#### 3. Participant Session Validation Test
-**File**: `tests/test_participant_session_validation.sql`
-```sql
--- Test to validate participant join/leave time consistency
+UNION ALL
+
 SELECT 
-    participant_id,
-    meeting_id,
-    user_id,
-    join_time,
-    leave_time
+    'bz_participants' as table_name,
+    COUNT(*) as invalid_timestamp_count
 FROM {{ ref('bz_participants') }}
-WHERE join_time IS NOT NULL 
-  AND leave_time IS NOT NULL
-  AND leave_time <= join_time
+WHERE DATE(load_timestamp) != CURRENT_DATE()
 ```
 
-#### 4. Feature Usage Date Alignment Test
-**File**: `tests/test_feature_usage_date_alignment.sql`
-```sql
--- Test to validate feature usage dates align with meeting dates
-SELECT 
-    fu.usage_id,
-    fu.meeting_id,
-    fu.usage_date,
-    m.start_time::DATE as meeting_date
-FROM {{ ref('bz_feature_usage') }} fu
-JOIN {{ ref('bz_meetings') }} m ON fu.meeting_id = m.meeting_id
-WHERE fu.usage_date != m.start_time::DATE
-```
+#### 3. TRY_CAST Validation Test
 
-#### 5. Billing Amount Validation Test
-**File**: `tests/test_billing_amount_validation.sql`
 ```sql
--- Test to validate billing amounts are within reasonable ranges
-SELECT 
-    event_id,
-    user_id,
-    event_type,
-    amount
-FROM {{ ref('bz_billing_events') }}
-WHERE (event_type IN ('subscription', 'usage') AND amount < 0)
-   OR (event_type = 'refund' AND amount > 0)
-   OR ABS(amount) > 10000  -- Flag amounts over $10,000
-```
+-- tests/test_try_cast_validation.sql
+-- Test to ensure TRY_CAST functions handle invalid data gracefully
 
-#### 6. License Date Range Validation Test
-**File**: `tests/test_license_date_range_validation.sql`
-```sql
--- Test to validate license date ranges are logical
-SELECT 
-    license_id,
-    license_type,
-    start_date,
-    end_date
-FROM {{ ref('bz_licenses') }}
-WHERE end_date IS NOT NULL 
-  AND end_date <= start_date
-```
-
-#### 7. Audit Trail Completeness Test
-**File**: `tests/test_audit_trail_completeness.sql`
-```sql
--- Test to ensure all Bronze layer operations are audited
-WITH expected_tables AS (
-    SELECT table_name 
-    FROM (
-        VALUES 
-        ('bz_users'),
-        ('bz_meetings'),
-        ('bz_participants'),
-        ('bz_feature_usage'),
-        ('bz_support_tickets'),
-        ('bz_billing_events'),
-        ('bz_licenses')
-    ) AS t(table_name)
+WITH source_data AS (
+    SELECT 
+        meeting_id,
+        end_time,
+        duration_minutes
+    FROM {{ source('raw', 'meetings') }}
 ),
-audited_tables AS (
-    SELECT DISTINCT source_table
-    FROM {{ ref('bz_data_audit') }}
-    WHERE status = 'SUCCESS'
+bronze_data AS (
+    SELECT 
+        meeting_id,
+        end_time,
+        duration_minutes
+    FROM {{ ref('bz_meetings') }}
 )
-SELECT table_name
-FROM expected_tables
-WHERE table_name NOT IN (SELECT source_table FROM audited_tables)
+SELECT 
+    s.meeting_id,
+    'Invalid END_TIME conversion' as error_type
+FROM source_data s
+LEFT JOIN bronze_data b ON s.meeting_id = b.meeting_id
+WHERE s.end_time IS NOT NULL 
+  AND b.end_time IS NULL
+  AND TRY_CAST(s.end_time AS TIMESTAMP_NTZ(9)) IS NULL
+
+UNION ALL
+
+SELECT 
+    s.meeting_id,
+    'Invalid DURATION_MINUTES conversion' as error_type
+FROM source_data s
+LEFT JOIN bronze_data b ON s.meeting_id = b.meeting_id
+WHERE s.duration_minutes IS NOT NULL 
+  AND b.duration_minutes IS NULL
+  AND TRY_CAST(s.duration_minutes AS NUMBER(38,0)) IS NULL
 ```
 
-#### 8. Data Freshness Validation Test
-**File**: `tests/test_data_freshness_validation.sql`
+#### 4. Audit Trail Validation Test
+
 ```sql
--- Test to validate data freshness across all Bronze tables
-WITH freshness_check AS (
-    SELECT 'bz_users' as table_name, MAX(load_timestamp) as last_load FROM {{ ref('bz_users') }}
+-- tests/test_audit_trail.sql
+-- Test to ensure audit records are created for each model execution
+
+SELECT 
+    source_table,
+    COUNT(*) as audit_record_count
+FROM {{ ref('bz_data_audit') }}
+WHERE DATE(load_timestamp) = CURRENT_DATE()
+GROUP BY source_table
+HAVING COUNT(*) = 0
+```
+
+#### 5. Data Quality Summary Test
+
+```sql
+-- tests/test_data_quality_summary.sql
+-- Comprehensive data quality test across all Bronze tables
+
+WITH quality_metrics AS (
+    SELECT 
+        'bz_users' as table_name,
+        COUNT(*) as total_records,
+        COUNT(CASE WHEN user_id IS NULL THEN 1 END) as null_primary_keys,
+        COUNT(DISTINCT user_id) as unique_primary_keys
+    FROM {{ ref('bz_users') }}
+    
     UNION ALL
-    SELECT 'bz_meetings' as table_name, MAX(load_timestamp) as last_load FROM {{ ref('bz_meetings') }}
+    
+    SELECT 
+        'bz_meetings' as table_name,
+        COUNT(*) as total_records,
+        COUNT(CASE WHEN meeting_id IS NULL THEN 1 END) as null_primary_keys,
+        COUNT(DISTINCT meeting_id) as unique_primary_keys
+    FROM {{ ref('bz_meetings') }}
+    
     UNION ALL
-    SELECT 'bz_participants' as table_name, MAX(load_timestamp) as last_load FROM {{ ref('bz_participants') }}
+    
+    SELECT 
+        'bz_participants' as table_name,
+        COUNT(*) as total_records,
+        COUNT(CASE WHEN participant_id IS NULL THEN 1 END) as null_primary_keys,
+        COUNT(DISTINCT participant_id) as unique_primary_keys
+    FROM {{ ref('bz_participants') }}
+    
     UNION ALL
-    SELECT 'bz_feature_usage' as table_name, MAX(load_timestamp) as last_load FROM {{ ref('bz_feature_usage') }}
+    
+    SELECT 
+        'bz_feature_usage' as table_name,
+        COUNT(*) as total_records,
+        COUNT(CASE WHEN usage_id IS NULL THEN 1 END) as null_primary_keys,
+        COUNT(DISTINCT usage_id) as unique_primary_keys
+    FROM {{ ref('bz_feature_usage') }}
+    
     UNION ALL
-    SELECT 'bz_support_tickets' as table_name, MAX(load_timestamp) as last_load FROM {{ ref('bz_support_tickets') }}
+    
+    SELECT 
+        'bz_support_tickets' as table_name,
+        COUNT(*) as total_records,
+        COUNT(CASE WHEN ticket_id IS NULL THEN 1 END) as null_primary_keys,
+        COUNT(DISTINCT ticket_id) as unique_primary_keys
+    FROM {{ ref('bz_support_tickets') }}
+    
     UNION ALL
-    SELECT 'bz_billing_events' as table_name, MAX(load_timestamp) as last_load FROM {{ ref('bz_billing_events') }}
+    
+    SELECT 
+        'bz_billing_events' as table_name,
+        COUNT(*) as total_records,
+        COUNT(CASE WHEN event_id IS NULL THEN 1 END) as null_primary_keys,
+        COUNT(DISTINCT event_id) as unique_primary_keys
+    FROM {{ ref('bz_billing_events') }}
+    
     UNION ALL
-    SELECT 'bz_licenses' as table_name, MAX(load_timestamp) as last_load FROM {{ ref('bz_licenses') }}
+    
+    SELECT 
+        'bz_licenses' as table_name,
+        COUNT(*) as total_records,
+        COUNT(CASE WHEN license_id IS NULL THEN 1 END) as null_primary_keys,
+        COUNT(DISTINCT license_id) as unique_primary_keys
+    FROM {{ ref('bz_licenses') }}
 )
 SELECT 
     table_name,
-    last_load,
-    DATEDIFF('hour', last_load, CURRENT_TIMESTAMP()) as hours_since_last_load
-FROM freshness_check
-WHERE DATEDIFF('hour', last_load, CURRENT_TIMESTAMP()) > 24  -- Flag tables not updated in 24 hours
+    'Primary key violation' as issue_type
+FROM quality_metrics
+WHERE null_primary_keys > 0 
+   OR total_records != unique_primary_keys
+```
+
+#### 6. Performance Test for Large Datasets
+
+```sql
+-- tests/test_performance_large_dataset.sql
+-- Test to ensure models perform well with large datasets
+
+WITH performance_metrics AS (
+    SELECT 
+        'bz_users' as table_name,
+        COUNT(*) as record_count,
+        CURRENT_TIMESTAMP() as test_timestamp
+    FROM {{ ref('bz_users') }}
+    
+    UNION ALL
+    
+    SELECT 
+        'bz_meetings' as table_name,
+        COUNT(*) as record_count,
+        CURRENT_TIMESTAMP() as test_timestamp
+    FROM {{ ref('bz_meetings') }}
+)
+SELECT 
+    table_name,
+    'Performance issue - too few records' as issue_type
+FROM performance_metrics
+WHERE record_count < 1000  -- Adjust threshold as needed
 ```
 
 ### Parameterized Tests
 
-#### 1. Generic Timestamp Validation Macro
-**File**: `macros/test_timestamp_validation.sql`
+#### Generic Test for Primary Key Validation
+
 ```sql
-{% macro test_timestamp_validation(model, timestamp_column) %}
-    SELECT 
-        *
-    FROM {{ model }}
-    WHERE {{ timestamp_column }} IS NULL
-       OR {{ timestamp_column }} > CURRENT_TIMESTAMP()
-       OR {{ timestamp_column }} < '2020-01-01'::TIMESTAMP
+-- macros/test_primary_key_quality.sql
+{% macro test_primary_key_quality(model, primary_key_column) %}
+
+SELECT 
+    '{{ primary_key_column }}' as column_name,
+    'Null primary key found' as issue_type,
+    COUNT(*) as issue_count
+FROM {{ model }}
+WHERE {{ primary_key_column }} IS NULL
+HAVING COUNT(*) > 0
+
+UNION ALL
+
+SELECT 
+    '{{ primary_key_column }}' as column_name,
+    'Duplicate primary key found' as issue_type,
+    COUNT(*) - COUNT(DISTINCT {{ primary_key_column }}) as issue_count
+FROM {{ model }}
+HAVING COUNT(*) != COUNT(DISTINCT {{ primary_key_column }})
+
 {% endmacro %}
 ```
 
-#### 2. Generic Foreign Key Validation Macro
-**File**: `macros/test_foreign_key_validation.sql`
+#### Generic Test for Foreign Key Validation
+
 ```sql
-{% macro test_foreign_key_validation(model, column_name, parent_model, parent_column) %}
-    SELECT 
-        {{ column_name }}
-    FROM {{ model }}
-    WHERE {{ column_name }} IS NOT NULL
-      AND {{ column_name }} NOT IN (
-          SELECT {{ parent_column }}
-          FROM {{ parent_model }}
-          WHERE {{ parent_column }} IS NOT NULL
-      )
+-- macros/test_foreign_key_integrity.sql
+{% macro test_foreign_key_integrity(model, foreign_key_column, reference_model, reference_column) %}
+
+SELECT 
+    {{ foreign_key_column }} as orphaned_key,
+    COUNT(*) as orphan_count
+FROM {{ model }} m
+LEFT JOIN {{ reference_model }} r 
+    ON m.{{ foreign_key_column }} = r.{{ reference_column }}
+WHERE m.{{ foreign_key_column }} IS NOT NULL
+  AND r.{{ reference_column }} IS NULL
+GROUP BY {{ foreign_key_column }}
+HAVING COUNT(*) > 0
+
 {% endmacro %}
 ```
 
 ## Test Execution Strategy
 
-### 1. Test Execution Order
-1. **Schema Tests**: Run basic schema validation tests first
-2. **Custom SQL Tests**: Execute custom business logic tests
-3. **Parameterized Tests**: Run reusable validation tests
-4. **Integration Tests**: Validate cross-table relationships
-5. **Performance Tests**: Validate query performance and resource usage
+### 1. Pre-deployment Testing
+- Run all schema tests before model deployment
+- Validate data quality metrics
+- Check audit trail functionality
 
-### 2. Test Environment Configuration
-```yaml
-# profiles.yml configuration for testing
-zoom_bronze_pipeline:
-  target: test
-  outputs:
-    test:
-      type: snowflake
-      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
-      user: "{{ env_var('SNOWFLAKE_USER') }}"
-      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH') }}"
-      role: "{{ env_var('SNOWFLAKE_ROLE') }}"
-      database: DB_POC_ZOOM_TEST
-      warehouse: WH_POC_ZOOM_TEST_XSMALL
-      schema: BRONZE_TEST
-      threads: 4
-      keepalives_idle: 240
-```
+### 2. Post-deployment Validation
+- Verify record counts match expectations
+- Validate timestamp overwrites
+- Check deduplication effectiveness
 
-### 3. Continuous Integration Setup
-```yaml
-# .github/workflows/dbt_tests.yml
-name: dbt Tests
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
+### 3. Continuous Monitoring
+- Daily execution of critical tests
+- Weekly comprehensive test suite
+- Monthly performance benchmarking
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
-      - name: Install dbt
-        run: pip install dbt-snowflake
-      - name: Run dbt tests
-        run: |
-          dbt deps
-          dbt seed
-          dbt run
-          dbt test
-        env:
-          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
-          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
-```
+### 4. Test Results Tracking
+- Store test results in dbt's run_results.json
+- Log test outcomes to Snowflake audit schema
+- Generate test reports for stakeholders
 
-## Test Results Tracking
+## Expected Test Outcomes
 
-### 1. Test Results Schema
-```sql
--- Test results tracking table
-CREATE TABLE IF NOT EXISTS BRONZE.DBT_TEST_RESULTS (
-    test_execution_id VARCHAR(16777216),
-    test_name VARCHAR(16777216),
-    model_name VARCHAR(16777216),
-    test_type VARCHAR(16777216),
-    status VARCHAR(16777216),
-    execution_time NUMBER(10,3),
-    error_message VARCHAR(16777216),
-    executed_at TIMESTAMP_NTZ(9),
-    executed_by VARCHAR(16777216)
-);
-```
+### Success Criteria
+- All primary key tests pass (100% unique, non-null)
+- All foreign key relationships validated
+- Data type conversions handled gracefully
+- Audit trail records created for each execution
+- Performance benchmarks met
+- Business rule validations pass
 
-### 2. Test Monitoring Dashboard Queries
-```sql
--- Test success rate by model
-SELECT 
-    model_name,
-    COUNT(*) as total_tests,
-    SUM(CASE WHEN status = 'PASS' THEN 1 ELSE 0 END) as passed_tests,
-    ROUND(passed_tests / total_tests * 100, 2) as success_rate
-FROM BRONZE.DBT_TEST_RESULTS
-WHERE executed_at >= CURRENT_DATE - 7
-GROUP BY model_name
-ORDER BY success_rate DESC;
+### Failure Scenarios
+- Duplicate primary keys detected
+- Null values in required fields
+- Invalid foreign key references
+- Data type conversion failures
+- Missing audit records
+- Performance degradation
 
--- Test execution trends
-SELECT 
-    DATE(executed_at) as test_date,
-    COUNT(*) as total_tests,
-    SUM(CASE WHEN status = 'PASS' THEN 1 ELSE 0 END) as passed_tests,
-    AVG(execution_time) as avg_execution_time
-FROM BRONZE.DBT_TEST_RESULTS
-WHERE executed_at >= CURRENT_DATE - 30
-GROUP BY DATE(executed_at)
-ORDER BY test_date DESC;
-```
+## Maintenance and Updates
 
-## Summary
+### Test Maintenance Schedule
+- **Weekly**: Review test results and update thresholds
+- **Monthly**: Add new test cases for edge scenarios
+- **Quarterly**: Performance test optimization
+- **Annually**: Comprehensive test suite review
 
-This comprehensive unit testing framework for the Zoom Bronze Layer dbt models provides:
+### Version Control
+- All test scripts maintained in version control
+- Test case documentation updated with model changes
+- Test results archived for historical analysis
 
-- **86 Total Test Cases** covering all Bronze layer models
-- **Schema-based Tests** for data type and constraint validation
-- **Custom SQL Tests** for business logic validation
-- **Parameterized Tests** for reusable validation patterns
-- **Edge Case Handling** for robust data quality assurance
-- **Audit Trail Validation** ensuring complete operation tracking
-- **Performance Monitoring** for pipeline optimization
-- **CI/CD Integration** for automated testing workflows
-
-The testing framework ensures data reliability, validates business rules, handles edge cases, and provides comprehensive monitoring capabilities for the Bronze layer pipeline in Snowflake.
+This comprehensive test suite ensures the reliability, performance, and data quality of the Zoom Bronze layer dbt models in Snowflake, providing confidence in the data pipeline's integrity and supporting robust analytics capabilities.
