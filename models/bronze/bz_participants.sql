@@ -22,7 +22,7 @@ WITH raw_participants AS (
         load_timestamp,
         update_timestamp,
         source_system
-    FROM {{ source('raw_schema', 'participants') }}
+    FROM {{ source('raw_layer', 'participants') }}
     WHERE participant_id IS NOT NULL  -- Filter out records with null primary keys
       AND meeting_id IS NOT NULL     -- Filter out records with null meeting_id
       AND user_id IS NOT NULL        -- Filter out records with null user_id
