@@ -17,7 +17,7 @@ WITH bronze_users AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_USERS') }}
+    FROM BRONZE.BZ_USERS
 ),
 
 data_quality_checks AS (
