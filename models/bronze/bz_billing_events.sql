@@ -1,55 +1,54 @@
--- Bronze Layer Billing Events Model
--- Description: Raw billing events data from source systems
+-- Bronze Layer Billing Events Table
+-- Description: Tracks financial transactions and billing activities
 -- Source: RAW.BILLING_EVENTS
--- Author: Data Engineering Team
+-- Author: DBT Data Engineer
 -- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table',
-    tags=['bronze', 'billing_events'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, status) SELECT 'BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'dbt_user', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'dbt_user', 1.0, 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    materialized='table'
 ) }}
 
--- CTE to select and filter raw data
-WITH raw_billing_events AS (
+WITH source_data AS (
     SELECT 
-        event_id,
-        user_id,
-        event_type,
-        CASE 
-            WHEN amount IS NOT NULL AND amount != '' 
-            THEN TRY_CAST(amount AS NUMBER(10,2))
-            ELSE NULL 
-        END AS amount,
-        event_date,
-        load_timestamp,
-        update_timestamp,
-        source_system
+        EVENT_ID,
+        USER_ID,
+        EVENT_TYPE,
+        TRY_CAST(AMOUNT AS NUMBER(10,2)) AS AMOUNT,
+        EVENT_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
     FROM {{ source('raw', 'billing_events') }}
-    WHERE event_id IS NOT NULL  -- Filter out NULL primary keys
-      AND user_id IS NOT NULL  -- Filter out NULL required fields
+    WHERE EVENT_ID IS NOT NULL  -- Filter out NULL primary keys
+      AND USER_ID IS NOT NULL   -- Filter out NULL foreign keys
 ),
 
--- CTE for deduplication based on primary key and latest timestamp
-deduped_billing_events AS (
-    SELECT *,
-        ROW_NUMBER() OVER (
-            PARTITION BY event_id 
-            ORDER BY COALESCE(update_timestamp, load_timestamp) DESC
-        ) AS row_num
-    FROM raw_billing_events
+-- Apply deduplication based on primary key and latest timestamp
+deduped_data AS (
+    SELECT *
+    FROM (
+        SELECT *,
+               ROW_NUMBER() OVER (
+                   PARTITION BY EVENT_ID 
+                   ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
+               ) AS row_num
+        FROM source_data
+    )
+    WHERE row_num = 1
+),
+
+-- Final transformation with Bronze timestamp overwrite
+final_data AS (
+    SELECT 
+        EVENT_ID,
+        USER_ID,
+        EVENT_TYPE,
+        AMOUNT,
+        EVENT_DATE,
+        CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
+        CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current DBT run time
+        SOURCE_SYSTEM
+    FROM deduped_data
 )
 
--- Final selection with Bronze timestamp overwrite
-SELECT 
-    event_id,
-    user_id,
-    event_type,
-    amount,
-    event_date,
-    CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
-    CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current DBT run time
-    source_system
-FROM deduped_billing_events
-WHERE row_num = 1
+SELECT * FROM final_data
