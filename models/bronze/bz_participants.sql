@@ -1,56 +1,55 @@
--- Bronze Layer Participants Model
--- Description: Raw participant data tracking meeting attendance
+-- Bronze Layer Participants Table
+-- Description: Tracks meeting participants and their session details
 -- Source: RAW.PARTICIPANTS
--- Author: Data Engineering Team
+-- Author: DBT Data Engineer
 -- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table',
-    tags=['bronze', 'participants'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, status) SELECT 'BZ_PARTICIPANTS', CURRENT_TIMESTAMP(), 'dbt_user', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_PARTICIPANTS', CURRENT_TIMESTAMP(), 'dbt_user', 1.0, 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    materialized='table'
 ) }}
 
--- CTE to select and filter raw data
-WITH raw_participants AS (
+WITH source_data AS (
     SELECT 
-        participant_id,
-        meeting_id,
-        user_id,
-        CASE 
-            WHEN join_time IS NOT NULL AND join_time != '' 
-            THEN TRY_CAST(join_time AS TIMESTAMP_NTZ(9))
-            ELSE NULL 
-        END AS join_time,
-        leave_time,
-        load_timestamp,
-        update_timestamp,
-        source_system
+        PARTICIPANT_ID,
+        MEETING_ID,
+        USER_ID,
+        TRY_CAST(JOIN_TIME AS TIMESTAMP_NTZ) AS JOIN_TIME,
+        LEAVE_TIME,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
     FROM {{ source('raw', 'participants') }}
-    WHERE participant_id IS NOT NULL  -- Filter out NULL primary keys
-      AND meeting_id IS NOT NULL     -- Filter out NULL required fields
-      AND user_id IS NOT NULL        -- Filter out NULL required fields
+    WHERE PARTICIPANT_ID IS NOT NULL  -- Filter out NULL primary keys
+      AND MEETING_ID IS NOT NULL      -- Filter out NULL foreign keys
+      AND USER_ID IS NOT NULL         -- Filter out NULL foreign keys
 ),
 
--- CTE for deduplication based on primary key and latest timestamp
-deduped_participants AS (
-    SELECT *,
-        ROW_NUMBER() OVER (
-            PARTITION BY participant_id 
-            ORDER BY COALESCE(update_timestamp, load_timestamp) DESC
-        ) AS row_num
-    FROM raw_participants
+-- Apply deduplication based on primary key and latest timestamp
+deduped_data AS (
+    SELECT *
+    FROM (
+        SELECT *,
+               ROW_NUMBER() OVER (
+                   PARTITION BY PARTICIPANT_ID 
+                   ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
+               ) AS row_num
+        FROM source_data
+    )
+    WHERE row_num = 1
+),
+
+-- Final transformation with Bronze timestamp overwrite
+final_data AS (
+    SELECT 
+        PARTICIPANT_ID,
+        MEETING_ID,
+        USER_ID,
+        JOIN_TIME,
+        LEAVE_TIME,
+        CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
+        CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current DBT run time
+        SOURCE_SYSTEM
+    FROM deduped_data
 )
 
--- Final selection with Bronze timestamp overwrite
-SELECT 
-    participant_id,
-    meeting_id,
-    user_id,
-    join_time,
-    leave_time,
-    CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
-    CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current DBT run time
-    source_system
-FROM deduped_participants
-WHERE row_num = 1
+SELECT * FROM final_data
