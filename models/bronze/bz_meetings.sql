@@ -23,7 +23,7 @@ WITH raw_meetings AS (
         load_timestamp,
         update_timestamp,
         source_system
-    FROM {{ source('raw_schema', 'meetings') }}
+    FROM {{ source('raw_layer', 'meetings') }}
     WHERE meeting_id IS NOT NULL  -- Filter out records with null primary keys
       AND host_id IS NOT NULL    -- Filter out records with null host_id
 ),
