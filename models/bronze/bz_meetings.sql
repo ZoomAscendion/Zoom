@@ -1,48 +1,73 @@
--- Bronze Layer Meetings Model
--- Description: Transforms raw meeting data into bronze layer with audit logging
+-- Bronze Layer Meetings Table
+-- Description: Stores meeting information and session details
 -- Author: Data Engineering Team
 -- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
-    tags=['bronze', 'meetings'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', DATEDIFF('seconds', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_MEETINGS' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    unique_key='meeting_id',
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_PROCESS', 0, 'STARTED')",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_PROCESS', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_MEETINGS' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS')"
 ) }}
 
 -- CTE to select and filter raw data
 WITH raw_meetings AS (
     SELECT 
-        MEETING_ID,
-        HOST_ID,
-        MEETING_TOPIC,
-        START_TIME,
-        TRY_CAST(END_TIME AS TIMESTAMP_NTZ(9)) as END_TIME,
-        TRY_CAST(DURATION_MINUTES AS NUMBER(38,0)) as DURATION_MINUTES,
-        LOAD_TIMESTAMP as RAW_LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP as RAW_UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
+        meeting_id,
+        host_id,
+        meeting_topic,
+        start_time,
+        end_time,
+        duration_minutes,
+        load_timestamp,
+        update_timestamp,
+        source_system
     FROM {{ source('raw', 'meetings') }}
-    WHERE MEETING_ID IS NOT NULL  -- Filter out records with null primary key
+    WHERE meeting_id IS NOT NULL  -- Filter out NULL primary keys
+      AND host_id IS NOT NULL    -- Filter out NULL foreign keys
 ),
 
--- CTE for deduplication based on primary key
+-- CTE for deduplication based on meeting_id and latest update_timestamp
 deduped_meetings AS (
     SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY MEETING_ID ORDER BY RAW_LOAD_TIMESTAMP DESC) as rn
+        ROW_NUMBER() OVER (
+            PARTITION BY meeting_id 
+            ORDER BY COALESCE(update_timestamp, load_timestamp) DESC
+        ) as rn
     FROM raw_meetings
+),
+
+-- CTE for data quality and transformation
+cleaned_meetings AS (
+    SELECT 
+        meeting_id,
+        host_id,
+        meeting_topic,
+        start_time,
+        CASE 
+            WHEN end_time IS NULL OR end_time = '' THEN NULL
+            ELSE TRY_TO_TIMESTAMP(end_time)
+        END as end_time,
+        CASE 
+            WHEN duration_minutes IS NULL OR duration_minutes = '' THEN NULL
+            ELSE TRY_TO_NUMBER(duration_minutes)
+        END as duration_minutes,
+        CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current timestamp
+        CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current timestamp
+        source_system
+    FROM deduped_meetings
+    WHERE rn = 1
 )
 
--- Final selection with bronze timestamp overwrite
+-- Final SELECT with audit columns
 SELECT 
-    MEETING_ID,
-    HOST_ID,
-    MEETING_TOPIC,
-    START_TIME,
-    END_TIME,
-    DURATION_MINUTES,
-    CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,  -- Overwrite with current DBT run time
-    CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,  -- Overwrite with current DBT run time
-    SOURCE_SYSTEM
-FROM deduped_meetings
-WHERE rn = 1  -- Keep only the most recent record per MEETING_ID
+    meeting_id,
+    host_id,
+    meeting_topic,
+    start_time,
+    end_time,
+    duration_minutes,
+    load_timestamp,
+    update_timestamp,
+    source_system
+FROM cleaned_meetings
