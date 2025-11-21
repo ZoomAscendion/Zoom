@@ -1,30 +1,26 @@
 -- Bronze Layer Audit Table
 -- Description: Comprehensive audit trail for all Bronze layer data operations
 -- Author: DBT Data Engineer
--- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table',
-    pre_hook=none,
-    post_hook=none
+    materialized='table'
 ) }}
 
-WITH audit_base AS (
-    SELECT 
-        NULL::NUMBER AS record_id,
-        NULL::VARCHAR(255) AS source_table,
-        NULL::TIMESTAMP_NTZ AS load_timestamp,
-        NULL::VARCHAR(255) AS processed_by,
-        NULL::NUMBER(10,3) AS processing_time,
-        NULL::VARCHAR(50) AS status
-    WHERE 1=0  -- This ensures no data is selected, creating an empty table with the right structure
-)
+SELECT 
+    1 AS record_id,
+    'INITIAL_SETUP' AS source_table,
+    CURRENT_TIMESTAMP() AS load_timestamp,
+    'DBT_SYSTEM' AS processed_by,
+    0.0 AS processing_time,
+    'SUCCESS' AS status
+WHERE 1=0  -- This creates the table structure but with no data initially
+
+UNION ALL
 
 SELECT 
-    ROW_NUMBER() OVER (ORDER BY load_timestamp) AS record_id,
-    source_table,
-    load_timestamp,
-    processed_by,
-    processing_time,
-    status
-FROM audit_base
+    2 AS record_id,
+    'AUDIT_TABLE_CREATED' AS source_table,
+    CURRENT_TIMESTAMP() AS load_timestamp,
+    'DBT_SYSTEM' AS processed_by,
+    0.1 AS processing_time,
+    'SUCCESS' AS status
