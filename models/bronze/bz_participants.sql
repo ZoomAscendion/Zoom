@@ -6,20 +6,8 @@
 {{ config(
     materialized='table',
     tags=['bronze', 'participants'],
-    pre_hook="
-        {% if this.name != 'bz_data_audit' %}
-        INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status)
-        VALUES ('BZ_PARTICIPANTS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 0, 'STARTED')
-        {% endif %}
-    ",
-    post_hook="
-        {% if this.name != 'bz_data_audit' %}
-        INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status)
-        VALUES ('BZ_PARTICIPANTS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', DATEDIFF('second', 
-            (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_PARTICIPANTS' AND status = 'STARTED'), 
-            CURRENT_TIMESTAMP()), 'COMPLETED')
-        {% endif %}
-    "
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_PARTICIPANTS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 0, 'STARTED'",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_PARTICIPANTS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 1, 'COMPLETED'"
 ) }}
 
 -- Filter out NULL primary keys and apply deduplication
