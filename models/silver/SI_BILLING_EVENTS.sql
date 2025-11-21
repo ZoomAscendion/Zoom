@@ -16,7 +16,7 @@ WITH bronze_billing_events AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_BILLING_EVENTS') }}
+    FROM BRONZE.BZ_BILLING_EVENTS
 ),
 
 data_quality_checks AS (
