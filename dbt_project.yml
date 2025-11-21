@@ -2,10 +2,8 @@ name: 'zoom_bronze_pipeline'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_bronze_pipeline'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -13,29 +11,31 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
   zoom_bronze_pipeline:
-    # Config indicated by + and applies to all files under models/bronze/
+    +materialized: table
     bronze:
       +materialized: table
-      +tags: ["bronze"]
+      +pre-hook: |
+        {% if this.name != 'bz_data_audit' %}
+          INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
+          VALUES ('{{ this.name }}', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 0, 'STARTED')
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'bz_data_audit' %}
+          UPDATE {{ ref('bz_data_audit') }}
+          SET PROCESSING_TIME = DATEDIFF('second', LOAD_TIMESTAMP, CURRENT_TIMESTAMP()),
+              STATUS = 'SUCCESS'
+          WHERE SOURCE_TABLE = '{{ this.name }}'
+            AND PROCESSED_BY = 'DBT_{{ invocation_id }}'
+            AND STATUS = 'STARTED'
+        {% endif %}
 
-# Global configurations
 vars:
-  # The `start_date` variable will be accessible in all resources
-  start_date: '2020-01-01'
-  
-# Seeds configuration
-seeds:
-  zoom_bronze_pipeline:
-    +quote_columns: false
-
-# Snapshots configuration
-snapshots:
-  zoom_bronze_pipeline:
-    +target_schema: snapshots
+  source_schema: 'RAW'
+  target_schema: 'BRONZE'
