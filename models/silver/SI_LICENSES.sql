@@ -17,7 +17,7 @@ WITH bronze_licenses AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('bronze', 'BZ_LICENSES') }}
+    FROM BRONZE.BZ_LICENSES
 ),
 
 date_cleaning AS (
