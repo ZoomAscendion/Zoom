@@ -1,9 +1,9 @@
-name: 'zoom_bronze_pipeline'
+name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
 # This setting configures which "profile" dbt uses for this project.
-profile: 'zoom_bronze_pipeline'
+profile: 'zoom_silver_pipeline'
 
 # These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
@@ -20,29 +20,56 @@ clean-targets:
 
 # Configuring models
 models:
-  zoom_bronze_pipeline:
-    # Config indicated by + and applies to all files under models/bronze/
-    bronze:
+  zoom_silver_pipeline:
+    # Config indicated by + and applies to all files under models/example/
+    silver:
       +materialized: table
-      +tags: ["bronze"]
+      +pre-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (
+            AUDIT_ID, 
+            TABLE_NAME, 
+            OPERATION_TYPE, 
+            AUDIT_TIMESTAMP, 
+            PROCESSED_BY
+          ) 
+          SELECT 
+            UUID_STRING(), 
+            '{{ this.name }}', 
+            'PIPELINE_START', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_SILVER_PIPELINE'
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (
+            AUDIT_ID, 
+            TABLE_NAME, 
+            OPERATION_TYPE, 
+            AUDIT_TIMESTAMP, 
+            PROCESSED_BY
+          ) 
+          SELECT 
+            UUID_STRING(), 
+            '{{ this.name }}', 
+            'PIPELINE_END', 
+            CURRENT_TIMESTAMP(), 
+            'DBT_SILVER_PIPELINE'
+        {% endif %}
 
-# Global configurations
+# Model execution order - SI_Audit_Log must run first
+model-ordering:
+  - "SI_Audit_Log"
+  - "SI_USERS"
+  - "SI_MEETINGS"
+  - "SI_PARTICIPANTS"
+  - "SI_FEATURE_USAGE"
+  - "SI_SUPPORT_TICKETS"
+  - "SI_BILLING_EVENTS"
+  - "SI_LICENSES"
+
 vars:
   # The `start_date` variable will be accessible in all resources
-  start_date: '2020-01-01'
-
-# Seeds configuration
-seeds:
-  zoom_bronze_pipeline:
-    +quote_columns: false
-
-# Snapshots configuration
-snapshots:
-  zoom_bronze_pipeline:
-    +target_database: "{{ var('target_database', 'DB_POC_ZOOM') }}"
-    +target_schema: "snapshots"
-
-# Macros configuration
-dispatch:
-  - macro_namespace: dbt_utils
-    search_order: ['zoom_bronze_pipeline', 'dbt_utils']
+  start_date: '2024-01-01'
+  # The `end_date` variable will be accessible in all resources  
+  end_date: '2024-12-31'
