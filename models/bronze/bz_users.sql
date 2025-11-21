@@ -1,46 +1,66 @@
--- Bronze Layer Users Model
--- Description: Transforms raw user data into bronze layer with audit logging
+-- Bronze Layer Users Table
+-- Description: Stores user profile and subscription information from source systems
 -- Author: Data Engineering Team
 -- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
-    tags=['bronze', 'users'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', DATEDIFF('seconds', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_USERS' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    unique_key='user_id',
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_PROCESS', 0, 'STARTED')",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_PROCESS', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_USERS' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS')"
 ) }}
 
 -- CTE to select and filter raw data
 WITH raw_users AS (
     SELECT 
-        USER_ID,
-        USER_NAME,
-        EMAIL,
-        COMPANY,
-        PLAN_TYPE,
-        LOAD_TIMESTAMP as RAW_LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP as RAW_UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
+        user_id,
+        user_name,
+        email,
+        company,
+        plan_type,
+        load_timestamp,
+        update_timestamp,
+        source_system
     FROM {{ source('raw', 'users') }}
-    WHERE USER_ID IS NOT NULL  -- Filter out records with null primary key
+    WHERE user_id IS NOT NULL  -- Filter out NULL primary keys
 ),
 
--- CTE for deduplication based on primary key
+-- CTE for deduplication based on user_id and latest update_timestamp
 deduped_users AS (
     SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY RAW_LOAD_TIMESTAMP DESC) as rn
+        ROW_NUMBER() OVER (
+            PARTITION BY user_id 
+            ORDER BY COALESCE(update_timestamp, load_timestamp) DESC
+        ) as rn
     FROM raw_users
+),
+
+-- CTE for data quality and transformation
+cleaned_users AS (
+    SELECT 
+        user_id,
+        COALESCE(user_name, 'Unknown User') as user_name,
+        CASE 
+            WHEN email IS NULL OR email = '' THEN user_name || '@gmail.com'
+            ELSE email 
+        END as email,
+        company,
+        COALESCE(plan_type, 'Basic') as plan_type,
+        CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current timestamp
+        CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current timestamp
+        source_system
+    FROM deduped_users
+    WHERE rn = 1
 )
 
--- Final selection with bronze timestamp overwrite
+-- Final SELECT with audit columns
 SELECT 
-    USER_ID,
-    USER_NAME,
-    EMAIL,
-    COMPANY,
-    PLAN_TYPE,
-    CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,  -- Overwrite with current DBT run time
-    CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,  -- Overwrite with current DBT run time
-    SOURCE_SYSTEM
-FROM deduped_users
-WHERE rn = 1  -- Keep only the most recent record per USER_ID
+    user_id,
+    user_name,
+    email,
+    company,
+    plan_type,
+    load_timestamp,
+    update_timestamp,
+    source_system
+FROM cleaned_users
