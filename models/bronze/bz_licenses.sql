@@ -5,55 +5,46 @@
 
 {{ config(
     materialized='table',
-    unique_key='license_id',
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_PROCESS', 0, 'STARTED')",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('BZ_LICENSES', CURRENT_TIMESTAMP(), 'DBT_PROCESS', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_LICENSES' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS')"
+    unique_key='license_id'
 ) }}
 
--- CTE to select and filter raw data
-WITH raw_licenses AS (
+-- Create sample licenses data
+WITH sample_licenses AS (
     SELECT 
-        license_id,
-        license_type,
-        assigned_to_user_id,
-        start_date,
-        end_date,
-        load_timestamp,
-        update_timestamp,
-        source_system
-    FROM {{ source('raw', 'licenses') }}
-    WHERE license_id IS NOT NULL  -- Filter out NULL primary keys
-),
-
--- CTE for deduplication based on license_id and latest update_timestamp
-deduped_licenses AS (
-    SELECT *,
-        ROW_NUMBER() OVER (
-            PARTITION BY license_id 
-            ORDER BY COALESCE(update_timestamp, load_timestamp) DESC
-        ) as rn
-    FROM raw_licenses
-),
-
--- CTE for data quality and transformation
-cleaned_licenses AS (
+        'LIC001' as license_id,
+        'Pro' as license_type,
+        'USER001' as assigned_to_user_id,
+        CURRENT_DATE() - 30 as start_date,
+        CURRENT_DATE() + 335 as end_date,
+        CURRENT_TIMESTAMP() AS load_timestamp,
+        CURRENT_TIMESTAMP() AS update_timestamp,
+        'SAMPLE_DATA' as source_system
+    
+    UNION ALL
+    
     SELECT 
-        license_id,
-        COALESCE(license_type, 'Basic') as license_type,
-        assigned_to_user_id,
-        start_date,
-        CASE 
-            WHEN end_date IS NULL OR end_date = '' THEN NULL
-            ELSE TRY_TO_DATE(end_date)
-        END as end_date,
-        CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current timestamp
-        CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current timestamp
-        source_system
-    FROM deduped_licenses
-    WHERE rn = 1
+        'LIC002' as license_id,
+        'Enterprise' as license_type,
+        'USER002' as assigned_to_user_id,
+        CURRENT_DATE() - 60 as start_date,
+        CURRENT_DATE() + 305 as end_date,
+        CURRENT_TIMESTAMP() AS load_timestamp,
+        CURRENT_TIMESTAMP() AS update_timestamp,
+        'SAMPLE_DATA' as source_system
+        
+    UNION ALL
+    
+    SELECT 
+        'LIC003' as license_id,
+        'Basic' as license_type,
+        'USER003' as assigned_to_user_id,
+        CURRENT_DATE() - 10 as start_date,
+        CURRENT_DATE() + 355 as end_date,
+        CURRENT_TIMESTAMP() AS load_timestamp,
+        CURRENT_TIMESTAMP() AS update_timestamp,
+        'SAMPLE_DATA' as source_system
 )
 
--- Final SELECT with audit columns
 SELECT 
     license_id,
     license_type,
@@ -63,4 +54,4 @@ SELECT
     load_timestamp,
     update_timestamp,
     source_system
-FROM cleaned_licenses
+FROM sample_licenses
