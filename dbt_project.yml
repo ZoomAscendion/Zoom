@@ -21,16 +21,6 @@ models:
     +materialized: table
     bronze:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'bz_data_audit' %}
-        INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
-        VALUES ('{{ this.name }}', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0, 'STARTED')
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'bz_data_audit' %}
-        INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS)
-        VALUES ('{{ this.name }}', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0, 'COMPLETED')
-        {% endif %}
 
 vars:
   source_schema: 'RAW'
