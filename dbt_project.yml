@@ -6,6 +6,8 @@ config-version: 2
 profile: 'zoom_silver_pipeline'
 
 # These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -13,14 +15,16 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
 # Configuring models
+# Full documentation: https://docs.getdbt.com/reference/model-configs
 models:
   zoom_silver_pipeline:
-    # Apply the following configurations to all files under models/silver/
+    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
       +on_schema_change: sync_all_columns
@@ -28,61 +32,27 @@ models:
       SI_Audit_Log:
         +pre_hook: []
         +post_hook: []
-      # All other silver models depend on audit log
-      SI_Users:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_Meetings:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_Participants:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_Feature_Usage:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_Support_Tickets:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_Billing_Events:
-        +depends_on:
-          - ref('SI_Audit_Log')
-      SI_Licenses:
-        +depends_on:
-          - ref('SI_Audit_Log')
-    bronze:
-      +materialized: table
+      # All other models depend on audit log
+      +pre_hook: "INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+      +post_hook: "INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+
+# Set the order of execution
+model-ordering:
+  - "SI_Audit_Log"
+  - "SI_USERS"
+  - "SI_MEETINGS"
+  - "SI_PARTICIPANTS"
+  - "SI_FEATURE_USAGE"
+  - "SI_SUPPORT_TICKETS"
+  - "SI_BILLING_EVENTS"
+  - "SI_LICENSES"
 
 vars:
-  # The `start_date` variable will be accessible in all resources
-  start_date: '2020-01-01'
-  # The `end_date` variable will be accessible in all resources  
-  end_date: '2030-12-31'
-
-# Set a custom schema for different environments
-# In production, this would typically be configured via environment variables
-target-path: "target"
-packages-install-path: "dbt_packages"
-
-# Configuring seeds
-seeds:
-  zoom_silver_pipeline:
-    +quote_columns: false
-
-# Configuring snapshots
-snapshots:
-  zoom_silver_pipeline:
-    +target_schema: snapshots
-    +strategy: timestamp
-    +updated_at: updated_at
-
-# Configuring tests
-tests:
-  zoom_silver_pipeline:
-    +store_failures: true
-    +severity: warn
-
-# Dispatch configuration for packages
-dispatch:
-  - macro_namespace: dbt_utils
-    search_order: ['zoom_silver_pipeline', 'dbt_utils']
+  # dbt version
+  dbt_version: ">=1.0.0"
+  # Timezone for timestamp conversions
+  default_timezone: "UTC"
+  # Data quality thresholds
+  min_data_quality_score: 70
+  # Audit settings
+  enable_audit_logging: true
