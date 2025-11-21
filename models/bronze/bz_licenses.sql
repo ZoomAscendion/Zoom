@@ -22,7 +22,7 @@ WITH raw_licenses AS (
         load_timestamp,
         update_timestamp,
         source_system
-    FROM {{ source('raw_schema', 'licenses') }}
+    FROM {{ source('raw_layer', 'licenses') }}
     WHERE license_id IS NOT NULL  -- Filter out records with null primary keys
 ),
 
