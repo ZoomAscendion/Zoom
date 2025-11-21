@@ -10,12 +10,12 @@
 
 WITH audit_base AS (
     SELECT
-        NULL::NUMBER AS record_id,
-        NULL::VARCHAR(255) AS source_table,
-        NULL::TIMESTAMP_NTZ AS load_timestamp,
-        NULL::VARCHAR(255) AS processed_by,
-        NULL::NUMBER(38,3) AS processing_time,
-        NULL::VARCHAR(50) AS status
+        CAST(ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP()) AS NUMBER) AS record_id,
+        CAST('INITIAL_SETUP' AS VARCHAR(255)) AS source_table,
+        CURRENT_TIMESTAMP() AS load_timestamp,
+        CAST('DBT_SYSTEM' AS VARCHAR(255)) AS processed_by,
+        CAST(0.0 AS NUMBER(38,3)) AS processing_time,
+        CAST('INITIALIZED' AS VARCHAR(50)) AS status
     WHERE 1=0  -- This ensures the table structure is created but no data is inserted initially
 )
 
