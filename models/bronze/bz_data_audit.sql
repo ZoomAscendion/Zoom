@@ -9,23 +9,12 @@
     post_hook=none
 ) }}
 
-WITH audit_base AS (
-    SELECT 
-        -- Auto-incrementing record ID will be handled by Snowflake AUTOINCREMENT
-        CAST(NULL AS NUMBER) AS record_id,
-        CAST('INITIAL_SETUP' AS VARCHAR(255)) AS source_table,
-        CURRENT_TIMESTAMP() AS load_timestamp,
-        CAST('DBT_BRONZE_PIPELINE' AS VARCHAR(255)) AS processed_by,
-        CAST(0 AS NUMBER(38,3)) AS processing_time,
-        CAST('COMPLETED' AS VARCHAR(50)) AS status
-    WHERE FALSE -- This ensures no initial records are inserted
-)
-
+-- Create the audit table structure with proper data types
 SELECT 
-    record_id,
-    source_table,
-    load_timestamp,
-    processed_by,
-    processing_time,
-    status
-FROM audit_base
+    CAST(1 AS NUMBER) AS record_id,
+    CAST('INITIAL_SETUP' AS VARCHAR(255)) AS source_table,
+    CURRENT_TIMESTAMP() AS load_timestamp,
+    CAST('DBT_BRONZE_PIPELINE' AS VARCHAR(255)) AS processed_by,
+    CAST(0.0 AS NUMBER(38,3)) AS processing_time,
+    CAST('COMPLETED' AS VARCHAR(50)) AS status
+WHERE FALSE -- This ensures no initial records are inserted, just creates the structure
