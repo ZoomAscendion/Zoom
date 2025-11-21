@@ -13,7 +13,6 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
@@ -21,11 +20,69 @@ clean-targets:
 # Configuring models
 models:
   zoom_silver_pipeline:
+    # Apply the following configurations to all files under models/silver/
     silver:
+      +materialized: table
+      +on_schema_change: sync_all_columns
+      # Ensure audit log runs first
+      SI_Audit_Log:
+        +pre_hook: []
+        +post_hook: []
+      # All other silver models depend on audit log
+      SI_Users:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Meetings:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Participants:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Feature_Usage:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Support_Tickets:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Billing_Events:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Licenses:
+        +depends_on:
+          - ref('SI_Audit_Log')
+    bronze:
       +materialized: table
 
 vars:
   # The `start_date` variable will be accessible in all resources
-  start_date: '2024-01-01'
+  start_date: '2020-01-01'
   # The `end_date` variable will be accessible in all resources  
-  end_date: '2024-12-31'
+  end_date: '2030-12-31'
+
+# Set a custom schema for different environments
+# In production, this would typically be configured via environment variables
+target-path: "target"
+packages-install-path: "dbt_packages"
+
+# Configuring seeds
+seeds:
+  zoom_silver_pipeline:
+    +quote_columns: false
+
+# Configuring snapshots
+snapshots:
+  zoom_silver_pipeline:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: updated_at
+
+# Configuring tests
+tests:
+  zoom_silver_pipeline:
+    +store_failures: true
+    +severity: warn
+
+# Dispatch configuration for packages
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['zoom_silver_pipeline', 'dbt_utils']
