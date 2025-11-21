@@ -1,51 +1,54 @@
--- Bronze Layer Support Tickets Model
--- Description: Raw support ticket data from customer service systems
+-- Bronze Layer Support Tickets Table
+-- Description: Manages customer support requests and resolution tracking
 -- Source: RAW.SUPPORT_TICKETS
--- Author: Data Engineering Team
+-- Author: DBT Data Engineer
 -- Created: {{ run_started_at }}
 
 {{ config(
-    materialized='table',
-    tags=['bronze', 'support_tickets'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, status) SELECT 'BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'dbt_user', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'dbt_user', 1.0, 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    materialized='table'
 ) }}
 
--- CTE to select and filter raw data
-WITH raw_support_tickets AS (
+WITH source_data AS (
     SELECT 
-        ticket_id,
-        user_id,
-        ticket_type,
-        resolution_status,
-        open_date,
-        load_timestamp,
-        update_timestamp,
-        source_system
+        TICKET_ID,
+        USER_ID,
+        TICKET_TYPE,
+        RESOLUTION_STATUS,
+        OPEN_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
     FROM {{ source('raw', 'support_tickets') }}
-    WHERE ticket_id IS NOT NULL  -- Filter out NULL primary keys
-      AND user_id IS NOT NULL   -- Filter out NULL required fields
+    WHERE TICKET_ID IS NOT NULL  -- Filter out NULL primary keys
+      AND USER_ID IS NOT NULL    -- Filter out NULL foreign keys
 ),
 
--- CTE for deduplication based on primary key and latest timestamp
-deduped_support_tickets AS (
-    SELECT *,
-        ROW_NUMBER() OVER (
-            PARTITION BY ticket_id 
-            ORDER BY COALESCE(update_timestamp, load_timestamp) DESC
-        ) AS row_num
-    FROM raw_support_tickets
+-- Apply deduplication based on primary key and latest timestamp
+deduped_data AS (
+    SELECT *
+    FROM (
+        SELECT *,
+               ROW_NUMBER() OVER (
+                   PARTITION BY TICKET_ID 
+                   ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
+               ) AS row_num
+        FROM source_data
+    )
+    WHERE row_num = 1
+),
+
+-- Final transformation with Bronze timestamp overwrite
+final_data AS (
+    SELECT 
+        TICKET_ID,
+        USER_ID,
+        TICKET_TYPE,
+        RESOLUTION_STATUS,
+        OPEN_DATE,
+        CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
+        CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current DBT run time
+        SOURCE_SYSTEM
+    FROM deduped_data
 )
 
--- Final selection with Bronze timestamp overwrite
-SELECT 
-    ticket_id,
-    user_id,
-    ticket_type,
-    resolution_status,
-    open_date,
-    CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
-    CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current DBT run time
-    source_system
-FROM deduped_support_tickets
-WHERE row_num = 1
+SELECT * FROM final_data
