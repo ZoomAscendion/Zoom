@@ -1,0 +1,230 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "Bronze layer source tables"
+    tables:
+      - name: BZ_USERS
+        description: "Bronze users table"
+      - name: BZ_MEETINGS
+        description: "Bronze meetings table"
+      - name: BZ_PARTICIPANTS
+        description: "Bronze participants table"
+      - name: BZ_FEATURE_USAGE
+        description: "Bronze feature usage table"
+      - name: BZ_SUPPORT_TICKETS
+        description: "Bronze support tickets table"
+      - name: BZ_BILLING_EVENTS
+        description: "Bronze billing events table"
+      - name: BZ_LICENSES
+        description: "Bronze licenses table"
+
+models:
+  - name: SI_Audit_Log
+    description: "Silver layer audit log table for tracking pipeline execution"
+    columns:
+      - name: AUDIT_ID
+        description: "Unique audit record identifier"
+        tests:
+          - not_null
+          - unique
+      - name: TABLE_NAME
+        description: "Name of the table being processed"
+        tests:
+          - not_null
+      - name: OPERATION_TYPE
+        description: "Type of operation performed"
+        tests:
+          - not_null
+
+  - name: SI_Users
+    description: "Silver layer users table with cleaned and validated data"
+    columns:
+      - name: USER_ID
+        description: "Unique user identifier"
+        tests:
+          - not_null
+          - unique
+      - name: EMAIL
+        description: "User email address"
+        tests:
+          - not_null
+      - name: PLAN_TYPE
+        description: "User subscription plan type"
+        tests:
+          - accepted_values:
+              values: ['FREE', 'BASIC', 'PRO', 'ENTERPRISE']
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - not_null
+      - name: VALIDATION_STATUS
+        description: "Validation status"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'WARNING', 'FAILED']
+
+  - name: SI_Meetings
+    description: "Silver layer meetings table with cleaned and validated data"
+    columns:
+      - name: MEETING_ID
+        description: "Unique meeting identifier"
+        tests:
+          - not_null
+          - unique
+      - name: HOST_ID
+        description: "Meeting host user ID"
+        tests:
+          - not_null
+      - name: DURATION_MINUTES
+        description: "Meeting duration in minutes"
+        tests:
+          - not_null
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - not_null
+      - name: VALIDATION_STATUS
+        description: "Validation status"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'WARNING', 'FAILED']
+
+  - name: SI_Participants
+    description: "Silver layer participants table with cleaned and validated data"
+    columns:
+      - name: PARTICIPANT_ID
+        description: "Unique participant identifier"
+        tests:
+          - not_null
+          - unique
+      - name: MEETING_ID
+        description: "Meeting identifier"
+        tests:
+          - not_null
+      - name: USER_ID
+        description: "Participant user ID"
+        tests:
+          - not_null
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - not_null
+      - name: VALIDATION_STATUS
+        description: "Validation status"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'WARNING', 'FAILED']
+
+  - name: SI_Feature_Usage
+    description: "Silver layer feature usage table with cleaned and validated data"
+    columns:
+      - name: USAGE_ID
+        description: "Unique usage identifier"
+        tests:
+          - not_null
+          - unique
+      - name: MEETING_ID
+        description: "Meeting identifier"
+        tests:
+          - not_null
+      - name: FEATURE_NAME
+        description: "Feature name"
+        tests:
+          - not_null
+      - name: USAGE_COUNT
+        description: "Usage count"
+        tests:
+          - not_null
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - not_null
+      - name: VALIDATION_STATUS
+        description: "Validation status"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'WARNING', 'FAILED']
+
+  - name: SI_Support_Tickets
+    description: "Silver layer support tickets table with cleaned and validated data"
+    columns:
+      - name: TICKET_ID
+        description: "Unique ticket identifier"
+        tests:
+          - not_null
+          - unique
+      - name: USER_ID
+        description: "User identifier"
+        tests:
+          - not_null
+      - name: RESOLUTION_STATUS
+        description: "Ticket resolution status"
+        tests:
+          - accepted_values:
+              values: ['OPEN', 'IN PROGRESS', 'RESOLVED', 'CLOSED']
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - not_null
+      - name: VALIDATION_STATUS
+        description: "Validation status"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'WARNING', 'FAILED']
+
+  - name: SI_Billing_Events
+    description: "Silver layer billing events table with cleaned and validated data"
+    columns:
+      - name: EVENT_ID
+        description: "Unique event identifier"
+        tests:
+          - not_null
+          - unique
+      - name: USER_ID
+        description: "User identifier"
+        tests:
+          - not_null
+      - name: AMOUNT
+        description: "Billing amount"
+        tests:
+          - not_null
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - not_null
+      - name: VALIDATION_STATUS
+        description: "Validation status"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'WARNING', 'FAILED']
+
+  - name: SI_Licenses
+    description: "Silver layer licenses table with cleaned and validated data"
+    columns:
+      - name: LICENSE_ID
+        description: "Unique license identifier"
+        tests:
+          - not_null
+          - unique
+      - name: ASSIGNED_TO_USER_ID
+        description: "User ID assigned to license"
+        tests:
+          - not_null
+      - name: START_DATE
+        description: "License start date"
+        tests:
+          - not_null
+      - name: END_DATE
+        description: "License end date"
+        tests:
+          - not_null
+      - name: DATA_QUALITY_SCORE
+        description: "Data quality score (0-100)"
+        tests:
+          - not_null
+      - name: VALIDATION_STATUS
+        description: "Validation status"
+        tests:
+          - accepted_values:
+              values: ['PASSED', 'WARNING', 'FAILED']
