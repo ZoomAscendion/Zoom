@@ -1,0 +1,84 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_SUPPORT_TICKETS', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_SUPPORT_TICKETS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+) }}
+
+-- Silver Layer Support Tickets Table
+-- Transforms and cleanses support ticket data from Bronze layer
+WITH bronze_support_tickets AS (
+    SELECT 
+        TICKET_ID,
+        USER_ID,
+        TICKET_TYPE,
+        RESOLUTION_STATUS,
+        OPEN_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_SUPPORT_TICKETS') }}
+),
+
+data_quality_checks AS (
+    SELECT 
+        *,
+        -- Data Quality Score Calculation
+        CASE 
+            WHEN TICKET_ID IS NULL THEN 0
+            WHEN USER_ID IS NULL THEN 10
+            WHEN TICKET_TYPE IS NULL THEN 20
+            WHEN RESOLUTION_STATUS NOT IN ('Open', 'In Progress', 'Resolved', 'Closed') THEN 30
+            WHEN OPEN_DATE IS NULL OR OPEN_DATE > CURRENT_DATE() THEN 40
+            ELSE 100
+        END AS DATA_QUALITY_SCORE,
+        
+        -- Validation Status
+        CASE 
+            WHEN TICKET_ID IS NULL OR USER_ID IS NULL OR TICKET_TYPE IS NULL THEN 'FAILED'
+            WHEN OPEN_DATE IS NULL OR OPEN_DATE > CURRENT_DATE() THEN 'FAILED'
+            WHEN RESOLUTION_STATUS NOT IN ('Open', 'In Progress', 'Resolved', 'Closed') THEN 'WARNING'
+            ELSE 'PASSED'
+        END AS VALIDATION_STATUS
+    FROM bronze_support_tickets
+),
+
+cleansed_support_tickets AS (
+    SELECT 
+        TICKET_ID,
+        USER_ID,
+        UPPER(TRIM(TICKET_TYPE)) AS TICKET_TYPE,
+        COALESCE(RESOLUTION_STATUS, 'Open') AS RESOLUTION_STATUS,
+        OPEN_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        DATA_QUALITY_SCORE,
+        VALIDATION_STATUS
+    FROM data_quality_checks
+    WHERE TICKET_ID IS NOT NULL  -- Eliminate null records
+),
+
+deduplication AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY TICKET_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM cleansed_support_tickets
+)
+
+SELECT 
+    TICKET_ID,
+    USER_ID,
+    TICKET_TYPE,
+    RESOLUTION_STATUS,
+    OPEN_DATE,
+    LOAD_TIMESTAMP,
+    UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    LOAD_DATE,
+    UPDATE_DATE,
+    DATA_QUALITY_SCORE,
+    VALIDATION_STATUS
+FROM deduplication
+WHERE rn = 1  -- Eliminate duplicates
+AND VALIDATION_STATUS != 'FAILED'  -- Eliminate failed records
