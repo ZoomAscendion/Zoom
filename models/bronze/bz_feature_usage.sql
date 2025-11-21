@@ -1,46 +1,64 @@
--- Bronze Layer Feature Usage Model
--- Description: Transforms raw feature usage data into bronze layer with audit logging
+-- Bronze Layer Feature Usage Table
+-- Description: Records usage of platform features during meetings
 -- Author: Data Engineering Team
 -- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
-    tags=['bronze', 'feature_usage'],
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', DATEDIFF('seconds', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_FEATURE_USAGE' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    unique_key='usage_id',
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_PROCESS', 0, 'STARTED')",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) VALUES ('BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_PROCESS', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_FEATURE_USAGE' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS')"
 ) }}
 
 -- CTE to select and filter raw data
 WITH raw_feature_usage AS (
     SELECT 
-        USAGE_ID,
-        MEETING_ID,
-        FEATURE_NAME,
-        USAGE_COUNT,
-        USAGE_DATE,
-        LOAD_TIMESTAMP as RAW_LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP as RAW_UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
+        usage_id,
+        meeting_id,
+        feature_name,
+        usage_count,
+        usage_date,
+        load_timestamp,
+        update_timestamp,
+        source_system
     FROM {{ source('raw', 'feature_usage') }}
-    WHERE USAGE_ID IS NOT NULL  -- Filter out records with null primary key
+    WHERE usage_id IS NOT NULL    -- Filter out NULL primary keys
+      AND meeting_id IS NOT NULL  -- Filter out NULL foreign keys
 ),
 
--- CTE for deduplication based on primary key
+-- CTE for deduplication based on usage_id and latest update_timestamp
 deduped_feature_usage AS (
     SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY USAGE_ID ORDER BY RAW_LOAD_TIMESTAMP DESC) as rn
+        ROW_NUMBER() OVER (
+            PARTITION BY usage_id 
+            ORDER BY COALESCE(update_timestamp, load_timestamp) DESC
+        ) as rn
     FROM raw_feature_usage
+),
+
+-- CTE for data quality and transformation
+cleaned_feature_usage AS (
+    SELECT 
+        usage_id,
+        meeting_id,
+        COALESCE(feature_name, 'unknown') as feature_name,
+        COALESCE(usage_count, 0) as usage_count,
+        usage_date,
+        CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current timestamp
+        CURRENT_TIMESTAMP() AS update_timestamp, -- Overwrite with current timestamp
+        source_system
+    FROM deduped_feature_usage
+    WHERE rn = 1
 )
 
--- Final selection with bronze timestamp overwrite
+-- Final SELECT with audit columns
 SELECT 
-    USAGE_ID,
-    MEETING_ID,
-    FEATURE_NAME,
-    USAGE_COUNT,
-    USAGE_DATE,
-    CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,  -- Overwrite with current DBT run time
-    CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,  -- Overwrite with current DBT run time
-    SOURCE_SYSTEM
-FROM deduped_feature_usage
-WHERE rn = 1  -- Keep only the most recent record per USAGE_ID
+    usage_id,
+    meeting_id,
+    feature_name,
+    usage_count,
+    usage_date,
+    load_timestamp,
+    update_timestamp,
+    source_system
+FROM cleaned_feature_usage
