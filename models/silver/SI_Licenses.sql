@@ -4,8 +4,8 @@
     post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PROCESS_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
 ) }}
 
--- Silver Licenses Table - Cleaned and standardized license assignments
--- Implements critical P1 DD/MM/YYYY date format conversion
+/* Silver Licenses Table - Cleaned and standardized license assignments */
+/* Implements critical P1 DD/MM/YYYY date format conversion */
 
 WITH bronze_licenses AS (
     SELECT 
@@ -32,7 +32,7 @@ cleaned_licenses AS (
         LICENSE_ID,
         UPPER(TRIM(LICENSE_TYPE)) AS LICENSE_TYPE,
         ASSIGNED_TO_USER_ID,
-        -- Critical P1: Convert DD/MM/YYYY date format to Snowflake-compatible format
+        /* Critical P1: Convert DD/MM/YYYY date format to Snowflake-compatible format */
         COALESCE(
             TRY_TO_DATE(START_DATE::STRING, 'YYYY-MM-DD'),
             TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY'),
@@ -40,7 +40,7 @@ cleaned_licenses AS (
             TRY_TO_DATE(START_DATE::STRING, 'MM/DD/YYYY'),
             TRY_TO_DATE(START_DATE)
         ) AS CLEAN_START_DATE,
-        -- Critical P1: Convert DD/MM/YYYY date format to Snowflake-compatible format
+        /* Critical P1: Convert DD/MM/YYYY date format to Snowflake-compatible format */
         COALESCE(
             TRY_TO_DATE(END_DATE::STRING, 'YYYY-MM-DD'),
             TRY_TO_DATE(END_DATE::STRING, 'DD/MM/YYYY'),
@@ -65,7 +65,7 @@ validated_licenses AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        -- Calculate data quality score
+        /* Calculate data quality score */
         CASE 
             WHEN LICENSE_ID IS NOT NULL 
                 AND LICENSE_TYPE IS NOT NULL
@@ -77,7 +77,7 @@ validated_licenses AS (
             WHEN LICENSE_ID IS NOT NULL AND ASSIGNED_TO_USER_ID IS NOT NULL THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
-        -- Set validation status
+        /* Set validation status */
         CASE 
             WHEN LICENSE_ID IS NOT NULL 
                 AND LICENSE_TYPE IS NOT NULL
