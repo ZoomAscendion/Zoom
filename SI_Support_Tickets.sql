@@ -1,0 +1,61 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_SUPPORT_TICKETS', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_SUPPORT_TICKETS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+) }}
+
+/* Transform Bronze Support Tickets to Silver Support Tickets */
+WITH bronze_support_tickets AS (
+    SELECT *
+    FROM {{ source('bronze', 'BZ_SUPPORT_TICKETS') }}
+),
+
+validated_support_tickets AS (
+    SELECT 
+        TICKET_ID,
+        USER_ID,
+        UPPER(TRIM(TICKET_TYPE)) AS TICKET_TYPE,
+        CASE 
+            WHEN RESOLUTION_STATUS IN ('Open', 'In Progress', 'Resolved', 'Closed') THEN RESOLUTION_STATUS
+            ELSE 'Open'
+        END AS RESOLUTION_STATUS,
+        OPEN_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        
+        /* Data Quality Score Calculation */
+        CASE 
+            WHEN TICKET_ID IS NULL THEN 0
+            WHEN USER_ID IS NULL OR TICKET_TYPE IS NULL THEN 40
+            WHEN OPEN_DATE IS NULL OR OPEN_DATE > CURRENT_DATE() THEN 70
+            ELSE 100
+        END AS DATA_QUALITY_SCORE,
+        
+        /* Validation Status */
+        CASE 
+            WHEN TICKET_ID IS NULL OR USER_ID IS NULL OR TICKET_TYPE IS NULL THEN 'FAILED'
+            WHEN OPEN_DATE IS NULL OR OPEN_DATE > CURRENT_DATE() THEN 'WARNING'
+            ELSE 'PASSED'
+        END AS VALIDATION_STATUS,
+        
+        ROW_NUMBER() OVER (PARTITION BY TICKET_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM bronze_support_tickets
+    WHERE TICKET_ID IS NOT NULL
+)
+
+SELECT 
+    TICKET_ID,
+    USER_ID,
+    TICKET_TYPE,
+    RESOLUTION_STATUS,
+    OPEN_DATE,
+    CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
+    CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    DATE(CURRENT_TIMESTAMP()) AS LOAD_DATE,
+    DATE(CURRENT_TIMESTAMP()) AS UPDATE_DATE,
+    DATA_QUALITY_SCORE,
+    VALIDATION_STATUS
+FROM validated_support_tickets
+WHERE rn = 1 AND VALIDATION_STATUS IN ('PASSED', 'WARNING')
