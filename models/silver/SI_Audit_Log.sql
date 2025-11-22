@@ -1,0 +1,21 @@
+{{ config(
+    materialized='table',
+    on_schema_change='sync_all_columns'
+) }}
+
+-- Silver Audit Log Table - Created first to support all other models
+-- This table tracks all audit information for Silver layer processing
+
+SELECT 
+    CAST(NULL AS VARCHAR(255)) AS AUDIT_ID,
+    CAST(NULL AS VARCHAR(255)) AS TABLE_NAME,
+    CAST(NULL AS VARCHAR(255)) AS COLUMN_NAME,
+    CAST(NULL AS VARCHAR(255)) AS RECORD_ID,
+    CAST(NULL AS VARCHAR(255)) AS ERROR_TYPE,
+    CAST(NULL AS VARCHAR(16777216)) AS ERROR_DESCRIPTION,
+    CAST(NULL AS VARCHAR(16777216)) AS ORIGINAL_VALUE,
+    CAST(NULL AS TIMESTAMP_NTZ(9)) AS AUDIT_TIMESTAMP,
+    CAST(NULL AS VARCHAR(255)) AS OPERATION_TYPE,
+    CAST(NULL AS VARCHAR(255)) AS PROCESSED_BY,
+    CAST(NULL AS VARCHAR(255)) AS SOURCE_SYSTEM
+WHERE FALSE
