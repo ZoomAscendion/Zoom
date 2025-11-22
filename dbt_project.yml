@@ -1,9 +1,9 @@
-name: 'zoom_bronze_pipeline'
+name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
 # This setting configures which "profile" dbt uses for this project.
-profile: 'zoom_bronze_pipeline'
+profile: 'zoom_silver_pipeline'
 
 # These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
@@ -13,12 +13,49 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
-  zoom_bronze_pipeline:
-    bronze:
+  zoom_silver_pipeline:
+    # Config indicated by + and applies to all files under models/silver/
+    silver:
       +materialized: table
-      +on_schema_change: "fail"
+      +on_schema_change: sync_all_columns
+      # Ensure audit log runs first
+      SI_Audit_Log:
+        +pre-hook: []
+        +post-hook: []
+      # All other models depend on audit log
+      +pre-hook: "INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+      +post-hook: "INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+
+# Specify the order of model execution
+model-ordering:
+  - "SI_Audit_Log"
+  - "SI_Users"
+  - "SI_Meetings"
+  - "SI_Participants"
+  - "SI_Feature_Usage"
+  - "SI_Support_Tickets"
+  - "SI_Billing_Events"
+  - "SI_Licenses"
+
+vars:
+  # dbt Cloud environment variables
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
+  
+# Snowflake-specific configurations
+quoting:
+  database: false
+  schema: false
+  identifier: false
+
+# Seeds configuration
+seeds:
+  zoom_silver_pipeline:
+    +quote_columns: false
