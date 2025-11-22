@@ -1,0 +1,91 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+) }}
+
+/* Silver Layer Licenses Table */
+/* Purpose: Cleaned and standardized license assignments with DD/MM/YYYY format conversion */
+/* Critical P1: DD/MM/YYYY date format conversion for START_DATE and END_DATE */
+
+WITH bronze_licenses AS (
+    SELECT 
+        LICENSE_ID,
+        LICENSE_TYPE,
+        ASSIGNED_TO_USER_ID,
+        START_DATE,
+        END_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_LICENSES') }}
+),
+
+date_cleaned AS (
+    SELECT 
+        *,
+        /* Critical P1: DD/MM/YYYY date format conversion */
+        CASE 
+            WHEN TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY') IS NOT NULL THEN
+                TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY')
+            ELSE TRY_TO_DATE(START_DATE::STRING)
+        END AS CLEAN_START_DATE,
+        
+        CASE 
+            WHEN TRY_TO_DATE(END_DATE::STRING, 'DD/MM/YYYY') IS NOT NULL THEN
+                TRY_TO_DATE(END_DATE::STRING, 'DD/MM/YYYY')
+            ELSE TRY_TO_DATE(END_DATE::STRING)
+        END AS CLEAN_END_DATE
+    FROM bronze_licenses
+),
+
+data_quality_checks AS (
+    SELECT 
+        *,
+        /* Data Quality Score Calculation */
+        CASE 
+            WHEN LICENSE_ID IS NULL THEN 0
+            WHEN LICENSE_TYPE IS NULL OR LENGTH(TRIM(LICENSE_TYPE)) = 0 THEN 20
+            WHEN ASSIGNED_TO_USER_ID IS NULL THEN 40
+            WHEN CLEAN_START_DATE IS NULL OR CLEAN_END_DATE IS NULL THEN 60
+            WHEN CLEAN_START_DATE >= CLEAN_END_DATE THEN 80
+            ELSE 100
+        END AS DATA_QUALITY_SCORE,
+        
+        /* Validation Status */
+        CASE 
+            WHEN LICENSE_ID IS NULL OR ASSIGNED_TO_USER_ID IS NULL THEN 'FAILED'
+            WHEN LICENSE_TYPE IS NULL OR LENGTH(TRIM(LICENSE_TYPE)) = 0 THEN 'FAILED'
+            WHEN CLEAN_START_DATE IS NULL OR CLEAN_END_DATE IS NULL THEN 'FAILED'
+            WHEN CLEAN_START_DATE >= CLEAN_END_DATE THEN 'FAILED'
+            ELSE 'PASSED'
+        END AS VALIDATION_STATUS
+    FROM date_cleaned
+),
+
+cleaned_licenses AS (
+    SELECT 
+        LICENSE_ID,
+        UPPER(TRIM(LICENSE_TYPE)) AS LICENSE_TYPE,
+        ASSIGNED_TO_USER_ID,
+        CLEAN_START_DATE AS START_DATE,
+        CLEAN_END_DATE AS END_DATE,
+        CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
+        CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        DATE(CURRENT_TIMESTAMP()) AS LOAD_DATE,
+        DATE(CURRENT_TIMESTAMP()) AS UPDATE_DATE,
+        DATA_QUALITY_SCORE,
+        VALIDATION_STATUS
+    FROM data_quality_checks
+    WHERE LICENSE_ID IS NOT NULL
+      AND ASSIGNED_TO_USER_ID IS NOT NULL
+      AND LICENSE_TYPE IS NOT NULL
+      AND LENGTH(TRIM(LICENSE_TYPE)) > 0
+      AND CLEAN_START_DATE IS NOT NULL
+      AND CLEAN_END_DATE IS NOT NULL
+      AND CLEAN_START_DATE < CLEAN_END_DATE
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY LICENSE_ID ORDER BY UPDATE_TIMESTAMP DESC) = 1
+)
+
+SELECT * FROM cleaned_licenses
