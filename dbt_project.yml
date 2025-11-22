@@ -2,8 +2,12 @@ name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
+# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_silver_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -11,25 +15,35 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"
-clean-targets:
+target-path: "target"  # directory which will store compiled SQL files
+clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+
 models:
   zoom_silver_pipeline:
+    # Config indicated by + and applies to all files under models/silver/
     silver:
       +materialized: table
+      +on_schema_change: sync_all_columns
+      # Ensure SI_Audit_Log runs first
       SI_Audit_Log:
-        +pre-hook: []
-        +post-hook: []
+        +pre_hook: []
+        +post_hook: []
+      # All other models depend on SI_Audit_Log
+      +pre_hook: "INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'PROCESS_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+      +post_hook: "INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), '{{ this.name }}', 'PROCESS_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
 
-vars:
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
-
-on-run-start:
-  - "{{ log('Starting Silver Layer Pipeline Execution', info=true) }}"
-
-on-run-end:
-  - "{{ log('Completed Silver Layer Pipeline Execution', info=true) }}"
+# Define execution order to ensure SI_Audit_Log is created first
+model-order:
+  - "SI_Audit_Log"
+  - "SI_Users"
+  - "SI_Meetings"
+  - "SI_Participants"
+  - "SI_Feature_Usage"
+  - "SI_Support_Tickets"
+  - "SI_Billing_Events"
+  - "SI_Licenses"
