@@ -20,4 +20,23 @@ models:
   zoom_silver_pipeline:
     silver:
       +materialized: table
-      +on_schema_change: sync_all_columns
+      +pre-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) 
+          SELECT UUID_STRING(), '{{ this.name }}', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'
+        {% endif %}
+      +post-hook: |
+        {% if this.name != 'SI_Audit_Log' %}
+          INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) 
+          SELECT UUID_STRING(), '{{ this.name }}', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'
+        {% endif %}
+
+vars:
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
+
+on-run-start:
+  - "{{ log('Starting Silver Layer Pipeline Execution', info=true) }}"
+
+on-run-end:
+  - "{{ log('Completed Silver Layer Pipeline Execution', info=true) }}"
