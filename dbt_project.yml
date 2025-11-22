@@ -11,6 +11,7 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
@@ -20,9 +21,4 @@ models:
     +materialized: table
     silver:
       +materialized: table
-
-vars:
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
-
-require-dbt-version: [">=1.0.0", "<2.0.0"]
+      +on_schema_change: sync_all_columns
