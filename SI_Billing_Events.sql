@@ -1,0 +1,60 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_BILLING_EVENTS', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_BILLING_EVENTS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+) }}
+
+/* Transform Bronze Billing Events to Silver Billing Events */
+WITH bronze_billing_events AS (
+    SELECT *
+    FROM {{ source('bronze', 'BZ_BILLING_EVENTS') }}
+),
+
+validated_billing_events AS (
+    SELECT 
+        EVENT_ID,
+        USER_ID,
+        UPPER(TRIM(EVENT_TYPE)) AS EVENT_TYPE,
+        ROUND(AMOUNT, 2) AS AMOUNT,
+        EVENT_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        
+        /* Data Quality Score Calculation */
+        CASE 
+            WHEN EVENT_ID IS NULL THEN 0
+            WHEN USER_ID IS NULL OR EVENT_TYPE IS NULL THEN 30
+            WHEN AMOUNT IS NULL OR AMOUNT <= 0 THEN 60
+            WHEN EVENT_DATE IS NULL OR EVENT_DATE > CURRENT_DATE() THEN 80
+            ELSE 100
+        END AS DATA_QUALITY_SCORE,
+        
+        /* Validation Status */
+        CASE 
+            WHEN EVENT_ID IS NULL OR USER_ID IS NULL OR EVENT_TYPE IS NULL THEN 'FAILED'
+            WHEN AMOUNT IS NULL OR AMOUNT <= 0 THEN 'WARNING'
+            WHEN EVENT_DATE IS NULL OR EVENT_DATE > CURRENT_DATE() THEN 'WARNING'
+            ELSE 'PASSED'
+        END AS VALIDATION_STATUS,
+        
+        ROW_NUMBER() OVER (PARTITION BY EVENT_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM bronze_billing_events
+    WHERE EVENT_ID IS NOT NULL
+)
+
+SELECT 
+    EVENT_ID,
+    USER_ID,
+    EVENT_TYPE,
+    AMOUNT,
+    EVENT_DATE,
+    CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
+    CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    DATE(CURRENT_TIMESTAMP()) AS LOAD_DATE,
+    DATE(CURRENT_TIMESTAMP()) AS UPDATE_DATE,
+    DATA_QUALITY_SCORE,
+    VALIDATION_STATUS
+FROM validated_billing_events
+WHERE rn = 1 AND VALIDATION_STATUS IN ('PASSED', 'WARNING')
