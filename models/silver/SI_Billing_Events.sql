@@ -4,7 +4,7 @@
     post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_BILLING_EVENTS', 'PROCESS_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
 ) }}
 
--- Silver Billing Events Table - Cleaned and standardized financial transactions
+/* Silver Billing Events Table - Cleaned and standardized financial transactions */
 
 WITH bronze_billing_events AS (
     SELECT 
@@ -36,7 +36,7 @@ validated_billing_events AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        -- Calculate data quality score
+        /* Calculate data quality score */
         CASE 
             WHEN EVENT_ID IS NOT NULL 
                 AND USER_ID IS NOT NULL
@@ -49,7 +49,7 @@ validated_billing_events AS (
             WHEN EVENT_ID IS NOT NULL AND USER_ID IS NOT NULL THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
-        -- Set validation status
+        /* Set validation status */
         CASE 
             WHEN EVENT_ID IS NOT NULL 
                 AND USER_ID IS NOT NULL
