@@ -1,0 +1,115 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_MEETINGS', 'PROCESS_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_MEETINGS', 'PROCESS_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+) }}
+
+/* Silver Meetings table with enhanced timestamp and numeric field cleaning */
+WITH bronze_meetings AS (
+    SELECT *
+    FROM {{ source('bronze', 'BZ_MEETINGS') }}
+),
+
+/* Clean and validate meetings data */
+validated_meetings AS (
+    SELECT 
+        MEETING_ID,
+        HOST_ID,
+        TRIM(MEETING_TOPIC) AS MEETING_TOPIC,
+        
+        /* Enhanced timestamp parsing with timezone handling */
+        CASE 
+            WHEN START_TIME::STRING LIKE '%EST%' THEN 
+                COALESCE(
+                    TRY_TO_TIMESTAMP(REGEXP_REPLACE(START_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
+                    TRY_TO_TIMESTAMP(REGEXP_REPLACE(START_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'DD/MM/YYYY HH24:MI'),
+                    TRY_TO_TIMESTAMP(REGEXP_REPLACE(START_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'MM/DD/YYYY HH24:MI'),
+                    TRY_TO_TIMESTAMP(START_TIME::STRING)
+                )
+            ELSE 
+                COALESCE(
+                    TRY_TO_TIMESTAMP(START_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
+                    TRY_TO_TIMESTAMP(START_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
+                    TRY_TO_TIMESTAMP(START_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
+                    TRY_TO_TIMESTAMP(START_TIME::STRING)
+                )
+        END AS CLEAN_START_TIME,
+        
+        CASE 
+            WHEN END_TIME::STRING LIKE '%EST%' THEN 
+                COALESCE(
+                    TRY_TO_TIMESTAMP(REGEXP_REPLACE(END_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
+                    TRY_TO_TIMESTAMP(REGEXP_REPLACE(END_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'DD/MM/YYYY HH24:MI'),
+                    TRY_TO_TIMESTAMP(REGEXP_REPLACE(END_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'MM/DD/YYYY HH24:MI'),
+                    TRY_TO_TIMESTAMP(END_TIME::STRING)
+                )
+            ELSE 
+                COALESCE(
+                    TRY_TO_TIMESTAMP(END_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
+                    TRY_TO_TIMESTAMP(END_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
+                    TRY_TO_TIMESTAMP(END_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
+                    TRY_TO_TIMESTAMP(END_TIME::STRING)
+                )
+        END AS CLEAN_END_TIME,
+        
+        /* Critical P1: Clean numeric field with text units */
+        CASE 
+            WHEN TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', '')) IS NOT NULL THEN
+                TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', ''))
+            ELSE TRY_TO_NUMBER(DURATION_MINUTES::STRING)
+        END AS CLEAN_DURATION_MINUTES,
+        
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        
+        /* Row number for deduplication */
+        ROW_NUMBER() OVER (PARTITION BY MEETING_ID ORDER BY UPDATE_TIMESTAMP DESC NULLS LAST, LOAD_TIMESTAMP DESC NULLS LAST) AS rn
+    FROM bronze_meetings
+    WHERE MEETING_ID IS NOT NULL
+),
+
+/* Apply business rules and calculate data quality */
+final_meetings AS (
+    SELECT 
+        *,
+        /* Data quality score calculation */
+        CASE 
+            WHEN MEETING_ID IS NULL THEN 0
+            WHEN HOST_ID IS NULL THEN 20
+            WHEN CLEAN_START_TIME IS NULL OR CLEAN_END_TIME IS NULL THEN 40
+            WHEN CLEAN_DURATION_MINUTES IS NULL THEN 60
+            WHEN CLEAN_END_TIME <= CLEAN_START_TIME THEN 70
+            WHEN CLEAN_DURATION_MINUTES < 0 OR CLEAN_DURATION_MINUTES > 1440 THEN 80
+            ELSE 100
+        END AS DATA_QUALITY_SCORE,
+        
+        /* Validation status */
+        CASE 
+            WHEN MEETING_ID IS NULL OR HOST_ID IS NULL THEN 'FAILED'
+            WHEN CLEAN_START_TIME IS NULL OR CLEAN_END_TIME IS NULL THEN 'FAILED'
+            WHEN CLEAN_DURATION_MINUTES IS NULL THEN 'FAILED'
+            WHEN CLEAN_END_TIME <= CLEAN_START_TIME THEN 'FAILED'
+            WHEN CLEAN_DURATION_MINUTES < 0 OR CLEAN_DURATION_MINUTES > 1440 THEN 'WARNING'
+            ELSE 'PASSED'
+        END AS VALIDATION_STATUS
+    FROM validated_meetings
+    WHERE rn = 1
+)
+
+SELECT 
+    MEETING_ID,
+    HOST_ID,
+    MEETING_TOPIC,
+    CLEAN_START_TIME AS START_TIME,
+    CLEAN_END_TIME AS END_TIME,
+    CLEAN_DURATION_MINUTES AS DURATION_MINUTES,
+    CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
+    CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    DATE(CURRENT_TIMESTAMP()) AS LOAD_DATE,
+    DATE(CURRENT_TIMESTAMP()) AS UPDATE_DATE,
+    DATA_QUALITY_SCORE,
+    VALIDATION_STATUS
+FROM final_meetings
+WHERE VALIDATION_STATUS != 'FAILED'
