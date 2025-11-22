@@ -3,8 +3,8 @@
     on_schema_change='sync_all_columns'
 ) }}
 
--- Silver Audit Log Table - Created first to support all other models
--- This table tracks all audit information for Silver layer processing
+/* Silver Audit Log Table - Created first to support all other models */
+/* This table tracks all audit information for Silver layer processing */
 
 SELECT 
     CAST(NULL AS VARCHAR(255)) AS AUDIT_ID,
