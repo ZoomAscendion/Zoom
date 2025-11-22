@@ -4,7 +4,7 @@
     post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_SUPPORT_TICKETS', 'PROCESS_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
 ) }}
 
--- Silver Support Tickets Table - Cleaned and standardized customer support requests
+/* Silver Support Tickets Table - Cleaned and standardized customer support requests */
 
 WITH bronze_support_tickets AS (
     SELECT 
@@ -39,7 +39,7 @@ validated_support_tickets AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        -- Calculate data quality score
+        /* Calculate data quality score */
         CASE 
             WHEN TICKET_ID IS NOT NULL 
                 AND USER_ID IS NOT NULL
@@ -51,7 +51,7 @@ validated_support_tickets AS (
             WHEN TICKET_ID IS NOT NULL AND USER_ID IS NOT NULL THEN 75
             ELSE 50
         END AS DATA_QUALITY_SCORE,
-        -- Set validation status
+        /* Set validation status */
         CASE 
             WHEN TICKET_ID IS NOT NULL 
                 AND USER_ID IS NOT NULL
