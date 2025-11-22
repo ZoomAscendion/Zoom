@@ -4,8 +4,8 @@
     post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_USERS', 'PROCESS_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
 ) }}
 
--- Silver Users Table - Cleaned and standardized user profile and subscription information
--- Implements data quality checks and transformations from Bronze layer
+/* Silver Users Table - Cleaned and standardized user profile and subscription information */
+/* Implements data quality checks and transformations from Bronze layer */
 
 WITH bronze_users AS (
     SELECT 
@@ -40,7 +40,7 @@ validated_users AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM,
-        -- Calculate data quality score
+        /* Calculate data quality score */
         CASE 
             WHEN USER_ID IS NOT NULL 
                 AND EMAIL IS NOT NULL 
@@ -50,7 +50,7 @@ validated_users AS (
             WHEN USER_ID IS NOT NULL AND EMAIL IS NOT NULL THEN 80
             ELSE 50
         END AS DATA_QUALITY_SCORE,
-        -- Set validation status
+        /* Set validation status */
         CASE 
             WHEN USER_ID IS NOT NULL 
                 AND EMAIL IS NOT NULL 
