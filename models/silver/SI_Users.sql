@@ -37,7 +37,7 @@ validated_users AS (
             WHEN USER_ID IS NOT NULL 
                 AND USER_NAME IS NOT NULL 
                 AND EMAIL IS NOT NULL 
-                AND REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+                AND REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
                 AND PLAN_TYPE IN ('FREE', 'BASIC', 'PRO', 'ENTERPRISE')
             THEN 100
             WHEN USER_ID IS NOT NULL AND EMAIL IS NOT NULL 
@@ -52,7 +52,7 @@ validated_users AS (
             WHEN USER_ID IS NOT NULL 
                 AND USER_NAME IS NOT NULL 
                 AND EMAIL IS NOT NULL 
-                AND REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+                AND REGEXP_LIKE(EMAIL, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
                 AND PLAN_TYPE IN ('FREE', 'BASIC', 'PRO', 'ENTERPRISE')
             THEN 'PASSED'
             WHEN USER_ID IS NOT NULL AND EMAIL IS NOT NULL 
