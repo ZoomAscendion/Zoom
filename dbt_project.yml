@@ -20,16 +20,9 @@ models:
   zoom_silver_pipeline:
     silver:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) 
-          SELECT UUID_STRING(), '{{ this.name }}', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) 
-          SELECT UUID_STRING(), '{{ this.name }}', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE'
-        {% endif %}
+      SI_Audit_Log:
+        +pre-hook: []
+        +post-hook: []
 
 vars:
   start_date: '2020-01-01'
