@@ -1,0 +1,89 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_PARTICIPANTS', 'PIPELINE_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_PARTICIPANTS', 'PIPELINE_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+) }}
+
+/* Silver Layer Participants Table */
+/* Purpose: Cleaned and standardized meeting participants with MM/DD/YYYY format validation */
+
+WITH bronze_participants AS (
+    SELECT 
+        PARTICIPANT_ID,
+        MEETING_ID,
+        USER_ID,
+        JOIN_TIME,
+        LEAVE_TIME,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_PARTICIPANTS') }}
+),
+
+timestamp_cleaned AS (
+    SELECT 
+        *,
+        /* MM/DD/YYYY HH:MM format validation and conversion */
+        COALESCE(
+            TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(JOIN_TIME::STRING)
+        ) AS CLEAN_JOIN_TIME,
+        
+        COALESCE(
+            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING)
+        ) AS CLEAN_LEAVE_TIME
+    FROM bronze_participants
+),
+
+data_quality_checks AS (
+    SELECT 
+        *,
+        /* Data Quality Score Calculation */
+        CASE 
+            WHEN PARTICIPANT_ID IS NULL THEN 0
+            WHEN MEETING_ID IS NULL OR USER_ID IS NULL THEN 20
+            WHEN CLEAN_JOIN_TIME IS NULL OR CLEAN_LEAVE_TIME IS NULL THEN 40
+            WHEN CLEAN_LEAVE_TIME <= CLEAN_JOIN_TIME THEN 60
+            ELSE 100
+        END AS DATA_QUALITY_SCORE,
+        
+        /* Validation Status */
+        CASE 
+            WHEN PARTICIPANT_ID IS NULL OR MEETING_ID IS NULL OR USER_ID IS NULL THEN 'FAILED'
+            WHEN CLEAN_JOIN_TIME IS NULL OR CLEAN_LEAVE_TIME IS NULL THEN 'FAILED'
+            WHEN CLEAN_LEAVE_TIME <= CLEAN_JOIN_TIME THEN 'FAILED'
+            ELSE 'PASSED'
+        END AS VALIDATION_STATUS
+    FROM timestamp_cleaned
+),
+
+cleaned_participants AS (
+    SELECT 
+        PARTICIPANT_ID,
+        MEETING_ID,
+        USER_ID,
+        CLEAN_JOIN_TIME AS JOIN_TIME,
+        CLEAN_LEAVE_TIME AS LEAVE_TIME,
+        CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
+        CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        DATE(CURRENT_TIMESTAMP()) AS LOAD_DATE,
+        DATE(CURRENT_TIMESTAMP()) AS UPDATE_DATE,
+        DATA_QUALITY_SCORE,
+        VALIDATION_STATUS
+    FROM data_quality_checks
+    WHERE PARTICIPANT_ID IS NOT NULL
+      AND MEETING_ID IS NOT NULL
+      AND USER_ID IS NOT NULL
+      AND CLEAN_JOIN_TIME IS NOT NULL
+      AND CLEAN_LEAVE_TIME IS NOT NULL
+      AND CLEAN_LEAVE_TIME > CLEAN_JOIN_TIME
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY PARTICIPANT_ID ORDER BY UPDATE_TIMESTAMP DESC) = 1
+)
+
+SELECT * FROM cleaned_participants
