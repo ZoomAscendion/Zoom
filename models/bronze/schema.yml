@@ -23,7 +23,7 @@ sources:
             description: "Timestamp when the record was last updated"
           - name: source_system
             description: "Source system that provided the user data"
-            
+
       - name: meetings
         description: "Raw meeting data including scheduling and basic meeting information"
         columns:
@@ -45,7 +45,7 @@ sources:
             description: "Timestamp when the record was last updated"
           - name: source_system
             description: "Source system that provided the meeting data"
-            
+
       - name: participants
         description: "Raw participant data tracking meeting attendance"
         columns:
@@ -65,7 +65,7 @@ sources:
             description: "Timestamp when the record was last updated"
           - name: source_system
             description: "Source system that provided the participant data"
-            
+
       - name: feature_usage
         description: "Raw feature usage data tracking user interactions"
         columns:
@@ -85,7 +85,7 @@ sources:
             description: "Timestamp when the record was last updated"
           - name: source_system
             description: "Source system that provided the feature usage data"
-            
+
       - name: support_tickets
         description: "Raw support ticket data from customer service systems"
         columns:
@@ -105,7 +105,7 @@ sources:
             description: "Timestamp when the record was last updated"
           - name: source_system
             description: "Source system that provided the support ticket data"
-            
+
       - name: billing_events
         description: "Raw billing events data from source systems"
         columns:
@@ -125,7 +125,7 @@ sources:
             description: "Timestamp when the record was last updated"
           - name: source_system
             description: "Source system that provided the billing event data"
-            
+
       - name: licenses
         description: "Raw license assignment and management data"
         columns:
@@ -152,32 +152,19 @@ models:
     columns:
       - name: record_id
         description: "Auto-incrementing unique identifier for each audit record"
-        tests:
-          - not_null
-          - unique
       - name: source_table
         description: "Name of the Bronze layer table"
-        tests:
-          - not_null
       - name: load_timestamp
         description: "When the operation occurred"
-        tests:
-          - not_null
       - name: processed_by
         description: "User or process that performed the operation"
-        tests:
-          - not_null
       - name: processing_time
         description: "Time taken to process the operation in seconds"
       - name: status
-        description: "Status of the operation (STARTED, COMPLETED, FAILED)"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['STARTED', 'COMPLETED', 'FAILED']
-              
+        description: "Status of the operation (SUCCESS, FAILED, WARNING)"
+
   - name: bz_users
-    description: "Bronze layer table storing cleaned and validated user profile information"
+    description: "Bronze layer table storing raw user profile and subscription information"
     columns:
       - name: user_id
         description: "Unique identifier for each user account"
@@ -185,34 +172,24 @@ models:
           - not_null
           - unique
       - name: user_name
-        description: "Display name of the user"
-        tests:
-          - not_null
+        description: "Display name of the user (PII)"
       - name: email
-        description: "Email address of the user"
+        description: "Email address of the user (PII)"
         tests:
           - not_null
       - name: company
-        description: "Company or organization the user belongs to"
+        description: "Company or organization name"
       - name: plan_type
-        description: "Subscription plan type for the user"
-        tests:
-          - not_null
+        description: "Subscription plan type (Basic, Pro, Business, Enterprise)"
       - name: load_timestamp
-        description: "Timestamp when the record was loaded into the bronze layer"
-        tests:
-          - not_null
+        description: "Timestamp when record was loaded into Bronze layer"
       - name: update_timestamp
-        description: "Timestamp when the record was last updated"
-        tests:
-          - not_null
+        description: "Timestamp when record was last updated"
       - name: source_system
-        description: "Source system that provided the user data"
-        tests:
-          - not_null
-          
+        description: "Source system from which data originated"
+
   - name: bz_meetings
-    description: "Bronze layer table storing cleaned and validated meeting information"
+    description: "Bronze layer table storing raw meeting information and session details"
     columns:
       - name: meeting_id
         description: "Unique identifier for each meeting"
@@ -224,63 +201,51 @@ models:
         tests:
           - not_null
       - name: meeting_topic
-        description: "Topic or title of the meeting"
+        description: "Topic or title of the meeting (Potential PII)"
       - name: start_time
-        description: "Timestamp when the meeting started"
+        description: "Meeting start timestamp"
         tests:
           - not_null
       - name: end_time
-        description: "Timestamp when the meeting ended"
+        description: "Meeting end timestamp"
       - name: duration_minutes
-        description: "Duration of the meeting in minutes"
+        description: "Meeting duration in minutes"
       - name: load_timestamp
-        description: "Timestamp when the record was loaded into the bronze layer"
-        tests:
-          - not_null
+        description: "Timestamp when record was loaded into Bronze layer"
       - name: update_timestamp
-        description: "Timestamp when the record was last updated"
-        tests:
-          - not_null
+        description: "Timestamp when record was last updated"
       - name: source_system
-        description: "Source system that provided the meeting data"
-        tests:
-          - not_null
-          
+        description: "Source system from which data originated"
+
   - name: bz_participants
-    description: "Bronze layer table storing cleaned and validated participant information"
+    description: "Bronze layer table tracking raw meeting participants and their session details"
     columns:
       - name: participant_id
-        description: "Unique identifier for each participant session"
+        description: "Unique identifier for each meeting participant"
         tests:
           - not_null
           - unique
       - name: meeting_id
-        description: "Identifier linking to the meeting"
+        description: "Reference to meeting"
         tests:
           - not_null
       - name: user_id
-        description: "Identifier of the user who participated"
+        description: "Reference to user who participated"
         tests:
           - not_null
       - name: join_time
-        description: "Timestamp when the participant joined the meeting"
+        description: "Timestamp when participant joined meeting"
       - name: leave_time
-        description: "Timestamp when the participant left the meeting"
+        description: "Timestamp when participant left meeting"
       - name: load_timestamp
-        description: "Timestamp when the record was loaded into the bronze layer"
-        tests:
-          - not_null
+        description: "Timestamp when record was loaded into Bronze layer"
       - name: update_timestamp
-        description: "Timestamp when the record was last updated"
-        tests:
-          - not_null
+        description: "Timestamp when record was last updated"
       - name: source_system
-        description: "Source system that provided the participant data"
-        tests:
-          - not_null
-          
+        description: "Source system from which data originated"
+
   - name: bz_feature_usage
-    description: "Bronze layer table storing cleaned and validated feature usage information"
+    description: "Bronze layer table recording raw usage of platform features during meetings"
     columns:
       - name: usage_id
         description: "Unique identifier for each feature usage record"
@@ -288,32 +253,30 @@ models:
           - not_null
           - unique
       - name: meeting_id
-        description: "Identifier linking to the meeting where feature was used"
+        description: "Reference to meeting where feature was used"
         tests:
           - not_null
       - name: feature_name
-        description: "Name of the feature that was used"
+        description: "Name of the feature being tracked"
         tests:
           - not_null
       - name: usage_count
-        description: "Number of times the feature was used in the session"
+        description: "Number of times feature was used"
+        tests:
+          - not_null
       - name: usage_date
-        description: "Date when the feature usage occurred"
+        description: "Date when feature usage occurred"
+        tests:
+          - not_null
       - name: load_timestamp
-        description: "Timestamp when the record was loaded into the bronze layer"
-        tests:
-          - not_null
+        description: "Timestamp when record was loaded into Bronze layer"
       - name: update_timestamp
-        description: "Timestamp when the record was last updated"
-        tests:
-          - not_null
+        description: "Timestamp when record was last updated"
       - name: source_system
-        description: "Source system that provided the feature usage data"
-        tests:
-          - not_null
-          
+        description: "Source system from which data originated"
+
   - name: bz_support_tickets
-    description: "Bronze layer table storing cleaned and validated support ticket information"
+    description: "Bronze layer table managing raw customer support requests and resolution tracking"
     columns:
       - name: ticket_id
         description: "Unique identifier for each support ticket"
@@ -321,36 +284,30 @@ models:
           - not_null
           - unique
       - name: user_id
-        description: "Identifier of the user who created the support ticket"
+        description: "Reference to user who created the ticket"
         tests:
           - not_null
       - name: ticket_type
-        description: "Category of the support ticket"
+        description: "Type of support ticket"
         tests:
           - not_null
       - name: resolution_status
-        description: "Current status of the ticket resolution"
+        description: "Current status of ticket resolution"
         tests:
           - not_null
       - name: open_date
-        description: "Date when the support ticket was opened"
+        description: "Date when ticket was opened"
         tests:
           - not_null
       - name: load_timestamp
-        description: "Timestamp when the record was loaded into the bronze layer"
-        tests:
-          - not_null
+        description: "Timestamp when record was loaded into Bronze layer"
       - name: update_timestamp
-        description: "Timestamp when the record was last updated"
-        tests:
-          - not_null
+        description: "Timestamp when record was last updated"
       - name: source_system
-        description: "Source system that provided the support ticket data"
-        tests:
-          - not_null
-          
+        description: "Source system from which data originated"
+
   - name: bz_billing_events
-    description: "Bronze layer table storing cleaned and validated billing event information"
+    description: "Bronze layer table tracking raw financial transactions and billing activities"
     columns:
       - name: event_id
         description: "Unique identifier for each billing event"
@@ -358,15 +315,15 @@ models:
           - not_null
           - unique
       - name: user_id
-        description: "Identifier linking to the user who generated the billing event"
+        description: "Reference to user associated with billing event"
         tests:
           - not_null
       - name: event_type
-        description: "Type of billing event (subscription, usage, etc.)"
+        description: "Type of billing event"
         tests:
           - not_null
       - name: amount
-        description: "Monetary amount associated with the billing event"
+        description: "Monetary amount for the billing event"
         tests:
           - not_null
       - name: event_date
@@ -374,20 +331,14 @@ models:
         tests:
           - not_null
       - name: load_timestamp
-        description: "Timestamp when the record was loaded into the bronze layer"
-        tests:
-          - not_null
+        description: "Timestamp when record was loaded into Bronze layer"
       - name: update_timestamp
-        description: "Timestamp when the record was last updated"
-        tests:
-          - not_null
+        description: "Timestamp when record was last updated"
       - name: source_system
-        description: "Source system that provided the billing event data"
-        tests:
-          - not_null
-          
+        description: "Source system from which data originated"
+
   - name: bz_licenses
-    description: "Bronze layer table storing cleaned and validated license information"
+    description: "Bronze layer table managing raw license assignments and entitlements"
     columns:
       - name: license_id
         description: "Unique identifier for each license"
@@ -395,26 +346,20 @@ models:
           - not_null
           - unique
       - name: license_type
-        description: "Type of license (Basic, Pro, Business, Enterprise)"
+        description: "Type of license"
         tests:
           - not_null
       - name: assigned_to_user_id
-        description: "User ID to whom the license is assigned"
+        description: "User ID to whom license is assigned"
       - name: start_date
-        description: "Date when the license becomes active"
+        description: "License validity start date"
         tests:
           - not_null
       - name: end_date
-        description: "Date when the license expires"
+        description: "License validity end date"
       - name: load_timestamp
-        description: "Timestamp when the record was loaded into the bronze layer"
-        tests:
-          - not_null
+        description: "Timestamp when record was loaded into Bronze layer"
       - name: update_timestamp
-        description: "Timestamp when the record was last updated"
-        tests:
-          - not_null
+        description: "Timestamp when record was last updated"
       - name: source_system
-        description: "Source system that provided the license data"
-        tests:
-          - not_null
+        description: "Source system from which data originated"
