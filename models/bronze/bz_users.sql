@@ -1,56 +1,61 @@
--- Bronze Layer Users Model
--- Description: Transforms raw user data into bronze layer with audit capabilities
+-- Bronze Layer Users Table
+-- Description: Raw user account data from user management systems
+-- Source: RAW.USERS
 -- Author: Data Engineering Team
 -- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
     unique_key='user_id',
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_USERS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'COMPLETED' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_USERS', CURRENT_TIMESTAMP(), 'dbt_user', 0, 'STARTED'",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_USERS', CURRENT_TIMESTAMP(), 'dbt_user', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_USERS' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS'"
 ) }}
 
-WITH raw_users AS (
-    -- Select from raw users table with null filtering for primary key
+-- Source data with null filtering for primary key
+WITH source_data AS (
     SELECT 
-        USER_ID,
-        USER_NAME,
-        EMAIL,
-        COMPANY,
-        PLAN_TYPE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
+        user_id,
+        user_name,
+        email,
+        company,
+        plan_type,
+        load_timestamp,
+        update_timestamp,
+        source_system
     FROM {{ source('raw', 'users') }}
-    WHERE USER_ID IS NOT NULL
+    WHERE user_id IS NOT NULL  -- Filter out null primary keys
 ),
 
-deduped_users AS (
-    -- Apply deduplication based on user_id, keeping the latest record
-    SELECT *
-    FROM (
-        SELECT *,
-               ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC) as rn
-        FROM raw_users
-    )
-    WHERE rn = 1
-),
-
-final_users AS (
-    -- Final transformation with data quality improvements
+-- Data cleaning and validation
+cleaned_data AS (
     SELECT 
-        USER_ID,
-        COALESCE(USER_NAME, 'Unknown User') AS USER_NAME,
-        CASE 
-            WHEN EMAIL IS NULL OR EMAIL = '' THEN USER_NAME || '@gmail.com'
-            ELSE EMAIL 
-        END AS EMAIL,
-        COMPANY,
-        COALESCE(PLAN_TYPE, 'Basic') AS PLAN_TYPE,
-        CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
-        CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,
-        COALESCE(SOURCE_SYSTEM, 'unknown') AS SOURCE_SYSTEM
-    FROM deduped_users
+        user_id,
+        COALESCE(user_name, 'Unknown User') AS user_name,
+        COALESCE(email, user_name || '@gmail.com') AS email,  -- Default email if null
+        company,
+        COALESCE(plan_type, 'Basic') AS plan_type,
+        load_timestamp,
+        update_timestamp,
+        source_system
+    FROM source_data
+),
+
+-- Deduplication based on user_id (keeping latest record)
+deduped_data AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY COALESCE(update_timestamp, load_timestamp) DESC) AS rn
+    FROM cleaned_data
 )
 
-SELECT * FROM final_users
+-- Final selection with Bronze timestamp overwrite
+SELECT 
+    user_id,
+    user_name,
+    email,
+    company,
+    plan_type,
+    CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
+    CURRENT_TIMESTAMP() AS update_timestamp,  -- Overwrite with current DBT run time
+    source_system
+FROM deduped_data
+WHERE rn = 1
