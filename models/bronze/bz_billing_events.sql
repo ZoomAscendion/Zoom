@@ -5,9 +5,7 @@
 
 {{ config(
     materialized='table',
-    unique_key='event_id',
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'DBT_USER', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'DBT_USER', 'COMPLETED' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    unique_key='event_id'
 ) }}
 
 -- Filter out NULL primary keys and apply deduplication
