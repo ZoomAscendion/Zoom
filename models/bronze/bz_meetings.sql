@@ -1,57 +1,66 @@
--- Bronze Layer Meetings Model
--- Description: Transforms raw meeting data into bronze layer with audit capabilities
+-- Bronze Layer Meetings Table
+-- Description: Raw meeting information and session details
+-- Source: RAW.MEETINGS
 -- Author: Data Engineering Team
 -- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
     unique_key='meeting_id',
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'COMPLETED' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'dbt_user', 0, 'STARTED'",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_MEETINGS', CURRENT_TIMESTAMP(), 'dbt_user', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_MEETINGS' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS'"
 ) }}
 
-WITH raw_meetings AS (
-    -- Select from raw meetings table with null filtering for primary key
+-- Source data with null filtering for primary key
+WITH source_data AS (
     SELECT 
-        MEETING_ID,
-        HOST_ID,
-        MEETING_TOPIC,
-        START_TIME,
-        END_TIME,
-        DURATION_MINUTES,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
+        meeting_id,
+        host_id,
+        meeting_topic,
+        start_time,
+        end_time,
+        duration_minutes,
+        load_timestamp,
+        update_timestamp,
+        source_system
     FROM {{ source('raw', 'meetings') }}
-    WHERE MEETING_ID IS NOT NULL
-      AND HOST_ID IS NOT NULL
-      AND START_TIME IS NOT NULL
+    WHERE meeting_id IS NOT NULL  -- Filter out null primary keys
+      AND host_id IS NOT NULL     -- Filter out null host_id
+      AND start_time IS NOT NULL  -- Filter out null start_time
 ),
 
-deduped_meetings AS (
-    -- Apply deduplication based on meeting_id, keeping the latest record
-    SELECT *
-    FROM (
-        SELECT *,
-               ROW_NUMBER() OVER (PARTITION BY MEETING_ID ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC) as rn
-        FROM raw_meetings
-    )
-    WHERE rn = 1
-),
-
-final_meetings AS (
-    -- Final transformation with data type conversions
+-- Data cleaning and validation
+cleaned_data AS (
     SELECT 
-        MEETING_ID,
-        HOST_ID,
-        MEETING_TOPIC,
-        START_TIME,
-        TRY_CAST(END_TIME AS TIMESTAMP_NTZ) AS END_TIME,
-        TRY_CAST(DURATION_MINUTES AS NUMBER) AS DURATION_MINUTES,
-        CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
-        CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,
-        COALESCE(SOURCE_SYSTEM, 'unknown') AS SOURCE_SYSTEM
-    FROM deduped_meetings
+        meeting_id,
+        host_id,
+        meeting_topic,
+        start_time,
+        TRY_CAST(end_time AS TIMESTAMP_NTZ(9)) AS end_time,  -- Handle string to timestamp conversion
+        TRY_CAST(duration_minutes AS NUMBER(38,0)) AS duration_minutes,  -- Handle string to number conversion
+        load_timestamp,
+        update_timestamp,
+        source_system
+    FROM source_data
+),
+
+-- Deduplication based on meeting_id (keeping latest record)
+deduped_data AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY meeting_id ORDER BY COALESCE(update_timestamp, load_timestamp) DESC) AS rn
+    FROM cleaned_data
 )
 
-SELECT * FROM final_meetings
+-- Final selection with Bronze timestamp overwrite
+SELECT 
+    meeting_id,
+    host_id,
+    meeting_topic,
+    start_time,
+    end_time,
+    duration_minutes,
+    CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
+    CURRENT_TIMESTAMP() AS update_timestamp,  -- Overwrite with current DBT run time
+    source_system
+FROM deduped_data
+WHERE rn = 1
