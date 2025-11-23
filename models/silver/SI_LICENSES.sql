@@ -1,0 +1,73 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_START_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP) SELECT UUID_STRING(), 'BRONZE_TO_SILVER_LICENSES', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'STARTED', 'BZ_LICENSES', 'SI_LICENSES', 'DBT_PIPELINE', CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'SI_Audit_Log'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_END_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, UPDATE_TIMESTAMP) SELECT UUID_STRING(), 'BRONZE_TO_SILVER_LICENSES', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'COMPLETED', 'BZ_LICENSES', 'SI_LICENSES', 'DBT_PIPELINE', CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+) }}
+
+-- Transform Bronze Licenses to Silver Licenses
+WITH bronze_licenses AS (
+    SELECT *
+    FROM {{ source('bronze', 'BZ_LICENSES') }}
+    WHERE LICENSE_ID IS NOT NULL
+),
+
+deduped_licenses AS (
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY LICENSE_ID 
+            ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC
+        ) as rn
+    FROM bronze_licenses
+),
+
+transformed_licenses AS (
+    SELECT 
+        LICENSE_ID,
+        UPPER(TRIM(LICENSE_TYPE)) AS LICENSE_TYPE,
+        ASSIGNED_TO_USER_ID,
+        START_DATE,
+        END_DATE,
+        CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
+        CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        CURRENT_DATE() AS LOAD_DATE,
+        CURRENT_DATE() AS UPDATE_DATE,
+        
+        /* Data Quality Score Calculation */
+        CASE 
+            WHEN LICENSE_ID IS NOT NULL 
+                AND LICENSE_TYPE IS NOT NULL 
+                AND ASSIGNED_TO_USER_ID IS NOT NULL 
+                AND START_DATE IS NOT NULL
+                AND END_DATE IS NOT NULL
+                AND START_DATE <= END_DATE
+            THEN 100
+            WHEN LICENSE_ID IS NOT NULL AND ASSIGNED_TO_USER_ID IS NOT NULL 
+            THEN 75
+            WHEN LICENSE_ID IS NOT NULL 
+            THEN 50
+            ELSE 25
+        END AS DATA_QUALITY_SCORE,
+        
+        /* Validation Status */
+        CASE 
+            WHEN LICENSE_ID IS NOT NULL 
+                AND LICENSE_TYPE IS NOT NULL 
+                AND ASSIGNED_TO_USER_ID IS NOT NULL 
+                AND START_DATE IS NOT NULL
+                AND END_DATE IS NOT NULL
+                AND START_DATE <= END_DATE
+            THEN 'PASSED'
+            WHEN LICENSE_ID IS NOT NULL AND ASSIGNED_TO_USER_ID IS NOT NULL 
+            THEN 'WARNING'
+            ELSE 'FAILED'
+        END AS VALIDATION_STATUS
+        
+    FROM deduped_licenses
+    WHERE rn = 1
+)
+
+SELECT *
+FROM transformed_licenses
+WHERE VALIDATION_STATUS IN ('PASSED', 'WARNING')
+  AND START_DATE <= END_DATE
