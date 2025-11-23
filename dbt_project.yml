@@ -1,9 +1,11 @@
-name: 'zoom_silver_pipeline'
+name: 'zoom_bronze_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_silver_pipeline'
+# This setting configures which "profile" dbt uses for this project.
+profile: 'zoom_bronze_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -11,14 +13,19 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
+# Configuring models
 models:
-  zoom_silver_pipeline:
-    +materialized: table
-    silver:
+  zoom_bronze_pipeline:
+    # Config indicated by + and applies to all files under models/example/
+    bronze:
       +materialized: table
-      +on_schema_change: sync_all_columns
+      +tags: ["bronze"]
+
+# Global configurations
+vars:
+  # The `start_date` variable will be accessible in all resources
+  start_date: '2020-01-01'
