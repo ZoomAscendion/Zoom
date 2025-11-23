@@ -1,57 +1,65 @@
--- Bronze Layer Billing Events Model
--- Description: Transforms raw billing event data into bronze layer with audit capabilities
+-- Bronze Layer Billing Events Table
+-- Description: Raw billing events data from source systems
+-- Source: RAW.BILLING_EVENTS
 -- Author: Data Engineering Team
 -- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
     unique_key='event_id',
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'COMPLETED' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'dbt_user', 0, 'STARTED'",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_BILLING_EVENTS', CURRENT_TIMESTAMP(), 'dbt_user', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_BILLING_EVENTS' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS'"
 ) }}
 
-WITH raw_billing_events AS (
-    -- Select from raw billing events table with null filtering for primary keys
+-- Source data with null filtering for primary key
+WITH source_data AS (
     SELECT 
-        EVENT_ID,
-        USER_ID,
-        EVENT_TYPE,
-        AMOUNT,
-        EVENT_DATE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
+        event_id,
+        user_id,
+        event_type,
+        amount,
+        event_date,
+        load_timestamp,
+        update_timestamp,
+        source_system
     FROM {{ source('raw', 'billing_events') }}
-    WHERE EVENT_ID IS NOT NULL
-      AND USER_ID IS NOT NULL
-      AND EVENT_TYPE IS NOT NULL
-      AND AMOUNT IS NOT NULL
-      AND EVENT_DATE IS NOT NULL
+    WHERE event_id IS NOT NULL    -- Filter out null primary keys
+      AND user_id IS NOT NULL     -- Filter out null user_id
+      AND event_type IS NOT NULL  -- Filter out null event_type
+      AND amount IS NOT NULL      -- Filter out null amount
+      AND event_date IS NOT NULL  -- Filter out null event_date
 ),
 
-deduped_billing_events AS (
-    -- Apply deduplication based on event_id, keeping the latest record
-    SELECT *
-    FROM (
-        SELECT *,
-               ROW_NUMBER() OVER (PARTITION BY EVENT_ID ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC) as rn
-        FROM raw_billing_events
-    )
-    WHERE rn = 1
-),
-
-final_billing_events AS (
-    -- Final transformation with data type conversion
+-- Data cleaning and validation
+cleaned_data AS (
     SELECT 
-        EVENT_ID,
-        USER_ID,
-        EVENT_TYPE,
-        TRY_CAST(AMOUNT AS NUMBER(10,2)) AS AMOUNT,
-        EVENT_DATE,
-        CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
-        CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,
-        COALESCE(SOURCE_SYSTEM, 'unknown') AS SOURCE_SYSTEM
-    FROM deduped_billing_events
+        event_id,
+        user_id,
+        event_type,
+        TRY_CAST(amount AS NUMBER(10,2)) AS amount,  -- Handle string to number conversion
+        event_date,
+        load_timestamp,
+        update_timestamp,
+        source_system
+    FROM source_data
+),
+
+-- Deduplication based on event_id (keeping latest record)
+deduped_data AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY event_id ORDER BY COALESCE(update_timestamp, load_timestamp) DESC) AS rn
+    FROM cleaned_data
 )
 
-SELECT * FROM final_billing_events
+-- Final selection with Bronze timestamp overwrite
+SELECT 
+    event_id,
+    user_id,
+    event_type,
+    amount,
+    event_date,
+    CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
+    CURRENT_TIMESTAMP() AS update_timestamp,  -- Overwrite with current DBT run time
+    source_system
+FROM deduped_data
+WHERE rn = 1
