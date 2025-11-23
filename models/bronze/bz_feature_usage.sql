@@ -1,55 +1,66 @@
--- Bronze Layer Feature Usage Model
--- Description: Transforms raw feature usage data into bronze layer with audit capabilities
+-- Bronze Layer Feature Usage Table
+-- Description: Raw feature usage data tracking user interactions
+-- Source: RAW.FEATURE_USAGE
 -- Author: Data Engineering Team
 -- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
     unique_key='usage_id',
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'COMPLETED' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'dbt_user', 0, 'STARTED'",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'dbt_user', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_FEATURE_USAGE' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS'"
 ) }}
 
-WITH raw_feature_usage AS (
-    -- Select from raw feature usage table with null filtering for primary keys
+-- Source data with null filtering for primary key
+WITH source_data AS (
     SELECT 
-        USAGE_ID,
-        MEETING_ID,
-        FEATURE_NAME,
-        USAGE_COUNT,
-        USAGE_DATE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
+        usage_id,
+        meeting_id,
+        feature_name,
+        usage_count,
+        usage_date,
+        load_timestamp,
+        update_timestamp,
+        source_system
     FROM {{ source('raw', 'feature_usage') }}
-    WHERE USAGE_ID IS NOT NULL
-      AND MEETING_ID IS NOT NULL
-      AND FEATURE_NAME IS NOT NULL
+    WHERE usage_id IS NOT NULL    -- Filter out null primary keys
+      AND meeting_id IS NOT NULL  -- Filter out null meeting_id
+      AND feature_name IS NOT NULL -- Filter out null feature_name
+      AND usage_count IS NOT NULL  -- Filter out null usage_count
+      AND usage_date IS NOT NULL   -- Filter out null usage_date
 ),
 
-deduped_feature_usage AS (
-    -- Apply deduplication based on usage_id, keeping the latest record
-    SELECT *
-    FROM (
-        SELECT *,
-               ROW_NUMBER() OVER (PARTITION BY USAGE_ID ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC) as rn
-        FROM raw_feature_usage
-    )
-    WHERE rn = 1
-),
-
-final_feature_usage AS (
-    -- Final transformation
+-- Data cleaning and validation
+cleaned_data AS (
     SELECT 
-        USAGE_ID,
-        MEETING_ID,
-        FEATURE_NAME,
-        COALESCE(USAGE_COUNT, 0) AS USAGE_COUNT,
-        USAGE_DATE,
-        CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
-        CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,
-        COALESCE(SOURCE_SYSTEM, 'unknown') AS SOURCE_SYSTEM
-    FROM deduped_feature_usage
+        usage_id,
+        meeting_id,
+        feature_name,
+        usage_count,
+        usage_date,
+        load_timestamp,
+        update_timestamp,
+        source_system
+    FROM source_data
+    WHERE usage_count >= 0  -- Ensure usage count is non-negative
+),
+
+-- Deduplication based on usage_id (keeping latest record)
+deduped_data AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY usage_id ORDER BY COALESCE(update_timestamp, load_timestamp) DESC) AS rn
+    FROM cleaned_data
 )
 
-SELECT * FROM final_feature_usage
+-- Final selection with Bronze timestamp overwrite
+SELECT 
+    usage_id,
+    meeting_id,
+    feature_name,
+    usage_count,
+    usage_date,
+    CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
+    CURRENT_TIMESTAMP() AS update_timestamp,  -- Overwrite with current DBT run time
+    source_system
+FROM deduped_data
+WHERE rn = 1
