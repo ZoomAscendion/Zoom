@@ -1,57 +1,65 @@
--- Bronze Layer Support Tickets Model
--- Description: Transforms raw support ticket data into bronze layer with audit capabilities
+-- Bronze Layer Support Tickets Table
+-- Description: Raw support ticket data from customer service systems
+-- Source: RAW.SUPPORT_TICKETS
 -- Author: Data Engineering Team
 -- Created: {{ run_started_at }}
 
 {{ config(
     materialized='table',
     unique_key='ticket_id',
-    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'STARTED' WHERE '{{ this.name }}' != 'bz_data_audit'",
-    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, STATUS) SELECT 'BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'DBT_{{ invocation_id }}', 'COMPLETED' WHERE '{{ this.name }}' != 'bz_data_audit'"
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'dbt_user', 0, 'STARTED'",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (source_table, load_timestamp, processed_by, processing_time, status) SELECT 'BZ_SUPPORT_TICKETS', CURRENT_TIMESTAMP(), 'dbt_user', DATEDIFF('second', (SELECT MAX(load_timestamp) FROM {{ ref('bz_data_audit') }} WHERE source_table = 'BZ_SUPPORT_TICKETS' AND status = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS'"
 ) }}
 
-WITH raw_support_tickets AS (
-    -- Select from raw support tickets table with null filtering for primary keys
+-- Source data with null filtering for primary key
+WITH source_data AS (
     SELECT 
-        TICKET_ID,
-        USER_ID,
-        TICKET_TYPE,
-        RESOLUTION_STATUS,
-        OPEN_DATE,
-        LOAD_TIMESTAMP,
-        UPDATE_TIMESTAMP,
-        SOURCE_SYSTEM
+        ticket_id,
+        user_id,
+        ticket_type,
+        resolution_status,
+        open_date,
+        load_timestamp,
+        update_timestamp,
+        source_system
     FROM {{ source('raw', 'support_tickets') }}
-    WHERE TICKET_ID IS NOT NULL
-      AND USER_ID IS NOT NULL
-      AND TICKET_TYPE IS NOT NULL
-      AND RESOLUTION_STATUS IS NOT NULL
-      AND OPEN_DATE IS NOT NULL
+    WHERE ticket_id IS NOT NULL      -- Filter out null primary keys
+      AND user_id IS NOT NULL        -- Filter out null user_id
+      AND ticket_type IS NOT NULL    -- Filter out null ticket_type
+      AND resolution_status IS NOT NULL -- Filter out null resolution_status
+      AND open_date IS NOT NULL      -- Filter out null open_date
 ),
 
-deduped_support_tickets AS (
-    -- Apply deduplication based on ticket_id, keeping the latest record
-    SELECT *
-    FROM (
-        SELECT *,
-               ROW_NUMBER() OVER (PARTITION BY TICKET_ID ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC) as rn
-        FROM raw_support_tickets
-    )
-    WHERE rn = 1
-),
-
-final_support_tickets AS (
-    -- Final transformation
+-- Data cleaning and validation
+cleaned_data AS (
     SELECT 
-        TICKET_ID,
-        USER_ID,
-        TICKET_TYPE,
-        RESOLUTION_STATUS,
-        OPEN_DATE,
-        CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
-        CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,
-        COALESCE(SOURCE_SYSTEM, 'unknown') AS SOURCE_SYSTEM
-    FROM deduped_support_tickets
+        ticket_id,
+        user_id,
+        ticket_type,
+        resolution_status,
+        open_date,
+        load_timestamp,
+        update_timestamp,
+        source_system
+    FROM source_data
+),
+
+-- Deduplication based on ticket_id (keeping latest record)
+deduped_data AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY ticket_id ORDER BY COALESCE(update_timestamp, load_timestamp) DESC) AS rn
+    FROM cleaned_data
 )
 
-SELECT * FROM final_support_tickets
+-- Final selection with Bronze timestamp overwrite
+SELECT 
+    ticket_id,
+    user_id,
+    ticket_type,
+    resolution_status,
+    open_date,
+    CURRENT_TIMESTAMP() AS load_timestamp,  -- Overwrite with current DBT run time
+    CURRENT_TIMESTAMP() AS update_timestamp,  -- Overwrite with current DBT run time
+    source_system
+FROM deduped_data
+WHERE rn = 1
