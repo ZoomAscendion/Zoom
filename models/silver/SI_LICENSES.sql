@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_START_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP) SELECT UUID_STRING(), 'BRONZE_TO_SILVER_LICENSES', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'STARTED', 'BZ_LICENSES', 'SI_LICENSES', 'DBT_PIPELINE', CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_END_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, UPDATE_TIMESTAMP) SELECT UUID_STRING(), 'BRONZE_TO_SILVER_LICENSES', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'COMPLETED', 'BZ_LICENSES', 'SI_LICENSES', 'DBT_PIPELINE', CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    materialized='table'
 ) }}
 
 -- Transform Bronze Licenses to Silver Licenses
@@ -15,7 +13,7 @@ deduped_licenses AS (
     SELECT *,
         ROW_NUMBER() OVER (
             PARTITION BY LICENSE_ID 
-            ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC
+            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
         ) as rn
     FROM bronze_licenses
 ),
@@ -33,7 +31,7 @@ transformed_licenses AS (
         CURRENT_DATE() AS LOAD_DATE,
         CURRENT_DATE() AS UPDATE_DATE,
         
-        /* Data Quality Score Calculation */
+        -- Data Quality Score Calculation
         CASE 
             WHEN LICENSE_ID IS NOT NULL 
                 AND LICENSE_TYPE IS NOT NULL 
@@ -49,7 +47,7 @@ transformed_licenses AS (
             ELSE 25
         END AS DATA_QUALITY_SCORE,
         
-        /* Validation Status */
+        -- Validation Status
         CASE 
             WHEN LICENSE_ID IS NOT NULL 
                 AND LICENSE_TYPE IS NOT NULL 
@@ -70,4 +68,4 @@ transformed_licenses AS (
 SELECT *
 FROM transformed_licenses
 WHERE VALIDATION_STATUS IN ('PASSED', 'WARNING')
-  AND START_DATE <= END_DATE
+  AND COALESCE(START_DATE, CURRENT_DATE()) <= COALESCE(END_DATE, CURRENT_DATE())
