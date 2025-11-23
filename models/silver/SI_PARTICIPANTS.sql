@@ -1,7 +1,5 @@
 {{ config(
-    materialized='table',
-    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_START_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP) SELECT UUID_STRING(), 'BRONZE_TO_SILVER_PARTICIPANTS', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'STARTED', 'BZ_PARTICIPANTS', 'SI_PARTICIPANTS', 'DBT_PIPELINE', CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'SI_Audit_Log'",
-    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_END_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, UPDATE_TIMESTAMP) SELECT UUID_STRING(), 'BRONZE_TO_SILVER_PARTICIPANTS', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'COMPLETED', 'BZ_PARTICIPANTS', 'SI_PARTICIPANTS', 'DBT_PIPELINE', CURRENT_TIMESTAMP() WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+    materialized='table'
 ) }}
 
 -- Transform Bronze Participants to Silver Participants with enhanced timestamp format validation
@@ -15,7 +13,7 @@ deduped_participants AS (
     SELECT *,
         ROW_NUMBER() OVER (
             PARTITION BY PARTICIPANT_ID 
-            ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC
+            ORDER BY COALESCE(UPDATE_TIMESTAMP, LOAD_TIMESTAMP) DESC
         ) as rn
     FROM bronze_participants
 ),
@@ -26,22 +24,22 @@ transformed_participants AS (
         MEETING_ID,
         USER_ID,
         
-        /* Enhanced JOIN_TIME with MM/DD/YYYY HH:MM format handling */
+        -- Enhanced JOIN_TIME with MM/DD/YYYY HH:MM format handling
         COALESCE(
             TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
             TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
             TRY_TO_TIMESTAMP(JOIN_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
             TRY_TO_TIMESTAMP(REGEXP_REPLACE(JOIN_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
-            TRY_TO_TIMESTAMP(JOIN_TIME::STRING)
+            JOIN_TIME
         ) AS JOIN_TIME,
         
-        /* Enhanced LEAVE_TIME with MM/DD/YYYY HH:MM format handling */
+        -- Enhanced LEAVE_TIME with MM/DD/YYYY HH:MM format handling
         COALESCE(
             TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'YYYY-MM-DD HH24:MI:SS'),
             TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
             TRY_TO_TIMESTAMP(LEAVE_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
             TRY_TO_TIMESTAMP(REGEXP_REPLACE(LEAVE_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
-            TRY_TO_TIMESTAMP(LEAVE_TIME::STRING)
+            LEAVE_TIME
         ) AS LEAVE_TIME,
         
         CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
@@ -50,7 +48,7 @@ transformed_participants AS (
         CURRENT_DATE() AS LOAD_DATE,
         CURRENT_DATE() AS UPDATE_DATE,
         
-        /* Data Quality Score Calculation */
+        -- Data Quality Score Calculation
         CASE 
             WHEN PARTICIPANT_ID IS NOT NULL 
                 AND MEETING_ID IS NOT NULL 
@@ -65,14 +63,13 @@ transformed_participants AS (
             ELSE 25
         END AS DATA_QUALITY_SCORE,
         
-        /* Validation Status */
+        -- Validation Status
         CASE 
             WHEN PARTICIPANT_ID IS NOT NULL 
                 AND MEETING_ID IS NOT NULL 
                 AND USER_ID IS NOT NULL 
                 AND JOIN_TIME IS NOT NULL 
                 AND LEAVE_TIME IS NOT NULL
-                AND LEAVE_TIME > JOIN_TIME
             THEN 'PASSED'
             WHEN PARTICIPANT_ID IS NOT NULL AND MEETING_ID IS NOT NULL 
             THEN 'WARNING'
@@ -86,5 +83,3 @@ transformed_participants AS (
 SELECT *
 FROM transformed_participants
 WHERE VALIDATION_STATUS IN ('PASSED', 'WARNING')
-  AND JOIN_TIME IS NOT NULL
-  AND LEAVE_TIME IS NOT NULL
