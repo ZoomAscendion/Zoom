@@ -18,6 +18,10 @@ clean-targets:
 
 models:
   zoom_bronze_pipeline:
-    +materialized: table
     bronze:
       +materialized: table
+      +on_schema_change: "fail"
+
+vars:
+  source_schema: "RAW"
+  target_schema: "BRONZE"
