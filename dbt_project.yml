@@ -20,31 +20,7 @@ models:
   zoom_silver_pipeline:
     silver:
       +materialized: table
-      +pre-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} 
-          (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_START_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, LOAD_TIMESTAMP) 
-          SELECT UUID_STRING(), '{{ this.name }}', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'STARTED', 'BZ_{{ this.name[3:] }}', '{{ this.name }}', 'DBT_PIPELINE', CURRENT_TIMESTAMP()
-        {% endif %}
-      +post-hook: |
-        {% if this.name != 'SI_Audit_Log' %}
-          INSERT INTO {{ ref('SI_Audit_Log') }} 
-          (EXECUTION_ID, PIPELINE_NAME, PIPELINE_TYPE, EXECUTION_END_TIME, EXECUTION_STATUS, SOURCE_TABLE, TARGET_TABLE, EXECUTED_BY, UPDATE_TIMESTAMP) 
-          SELECT UUID_STRING(), '{{ this.name }}', 'BRONZE_TO_SILVER', CURRENT_TIMESTAMP(), 'COMPLETED', 'BZ_{{ this.name[3:] }}', '{{ this.name }}', 'DBT_PIPELINE', CURRENT_TIMESTAMP()
-        {% endif %}
 
 vars:
-  # dbt variables
   start_date: '2020-01-01'
   end_date: '2030-12-31'
-
-# Specify the order of model execution
-model-ordering:
-  - "SI_Audit_Log"
-  - "SI_USERS"
-  - "SI_MEETINGS"
-  - "SI_PARTICIPANTS"
-  - "SI_FEATURE_USAGE"
-  - "SI_SUPPORT_TICKETS"
-  - "SI_BILLING_EVENTS"
-  - "SI_LICENSES"
