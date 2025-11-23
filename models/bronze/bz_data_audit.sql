@@ -8,11 +8,12 @@
     unique_key='record_id'
 ) }}
 
+-- Create audit table structure
 SELECT 
-    CAST(NULL AS NUMBER) AS RECORD_ID,
-    CAST(NULL AS VARCHAR(255)) AS SOURCE_TABLE,
-    CAST(NULL AS TIMESTAMP_NTZ(9)) AS LOAD_TIMESTAMP,
-    CAST(NULL AS VARCHAR(255)) AS PROCESSED_BY,
-    CAST(NULL AS NUMBER(38,3)) AS PROCESSING_TIME,
-    CAST(NULL AS VARCHAR(50)) AS STATUS
-WHERE FALSE
+    CAST(NULL AS NUMBER) AS record_id,
+    CAST(NULL AS VARCHAR(255)) AS source_table,
+    CAST(NULL AS TIMESTAMP_NTZ(9)) AS load_timestamp,
+    CAST(NULL AS VARCHAR(255)) AS processed_by,
+    CAST(NULL AS NUMBER(38,3)) AS processing_time,
+    CAST(NULL AS VARCHAR(50)) AS status
+WHERE 1=0  -- This ensures no data is inserted, just creates the structure
