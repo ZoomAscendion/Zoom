@@ -1,8 +1,8 @@
-name: 'zoom_silver_pipeline'
+name: 'zoom_bronze_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_silver_pipeline'
+profile: 'zoom_bronze_pipeline'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,10 +17,7 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  zoom_silver_pipeline:
-    silver:
+  zoom_bronze_pipeline:
+    +materialized: table
+    bronze:
       +materialized: table
-
-vars:
-  start_date: '2020-01-01'
-  end_date: '2030-12-31'
