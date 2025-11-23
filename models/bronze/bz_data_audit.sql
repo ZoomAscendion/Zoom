@@ -8,11 +8,22 @@
     unique_key='record_id'
 ) }}
 
-CREATE TABLE IF NOT EXISTS {{ this }} (
-    RECORD_ID NUMBER AUTOINCREMENT PRIMARY KEY,
-    SOURCE_TABLE VARCHAR(255) NOT NULL,
-    LOAD_TIMESTAMP TIMESTAMP_NTZ(9) NOT NULL,
-    PROCESSED_BY VARCHAR(255) NOT NULL,
-    PROCESSING_TIME NUMBER(38,3),
-    STATUS VARCHAR(50) NOT NULL
+WITH audit_data AS (
+    SELECT 
+        ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP()) as record_id,
+        'SYSTEM_INIT' as source_table,
+        CURRENT_TIMESTAMP() as load_timestamp,
+        'DBT_SYSTEM' as processed_by,
+        0.0 as processing_time,
+        'INITIALIZED' as status
+    WHERE FALSE  -- This ensures no actual data is inserted during initial creation
 )
+
+SELECT 
+    record_id,
+    source_table,
+    load_timestamp,
+    processed_by,
+    processing_time,
+    status
+FROM audit_data
