@@ -1,6 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['FEATURE_NAME', 'FEATURE_CATEGORY']
+    materialized='table'
 ) }}
 
 SELECT DISTINCT
@@ -34,7 +33,7 @@ SELECT DISTINCT
     'All Users' AS TARGET_USER_SEGMENT,
     CURRENT_DATE AS LOAD_DATE,
     CURRENT_DATE AS UPDATE_DATE,
-    SOURCE_SYSTEM
-FROM {{ ref('si_feature_usage') }}
-WHERE VALIDATION_STATUS = 'PASSED'
+    COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
+FROM {{ source('silver', 'si_feature_usage') }}
+WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
   AND FEATURE_NAME IS NOT NULL
