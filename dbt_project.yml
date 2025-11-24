@@ -1,11 +1,9 @@
-name: 'zoom_bronze_pipeline'
+name: 'zoom_gold_analytics'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
-profile: 'zoom_bronze_pipeline'
+profile: 'zoom_gold_analytics'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -13,12 +11,21 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
 models:
-  zoom_bronze_pipeline:
-    bronze:
+  zoom_gold_analytics:
+    +materialized: table
+    gold:
       +materialized: table
-      +on_schema_change: "fail"
+      dimensional:
+        +materialized: table
+      fact:
+        +materialized: table
+
+vars:
+  start_date: '2020-01-01'
+  end_date: '2030-12-31'
