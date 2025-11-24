@@ -2,10 +2,8 @@ name: 'zoom_gold_analytics'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
 profile: 'zoom_gold_analytics'
 
-# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -18,40 +16,15 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
 models:
   zoom_gold_analytics:
-    # Config indicated by + and applies to all files under models/example/
     gold:
       +materialized: table
       dimension:
         +materialized: table
-        +cluster_by: ["load_date"]
       fact:
         +materialized: table
-        +cluster_by: ["load_timestamp"]
 
-# Global configurations
 vars:
-  # The `start_date` variable will be accessible in all resources
   start_date: '2020-01-01'
   end_date: '2030-12-31'
-  
-# Snapshot configurations
-snapshots:
-  zoom_gold_analytics:
-    +target_schema: snapshots
-    +strategy: timestamp
-    +updated_at: updated_at
-
-# Seeds configurations
-seeds:
-  zoom_gold_analytics:
-    +schema: seeds
-    +quote_columns: false
-
-# Test configurations
-tests:
-  zoom_gold_analytics:
-    +store_failures: true
-    +schema: test_failures
