@@ -1,6 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['DATE_VALUE', 'FISCAL_YEAR']
+    materialized='table'
 ) }}
 
 WITH date_series AS (
