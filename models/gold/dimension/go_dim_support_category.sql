@@ -1,6 +1,5 @@
 {{ config(
-    materialized='table',
-    cluster_by=['SUPPORT_CATEGORY', 'PRIORITY_LEVEL']
+    materialized='table'
 ) }}
 
 SELECT DISTINCT
@@ -55,7 +54,7 @@ SELECT DISTINCT
     END AS SLA_TARGET_HOURS,
     CURRENT_DATE AS LOAD_DATE,
     CURRENT_DATE AS UPDATE_DATE,
-    SOURCE_SYSTEM
-FROM {{ ref('si_support_tickets') }}
-WHERE VALIDATION_STATUS = 'PASSED'
+    COALESCE(SOURCE_SYSTEM, 'UNKNOWN') AS SOURCE_SYSTEM
+FROM {{ source('silver', 'si_support_tickets') }}
+WHERE COALESCE(VALIDATION_STATUS, 'PASSED') = 'PASSED'
   AND TICKET_TYPE IS NOT NULL
