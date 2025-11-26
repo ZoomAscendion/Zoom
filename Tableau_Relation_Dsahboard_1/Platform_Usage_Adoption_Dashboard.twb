@@ -1,0 +1,228 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xml:base='http://localhost' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AccessibleZoneTabOrder.true...AccessibleZoneTabOrder />
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <AutoCreateAndUpdateDSDPhoneLayouts />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <SetMembershipControl />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <repository-location id='Platform_Usage_Adoption_Report' path='/workbooks' revision='1.0' />
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <datasources>
+    <datasource caption='Platform_Usage_Adoption_DS' inline='true' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.1bbandk06t32nw1aonthl103n18b'>
+            <connection authentication='oauth' class='snowflake' dbname='DB_POC_ZOOM' instanceurl='https://a8977680256071-ascendion_partner.snowflakecomputing.com' odbc-connect-string-extras='' one-time-sql='' role='FR__POC__ADMIN__ZOOM' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' server-oauth='server-custom' service='FR__POC__ADMIN__ZOOM' username='SATHYANARAYANA.P@ASCENDION.COM' warehouse='WH_POC_ZOOM_DEV_XSMALL' workgroup-auth-mode='prompt' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='collection'>
+          <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='FACT_MEETING_ACTIVITY' table='[DB_POC_ZOOM].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
+          <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='FACT_FEATURE_USAGE' table='[DB_POC_ZOOM].[GOLD].[FACT_FEATURE_USAGE]' type='table' />
+          <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='DIM_USER' table='[DB_POC_ZOOM].[GOLD].[DIM_USER]' type='table' />
+          <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='DIM_MEETING' table='[DB_POC_ZOOM].[GOLD].[DIM_MEETING]' type='table' />
+          <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='DIM_FEATURE' table='[DB_POC_ZOOM].[GOLD].[DIM_FEATURE]' type='table' />
+          <relation connection='snowflake.1bbandk06t32nw1aonthl103n18b' name='DIM_DATE' table='[DB_POC_ZOOM].[GOLD].[DIM_DATE]' type='table' />
+        </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <cols>
+          <map key='[USER_KEY]' value='[FACT_MEETING_ACTIVITY].[USER_KEY]' />
+          <map key='[MEETING_KEY]' value='[FACT_MEETING_ACTIVITY].[MEETING_KEY]' />
+          <map key='[DURATION_MINUTES]' value='[FACT_MEETING_ACTIVITY].[DURATION_MINUTES]' />
+          <map key='[MEETING_DATE]' value='[FACT_MEETING_ACTIVITY].[MEETING_DATE]' />
+          <map key='[USAGE_COUNT]' value='[FACT_FEATURE_USAGE].[USAGE_COUNT]' />
+          <map key='[USER_NAME]' value='[DIM_USER].[USER_NAME]' />
+          <map key='[PLAN_TYPE]' value='[DIM_USER].[PLAN_TYPE]' />
+          <map key='[MEETING_TYPE]' value='[DIM_MEETING].[MEETING_TYPE]' />
+          <map key='[MEETING_CATEGORY]' value='[DIM_MEETING].[MEETING_CATEGORY]' />
+          <map key='[FEATURE_NAME]' value='[DIM_FEATURE].[FEATURE_NAME]' />
+          <map key='[FEATURE_CATEGORY]' value='[DIM_FEATURE].[FEATURE_CATEGORY]' />
+        </cols>
+      </connection>
+      <column caption='Total Users' datatype='integer' name='[Total_Users]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([USER_KEY])' />
+      </column>
+      <column caption='Avg Duration Minutes' datatype='real' name='[Avg_Duration_Minutes]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([DURATION_MINUTES])' />
+      </column>
+      <column caption='Meetings Per User' datatype='integer' name='[Meetings_Per_User]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([MEETING_KEY])' />
+      </column>
+      <column caption='Total Feature Usage' datatype='integer' name='[Total_Feature_Usage]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([USAGE_COUNT])' />
+      </column>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Total Users KPI'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='12'>Total Number of Users</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Platform_Usage_Adoption_DS' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
+          </datasources>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Text' />
+            <encodings>
+              <text column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[Total_Users]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{A1B2C3D4-E5F6-A7B8-C9D0-E1F2A3B4C5D6}' />
+    </worksheet>
+    <worksheet name='Avg Meeting Duration by Type'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='12'>Average Meeting Duration by Type and Category</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Platform_Usage_Adoption_DS' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
+          </datasources>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[MEETING_CATEGORY]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[MEETING_TYPE]</rows>
+        <cols>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[Avg_Duration_Minutes]</cols>
+      </table>
+      <simple-id uuid='{B2C3D4E5-F6A7-B8C9-D0E1-F2A3B4C5D6E7}' />
+    </worksheet>
+    <worksheet name='Meetings per User'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='12'>Number of Meetings per User</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Platform_Usage_Adoption_DS' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
+          </datasources>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[PLAN_TYPE]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[USER_NAME]</rows>
+        <cols>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[Meetings_Per_User]</cols>
+      </table>
+      <simple-id uuid='{C3D4E5F6-A7B8-C9D0-E1F2-A3B4C5D6E7F8}' />
+    </worksheet>
+    <worksheet name='Feature Usage Distribution'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='12'>Feature Usage Distribution</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Platform_Usage_Adoption_DS' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
+          </datasources>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Pie' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[FEATURE_CATEGORY]' />
+              <size column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[Total_Feature_Usage]' />
+              <text column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[FEATURE_NAME]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{D4E5F6A7-B8C9-D0E1-F2A3-B4C5D6E7F8A9}' />
+    </worksheet>
+  </worksheets>
+  <dashboards>
+    <dashboard name='Platform Usage &amp; Adoption Dashboard'>
+      <style />
+      <size maxheight='800' maxwidth='1200' minheight='800' minwidth='1200' />
+      <zones>
+        <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
+          <zone h='25000' id='1' name='Total Users KPI' w='100000' x='0' y='0' />
+          <zone h='25000' id='2' name='Avg Meeting Duration by Type' w='100000' x='0' y='25000' />
+          <zone h='25000' id='3' name='Meetings per User' w='50000' x='0' y='50000' />
+          <zone h='25000' id='5' name='Feature Usage Distribution' w='50000' x='50000' y='50000' />
+        </zone>
+      </zones>
+      <simple-id uuid='{E5F6A7B8-C9D0-E1F2-A3B4-C5D6E7F8A9B0}' />
+    </dashboard>
+  </dashboards>
+  <windows>
+    <window class='worksheet' name='Total Users KPI'>
+      <simple-id uuid='{F6A7B8C9-D0E1-F2A3-B4C5-D6E7F8A9B0C1}' />
+    </window>
+    <window class='worksheet' name='Avg Meeting Duration by Type'>
+      <simple-id uuid='{A7B8C9D0-E1F2-A3B4-C5D6-E7F8A9B0C1D2}' />
+    </window>
+    <window class='worksheet' name='Meetings per User'>
+      <simple-id uuid='{B8C9D0E1-F2A3-B4C5-D6E7-F8A9B0C1D2E3}' />
+    </window>
+    <window class='worksheet' name='Feature Usage Distribution'>
+      <simple-id uuid='{C9D0E1F2-A3B4-C5D6-E7F8-A9B0C1D2E3F4}' />
+    </window>
+    <window class='dashboard' maximized='true' name='Platform Usage &amp; Adoption Dashboard'>
+      <simple-id uuid='{D0E1F2A3-B4C5-D6E7-F8A9-B0C1D2E3F4A5}' />
+    </window>
+  </windows>
+</workbook>
