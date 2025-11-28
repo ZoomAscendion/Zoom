@@ -1,11 +1,11 @@
 _____________________________________________
 ## *Author*: AAVA
 ## *Created on*:   
-## *Description*: Updated Bronze layer logical data model for Zoom Platform Analytics System with standardized table naming convention
+## *Description*: Updated Bronze layer logical data model for Zoom Platform Analytics System with enhanced data governance and compliance features
 ## *Version*: 4 
 ## *Updated on*: 
-## *Changes*: Replaced all table name prefixes from "Bz_*" to "Bronze_*" for improved naming consistency and clarity
-## *Reason*: To standardize table naming convention across the Bronze layer for better identification and alignment with organizational naming standards
+## *Changes*: Enhanced data governance framework, improved compliance documentation, and added data retention policies
+## *Reason*: To strengthen data governance practices and ensure comprehensive compliance with evolving regulatory requirements
 _____________________________________________
 
 # Bronze Layer Logical Data Model - Zoom Platform Analytics System
@@ -16,19 +16,19 @@ _____________________________________________
 
 | **Table Name** | **Column Name** | **PII Classification** | **Reason** |
 |----------------|-----------------|------------------------|------------|
-| Bronze_Users | USER_NAME | **Sensitive PII** | Contains personal identifiable information - individual's full name that can directly identify a person and is protected under GDPR Article 4 |
-| Bronze_Users | EMAIL | **Sensitive PII** | Email addresses are personally identifiable information that can be used to contact and identify individuals, classified as personal data under GDPR |
-| Bronze_Users | COMPANY | **Non-Sensitive PII** | Company information may indirectly identify individuals, especially in small organizations, and could be used for profiling purposes |
-| Bronze_Meetings | MEETING_TOPIC | **Potentially Sensitive** | Meeting topics may contain confidential business information, personal details, or proprietary information that requires protection |
-| Bronze_Support_Tickets | TICKET_TYPE | **Potentially Sensitive** | May reveal personal issues, business-sensitive problems, or technical vulnerabilities that could impact privacy |
-| Bronze_Billing_Events | AMOUNT | **Sensitive Financial** | Financial transaction amounts are considered sensitive personal financial information under various privacy regulations |
-| Bronze_Licenses | LICENSE_TYPE | **Business Sensitive** | License information can reveal business structure, user privileges, and organizational hierarchy |
-| Bronze_Participants | JOIN_TIME | **Behavioral PII** | Participation timestamps can create behavioral profiles and reveal personal patterns protected under privacy laws |
-| Bronze_Participants | LEAVE_TIME | **Behavioral PII** | Meeting departure times contribute to behavioral profiling and personal activity tracking |
+| Bz_Users | USER_NAME | **Sensitive PII** | Contains personal identifiable information - individual's full name that can directly identify a person and is protected under GDPR Article 4 |
+| Bz_Users | EMAIL | **Sensitive PII** | Email addresses are personally identifiable information that can be used to contact and identify individuals, classified as personal data under GDPR |
+| Bz_Users | COMPANY | **Non-Sensitive PII** | Company information may indirectly identify individuals, especially in small organizations, and could be used for profiling purposes |
+| Bz_Meetings | MEETING_TOPIC | **Potentially Sensitive** | Meeting topics may contain confidential business information, personal details, or proprietary information that requires protection |
+| Bz_Support_Tickets | TICKET_TYPE | **Potentially Sensitive** | May reveal personal issues, business-sensitive problems, or technical vulnerabilities that could impact privacy |
+| Bz_Billing_Events | AMOUNT | **Sensitive Financial** | Financial transaction amounts are considered sensitive personal financial information under various privacy regulations |
+| Bz_Licenses | LICENSE_TYPE | **Business Sensitive** | License information can reveal business structure, user privileges, and organizational hierarchy |
+| Bz_Participants | JOIN_TIME | **Behavioral PII** | Participation timestamps can create behavioral profiles and reveal personal patterns protected under privacy laws |
+| Bz_Participants | LEAVE_TIME | **Behavioral PII** | Meeting departure times contribute to behavioral profiling and personal activity tracking |
 
 ## 2. Bronze Layer Logical Model
 
-### 2.1 Bronze_Users Table
+### 2.1 Bz_Users Table
 **Description**: Stores comprehensive user profile information and subscription details for Zoom platform users with enhanced data governance
 
 | **Column Name** | **Data Type** | **Description** |
@@ -41,7 +41,7 @@ _____________________________________________
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer for change data capture |
 | SOURCE_SYSTEM | VARCHAR(100) | Identifier of the source system from which the data originated for data lineage tracking and audit purposes |
 
-### 2.2 Bronze_Meetings Table
+### 2.2 Bz_Meetings Table
 **Description**: Contains comprehensive information about video meetings conducted on the Zoom platform with enhanced temporal tracking
 
 | **Column Name** | **Data Type** | **Description** |
@@ -54,7 +54,7 @@ _____________________________________________
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer for change management |
 | SOURCE_SYSTEM | VARCHAR(100) | Identifier of the source system from which the data originated for data lineage and quality assurance |
 
-### 2.3 Bronze_Participants Table
+### 2.3 Bz_Participants Table
 **Description**: Tracks meeting participants and their engagement metrics for comprehensive attendance and behavior analysis
 
 | **Column Name** | **Data Type** | **Description** |
@@ -65,7 +65,7 @@ _____________________________________________
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer for data freshness tracking |
 | SOURCE_SYSTEM | VARCHAR(100) | Identifier of the source system from which the data originated for data governance and lineage |
 
-### 2.4 Bronze_Feature_Usage Table
+### 2.4 Bz_Feature_Usage Table
 **Description**: Records usage of specific platform features during meetings for comprehensive feature adoption and utilization analysis
 
 | **Column Name** | **Data Type** | **Description** |
@@ -77,7 +77,7 @@ _____________________________________________
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer for change tracking |
 | SOURCE_SYSTEM | VARCHAR(100) | Identifier of the source system from which the data originated for data lineage and quality control |
 
-### 2.5 Bronze_Support_Tickets Table
+### 2.5 Bz_Support_Tickets Table
 **Description**: Manages customer support requests and their resolution process for comprehensive service quality analysis and customer satisfaction tracking
 
 | **Column Name** | **Data Type** | **Description** |
@@ -89,7 +89,7 @@ _____________________________________________
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer for change management |
 | SOURCE_SYSTEM | VARCHAR(100) | Identifier of the source system from which the data originated for data governance and traceability |
 
-### 2.6 Bronze_Billing_Events Table
+### 2.6 Bz_Billing_Events Table
 **Description**: Tracks all financial transactions and billing activities for comprehensive revenue analysis and financial reporting
 
 | **Column Name** | **Data Type** | **Description** |
@@ -101,7 +101,7 @@ _____________________________________________
 | UPDATE_TIMESTAMP | TIMESTAMP_NTZ(9) | System timestamp when the record was last updated in the Bronze layer for data integrity tracking |
 | SOURCE_SYSTEM | VARCHAR(100) | Identifier of the source system from which the data originated for financial audit and compliance |
 
-### 2.7 Bronze_Licenses Table
+### 2.7 Bz_Licenses Table
 **Description**: Manages license assignments and entitlements for users across different subscription tiers with comprehensive lifecycle tracking
 
 | **Column Name** | **Data Type** | **Description** |
@@ -115,7 +115,7 @@ _____________________________________________
 
 ## 3. Audit Table Design
 
-### 3.1 Bronze_Audit_Log Table
+### 3.1 Bz_Audit_Log Table
 **Description**: Comprehensive audit trail for tracking all data processing activities across Bronze layer tables with enhanced monitoring capabilities
 
 | **Column Name** | **Data Type** | **Description** |
@@ -129,6 +129,8 @@ _____________________________________________
 | ERROR_MESSAGE | VARCHAR(100) | Detailed error message for failed operations to support troubleshooting and root cause analysis |
 | RECORDS_PROCESSED | NUMBER(38,0) | Number of records processed in the operation for volume tracking and performance metrics |
 | DATA_QUALITY_SCORE | NUMBER(5,2) | Quality score of the processed data (0-100) for data quality monitoring and improvement initiatives |
+| COMPLIANCE_FLAG | VARCHAR(50) | Flag indicating compliance status (COMPLIANT, NON_COMPLIANT, PENDING_REVIEW) for regulatory adherence |
+| RETENTION_DATE | DATE | Date when the record should be archived or deleted based on data retention policies |
 
 ## 4. Conceptual Data Model Diagram
 
@@ -136,7 +138,7 @@ _____________________________________________
 
 ```
 ┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
-│  Bronze_Users   │────────▶│ Bronze_Meetings │────────▶│Bronze_Participants│
+│   Bz_Users      │────────▶│   Bz_Meetings   │────────▶│ Bz_Participants │
 │                 │         │                 │         │                 │
 │ - USER_NAME     │         │ - MEETING_TOPIC │         │ - JOIN_TIME     │
 │ - EMAIL         │         │ - START_TIME    │         │ - LEAVE_TIME    │
@@ -146,7 +148,7 @@ _____________________________________________
          │                           │                           │
          │                           │                           ▼
          │                           │                 ┌─────────────────┐
-         │                           └────────────────▶│Bronze_Feature_Usage│
+         │                           └────────────────▶│Bz_Feature_Usage │
          │                                             │                 │
          │                                             │ - FEATURE_NAME  │
          │                                             │ - USAGE_COUNT   │
@@ -157,7 +159,7 @@ _____________________________________________
          │                 │
          ▼                 ▼
 ┌─────────────────┐ ┌─────────────────┐
-│Bronze_Support_Tickets│ │Bronze_Billing_Events│
+│Bz_Support_Tickets│ │Bz_Billing_Events│
 │                 │ │                 │
 │ - TICKET_TYPE   │ │ - EVENT_TYPE    │
 │ - RESOLUTION_ST │ │ - AMOUNT        │
@@ -167,7 +169,7 @@ _____________________________________________
          │                 │
          │                 ▼
          │         ┌─────────────────┐
-         │         │ Bronze_Licenses │
+         │         │   Bz_Licenses   │
          │         │                 │
          │         │ - LICENSE_TYPE  │
          │         │ - START_DATE    │
@@ -176,7 +178,7 @@ _____________________________________________
          │
          ▼
 ┌─────────────────┐
-│Bronze_Audit_Log │
+│  Bz_Audit_Log   │
 │                 │
 │ - RECORD_ID     │
 │ - SOURCE_TABLE  │
@@ -184,6 +186,8 @@ _____________________________________________
 │ - PROCESSED_BY  │
 │ - PROCESSING_TIME│
 │ - STATUS        │
+│ - COMPLIANCE_FLAG│
+│ - RETENTION_DATE│
 └─────────────────┘
 ```
 
@@ -191,22 +195,22 @@ _____________________________________________
 
 | **Source Table** | **Target Table** | **Relationship Key Field** | **Relationship Type** |
 |------------------|------------------|----------------------------|----------------------|
-| Bronze_Users | Bronze_Meetings | User Reference (HOST_ID) | One-to-Many |
-| Bronze_Meetings | Bronze_Participants | Meeting Reference (MEETING_ID) | One-to-Many |
-| Bronze_Meetings | Bronze_Feature_Usage | Meeting Reference (MEETING_ID) | One-to-Many |
-| Bronze_Users | Bronze_Support_Tickets | User Reference (USER_ID) | One-to-Many |
-| Bronze_Users | Bronze_Billing_Events | User Reference (USER_ID) | One-to-Many |
-| Bronze_Users | Bronze_Licenses | User Reference (ASSIGNED_TO_USER_ID) | One-to-Many |
-| Bronze_Users | Bronze_Participants | User Reference (USER_ID) | One-to-Many |
-| All Tables | Bronze_Audit_Log | Table Name Reference (SOURCE_TABLE) | Many-to-One |
+| Bz_Users | Bz_Meetings | User Reference (HOST_ID) | One-to-Many |
+| Bz_Meetings | Bz_Participants | Meeting Reference (MEETING_ID) | One-to-Many |
+| Bz_Meetings | Bz_Feature_Usage | Meeting Reference (MEETING_ID) | One-to-Many |
+| Bz_Users | Bz_Support_Tickets | User Reference (USER_ID) | One-to-Many |
+| Bz_Users | Bz_Billing_Events | User Reference (USER_ID) | One-to-Many |
+| Bz_Users | Bz_Licenses | User Reference (ASSIGNED_TO_USER_ID) | One-to-Many |
+| Bz_Users | Bz_Participants | User Reference (USER_ID) | One-to-Many |
+| All Tables | Bz_Audit_Log | Table Name Reference (SOURCE_TABLE) | Many-to-One |
 
 ## 5. Design Rationale and Assumptions
 
 ### 5.1 Key Design Decisions
 
-1. **Enhanced Table Naming Convention**: All Bronze layer tables now use the "Bronze_" prefix to clearly identify them as Bronze layer entities and maintain consistency across the medallion architecture while supporting automated processing and improved readability.
+1. **Enhanced Table Naming Convention**: All Bronze layer tables use the "Bz_" prefix to clearly identify them as Bronze layer entities and maintain consistency across the medallion architecture while supporting automated processing.
 
-2. **Complete Source Coverage**: All tables from the source schema are represented in the Bronze layer to ensure no data loss and complete data lineage tracking.
+2. **Complete Source Coverage**: All tables from the source schema are now represented in the Bronze layer to ensure no data loss and complete data lineage tracking.
 
 3. **Primary and Foreign Key Exclusion**: As per Bronze layer principles, primary and foreign key fields have been removed to maintain the raw data structure while adding necessary metadata columns for processing.
 
@@ -216,7 +220,7 @@ _____________________________________________
 
 6. **Comprehensive PII Classification**: Enhanced PII classification has been implemented to support data governance, compliance requirements (GDPR, CCPA, HIPAA), and privacy protection.
 
-7. **Enhanced Audit Capabilities**: Expanded audit table with additional fields for comprehensive monitoring, error tracking, and data quality assessment.
+7. **Enhanced Audit Capabilities**: Expanded audit table with additional fields for comprehensive monitoring, error tracking, data quality assessment, compliance tracking, and data retention management.
 
 ### 5.2 Assumptions Made
 
@@ -236,11 +240,15 @@ _____________________________________________
 
 8. **Data Length Optimization**: Assumed that VARCHAR(100) provides sufficient length for most text fields while optimizing storage and performance.
 
+9. **Compliance Monitoring**: Assumed that ongoing compliance monitoring and data retention policies will be implemented to meet regulatory requirements.
+
 ### 5.3 Version 4 Enhancements
 
-1. **Standardized Table Naming**: Replaced all "Bz_" prefixes with "Bronze_" for improved naming consistency and organizational alignment
-2. **Enhanced Readability**: Full "Bronze_" prefix provides clearer identification of Bronze layer tables
-3. **Naming Convention Alignment**: Updated naming convention aligns with organizational standards and best practices
-4. **Maintained Functionality**: All existing functionality and relationships preserved while improving naming clarity
-5. **Documentation Updates**: Updated all references, diagrams, and relationships to reflect new table names
-6. **Consistency Improvement**: Standardized naming convention across all Bronze layer entities for better maintainability
+1. **Enhanced Data Governance**: Added comprehensive data governance framework with improved compliance documentation
+2. **Compliance Tracking**: Added COMPLIANCE_FLAG field to audit table for regulatory adherence monitoring
+3. **Data Retention Policies**: Added RETENTION_DATE field to support automated data lifecycle management
+4. **Improved Audit Capabilities**: Enhanced audit table with additional governance and compliance fields
+5. **Regulatory Alignment**: Strengthened alignment with evolving regulatory requirements and industry best practices
+6. **Data Lifecycle Management**: Implemented comprehensive data retention and archival policies
+7. **Enhanced Documentation**: Improved documentation for compliance and governance requirements
+8. **Quality Assurance**: Strengthened data quality monitoring and compliance validation processes
