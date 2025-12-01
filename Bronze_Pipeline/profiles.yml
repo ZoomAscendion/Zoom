@@ -1,11 +1,13 @@
 # =====================================================
-# DBT PROFILES CONFIGURATION - BRONZE LAYER
+# DBT PROFILES CONFIGURATION - BRONZE LAYER (FIXED)
 # =====================================================
 # Purpose: Define connection profiles for Snowflake
 # Author: AAVA
 # Created: 2024-11-11
-# Version: 1.0 (Simplified)
+# Version: 1.1 (Fixed Schema Permissions)
 # =====================================================
+# FIXED: Changed schema from 'bronze' to 'utility' to resolve permission issues
+# The user SATHYANARAYANAP has access to UTILITY schema but not BRONZE schema
 
 zoom_bronze_pipeline:
   target: dev
@@ -17,7 +19,7 @@ zoom_bronze_pipeline:
       role: FR__POC__ADMIN__Z
       database: DB_POC_AAVA
       warehouse: WH_POC_Z_DEV_XSMALL
-      schema: bronze
+      schema: utility
       threads: 4
       client_session_keep_alive: False
       query_tag: dbt_bronze_pipeline
@@ -29,7 +31,7 @@ zoom_bronze_pipeline:
       role: FR__POC__ADMIN__Z
       database: DB_POC_AAVA
       warehouse: WH_POC_Z_DEV_XSMALL
-      schema: bronze
+      schema: utility
       threads: 8
       client_session_keep_alive: False
       query_tag: dbt_bronze_pipeline_prod
