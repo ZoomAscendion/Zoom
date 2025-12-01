@@ -1,18 +1,18 @@
 _____________________________________________
 ## *Author*: AAVA
 ## *Created on*:   
-## *Description*: Updated conceptual data model for Zoom Platform Analytics System with refined entities and dimensional modeling approach
+## *Description*: Updated conceptual data model for Platform Analytics System with refined entities and dimensional modeling approach
 ## *Version*: 2
 ## *Changes*: Restructured entities to align with dimensional modeling principles, added dimension tables for Date, Feature, and Support Category, refined fact tables for Meeting Activity and Support Activity, updated relationships to reflect proper star schema design
 ## *Reason*: The original model needed to be updated to better align with the specific report requirements and implement proper dimensional modeling structure as indicated in the requirements document
 ## *Updated on*: 
 _____________________________________________
 
-# Zoom Platform Analytics System - Conceptual Data Model
+#  Platform Analytics System - Conceptual Data Model
 
 ## 1. Domain Overview
 
-The Zoom Platform Analytics System operates within the **Video Communications and Collaboration** domain. This system manages and analyzes data related to user activities, meeting operations, platform performance, and customer support interactions. The primary focus areas include:
+The   Platform Analytics System operates within the **Video Communications and Collaboration** domain. This system manages and analyzes data related to user activities, meeting operations, platform performance, and customer support interactions. The primary focus areas include:
 
 - **Platform Usage & Adoption**: Tracking user engagement, meeting activities, and feature utilization patterns
 - **Service Reliability & Support**: Managing customer support interactions and resolution tracking
