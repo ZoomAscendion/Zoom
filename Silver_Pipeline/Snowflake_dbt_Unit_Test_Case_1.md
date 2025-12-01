@@ -1,9 +1,9 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*: 2025-01-27
+## *Created on*: 
 ## *Description*: Comprehensive unit test cases and dbt test scripts for Zoom Platform Analytics System Silver layer models
 ## *Version*: 1 
-## *Updated on*: 2025-01-27
+## *Updated on*: 
 _____________________________________________
 
 # Snowflake dbt Unit Test Cases
