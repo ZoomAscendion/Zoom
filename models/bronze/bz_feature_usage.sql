@@ -1,0 +1,52 @@
+-- Bronze Feature Usage Table
+-- Description: Records usage of platform features during meetings
+-- Author: AAVA Data Engineering Team
+-- Created: {{ run_started_at }}
+
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', 0, 'STARTED'",
+    post_hook="INSERT INTO {{ ref('bz_data_audit') }} (SOURCE_TABLE, LOAD_TIMESTAMP, PROCESSED_BY, PROCESSING_TIME, STATUS) SELECT 'BZ_FEATURE_USAGE', CURRENT_TIMESTAMP(), 'DBT_BRONZE_PIPELINE', DATEDIFF('second', (SELECT MAX(LOAD_TIMESTAMP) FROM {{ ref('bz_data_audit') }} WHERE SOURCE_TABLE = 'BZ_FEATURE_USAGE' AND STATUS = 'STARTED'), CURRENT_TIMESTAMP()), 'SUCCESS'"
+) }}
+
+WITH source_data AS (
+    SELECT 
+        USAGE_ID,
+        MEETING_ID,
+        FEATURE_NAME,
+        USAGE_COUNT,
+        USAGE_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('raw_schema', 'feature_usage') }}
+    WHERE USAGE_ID IS NOT NULL  -- Filter out null primary keys
+),
+
+-- Apply deduplication based on USAGE_ID and latest UPDATE_TIMESTAMP
+deduped_data AS (
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY USAGE_ID 
+            ORDER BY UPDATE_TIMESTAMP DESC, LOAD_TIMESTAMP DESC
+        ) as rn
+    FROM source_data
+),
+
+-- Data quality transformations
+cleaned_data AS (
+    SELECT 
+        USAGE_ID,
+        MEETING_ID,
+        COALESCE(FEATURE_NAME, 'Unknown Feature') as FEATURE_NAME,
+        COALESCE(USAGE_COUNT, 0) as USAGE_COUNT,
+        USAGE_DATE,
+        -- Bronze Timestamp Overwrite Requirement
+        CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
+        CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,
+        COALESCE(SOURCE_SYSTEM, 'UNKNOWN') as SOURCE_SYSTEM
+    FROM deduped_data
+    WHERE rn = 1
+)
+
+SELECT * FROM cleaned_data
