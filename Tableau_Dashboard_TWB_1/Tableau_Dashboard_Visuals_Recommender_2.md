@@ -1,321 +1,384 @@
 _____________________________________________
 ## *Author*: AAVA
 ## *Created on*: 
-## *Description*: Enhanced Tableau Dashboard Visuals Recommender with Data Model and Relationships for Platform Analytics System
+## *Description*: Tableau Dashboard Visuals Recommender for Service Reliability & Support Report
 ## *Version*: 2
 ## *Updated on*: 
 _____________________________________________
 
 # Tableau Dashboard Visuals Recommender
-## Platform Analytics System - Enhanced with Data Model and Relationships
+## Service Reliability & Support Report
 
 ## **Data Model and Relationships**
 
-### **Star Schema Design for Platform Analytics**
+### **Star Schema Design for Support Analytics**
 
-Based on the requirement document analysis, the following data model supports the two main reports:
+This report focuses on support ticket analysis, service reliability metrics, and customer support performance.
 
-#### **Fact Tables:**
-1. **FACT_MEETING_ACTIVITY** (Primary fact for Platform Usage & Adoption Report)
-2. **FACT_SUPPORT_ACTIVITY** (Primary fact for Service Reliability & Support Report)
+#### **Primary Fact Table:**
+- **FACT_SUPPORT_METRICS** (Grain: One record per support ticket)
 
-#### **Dimension Tables:**
-1. **DIM_USER** (Central dimension for user analysis)
-2. **DIM_DATE** (Time dimension for temporal analysis)
-3. **DIM_MEETING** (Meeting characteristics)
-4. **DIM_SUPPORT_CATEGORY** (Support categorization)
+#### **Supporting Dimension Tables:**
+- **DIM_USER** (Customer and user information)
+- **DIM_DATE** (Time dimension for temporal analysis)
+- **DIM_SUPPORT_CATEGORY** (Support categorization and SLA definitions)
 
-### **Key Relationships for Report Requirements**
-
-#### **Report 1: Platform Usage & Adoption Report**
+### **Key Relationships for Support Report**
 
 **Primary Data Flow:**
 ```
-FACT_MEETING_ACTIVITY (Grain: One record per meeting per user)
-├── → DIM_USER (USER_KEY) [Many-to-One]
-├── → DIM_MEETING (MEETING_KEY) [Many-to-One]
-├── → DIM_DATE (DATE_KEY) [Many-to-One]
-
-
-**Required Tables for Platform Usage Metrics:**
-- **FACT_MEETING_ACTIVITY**: Contains DURATION_MINUTES, PARTICIPANT_COUNT, MEETING_TOPIC
-- **DIM_USER**: Contains USER_NAME, PLAN_TYPE, GEOGRAPHIC_REGION, USER_ROLE
-- **DIM_MEETING**: Contains MEETING_TYPE, MEETING_CATEGORY, BUSINESS_PURPOSE
-- **DIM_DATE**: Contains DATE_VALUE, YEAR, MONTH, QUARTER for time-based analysis
-
-#### **Report 2: Service Reliability & Support Report**
-
-**Primary Data Flow:**
+FACT_SUPPORT_METRICS (Grain: One record per support ticket)
+├── → DIM_USER (USER_DIM_ID) [Many-to-One]
+├── → DIM_SUPPORT_CATEGORY (SUPPORT_CATEGORY_ID) [Many-to-One]
+├── → DIM_DATE (DATE_ID) [Many-to-One]
 ```
-FACT_SUPPORT_ACTIVITY (Grain: One record per support ticket)
-├── → DIM_USER (USER_KEY) [Many-to-One]
-├── → DIM_DATE (DATE_KEY) [Many-to-One]
-└── → DIM_SUPPORT_CATEGORY (SUPPORT_CATEGORY_KEY) [Many-to-One]
-```
-
-**Required Tables for Support Metrics:**
-- **FACT_SUPPORT_ACTIVITY**: Contains RESOLUTION_STATUS, PRIORITY_LEVEL, RESOLUTION_TIME_HOURS
-- **DIM_SUPPORT_CATEGORY**: Contains SUPPORT_CATEGORY, SUPPORT_SUBCATEGORY, PRIORITY_LEVEL
-- **DIM_USER**: Contains user details for support requesters
-- **DIM_DATE**: Contains temporal dimensions for support trend analysis
 
 ## **1. Visual Recommendations**
 
-### **Report 1: Platform Usage & Adoption Report**
+### **Support Overview Section**
 
-#### **Metric 1: Track Key Usage Metrics (Total Meeting Minutes and Active Users)**
-- **Data Element:** Total Meeting Minutes and Active Users KPI
-- **Recommended Visual:** KPI Cards with Trend Indicators
+#### **Metric 1: Support KPI Dashboard**
+- **Data Element:** Key Support Performance Indicators
+- **Recommended Visual:** KPI Cards with Status Indicators
 - **Data Fields:** 
-  - Total Minutes: `SUM([Duration Minutes])`
-  - Active Users: `COUNTD([User Key])`
-  - Previous Period Comparison
+  - SUPPORT_METRICS_ID from FACT_SUPPORT_METRICS
+  - RESOLUTION_STATUS from FACT_SUPPORT_METRICS
+  - FIRST_CONTACT_RESOLUTION from FACT_SUPPORT_METRICS
+  - SLA_MET from FACT_SUPPORT_METRICS
+  - CUSTOMER_SATISFACTION_SCORE from FACT_SUPPORT_METRICS
 - **Query/Tableau Calculation:** 
   ```
-  // Total Meeting Minutes
-  SUM([Duration Minutes])
+  // Total Support Tickets
+  COUNT([Support Metrics Id])
   
-  // Active Users
-  COUNTD([User Key])
+  // Resolution Rate
+  SUM(IF [Resolution Status] = 'Resolved' THEN 1 ELSE 0 END) / COUNT([Support Metrics Id])
   
-  // Month-over-Month Growth
-  (SUM([Duration Minutes]) - LOOKUP(SUM([Duration Minutes]), -1)) / LOOKUP(SUM([Duration Minutes]), -1)
+  // First Contact Resolution Rate
+  SUM(IF [First Contact Resolution] = TRUE THEN 1 ELSE 0 END) / COUNT([Support Metrics Id])
+  
+  // SLA Compliance Rate
+  SUM(IF [Sla Met] = TRUE THEN 1 ELSE 0 END) / COUNT([Support Metrics Id])
+  
+  // Average Customer Satisfaction
+  AVG([Customer Satisfaction Score])
+  
+  // Trend Indicator (Month-over-Month)
+  (COUNT([Support Metrics Id]) - LOOKUP(COUNT([Support Metrics Id]), -1)) / ABS(LOOKUP(COUNT([Support Metrics Id]), -1))
   ```
-- **Calculations:** Period-over-period percentage change, trend indicators
-- **Interactivity:** Date range filter, drill-down to daily/weekly views
-- **Justification:** KPI cards provide immediate visibility into key performance indicators with trend context
-- **Optimization Tips:** Use extract with monthly aggregations, implement incremental refresh
-
----
-
-#### **Metric 2: Average Meeting Duration by Type and Category**
-- **Data Element:** Average Meeting Duration Analysis
-- **Recommended Visual:** Grouped Bar Chart with Reference Lines
-- **Data Fields:** MEETING_TYPE, MEETING_CATEGORY, AVG(DURATION_MINUTES)
-- **Query/Tableau Calculation:** 
-  ```
-  // Average Duration by Type
-  {FIXED [Meeting Type] : AVG([Duration Minutes])}
-  
-  // Average Duration by Category within Type
-  {FIXED [Meeting Type], [Meeting Category] : AVG([Duration Minutes])}
-  
-  // Overall Average Reference Line
-  WINDOW_AVG(AVG([Duration Minutes]))
-  ```
-- **Calculations:** Fixed LOD for consistent averages, reference line for benchmark
+- **Calculations:** Resolution rates, SLA compliance, satisfaction averages, trend indicators
 - **Interactivity:** 
-  - Parameter to switch between Type and Category view
-  - Filter by date range and user segment
-  - Tooltip showing participant count statistics
-- **Justification:** Grouped bars allow comparison across multiple categorical dimensions
-- **Optimization Tips:** Pre-aggregate at source level, use context filters for date ranges
+  - Date range filter with preset options
+  - Drill-down to daily/weekly granularity
+  - Color coding based on performance thresholds
+- **Justification:** KPI cards provide immediate visibility into critical support metrics with performance indicators
+- **Optimization Tips:** 
+  - Use extract with daily aggregations
+  - Pre-calculate rates at source level
+  - Implement conditional formatting for status indicators
 
 ---
 
-#### **Metric 3: Number of Users by Meeting Topics**
-- **Data Element:** Meeting Topic Popularity
-- **Recommended Visual:** Highlight Table (Square Mark Type) - Heat Map Style
-- **Data Fields:** MEETING_TOPIC, COUNT(DISTINCT USER_KEY), Meeting Frequency
+#### **Metric 2: Support Volume and Resolution Trends**
+- **Data Element:** Support Ticket Volume and Resolution Time Trends
+- **Recommended Visual:** Dual-Axis Line Chart with Bar Overlay
+- **Data Fields:** 
+  - DATE_ID from FACT_SUPPORT_METRICS
+  - SUPPORT_METRICS_ID count
+  - RESOLUTION_TIME_HOURS from FACT_SUPPORT_METRICS
+  - SLA_TARGET_HOURS from DIM_SUPPORT_CATEGORY
 - **Query/Tableau Calculation:** 
   ```
-  // Unique Users per Topic
-  COUNTD([User Key])
+  // Daily Ticket Volume
+  COUNT([Support Metrics Id])
   
-  // Topic Engagement Score
-  COUNTD([User Key]) / TOTAL(COUNTD([User Key]))
+  // Average Resolution Time
+  AVG([Resolution Time Hours])
   
-  // Meeting Frequency per Topic
-  COUNT([Meeting Activity Id])
+  // SLA Target Reference
+  AVG([Sla Target Hours])
+  
+  // Resolution Time Variance
+  AVG([Resolution Time Hours]) - AVG([Sla Target Hours])
+  
+  // 7-Day Moving Average
+  WINDOW_AVG(COUNT([Support Metrics Id]), -6, 0)
+  
+  // Trend Direction
+  (AVG([Resolution Time Hours]) - LOOKUP(AVG([Resolution Time Hours]), -7)) / ABS(LOOKUP(AVG([Resolution Time Hours]), -7))
   ```
-- **Calculations:** User count, engagement percentage, frequency metrics
+- **Calculations:** Moving averages, variance calculations, trend analysis
 - **Interactivity:** 
-  - Filter by meeting type and date range
-  - Sort by user count or engagement score
-  - Click to filter other dashboard views
-- **Justification:** Heat map format shows both topic popularity and engagement intensity
-- **Optimization Tips:** Limit to top 50 topics, use string aggregation for topic grouping
+  - Parameter to switch between daily/weekly/monthly views
+  - Filter by priority level and support category
+  - Reference lines for SLA targets
+- **Justification:** Dual-axis shows relationship between volume and performance metrics
+- **Optimization Tips:** Use continuous date axis, pre-aggregate by date, implement date partitioning
 
 ---
 
-#### **Metric 4: Number of Meetings per User**
-- **Data Element:** User Meeting Frequency Distribution
-- **Recommended Visual:** Histogram with Box Plot Overlay
-- **Data Fields:** USER_NAME, COUNT(MEETING_ACTIVITY_ID), User Segments
+### **Category Analysis Section**
+
+#### **Metric 3: Support Categories and User Distribution**
+- **Data Element:** Support Category Analysis with User Impact
+- **Recommended Visual:** Nested Bar Chart (Horizontal Stacked)
+- **Data Fields:** 
+  - SUPPORT_CATEGORY from DIM_SUPPORT_CATEGORY
+  - SUPPORT_SUBCATEGORY from DIM_SUPPORT_CATEGORY
+  - USER_DIM_ID from FACT_SUPPORT_METRICS
+  - PRIORITY_LEVEL from FACT_SUPPORT_METRICS
 - **Query/Tableau Calculation:** 
   ```
-  // Meetings per User
-  {FIXED [User Key] : COUNT([Meeting Activity Id])}
-  
-  // User Engagement Bins
-  IF [Meetings per User] <= 5 THEN "Low (1-5)"
-  ELSEIF [Meetings per User] <= 15 THEN "Medium (6-15)"
-  ELSEIF [Meetings per User] <= 30 THEN "High (16-30)"
-  ELSE "Very High (30+)"
-  END
-  
-  // Percentile Ranking
-  PERCENTILE([Meetings per User], 0.25, 0.5, 0.75)
-  ```
-- **Calculations:** User-level aggregation, binning logic, percentile calculations
-- **Interactivity:** 
-  - Dynamic bin size parameter
-  - Filter by user role and plan type
-  - Drill-through to user detail view
-- **Justification:** Histogram shows distribution patterns, box plot adds statistical context
-- **Optimization Tips:** Create user-level extract, use calculated bins for performance
-
----
-
-### **Report 2: Service Reliability & Support Report**
-
-#### **Metric 1: Number of Users by Support Category and Subcategory**
-- **Data Element:** Support Category User Distribution
-- **Recommended Visual:** Nested Bar Chart (Stacked Horizontal)
-- **Data Fields:** SUPPORT_CATEGORY, SUPPORT_SUBCATEGORY, COUNT(DISTINCT USER_KEY)
-- **Query/Tableau Calculation:** 
-  ```
-  // Users per Category
-  COUNTD([User Key])
+  // Unique Users per Category
+  COUNTD([User Dim Id])
   
   // Category Distribution Percentage
-  COUNTD([User Key]) / TOTAL(COUNTD([User Key]))
+  COUNTD([User Dim Id]) / TOTAL(COUNTD([User Dim Id]))
   
   // Subcategory within Category Percentage
-  COUNTD([User Key]) / TOTAL(COUNTD([User Key]) INCLUDE [Support Category])
+  COUNTD([User Dim Id]) / TOTAL(COUNTD([User Dim Id]) INCLUDE [Support Category])
+  
+  // Average Priority Score by Category
+  AVG(IF [Priority Level] = 'Critical' THEN 4
+      ELSEIF [Priority Level] = 'High' THEN 3
+      ELSEIF [Priority Level] = 'Medium' THEN 2
+      ELSE 1 END)
+  
+  // Category Impact Score
+  COUNTD([User Dim Id]) * AVG([Customer Satisfaction Score])
   ```
-- **Calculations:** Distinct user counts, percentage distributions at multiple levels
+- **Calculations:** User counts, percentage distributions, priority scoring, impact metrics
 - **Interactivity:** 
   - Hierarchical drill-down from category to subcategory
   - Filter by priority level and date range
-  - Sort options (count, alphabetical)
-- **Justification:** Stacked bars show both total volume and internal distribution
-- **Optimization Tips:** Pre-aggregate support user counts, use extract with category rollups
+  - Sort by user count, priority, or satisfaction
+  - Color coding by priority distribution
+- **Justification:** Stacked bars show both volume and internal distribution with priority context
+- **Optimization Tips:** 
+  - Pre-aggregate user counts by category
+  - Use extract with category rollups
+  - Limit subcategories to top 10 per category
 
 ---
 
-#### **Metric 2: Number of Support Activities by Resolution Status**
-- **Data Element:** Support Resolution Status Overview
-- **Recommended Visual:** Donut Chart with Central KPI
-- **Data Fields:** RESOLUTION_STATUS, COUNT(SUPPORT_ACTIVITY_ID)
+#### **Metric 4: Resolution Status Analysis**
+- **Data Element:** Support Ticket Resolution Status Distribution
+- **Recommended Visual:** Donut Chart with Central KPI and Detail Table
+- **Data Fields:** 
+  - RESOLUTION_STATUS from FACT_SUPPORT_METRICS
+  - SUPPORT_METRICS_ID count
+  - RESOLUTION_TIME_HOURS from FACT_SUPPORT_METRICS
+  - CUSTOMER_SATISFACTION_SCORE from FACT_SUPPORT_METRICS
 - **Query/Tableau Calculation:** 
   ```
-  // Total Support Activities
-  COUNT([Support Activity Id])
+  // Status Distribution
+  COUNT([Support Metrics Id])
   
-  // Resolution Rate
-  SUM(IF [Resolution Status] = 'Resolved' THEN 1 ELSE 0 END) / COUNT([Support Activity Id])
+  // Status Percentage
+  COUNT([Support Metrics Id]) / TOTAL(COUNT([Support Metrics Id]))
   
   // Average Resolution Time by Status
   AVG([Resolution Time Hours])
   
-  // First Contact Resolution Rate
-  SUM(IF [First Contact Resolution Flag] = TRUE THEN 1 ELSE 0 END) / COUNT([Support Activity Id])
+  // Status-based Satisfaction
+  AVG([Customer Satisfaction Score])
+  
+  // Resolution Efficiency Score
+  SUM(IF [Resolution Status] IN ('Resolved', 'Closed') THEN 1 ELSE 0 END) / COUNT([Support Metrics Id])
+  
+  // Pending Tickets Age
+  IF [Resolution Status] = 'Open' OR [Resolution Status] = 'In Progress' THEN
+    DATEDIFF('day', [Ticket Created Date], TODAY())
+  END
   ```
-- **Calculations:** Status counts, resolution rates, time-based metrics
+- **Calculations:** Status counts, percentages, time-based metrics, efficiency scores
 - **Interactivity:** 
-  - Date range and priority filters
-  - Click to filter detailed views
-  - Hover for detailed metrics
-- **Justification:** Donut chart shows proportional distribution with central summary metric
-- **Optimization Tips:** Use quick table calculations for percentages, limit status categories
+  - Click to filter detailed views by status
+  - Hover for detailed metrics and counts
+  - Filter by date range and priority
+  - Drill-through to ticket details
+- **Justification:** Donut chart shows proportional distribution with central summary, table provides detailed breakdown
+- **Optimization Tips:** 
+  - Use quick table calculations for percentages
+  - Limit status categories to active ones
+  - Pre-calculate aging metrics
 
 ---
 
-#### **Metric 3: Number of Support Activities by Priority**
-- **Data Element:** Priority Level Analysis with SLA Performance
-- **Recommended Visual:** Bullet Graph with Target Indicators
-- **Data Fields:** PRIORITY_LEVEL, COUNT(SUPPORT_ACTIVITY_ID), SLA_TARGET_HOURS, RESOLUTION_TIME_HOURS
+### **Performance Analysis Section**
+
+#### **Metric 5: Priority Level Analysis with SLA Performance**
+- **Data Element:** Priority-based Performance and SLA Compliance
+- **Recommended Visual:** Bullet Graph with Performance Bands
+- **Data Fields:** 
+  - PRIORITY_LEVEL from FACT_SUPPORT_METRICS
+  - SUPPORT_METRICS_ID count
+  - RESOLUTION_TIME_HOURS from FACT_SUPPORT_METRICS
+  - SLA_TARGET_HOURS from DIM_SUPPORT_CATEGORY
+  - SLA_MET from FACT_SUPPORT_METRICS
 - **Query/Tableau Calculation:** 
   ```
-  // Activities by Priority
-  COUNT([Support Activity Id])
+  // Tickets by Priority
+  COUNT([Support Metrics Id])
   
-  // SLA Compliance Rate
-  SUM(IF [Sla Met] = TRUE THEN 1 ELSE 0 END) / COUNT([Support Activity Id])
+  // SLA Compliance Rate by Priority
+  SUM(IF [Sla Met] = TRUE THEN 1 ELSE 0 END) / COUNT([Support Metrics Id])
   
-  // Average vs Target Resolution Time
-  AVG([Resolution Time Hours]) - AVG([Expected Resolution Time Hours])
+  // Average Resolution Time vs Target
+  AVG([Resolution Time Hours])
+  AVG([Sla Target Hours])
+  
+  // Performance Score (0-100)
+  (SUM(IF [Sla Met] = TRUE THEN 1 ELSE 0 END) / COUNT([Support Metrics Id])) * 100
   
   // Priority Distribution
-  COUNT([Support Activity Id]) / TOTAL(COUNT([Support Activity Id]))
+  COUNT([Support Metrics Id]) / TOTAL(COUNT([Support Metrics Id]))
+  
+  // SLA Breach Analysis
+  AVG(IF [Sla Met] = FALSE THEN [Sla Breach Hours] ELSE 0 END)
   ```
-- **Calculations:** Priority counts, SLA performance metrics, variance calculations
+- **Calculations:** Priority counts, SLA performance, variance analysis, breach metrics
 - **Interactivity:** 
-  - Parameter for SLA target adjustment
-  - Filter by support category
-  - Color coding for performance indicators
-- **Justification:** Bullet graphs effectively show actual vs target performance with clear visual indicators
-- **Optimization Tips:** Use parameters for dynamic targets, pre-calculate SLA metrics
+  - Parameter for SLA target adjustment (80%, 85%, 90%, 95%)
+  - Filter by support category and date range
+  - Color coding for performance bands (Red <70%, Yellow 70-90%, Green >90%)
+  - Drill-down to individual ticket analysis
+- **Justification:** Bullet graphs effectively show actual vs target performance with clear visual performance indicators
+- **Optimization Tips:** 
+  - Use parameters for dynamic SLA targets
+  - Pre-calculate SLA metrics at priority level
+  - Implement performance band calculations
+
+---
+
+#### **Metric 6: Support Agent Performance and Workload**
+- **Data Element:** Agent Performance Metrics and Capacity Analysis
+- **Recommended Visual:** Scatter Plot with Quadrant Analysis
+- **Data Fields:** 
+  - AGENT_INTERACTIONS_COUNT from FACT_SUPPORT_METRICS
+  - RESOLUTION_TIME_HOURS from FACT_SUPPORT_METRICS
+  - CUSTOMER_SATISFACTION_SCORE from FACT_SUPPORT_METRICS
+  - FIRST_CONTACT_RESOLUTION from FACT_SUPPORT_METRICS
+- **Query/Tableau Calculation:** 
+  ```
+  // Agent Workload (Tickets per Agent)
+  COUNT([Support Metrics Id])
+  
+  // Average Resolution Time per Agent
+  AVG([Resolution Time Hours])
+  
+  // Agent Satisfaction Score
+  AVG([Customer Satisfaction Score])
+  
+  // First Contact Resolution Rate
+  SUM(IF [First Contact Resolution] = TRUE THEN 1 ELSE 0 END) / COUNT([Support Metrics Id])
+  
+  // Agent Efficiency Score
+  (AVG([Customer Satisfaction Score]) * 20) + 
+  (SUM(IF [First Contact Resolution] = TRUE THEN 1 ELSE 0 END) / COUNT([Support Metrics Id]) * 80)
+  
+  // Performance Quadrants
+  IF AVG([Resolution Time Hours]) <= WINDOW_AVG(AVG([Resolution Time Hours])) AND 
+     AVG([Customer Satisfaction Score]) >= WINDOW_AVG(AVG([Customer Satisfaction Score])) 
+  THEN "High Performer"
+  ELSEIF AVG([Resolution Time Hours]) <= WINDOW_AVG(AVG([Resolution Time Hours])) 
+  THEN "Fast Resolver"
+  ELSEIF AVG([Customer Satisfaction Score]) >= WINDOW_AVG(AVG([Customer Satisfaction Score])) 
+  THEN "Quality Focused"
+  ELSE "Needs Improvement"
+  END
+  ```
+- **Calculations:** Agent-level aggregations, efficiency scores, quadrant analysis
+- **Interactivity:** 
+  - Size by ticket volume, color by satisfaction score
+  - Filter by support category and time period
+  - Quadrant reference lines for performance benchmarks
+  - Drill-through to individual agent performance
+- **Justification:** Scatter plot reveals relationships between efficiency and quality metrics with performance segmentation
+- **Optimization Tips:** 
+  - Aggregate at agent level for performance
+  - Use calculated fields for quadrant analysis
+  - Implement agent anonymization if required
 
 ---
 
 ## **2. Overall Dashboard Design**
 
 ### **Layout Suggestions:**
-- **Dashboard 1 - Platform Usage & Adoption:**
-  - **Header:** KPI cards for total minutes and active users
-  - **Left Panel:** Meeting duration analysis and user distribution
-  - **Right Panel:** Topic popularity and feature usage trends
-  - **Footer:** User engagement histogram and filters
-
-- **Dashboard 2 - Service Reliability & Support:**
-  - **Header:** Support KPI summary (total tickets, resolution rate, avg time)
-  - **Main Area:** Category distribution and resolution status charts
-  - **Side Panel:** Priority analysis and SLA performance
-  - **Bottom:** Detailed support metrics and trend analysis
+- **Header Section (20% height):** 
+  - Support KPI cards (total tickets, resolution rate, SLA compliance, satisfaction)
+  - Global filters and date range selector
+- **Main Content Area (65% height):**
+  - **Left Panel (45%):** Category analysis and resolution status charts
+  - **Right Panel (55%):** Priority analysis and performance trends
+- **Footer Section (15% height):** 
+  - Agent performance scatter plot
+  - Additional filter controls and export options
 
 ### **Performance Optimization:**
 - **Extract Strategy:** 
-  - Daily incremental refresh for fact tables
-  - Weekly full refresh for dimensions
-  - Separate extracts for each major report area
-- **Data Source Optimization:**
-  - Use the custom SQL queries provided above
-  - Implement data source filters for date ranges
-  - Create indexed views for frequently joined tables
+  - Daily incremental refresh for FACT_SUPPORT_METRICS
+  - Weekly full refresh for DIM_SUPPORT_CATEGORY
+  - Separate extracts for current vs historical analysis
+- **Query Optimization:**
+  - Use custom SQL with pre-aggregated support metrics
+  - Implement ticket status indexing
+  - Create materialized views for SLA calculations
 - **Calculation Optimization:**
-  - Move aggregations to data source level where possible
-  - Use context filters before dimension filters
-  - Minimize LOD calculations by pre-aggregating
+  - Move SLA calculations to data source level
+  - Use context filters for date and priority
+  - Minimize agent-level LOD calculations
 
 ### **Color Scheme:**
-- **Primary:** Blue (#1f77b4) for main metrics
-- **Secondary:** Orange (#ff7f0e) for comparisons
-- **Alert:** Red (#d62728) for issues/high priority
-- **Success:** Green (#2ca02c) for targets met
-- **Neutral:** Gray (#7f7f7f) for supporting elements
+- **Primary:** Blue (#1f77b4) for support volume metrics
+- **Success:** Green (#2ca02c) for resolved tickets and SLA compliance
+- **Warning:** Orange (#ff7f0e) for in-progress and medium priority
+- **Critical:** Red (#d62728) for overdue tickets and SLA breaches
+- **Neutral:** Gray (#7f7f7f) for pending and background elements
 
 ### **Typography:**
-- **Headers:** Tableau Book, 16pt, Bold
-- **Labels:** Tableau Book, 11pt, Regular
-- **KPIs:** Tableau Book, 20pt, Bold
-- **Details:** Tableau Book, 9pt, Regular
+- **Dashboard Title:** Tableau Book, 18pt, Bold
+- **Section Headers:** Tableau Book, 14pt, Bold
+- **Chart Titles:** Tableau Book, 12pt, Bold
+- **KPI Values:** Tableau Book, 24pt, Bold
+- **Status Indicators:** Tableau Book, 11pt, Bold
+- **Labels and Legends:** Tableau Book, 10pt, Regular
+- **Tooltips:** Tableau Book, 9pt, Regular
 
 ### **Interactive Elements:**
 
 | Element Type | Purpose | Implementation | Data Fields |
 |--------------|---------|----------------|-------------|
-| **Date Range Filter** | Time period selection | Relative date with custom options | DATE_KEY (Last 30 days, Last Quarter, Last Year) |
-| **User Segment Filter** | User characteristic filtering | Multi-select dropdown | PLAN_TYPE, USER_ROLE, GEOGRAPHIC_REGION |
-| **Meeting Type Parameter** | Switch analysis focus | Single-select parameter | MEETING_TYPE vs MEETING_CATEGORY |
-| **Priority Filter** | Support priority filtering | Single-select with "All" | PRIORITY_LEVEL (High, Medium, Low, All) |
-| **Support Category Filter** | Category-based filtering | Hierarchical filter | SUPPORT_CATEGORY → SUPPORT_SUBCATEGORY |
-| **Drill-Down Actions** | Navigate to details | Filter actions | USER_KEY → User details, MEETING_KEY → Meeting analysis |
-| **Cross-Filter Actions** | Related data highlighting | Highlight actions | Cross-highlight between related visualizations |
-| **Reset Dashboard** | Clear all filters | Reset button | Return to default filter state |
+| **Date Range Filter** | Time period selection | Relative date filter with support-specific ranges | DATE_ID (Last 7 days, Last 30 days, Last Quarter, YTD, Custom) |
+| **Priority Filter** | Priority-based filtering | Multi-select with "All" option | PRIORITY_LEVEL (Critical, High, Medium, Low, All) |
+| **Support Category Filter** | Category-based analysis | Hierarchical filter with search | SUPPORT_CATEGORY → SUPPORT_SUBCATEGORY |
+| **Resolution Status Filter** | Status-based filtering | Multi-select dropdown | RESOLUTION_STATUS (Open, In Progress, Resolved, Closed, Escalated) |
+| **SLA Target Parameter** | Performance benchmark adjustment | Slider parameter (70%-99%) | SLA compliance threshold for color coding |
+| **Agent Filter** | Agent performance filtering | Multi-select with anonymization option | Agent identifiers (if available) |
+| **Customer Segment Filter** | Customer-based analysis | Multi-select dropdown | PLAN_TYPE, ACCOUNT_TYPE, GEOGRAPHIC_REGION |
+| **Cross-Filter Actions** | Related data highlighting | Filter actions between charts | USER_DIM_ID, SUPPORT_CATEGORY_ID cross-filtering |
+| **Drill-Down Actions** | Navigate to detailed views | URL actions to ticket details | Individual ticket analysis, Agent dashboards |
+| **Alert Actions** | Performance notifications | Conditional actions | SLA breach alerts, High priority notifications |
+| **Export Actions** | Data extraction and reporting | Download actions | Filtered data export, Performance reports |
 
-### **Data Relationships Summary:**
+### **SLA Performance Indicators:**
+- **Green (Target Met):** SLA compliance ≥ 95%
+- **Yellow (Warning):** SLA compliance 85-94%
+- **Red (Critical):** SLA compliance < 85%
+- **Reference Lines:** Industry benchmarks and internal targets
 
-**For Platform Usage Dashboard:**
-- Primary: FACT_MEETING_ACTIVITY → DIM_USER, DIM_MEETING, DIM_DATE
-- Secondary: FACT_FEATURE_USAGE → DIM_FEATURE, DIM_USER, DIM_DATE
-- Join Type: Inner joins to ensure data quality
-- Grain: Meeting-level and feature usage-level analysis
+### **Dashboard Alerts and Notifications:**
+1. **Critical Priority Overdue:** Tickets exceeding SLA by >4 hours
+2. **High Volume Alert:** Daily ticket volume >150% of average
+3. **Low Satisfaction Alert:** Daily average satisfaction <3.0
+4. **Agent Overload Alert:** Agent handling >20 active tickets
+5. **SLA Breach Trend:** 3+ consecutive days of <90% compliance
 
-**For Support Dashboard:**
-- Primary: FACT_SUPPORT_ACTIVITY → DIM_USER, DIM_SUPPORT_CATEGORY, DIM_DATE
-- Join Type: Inner joins with current record filtering
-- Grain: Support ticket-level analysis
+### **Mobile Optimization:**
+- **Responsive Layout:** Automatic adjustment for tablet and mobile devices
+- **Touch-Friendly Filters:** Large touch targets for mobile interaction
+- **Simplified Mobile View:** Key KPIs and trends only for mobile
+- **Offline Capability:** Cached data for offline viewing of key metrics
 
-This enhanced version provides the complete data model, relationships, and specific table usage that directly aligns with the Platform Analytics System requirements outlined in the requirement document.
+**Output URL:** https://github.com/DIAscendion/Ascendion/blob/Agent_Output/Tableau_Dashboard_TWB_1
+**Pipeline ID:** 9468
