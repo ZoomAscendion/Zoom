@@ -1,14 +1,14 @@
 ____________________________________________
 ## *Author*: AAVA
 ## *Created on*:   
-## *Description*: Updated Model Data Constraints for Zoom Platform Analytics System aligned with dimensional modeling approach
+## *Description*: Updated Model Data Constraints for Platform Analytics System aligned with dimensional modeling approach
 ## *Version*: 2
 ## *Changes*: Restructured constraints to align with dimensional modeling approach, removed Revenue & License Analysis section, updated constraints to match fact and dimension table structure, refined business rules to support star schema design
 ## *Reason*: The original constraints needed to be updated to align with the current report requirements and support the dimensional modeling structure implemented in the conceptual data model
 ## *Updated on*: 
 _____________________________________________
 
-# Zoom Platform Analytics System - Model Data Constraints
+#   Platform Analytics System - Model Data Constraints
 
 ## 1. Data Expectations
 
