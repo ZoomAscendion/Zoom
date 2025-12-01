@@ -1,9 +1,9 @@
-name: 'aava_bronze_pipeline'
+name: 'zoom_silver_pipeline'
 version: '1.0.0'
 config-version: 2
 
 # This setting configures which "profile" dbt uses for this project.
-profile: 'aava_bronze_pipeline'
+profile: 'zoom_silver_pipeline'
 
 # These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
@@ -13,29 +13,55 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+target-path: "target"
+clean-targets:
   - "target"
   - "dbt_packages"
 
 # Configuring models
 models:
-  aava_bronze_pipeline:
-    # Config indicated by + and applies to all files under models/bronze/
-    bronze:
+  zoom_silver_pipeline:
+    # Config indicated by + and applies to all files under models/silver/
+    silver:
       +materialized: table
-      +tags: ["bronze"]
-      +on_schema_change: "fail"
-      
-# Global configurations
-vars:
-  # The `start_date` variable will be accessible in all resources
-  start_date: '2020-01-01'
-  
-# Require specific dbt version
-require-dbt-version: [">=1.0.0", "<2.0.0"]
+      +on_schema_change: sync_all_columns
+      # Ensure audit log runs first
+      SI_Audit_Log:
+        +pre-hook: []
+        +post-hook: []
+      # All other models depend on audit log
+      SI_Users:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Meetings:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Participants:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Feature_Usage:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Support_Tickets:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Billing_Events:
+        +depends_on:
+          - ref('SI_Audit_Log')
+      SI_Licenses:
+        +depends_on:
+          - ref('SI_Audit_Log')
 
-# Dispatch configuration for packages
-dispatch:
-  - macro_namespace: dbt_utils
-    search_order: ['dbt_utils']
+# Set the timezone for timestamp functions
+quoting:
+  database: false
+  schema: false
+  identifier: false
+
+vars:
+  # dbt version
+  dbt_version: ">=1.0.0"
+  # Timezone setting
+  timezone: 'UTC'
+  # Data quality threshold
+  dq_threshold: 60
