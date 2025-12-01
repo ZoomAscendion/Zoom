@@ -1,0 +1,35 @@
+# =====================================================
+# DBT PROFILES CONFIGURATION - BRONZE LAYER
+# =====================================================
+# Purpose: Define connection profiles for Snowflake
+# Author: AAVA
+# Created: 2024-11-11
+# Version: 1.0 (Simplified)
+# =====================================================
+
+zoom_bronze_pipeline:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: A8977680256071-ASCENDION_PARTNER
+      user: SATHYANARAYANAP
+      role: FR__POC__ADMIN__Z
+      database: DB_POC_AAVA
+      warehouse: WH_POC_Z_DEV_XSMALL
+      schema: bronze
+      threads: 4
+      client_session_keep_alive: False
+      query_tag: dbt_bronze_pipeline
+      
+    prod:
+      type: snowflake
+      account: A8977680256071-ASCENDION_PARTNER
+      user: SATHYANARAYANAP
+      role: FR__POC__ADMIN__Z
+      database: DB_POC_AAVA
+      warehouse: WH_POC_Z_DEV_XSMALL
+      schema: bronze
+      threads: 8
+      client_session_keep_alive: False
+      query_tag: dbt_bronze_pipeline_prod
