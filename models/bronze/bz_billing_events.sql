@@ -21,7 +21,7 @@ WITH source_data AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('raw_schema', 'billing_events') }}
+    FROM {{ source('raw', 'billing_events') }}
     WHERE EVENT_ID IS NOT NULL  -- Filter out null primary keys
 ),
 
