@@ -24,13 +24,13 @@ trends and areas for improvement.
 -   Number of Users by Meeting Topics
 -   Number of Meeting per User
 
-**Data Relationships and Raw Tables Used**
+**Facts, Dimensions and Data Relationships Used**
 
--   Meeting Activity \--\>Users
--   Meeting Activity \--\>Meeting
--   Meeting Activity \--\>Users
--   Feature Usage \--\>Dim Feature
--   Feature Usage \--\>Dim Date
+-   Fact Meeting Activity \--\>Dim Users
+-   Fact Meeting Activity \--\>Dim Meeting
+-   Fact Meeting Activity \--\>Dim Users
+-   Fact Feature Usage \--\>Dim Feature
+-   Fact Feature Usage \--\>Dim Date
 
 
 **2. SERVICE RELIABILITY & SUPPORT REPORT**
@@ -44,7 +44,7 @@ service quality and reduce ticket volume.
 - Number of Support Activities by Resolution Status
 - Number of Support Activities by Priority
 
-**Data Relationships and Raw Tables Used**
+**Facts, Dimensions and Data Relationships Used**
 -   Fact Support Activity  \--\> Dim Date
 -   Fact Support Activity  \--\> Dim Support Category
 -   Fact Support Activity  \--\> Dim User
