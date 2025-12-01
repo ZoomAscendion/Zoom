@@ -5,7 +5,7 @@
 ) }}
 
 -- Silver layer transformation for Billing Events
--- Cleansed and standardized financial transaction data
+-- Cleansed and standardized financial transaction data with numeric field cleaning
 
 WITH bronze_billing_events AS (
     SELECT 
@@ -26,7 +26,25 @@ cleansed_billing_events AS (
         EVENT_ID,
         USER_ID,
         UPPER(TRIM(EVENT_TYPE)) AS EVENT_TYPE,
-        ROUND(AMOUNT, 2) AS AMOUNT,
+        -- Critical P1: Clean numeric field with quotes ("50.21" error fix)
+        CASE 
+            WHEN TRY_TO_NUMBER(REPLACE(AMOUNT::STRING, '"', '')) IS NOT NULL THEN
+                TRY_TO_NUMBER(REPLACE(AMOUNT::STRING, '"', ''))
+            ELSE TRY_TO_NUMBER(AMOUNT::STRING)
+        END AS CLEAN_AMOUNT,
+        EVENT_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM bronze_billing_events
+),
+
+validated_billing_events AS (
+    SELECT 
+        EVENT_ID,
+        USER_ID,
+        EVENT_TYPE,
+        ROUND(CLEAN_AMOUNT, 2) AS AMOUNT,
         EVENT_DATE,
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
@@ -37,7 +55,7 @@ cleansed_billing_events AS (
         -- Data quality scoring
         CASE 
             WHEN EVENT_ID IS NOT NULL AND USER_ID IS NOT NULL AND EVENT_TYPE IS NOT NULL 
-                 AND AMOUNT IS NOT NULL AND AMOUNT > 0 AND EVENT_DATE IS NOT NULL 
+                 AND CLEAN_AMOUNT IS NOT NULL AND CLEAN_AMOUNT > 0 AND EVENT_DATE IS NOT NULL 
                  AND EVENT_DATE <= CURRENT_DATE() THEN 100
             WHEN EVENT_ID IS NOT NULL AND USER_ID IS NOT NULL AND EVENT_TYPE IS NOT NULL THEN 80
             WHEN EVENT_ID IS NOT NULL THEN 60
@@ -46,18 +64,18 @@ cleansed_billing_events AS (
         -- Validation status
         CASE 
             WHEN EVENT_ID IS NOT NULL AND USER_ID IS NOT NULL AND EVENT_TYPE IS NOT NULL 
-                 AND AMOUNT IS NOT NULL AND AMOUNT > 0 AND EVENT_DATE IS NOT NULL 
+                 AND CLEAN_AMOUNT IS NOT NULL AND CLEAN_AMOUNT > 0 AND EVENT_DATE IS NOT NULL 
                  AND EVENT_DATE <= CURRENT_DATE() THEN 'PASSED'
             WHEN EVENT_ID IS NOT NULL AND USER_ID IS NOT NULL AND EVENT_TYPE IS NOT NULL THEN 'WARNING'
             ELSE 'FAILED'
         END AS VALIDATION_STATUS
-    FROM bronze_billing_events
+    FROM cleansed_billing_events
 ),
 
 deduped_billing_events AS (
     SELECT *,
         ROW_NUMBER() OVER (PARTITION BY EVENT_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
-    FROM cleansed_billing_events
+    FROM validated_billing_events
 )
 
 SELECT 
