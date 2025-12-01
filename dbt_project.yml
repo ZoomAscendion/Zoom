@@ -1,8 +1,8 @@
-name: 'aava_bronze_pipeline'
+name: 'zoom_analytics_bronze'
 version: '1.0.0'
 config-version: 2
 
-profile: 'aava_bronze_pipeline'
+profile: 'zoom_analytics_bronze'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -11,29 +11,13 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
-vars:
-  source_database: 'DB_POC_AAVA'
-  source_schema: 'RAW'
-  target_database: 'DB_POC_AAVA'
-  target_schema: 'BRONZE'
-
 models:
-  aava_bronze_pipeline:
-    +materialized: table
-    +tags: ["bronze"]
+  zoom_analytics_bronze:
     bronze:
       +materialized: table
-      +tags: ["bronze", "raw_data"]
-
-tests:
-  +store_failures: true
-  +severity: 'warn'
-
-quoting:
-  database: false
-  schema: false
-  identifier: false
+      +on_schema_change: "fail"
