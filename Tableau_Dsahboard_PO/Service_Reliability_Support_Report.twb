@@ -1,0 +1,642 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20233.23.1017.0948                               -->
+<workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xml:base='http://localhost' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AccessibleZoneTabOrder.true...AccessibleZoneTabOrder />
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <AutoCreateAndUpdateDSDPhoneLayouts />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <SetMembershipControl />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <repository-location id='Service_Reliability_Support_Report' path='/workbooks' revision='1.0' />
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
+  <datasources>
+    <datasource caption='Service_Reliability_Support_DS' inline='true' name='federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.3ddef08v54py3cqpvjn305p39d'>
+            <connection authentication='oauth' class='snowflake' dbname='DB_POC_Z' instanceurl='https://a8977680256071-ascendion_partner.snowflakecomputing.com' odbc-connect-string-extras='' one-time-sql='' role='FR__POC__ADMIN__Z' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' server-oauth='server-custom' service='FR__POC__ADMIN__Z' username='SATHYANARAYANA.P@ASCENDION.COM' warehouse='WH_POC_ZOOM_DEV_XSMALL' workgroup-auth-mode='prompt' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.3ddef08v54py3cqpvjn305p39d' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='collection'>
+          <relation connection='snowflake.3ddef08v54py3cqpvjn305p39d' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
+          <relation connection='snowflake.3ddef08v54py3cqpvjn305p39d' name='DIM_USER' table='[DB_POC_Z].[GOLD].[DIM_USER]' type='table' />
+          <relation connection='snowflake.3ddef08v54py3cqpvjn305p39d' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_Z].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
+          <relation connection='snowflake.3ddef08v54py3cqpvjn305p39d' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
+        </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <cols>
+          <map key='[SUPPORT_ACTIVITY_ID]' value='[FACT_SUPPORT_ACTIVITY].[SUPPORT_ACTIVITY_ID]' />
+          <map key='[USER_KEY]' value='[FACT_SUPPORT_ACTIVITY].[USER_KEY]' />
+          <map key='[DATE_KEY]' value='[FACT_SUPPORT_ACTIVITY].[DATE_KEY]' />
+          <map key='[SUPPORT_CATEGORY_KEY]' value='[FACT_SUPPORT_ACTIVITY].[SUPPORT_CATEGORY_KEY]' />
+          <map key='[RESOLUTION_STATUS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_STATUS]' />
+          <map key='[PRIORITY_LEVEL]' value='[FACT_SUPPORT_ACTIVITY].[PRIORITY_LEVEL]' />
+          <map key='[RESOLUTION_TIME_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_TIME_HOURS]' />
+          <map key='[CUSTOMER_SATISFACTION_SCORE]' value='[FACT_SUPPORT_ACTIVITY].[CUSTOMER_SATISFACTION_SCORE]' />
+          <map key='[SLA_MET]' value='[FACT_SUPPORT_ACTIVITY].[SLA_MET]' />
+          <map key='[FIRST_CONTACT_RESOLUTION_FLAG]' value='[FACT_SUPPORT_ACTIVITY].[FIRST_CONTACT_RESOLUTION_FLAG]' />
+          <map key='[ESCALATION_COUNT]' value='[FACT_SUPPORT_ACTIVITY].[ESCALATION_COUNT]' />
+          <map key='[REOPENED_COUNT]' value='[FACT_SUPPORT_ACTIVITY].[REOPENED_COUNT]' />
+          <map key='[FIRST_RESPONSE_TIME_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[FIRST_RESPONSE_TIME_HOURS]' />
+          <map key='[CUSTOMER_WAIT_TIME_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[CUSTOMER_WAIT_TIME_HOURS]' />
+          <map key='[TICKET_OPEN_DATE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_OPEN_DATE]' />
+          <map key='[TICKET_CLOSE_DATE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_CLOSE_DATE]' />
+          <map key='[USER_NAME]' value='[DIM_USER].[USER_NAME]' />
+          <map key='[PLAN_TYPE]' value='[DIM_USER].[PLAN_TYPE]' />
+          <map key='[GEOGRAPHIC_REGION]' value='[DIM_USER].[GEOGRAPHIC_REGION]' />
+          <map key='[USER_KEY (DIM_USER)]' value='[DIM_USER].[USER_KEY]' />
+          <map key='[SUPPORT_CATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY]' />
+          <map key='[SUPPORT_SUBCATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_SUBCATEGORY]' />
+          <map key='[EXPECTED_RESOLUTION_TIME_HOURS]' value='[DIM_SUPPORT_CATEGORY].[EXPECTED_RESOLUTION_TIME_HOURS]' />
+          <map key='[SLA_TARGET_HOURS]' value='[DIM_SUPPORT_CATEGORY].[SLA_TARGET_HOURS]' />
+          <map key='[SUPPORT_CATEGORY_KEY (DIM_SUPPORT_CATEGORY)]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY_KEY]' />
+          <map key='[DATE_VALUE]' value='[DIM_DATE].[DATE_VALUE]' />
+          <map key='[YEAR]' value='[DIM_DATE].[YEAR]' />
+          <map key='[MONTH]' value='[DIM_DATE].[MONTH]' />
+          <map key='[QUARTER]' value='[DIM_DATE].[QUARTER]' />
+          <map key='[MONTH_NAME]' value='[DIM_DATE].[MONTH_NAME]' />
+          <map key='[DATE_KEY (DIM_DATE)]' value='[DIM_DATE].[DATE_KEY]' />
+        </cols>
+        <metadata-records>
+          <metadata-record class='column'>
+            <remote-name>SUPPORT_ACTIVITY_ID</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[SUPPORT_ACTIVITY_ID]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>SUPPORT_ACTIVITY_ID</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>18</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_KEY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_KEY]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>USER_KEY</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>32</width>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DATE_KEY</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[DATE_KEY]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>DATE_KEY</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SUPPORT_CATEGORY_KEY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[SUPPORT_CATEGORY_KEY]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>SUPPORT_CATEGORY_KEY</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>32</width>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>RESOLUTION_STATUS</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[RESOLUTION_STATUS]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>RESOLUTION_STATUS</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PRIORITY_LEVEL</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[PRIORITY_LEVEL]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>PRIORITY_LEVEL</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>RESOLUTION_TIME_HOURS</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[RESOLUTION_TIME_HOURS]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>RESOLUTION_TIME_HOURS</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>18</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Support Activity ID' datatype='integer' name='[SUPPORT_ACTIVITY_ID]' role='dimension' type='ordinal' />
+      <column caption='User Key' datatype='string' name='[USER_KEY]' role='dimension' type='nominal' />
+      <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+      <column caption='Support Category Key' datatype='string' name='[SUPPORT_CATEGORY_KEY]' role='dimension' type='nominal' />
+      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+      <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
+      <column caption='Resolution Time Hours' datatype='integer' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='Customer Satisfaction Score' datatype='integer' name='[CUSTOMER_SATISFACTION_SCORE]' role='measure' type='quantitative' />
+      <column caption='SLA Met' datatype='boolean' name='[SLA_MET]' role='dimension' type='nominal' />
+      <column caption='First Contact Resolution Flag' datatype='boolean' name='[FIRST_CONTACT_RESOLUTION_FLAG]' role='dimension' type='nominal' />
+      <column caption='Escalation Count' datatype='integer' name='[ESCALATION_COUNT]' role='measure' type='quantitative' />
+      <column caption='Reopened Count' datatype='integer' name='[REOPENED_COUNT]' role='measure' type='quantitative' />
+      <column caption='First Response Time Hours' datatype='integer' name='[FIRST_RESPONSE_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='Customer Wait Time Hours' datatype='integer' name='[CUSTOMER_WAIT_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='Ticket Open Date' datatype='date' name='[TICKET_OPEN_DATE]' role='dimension' type='ordinal' />
+      <column caption='Ticket Close Date' datatype='date' name='[TICKET_CLOSE_DATE]' role='dimension' type='ordinal' />
+      <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+      <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Geographic Region' datatype='string' name='[GEOGRAPHIC_REGION]' role='dimension' type='nominal' />
+      <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Support Subcategory' datatype='string' name='[SUPPORT_SUBCATEGORY]' role='dimension' type='nominal' />
+      <column caption='Expected Resolution Time Hours' datatype='integer' name='[EXPECTED_RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='SLA Target Hours' datatype='integer' name='[SLA_TARGET_HOURS]' role='measure' type='quantitative' />
+      <column caption='Date Value' datatype='date' name='[DATE_VALUE]' role='dimension' type='ordinal' />
+      <column caption='Year' datatype='integer' name='[YEAR]' role='dimension' type='quantitative' />
+      <column caption='Month' datatype='integer' name='[MONTH]' role='dimension' type='quantitative' />
+      <column caption='Quarter' datatype='integer' name='[QUARTER]' role='dimension' type='quantitative' />
+      <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+      
+      <!-- Calculated Fields for KPIs and Metrics -->
+      <column caption='Total Support Activities' datatype='integer' name='[Total_Support_Activities]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
+      </column>
+      <column caption='Users by Support Category' datatype='integer' name='[Users_By_Support_Category]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([USER_KEY])' />
+      </column>
+      <column caption='Category Distribution Percentage' datatype='real' name='[Category_Distribution_Percentage]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([USER_KEY]) / TOTAL(COUNTD([USER_KEY]))' />
+      </column>
+      <column caption='Subcategory within Category Percentage' datatype='real' name='[Subcategory_Within_Category_Percentage]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([USER_KEY]) / TOTAL(COUNTD([USER_KEY]) INCLUDE [SUPPORT_CATEGORY])' />
+      </column>
+      <column caption='Resolution Rate' datatype='real' name='[Resolution_Rate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [RESOLUTION_STATUS] = &quot;Resolved&quot; THEN 1 ELSE 0 END) / COUNT([SUPPORT_ACTIVITY_ID])' />
+      </column>
+      <column caption='Average Resolution Time by Status' datatype='real' name='[Avg_Resolution_Time_By_Status]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
+      </column>
+      <column caption='First Contact Resolution Rate' datatype='real' name='[First_Contact_Resolution_Rate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [FIRST_CONTACT_RESOLUTION_FLAG] = TRUE THEN 1 ELSE 0 END) / COUNT([SUPPORT_ACTIVITY_ID])' />
+      </column>
+      <column caption='SLA Compliance Rate' datatype='real' name='[SLA_Compliance_Rate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [SLA_MET] = TRUE THEN 1 ELSE 0 END) / COUNT([SUPPORT_ACTIVITY_ID])' />
+      </column>
+      <column caption='Average vs Target Resolution Time' datatype='real' name='[Avg_Vs_Target_Resolution_Time]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS]) - AVG([EXPECTED_RESOLUTION_TIME_HOURS])' />
+      </column>
+      <column caption='Priority Distribution' datatype='real' name='[Priority_Distribution]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID]) / TOTAL(COUNT([SUPPORT_ACTIVITY_ID]))' />
+      </column>
+      <column caption='Average Customer Satisfaction' datatype='real' name='[Avg_Customer_Satisfaction]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([CUSTOMER_SATISFACTION_SCORE])' />
+      </column>
+      <column caption='Escalation Rate' datatype='real' name='[Escalation_Rate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([ESCALATION_COUNT]) / COUNT([SUPPORT_ACTIVITY_ID])' />
+      </column>
+      <column caption='Reopened Ticket Rate' datatype='real' name='[Reopened_Ticket_Rate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([REOPENED_COUNT]) / COUNT([SUPPORT_ACTIVITY_ID])' />
+      </column>
+      <column caption='Average First Response Time' datatype='real' name='[Avg_First_Response_Time]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([FIRST_RESPONSE_TIME_HOURS])' />
+      </column>
+      <column caption='Average Customer Wait Time' datatype='real' name='[Avg_Customer_Wait_Time]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([CUSTOMER_WAIT_TIME_HOURS])' />
+      </column>
+      <column caption='Support Volume Trend' datatype='integer' name='[Support_Volume_Trend]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
+      </column>
+      <column caption='High Priority Tickets' datatype='integer' name='[High_Priority_Tickets]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [PRIORITY_LEVEL] = &quot;High&quot; THEN 1 ELSE 0 END)' />
+      </column>
+      <column caption='Medium Priority Tickets' datatype='integer' name='[Medium_Priority_Tickets]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [PRIORITY_LEVEL] = &quot;Medium&quot; THEN 1 ELSE 0 END)' />
+      </column>
+      <column caption='Low Priority Tickets' datatype='integer' name='[Low_Priority_Tickets]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [PRIORITY_LEVEL] = &quot;Low&quot; THEN 1 ELSE 0 END)' />
+      </column>
+      
+      <_.fcp.ObjectModelTableType.true...column caption='FACT_SUPPORT_ACTIVITY' datatype='table' name='[__tableau_internal_object_id__].[FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_USER' datatype='table' name='[__tableau_internal_object_id__].[DIM_USER (DB_POC_Z.DIM_USER)_C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6F7]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_SUPPORT_CATEGORY' datatype='table' name='[__tableau_internal_object_id__].[DIM_SUPPORT_CATEGORY (DB_POC_Z.DIM_SUPPORT_CATEGORY)_D3E4F5A6B7C8D9E0F1A2B3C4D5E6F7A8]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_DATE' datatype='table' name='[__tableau_internal_object_id__].[DIM_DATE (DB_POC_Z.DIM_DATE)_E4F5A6B7C8D9E0F1A2B3C4D5E6F7A8B9]' role='measure' type='quantitative' />
+      
+      <column-instance column='[SUPPORT_CATEGORY]' derivation='None' name='[none:SUPPORT_CATEGORY:nk]' pivot='key' type='nominal' />
+      <column-instance column='[SUPPORT_SUBCATEGORY]' derivation='None' name='[none:SUPPORT_SUBCATEGORY:nk]' pivot='key' type='nominal' />
+      <column-instance column='[RESOLUTION_STATUS]' derivation='None' name='[none:RESOLUTION_STATUS:nk]' pivot='key' type='nominal' />
+      <column-instance column='[PRIORITY_LEVEL]' derivation='None' name='[none:PRIORITY_LEVEL:nk]' pivot='key' type='nominal' />
+      <column-instance column='[PLAN_TYPE]' derivation='None' name='[none:PLAN_TYPE:nk]' pivot='key' type='nominal' />
+      <column-instance column='[GEOGRAPHIC_REGION]' derivation='None' name='[none:GEOGRAPHIC_REGION:nk]' pivot='key' type='nominal' />
+      <column-instance column='[DATE_VALUE]' derivation='Month' name='[mn:DATE_VALUE:ok]' pivot='key' type='ordinal' />
+      <column-instance column='[DATE_VALUE]' derivation='Year' name='[yr:DATE_VALUE:ok]' pivot='key' type='ordinal' />
+      
+      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      
+      <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+        <objects>
+          <object caption='FACT_SUPPORT_ACTIVITY' id='FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6'>
+            <properties context=''>
+              <relation connection='snowflake.3ddef08v54py3cqpvjn305p39d' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
+            </properties>
+          </object>
+          <object caption='DIM_USER' id='DIM_USER (DB_POC_Z.DIM_USER)_C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6F7'>
+            <properties context=''>
+              <relation connection='snowflake.3ddef08v54py3cqpvjn305p39d' name='DIM_USER' table='[DB_POC_Z].[GOLD].[DIM_USER]' type='table' />
+            </properties>
+          </object>
+          <object caption='DIM_SUPPORT_CATEGORY' id='DIM_SUPPORT_CATEGORY (DB_POC_Z.DIM_SUPPORT_CATEGORY)_D3E4F5A6B7C8D9E0F1A2B3C4D5E6F7A8'>
+            <properties context=''>
+              <relation connection='snowflake.3ddef08v54py3cqpvjn305p39d' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_Z].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
+            </properties>
+          </object>
+          <object caption='DIM_DATE' id='DIM_DATE (DB_POC_Z.DIM_DATE)_E4F5A6B7C8D9E0F1A2B3C4D5E6F7A8B9'>
+            <properties context=''>
+              <relation connection='snowflake.3ddef08v54py3cqpvjn305p39d' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
+            </properties>
+          </object>
+        </objects>
+        <relationships>
+          <relationship caption='FACT_SUPPORT_ACTIVITY to DIM_USER' id='B1C2D3E4-F5A6-B7C8-D9E0-F1A2B3C4D5E6'>
+            <expression op='='>
+              <expression op='[USER_KEY]' />
+              <expression op='[USER_KEY (DIM_USER)]' />
+            </expression>
+            <first-end-point object-id='FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6' />
+            <second-end-point object-id='DIM_USER (DB_POC_Z.DIM_USER)_C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6F7' />
+          </relationship>
+          <relationship caption='FACT_SUPPORT_ACTIVITY to DIM_SUPPORT_CATEGORY' id='C2D3E4F5-A6B7-C8D9-E0F1-A2B3C4D5E6F7'>
+            <expression op='='>
+              <expression op='[SUPPORT_CATEGORY_KEY]' />
+              <expression op='[SUPPORT_CATEGORY_KEY (DIM_SUPPORT_CATEGORY)]' />
+            </expression>
+            <first-end-point object-id='FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6' />
+            <second-end-point object-id='DIM_SUPPORT_CATEGORY (DB_POC_Z.DIM_SUPPORT_CATEGORY)_D3E4F5A6B7C8D9E0F1A2B3C4D5E6F7A8' />
+          </relationship>
+          <relationship caption='FACT_SUPPORT_ACTIVITY to DIM_DATE' id='D3E4F5A6-B7C8-D9E0-F1A2-B3C4D5E6F7A8'>
+            <expression op='='>
+              <expression op='[DATE_KEY]' />
+              <expression op='[DATE_KEY (DIM_DATE)]' />
+            </expression>
+            <first-end-point object-id='FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6' />
+            <second-end-point object-id='DIM_DATE (DB_POC_Z.DIM_DATE)_E4F5A6B7C8D9E0F1A2B3C4D5E6F7A8B9' />
+          </relationship>
+        </relationships>
+      </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+    </datasource>
+  </datasources>
+  
+  <worksheets>
+    <worksheet name='Users by Support Category'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='14'>Number of Users by Support Category and Subcategory</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service_Reliability_Support_DS' name='federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r' />
+          </datasources>
+          <datasource-dependencies datasource='federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r'>
+            <column caption='Users by Support Category' datatype='integer' name='[Users_By_Support_Category]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD([USER_KEY])' />
+            </column>
+            <column-instance column='[SUPPORT_CATEGORY]' derivation='None' name='[none:SUPPORT_CATEGORY:nk]' pivot='key' type='nominal' />
+            <column-instance column='[SUPPORT_SUBCATEGORY]' derivation='None' name='[none:SUPPORT_SUBCATEGORY:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Users_By_Support_Category]' derivation='User' name='[usr:Users_By_Support_Category:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[none:SUPPORT_CATEGORY:nk]' type='palette'>
+              <map to='#4e79a7'>
+                <bucket>&quot;Technical&quot;</bucket>
+              </map>
+              <map to='#f28e2b'>
+                <bucket>&quot;Billing&quot;</bucket>
+              </map>
+              <map to='#e15759'>
+                <bucket>&quot;Account Access&quot;</bucket>
+              </map>
+              <map to='#76b7b2'>
+                <bucket>&quot;Feature Request&quot;</bucket>
+              </map>
+              <map to='#59a14f'>
+                <bucket>&quot;Connectivity&quot;</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[none:SUPPORT_CATEGORY:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>
+          <field>[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[none:SUPPORT_CATEGORY:nk]</field>
+          <field>[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[none:SUPPORT_SUBCATEGORY:nk]</field>
+        </rows>
+        <cols>
+          <field>[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Users_By_Support_Category:qk]</field>
+        </cols>
+      </table>
+      <simple-id uuid='{B1C2D3E4-F5A6-B7C8-D9E0-F1A2B3C4D5E6}' />
+    </worksheet>
+    
+    <worksheet name='Support Activities by Resolution Status'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='14'>Number of Support Activities by Resolution Status</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service_Reliability_Support_DS' name='federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r' />
+          </datasources>
+          <datasource-dependencies datasource='federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r'>
+            <column caption='Total Support Activities' datatype='integer' name='[Total_Support_Activities]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
+            </column>
+            <column-instance column='[RESOLUTION_STATUS]' derivation='None' name='[none:RESOLUTION_STATUS:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Total_Support_Activities]' derivation='User' name='[usr:Total_Support_Activities:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[none:RESOLUTION_STATUS:nk]' type='palette'>
+              <map to='#2ca02c'>
+                <bucket>&quot;Resolved&quot;</bucket>
+              </map>
+              <map to='#ff7f0e'>
+                <bucket>&quot;In Progress&quot;</bucket>
+              </map>
+              <map to='#d62728'>
+                <bucket>&quot;Open&quot;</bucket>
+              </map>
+              <map to='#9467bd'>
+                <bucket>&quot;Closed&quot;</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Pie' />
+            <encodings>
+              <color column='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[none:RESOLUTION_STATUS:nk]' />
+              <size column='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Total_Support_Activities:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>
+          <field>[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Total_Support_Activities:qk]</field>
+        </rows>
+        <cols>
+          <field>[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[none:RESOLUTION_STATUS:nk]</field>
+        </cols>
+      </table>
+      <simple-id uuid='{C2D3E4F5-A6B7-C8D9-E0F1-A2B3C4D5E6F7}' />
+    </worksheet>
+    
+    <worksheet name='Support Activities by Priority'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='14'>Number of Support Activities by Priority Level</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service_Reliability_Support_DS' name='federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r' />
+          </datasources>
+          <datasource-dependencies datasource='federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r'>
+            <column caption='SLA Compliance Rate' datatype='real' name='[SLA_Compliance_Rate]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM(IF [SLA_MET] = TRUE THEN 1 ELSE 0 END) / COUNT([SUPPORT_ACTIVITY_ID])' />
+            </column>
+            <column caption='Average vs Target Resolution Time' datatype='real' name='[Avg_Vs_Target_Resolution_Time]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS]) - AVG([EXPECTED_RESOLUTION_TIME_HOURS])' />
+            </column>
+            <column-instance column='[PRIORITY_LEVEL]' derivation='None' name='[none:PRIORITY_LEVEL:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Total_Support_Activities]' derivation='User' name='[usr:Total_Support_Activities:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[SLA_Compliance_Rate]' derivation='User' name='[usr:SLA_Compliance_Rate:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:SLA_Compliance_Rate:qk]' type='interpolated'>
+              <color-palette custom='false' name='Red-Green Diverging' type='ordered-diverging' />
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:SLA_Compliance_Rate:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>
+          <field>[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Total_Support_Activities:qk]</field>
+        </rows>
+        <cols>
+          <field>[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[none:PRIORITY_LEVEL:nk]</field>
+        </cols>
+      </table>
+      <simple-id uuid='{D3E4F5A6-B7C8-D9E0-F1A2-B3C4D5E6F7A8}' />
+    </worksheet>
+    
+    <worksheet name='Support KPI Summary'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='16'>Support KPI Summary</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Service_Reliability_Support_DS' name='federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r' />
+          </datasources>
+          <datasource-dependencies datasource='federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r'>
+            <column caption='Resolution Rate' datatype='real' name='[Resolution_Rate]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM(IF [RESOLUTION_STATUS] = &quot;Resolved&quot; THEN 1 ELSE 0 END) / COUNT([SUPPORT_ACTIVITY_ID])' />
+            </column>
+            <column caption='Average Resolution Time by Status' datatype='real' name='[Avg_Resolution_Time_By_Status]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
+            </column>
+            <column caption='Average Customer Satisfaction' datatype='real' name='[Avg_Customer_Satisfaction]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([CUSTOMER_SATISFACTION_SCORE])' />
+            </column>
+            <column-instance column='[Total_Support_Activities]' derivation='User' name='[usr:Total_Support_Activities:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Resolution_Rate]' derivation='User' name='[usr:Resolution_Rate:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Avg_Resolution_Time_By_Status]' derivation='User' name='[usr:Avg_Resolution_Time_By_Status:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Avg_Customer_Satisfaction]' derivation='User' name='[usr:Avg_Customer_Satisfaction:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='cell'>
+            <format attr='text-format' field='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Total_Support_Activities:qk]' value='c&quot;#,##0&quot;' />
+            <format attr='font-size' field='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Total_Support_Activities:qk]' value='18' />
+            <format attr='font-weight' field='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Total_Support_Activities:qk]' value='bold' />
+            <format attr='text-format' field='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Resolution_Rate:qk]' value='p0%' />
+            <format attr='text-format' field='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Avg_Resolution_Time_By_Status:qk]' value='c&quot;#,##0.0&quot;hrs&quot;' />
+            <format attr='text-format' field='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Avg_Customer_Satisfaction:qk]' value='c&quot;#,##0.0&quot;' />
+          </style>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Text' />
+            <encodings>
+              <text column='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Total_Support_Activities:qk]' />
+              <text column='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Resolution_Rate:qk]' />
+              <text column='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Avg_Resolution_Time_By_Status:qk]' />
+              <text column='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Avg_Customer_Satisfaction:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>
+          <field>[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Total_Support_Activities:qk]</field>
+          <field>[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Resolution_Rate:qk]</field>
+          <field>[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Avg_Resolution_Time_By_Status:qk]</field>
+          <field>[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[usr:Avg_Customer_Satisfaction:qk]</field>
+        </rows>
+        <cols />
+      </table>
+      <simple-id uuid='{E4F5A6B7-C8D9-E0F1-A2B3-C4D5E6F7A8B9}' />
+    </worksheet>
+  </worksheets>
+  
+  <dashboards>
+    <dashboard name='Service Reliability Dashboard'>
+      <style />
+      <size maxheight='800' maxwidth='1000' minheight='800' minwidth='1000' />
+      <zones>
+        <zone h='100000' id='2' type='layout-basic' w='100000' x='0' y='0'>
+          <zone h='98000' id='3' type='layout-basic' w='98000' x='1000' y='1000'>
+            <zone h='15000' id='4' param='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[none:PRIORITY_LEVEL:nk]' type='filter' w='98000' x='0' y='0' />
+            <zone h='20000' id='5' name='Support KPI Summary' type='worksheet' w='98000' x='0' y='15000' />
+            <zone h='30000' id='6' name='Users by Support Category' type='worksheet' w='48000' x='0' y='35000' />
+            <zone h='30000' id='7' name='Support Activities by Resolution Status' type='worksheet' w='48000' x='50000' y='35000' />
+            <zone h='30000' id='8' name='Support Activities by Priority' type='worksheet' w='98000' x='0' y='67000' />
+          </zone>
+        </zone>
+      </zones>
+      <devicelayouts>
+        <devicelayout auto-generated='true' name='Phone'>
+          <size maxheight='700' minheight='700' sizing-mode='vscroll' />
+          <zones>
+            <zone h='100000' id='9' type='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98000' id='10' type='layout-basic' w='98000' x='1000' y='1000'>
+                <zone h='6000' id='11' param='[federated.2bcd3e4f5g6h7i8j9k0l1m2n3o4p5q6r].[none:PRIORITY_LEVEL:nk]' type='filter' w='98000' x='0' y='0' />
+                <zone h='20000' id='12' name='Support KPI Summary' type='worksheet' w='98000' x='0' y='6000' />
+                <zone h='24000' id='13' name='Users by Support Category' type='worksheet' w='98000' x='0' y='26000' />
+                <zone h='24000' id='14' name='Support Activities by Resolution Status' type='worksheet' w='98000' x='0' y='50000' />
+                <zone h='24000' id='15' name='Support Activities by Priority' type='worksheet' w='98000' x='0' y='74000' />
+              </zone>
+            </zone>
+          </zones>
+        </devicelayout>
+      </devicelayouts>
+      <simple-id uuid='{F5A6B7C8-D9E0-F1A2-B3C4-D5E6F7A8B9C0}' />
+    </dashboard>
+  </dashboards>
+  
+  <windows source-height='30'>
+    <window class='worksheet' maximized='true' name='Users by Support Category'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{A6B7C8D9-E0F1-A2B3-C4D5-E6F7A8B9C0D1}' />
+    </window>
+    <window class='dashboard' maximized='true' name='Service Reliability Dashboard'>
+      <viewpoints />
+      <active id='-1' />
+      <simple-id uuid='{B7C8D9E0-F1A2-B3C4-D5E6-F7A8B9C0D1E2}' />
+    </window>
+  </windows>
+</workbook>
