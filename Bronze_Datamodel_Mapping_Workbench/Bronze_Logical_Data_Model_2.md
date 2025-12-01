@@ -1,9 +1,9 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*: 2024-12-19
+## *Created on*: 2025-11-30
 ## *Description*: Updated Bronze Layer Logical Data Model for Medallion Architecture
 ## *Version*: 2
-## *Updated on*: 2024-12-19
+## *Updated on*: 2025-12-01
 ## *Changes*: Enhanced PII classification, added data quality fields, improved audit table design
 ## *Reason*: Strengthening data governance and quality monitoring capabilities
 _____________________________________________
