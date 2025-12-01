@@ -18,8 +18,6 @@ Based on the requirement document analysis, the following data model supports th
 #### **Fact Tables:**
 1. **FACT_MEETING_ACTIVITY** (Primary fact for Platform Usage & Adoption Report)
 2. **FACT_SUPPORT_ACTIVITY** (Primary fact for Service Reliability & Support Report)
-3. **FACT_FEATURE_USAGE** (Supporting fact for feature analysis)
-4. **FACT_REVENUE_ACTIVITY** (Additional business context)
 
 #### **Dimension Tables:**
 1. **DIM_USER** (Central dimension for user analysis)
@@ -27,7 +25,6 @@ Based on the requirement document analysis, the following data model supports th
 3. **DIM_MEETING** (Meeting characteristics)
 4. **DIM_FEATURE** (Feature details)
 5. **DIM_SUPPORT_CATEGORY** (Support categorization)
-6. **DIM_LICENSE** (License and subscription details)
 
 ### **Key Relationships for Report Requirements**
 
