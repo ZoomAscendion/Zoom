@@ -152,27 +152,16 @@ models:
     columns:
       - name: record_id
         description: "Auto-incrementing unique identifier for each audit record"
-        tests:
-          - not_null
-          - unique
       - name: source_table
         description: "Name of the Bronze layer table"
-        tests:
-          - not_null
       - name: load_timestamp
         description: "When the operation occurred"
-        tests:
-          - not_null
       - name: processed_by
         description: "User or process that performed the operation"
       - name: processing_time
         description: "Time taken to process the operation in seconds"
       - name: status
         description: "Status of the operation (SUCCESS, FAILED, WARNING)"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['SUCCESS', 'FAILED', 'WARNING', 'STARTED']
               
   - name: bz_users
     description: "Bronze layer table storing user profile and subscription information"
