@@ -1,36 +1,16 @@
 # =====================================================
-# DBT PACKAGES CONFIGURATION - BRONZE LAYER
+# DBT PACKAGES CONFIGURATION - BRONZE LAYER (SIMPLIFIED)
 # =====================================================
-# Purpose: Define external packages required for Bronze layer processing
+# Purpose: Define minimal external packages for Bronze layer processing
 # Author: AAVA
 # Created: 2024-11-11
-# Version: 1.0
+# Version: 1.0 (Simplified)
 # =====================================================
 
 packages:
   # DBT Utils - Essential utilities for data transformations
   - package: dbt-labs/dbt_utils
     version: [">=1.0.0", "<2.0.0"]
-    
-  # DBT Expectations - Data quality testing framework
-  - package: calogica/dbt_expectations
-    version: [">=0.8.0", "<1.0.0"]
-    
-  # DBT Audit Helper - Utilities for data auditing and comparison
-  - package: dbt-labs/audit_helper
-    version: [">=0.8.0", "<1.0.0"]
-    
-  # Snowflake Utils - Snowflake-specific utilities
-  - package: dbt-labs/snowflake_utils
-    version: [">=0.3.0", "<1.0.0"]
-    
-  # DBT Meta Testing - Enhanced testing capabilities
-  - package: tnightengale/dbt_meta_testing
-    version: [">=0.3.0", "<1.0.0"]
-    
-  # Logging - Enhanced logging capabilities for monitoring
-  - package: dbt-labs/logging
-    version: [">=0.9.0", "<1.0.0"]
 
 # =====================================================
 # PACKAGE DESCRIPTIONS AND USE CASES
@@ -39,37 +19,7 @@ packages:
 # dbt_utils:
 # - generate_surrogate_key(): Create surrogate keys for audit records
 # - get_column_values(): Dynamic value extraction for testing
-# - pivot(): Data pivoting operations
-# - union_relations(): Combine multiple relations
-# - date_spine(): Generate date sequences for time-based analysis
 # - safe_cast(): Type casting with error handling
-
-# dbt_expectations:
-# - expect_column_values_to_be_unique(): Enhanced uniqueness testing
-# - expect_column_values_to_not_be_null(): Comprehensive null checking
-# - expect_column_values_to_be_in_set(): Value validation
-# - expect_table_row_count_to_be_between(): Row count validation
-# - expect_column_mean_to_be_between(): Statistical validation
-
-# audit_helper:
-# - compare_relations(): Compare data between tables
-# - compare_column_values(): Detailed column comparison
-# - compare_all_columns(): Comprehensive table comparison
-
-# snowflake_utils:
-# - get_tables_by_pattern(): Dynamic table discovery
-# - get_columns_in_relation(): Schema introspection
-# - snowflake_warehouse_size(): Warehouse optimization
-
-# dbt_meta_testing:
-# - test_coverage(): Ensure comprehensive testing
-# - model_documentation(): Documentation validation
-# - source_freshness(): Data freshness monitoring
-
-# logging:
-# - log_results(): Enhanced result logging
-# - log_performance(): Performance monitoring
-# - log_data_quality(): Data quality metrics logging
 
 # =====================================================
 # INSTALLATION NOTES
@@ -79,7 +29,4 @@ packages:
 #
 # This will download and install all specified packages
 # into the dbt_packages/ directory.
-#
-# Package versions are pinned to ensure compatibility
-# and reproducible builds across environments.
-# =====================================================
+# =====
