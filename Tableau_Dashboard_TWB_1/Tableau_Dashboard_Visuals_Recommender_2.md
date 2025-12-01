@@ -23,8 +23,7 @@ Based on the requirement document analysis, the following data model supports th
 1. **DIM_USER** (Central dimension for user analysis)
 2. **DIM_DATE** (Time dimension for temporal analysis)
 3. **DIM_MEETING** (Meeting characteristics)
-4. **DIM_FEATURE** (Feature details)
-5. **DIM_SUPPORT_CATEGORY** (Support categorization)
+4. **DIM_SUPPORT_CATEGORY** (Support categorization)
 
 ### **Key Relationships for Report Requirements**
 
@@ -36,21 +35,13 @@ FACT_MEETING_ACTIVITY (Grain: One record per meeting per user)
 ├── → DIM_USER (USER_KEY) [Many-to-One]
 ├── → DIM_MEETING (MEETING_KEY) [Many-to-One]
 ├── → DIM_DATE (DATE_KEY) [Many-to-One]
-└── → DIM_FEATURE (FEATURE_KEY) [Many-to-One]
 
-FACT_FEATURE_USAGE (Grain: One record per feature usage event)
-├── → DIM_FEATURE (FEATURE_KEY) [Many-to-One]
-├── → DIM_USER (USER_KEY) [Many-to-One]
-├── → DIM_DATE (DATE_KEY) [Many-to-One]
-└── → DIM_MEETING (MEETING_KEY) [Many-to-One]
-```
 
 **Required Tables for Platform Usage Metrics:**
 - **FACT_MEETING_ACTIVITY**: Contains DURATION_MINUTES, PARTICIPANT_COUNT, MEETING_TOPIC
 - **DIM_USER**: Contains USER_NAME, PLAN_TYPE, GEOGRAPHIC_REGION, USER_ROLE
 - **DIM_MEETING**: Contains MEETING_TYPE, MEETING_CATEGORY, BUSINESS_PURPOSE
 - **DIM_DATE**: Contains DATE_VALUE, YEAR, MONTH, QUARTER for time-based analysis
-- **DIM_FEATURE**: Contains FEATURE_NAME, FEATURE_CATEGORY for feature usage tracking
 
 #### **Report 2: Service Reliability & Support Report**
 
