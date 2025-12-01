@@ -1,9 +1,11 @@
-name: 'zoom_gold_analytics'
+name: 'aava_bronze_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'zoom_gold_analytics'
+# This setting configures which "profile" dbt uses for this project.
+profile: 'aava_bronze_pipeline'
 
+# These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -11,16 +13,154 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
+# Project variables
+vars:
+  # Source configuration
+  source_database: 'DB_POC_AAVA'
+  source_schema: 'RAW'
+  
+  # Target configuration
+  target_database: 'DB_POC_AAVA'
+  target_schema: 'BRONZE'
+  
+  # Processing configuration
+  batch_size: 10000
+  max_processing_time_minutes: 60
+  
+  # Data quality thresholds
+  data_quality_threshold: 0.95
+  null_threshold: 0.1
+
+# Model configurations
 models:
-  zoom_gold_analytics:
-    +materialized: table
-    gold:
-      dimension:
-        +materialized: table
-      fact:
-        +materialized: table
+  aava_bronze_pipeline:
+    # Global model configurations
+    +materialized: incremental
+    +on_schema_change: "append_new_columns"
+    +snowflake_warehouse: "{{ var('snowflake_warehouse', 'WH_POC_Z_DEV_XSMALL') }}"
+    
+    # Bronze layer specific configurations
+    bronze:
+      +materialized: incremental
+      +unique_key: "{{ var('unique_key_column') }}"
+      +on_schema_change: "append_new_columns"
+      +tags: ["bronze", "raw_data", "incremental"]
+      
+      # Audit model configuration
+      bz_data_audit:
+        +materialized: incremental
+        +unique_key: "record_id"
+        +tags: ["bronze", "audit", "monitoring"]
+        +pre_hook: []
+        +post_hook: []
+      
+      # User data configuration
+      bz_users:
+        +materialized: incremental
+        +unique_key: "user_id"
+        +tags: ["bronze", "users", "pii"]
+        +meta:
+          data_classification: "pii"
+          retention_days: 2555  # 7 years
+          
+      # Meeting data configuration
+      bz_meetings:
+        +materialized: incremental
+        +unique_key: "meeting_id"
+        +tags: ["bronze", "meetings"]
+        +meta:
+          data_classification: "internal"
+          retention_days: 1095  # 3 years
+          
+      # Participant data configuration
+      bz_participants:
+        +materialized: incremental
+        +unique_key: "participant_id"
+        +tags: ["bronze", "participants"]
+        +meta:
+          data_classification: "internal"
+          retention_days: 1095  # 3 years
+          
+      # Feature usage configuration
+      bz_feature_usage:
+        +materialized: incremental
+        +unique_key: "usage_id"
+        +tags: ["bronze", "feature_usage", "analytics"]
+        +meta:
+          data_classification: "internal"
+          retention_days: 730  # 2 years
+          
+      # Support tickets configuration
+      bz_support_tickets:
+        +materialized: incremental
+        +unique_key: "ticket_id"
+        +tags: ["bronze", "support_tickets"]
+        +meta:
+          data_classification: "internal"
+          retention_days: 1825  # 5 years
+          
+      # Billing events configuration
+      bz_billing_events:
+        +materialized: incremental
+        +unique_key: "event_id"
+        +tags: ["bronze", "billing_events", "financial"]
+        +meta:
+          data_classification: "financial"
+          retention_days: 2555  # 7 years
+          
+      # Licenses configuration
+      bz_licenses:
+        +materialized: incremental
+        +unique_key: "license_id"
+        +tags: ["bronze", "licenses"]
+        +meta:
+          data_classification: "internal"
+          retention_days: 1095  # 3 years
+
+# Test configurations
+tests:
+  +store_failures: true
+  +severity: 'warn'
+
+# Snapshot configurations
+snapshots:
+  aava_bronze_pipeline:
+    +target_schema: "{{ var('target_schema') }}_SNAPSHOTS"
+    +strategy: timestamp
+    +updated_at: update_timestamp
+
+# Seed configurations
+seeds:
+  aava_bronze_pipeline:
+    +schema: "{{ var('target_schema') }}_SEEDS"
+
+# Macro configurations
+macros:
+  aava_bronze_pipeline:
+    +schema: "{{ var('target_schema') }}_MACROS"
+
+# Global hooks for monitoring and logging
+on-run-start:
+  - "{{ log('Starting Bronze layer pipeline execution at ' ~ run_started_at, info=true) }}"
+  - "CREATE SCHEMA IF NOT EXISTS {{ var('target_schema') }}"
+
+on-run-end:
+  - "{{ log('Completed Bronze layer pipeline execution at ' ~ run_started_at, info=true) }}"
+  - "{{ log('Total models processed: ' ~ (results | length), info=true) }}"
+
+# Quoting configuration for Snowflake
+quoting:
+  database: false
+  schema: false
+  identifier: false
+
+# Dispatch configuration for package compatibility
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['aava_bronze_pipeline', 'dbt_utils']
+  - macro_namespace: dbt_expectations
+    search_order: ['aava_bronze_pipeline', 'dbt_expectations']
