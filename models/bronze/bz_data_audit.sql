@@ -7,7 +7,7 @@
     materialized='table'
 ) }}
 
--- Create audit table structure with sample data for initialization
+-- Create audit table structure with proper column definitions
 SELECT 
     1 as RECORD_ID,
     'INITIALIZATION' as SOURCE_TABLE,
@@ -16,15 +16,3 @@ SELECT
     0.001 as PROCESSING_TIME,
     'SUCCESS' as STATUS
 WHERE FALSE -- This ensures the table is created but empty initially
-
-UNION ALL
-
--- Add proper column structure
-SELECT 
-    CAST(NULL AS NUMBER) as RECORD_ID,
-    CAST(NULL AS VARCHAR(255)) as SOURCE_TABLE,
-    CAST(NULL AS TIMESTAMP_NTZ(9)) as LOAD_TIMESTAMP,
-    CAST(NULL AS VARCHAR(255)) as PROCESSED_BY,
-    CAST(NULL AS NUMBER(38,3)) as PROCESSING_TIME,
-    CAST(NULL AS VARCHAR(50)) as STATUS
-WHERE FALSE
