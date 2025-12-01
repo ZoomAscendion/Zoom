@@ -28,80 +28,70 @@
     <datasource caption='Platform_Analytics_DS' inline='true' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' version='18.1'>
       <connection class='federated'>
         <named-connections>
-          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
+          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r'>
             <connection authentication='oauth' class='snowflake' dbname='DB_POC_Z' instanceurl='https://a8977680256071-ascendion_partner.snowflakecomputing.com' odbc-connect-string-extras='' one-time-sql='' role='FR__POC__ADMIN__Z' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' server-oauth='server-custom' service='FR__POC__ADMIN__Z' username='SATHYANARAYANA.P@ASCENDION.COM' warehouse='WH_POC_ZOOM_DEV_XSMALL' workgroup-auth-mode='prompt' />
           </named-connection>
         </named-connections>
-        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
         <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='collection'>
-          <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='FACT_MEETING_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
-          <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='FACT_FEATURE_USAGE' table='[DB_POC_Z].[GOLD].[FACT_FEATURE_USAGE]' type='table' />
-          <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
-          <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='DIM_USER' table='[DB_POC_Z].[GOLD].[DIM_USER]' type='table' />
-          <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='DIM_MEETING' table='[DB_POC_Z].[GOLD].[DIM_MEETING]' type='table' />
-          <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='DIM_FEATURE' table='[DB_POC_Z].[GOLD].[DIM_FEATURE]' type='table' />
+          <relation connection='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r' name='FACT_MEETING_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
+          <relation connection='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
+          <relation connection='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
+          <relation connection='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r' name='DIM_USER' table='[DB_POC_Z].[GOLD].[DIM_USER]' type='table' />
+          <relation connection='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r' name='DIM_MEETING' table='[DB_POC_Z].[GOLD].[DIM_MEETING]' type='table' />
+          <relation connection='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r' name='DIM_FEATURE' table='[DB_POC_Z].[GOLD].[DIM_FEATURE]' type='table' />
+          <relation connection='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_Z].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
         </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
         <cols>
+          <!-- FACT_MEETING_ACTIVITY columns -->
           <map key='[MEETING_ACTIVITY_ID]' value='[FACT_MEETING_ACTIVITY].[MEETING_ACTIVITY_ID]' />
           <map key='[USER_KEY]' value='[FACT_MEETING_ACTIVITY].[USER_KEY]' />
           <map key='[MEETING_KEY]' value='[FACT_MEETING_ACTIVITY].[MEETING_KEY]' />
           <map key='[DATE_KEY]' value='[FACT_MEETING_ACTIVITY].[DATE_KEY]' />
-          <map key='[MEETING_TOPIC]' value='[FACT_MEETING_ACTIVITY].[MEETING_TOPIC]' />
           <map key='[DURATION_MINUTES]' value='[FACT_MEETING_ACTIVITY].[DURATION_MINUTES]' />
           <map key='[PARTICIPANT_COUNT]' value='[FACT_MEETING_ACTIVITY].[PARTICIPANT_COUNT]' />
-          <map key='[FEATURES_USED_COUNT]' value='[FACT_MEETING_ACTIVITY].[FEATURES_USED_COUNT]' />
-          <map key='[FEATURE_USAGE_ID]' value='[FACT_FEATURE_USAGE].[FEATURE_USAGE_ID]' />
-          <map key='[USER_KEY (FACT_FEATURE_USAGE)]' value='[FACT_FEATURE_USAGE].[USER_KEY]' />
-          <map key='[FEATURE_KEY]' value='[FACT_FEATURE_USAGE].[FEATURE_KEY]' />
-          <map key='[DATE_KEY (FACT_FEATURE_USAGE)]' value='[FACT_FEATURE_USAGE].[DATE_KEY]' />
-          <map key='[USAGE_COUNT]' value='[FACT_FEATURE_USAGE].[USAGE_COUNT]' />
-          <map key='[USAGE_DURATION_MINUTES]' value='[FACT_FEATURE_USAGE].[USAGE_DURATION_MINUTES]' />
-          <map key='[FEATURE_ADOPTION_SCORE]' value='[FACT_FEATURE_USAGE].[FEATURE_ADOPTION_SCORE]' />
-          <map key='[DATE_ID]' value='[DIM_DATE].[DATE_ID]' />
+          <map key='[MEETING_TOPIC]' value='[FACT_MEETING_ACTIVITY].[MEETING_TOPIC]' />
+          <!-- FACT_SUPPORT_ACTIVITY columns -->
+          <map key='[SUPPORT_ACTIVITY_ID]' value='[FACT_SUPPORT_ACTIVITY].[SUPPORT_ACTIVITY_ID]' />
+          <map key='[USER_KEY (SUPPORT)]' value='[FACT_SUPPORT_ACTIVITY].[USER_KEY]' />
+          <map key='[DATE_KEY (SUPPORT)]' value='[FACT_SUPPORT_ACTIVITY].[DATE_KEY]' />
+          <map key='[SUPPORT_CATEGORY_KEY]' value='[FACT_SUPPORT_ACTIVITY].[SUPPORT_CATEGORY_KEY]' />
+          <map key='[RESOLUTION_STATUS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_STATUS]' />
+          <map key='[PRIORITY_LEVEL]' value='[FACT_SUPPORT_ACTIVITY].[PRIORITY_LEVEL]' />
+          <map key='[RESOLUTION_TIME_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_TIME_HOURS]' />
+          <map key='[TICKET_OPEN_DATE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_OPEN_DATE]' />
+          <map key='[TICKET_CLOSE_DATE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_CLOSE_DATE]' />
+          <!-- DIM_USER columns -->
+          <map key='[USER_KEY (DIM_USER)]' value='[DIM_USER].[USER_KEY]' />
+          <map key='[USER_NAME]' value='[DIM_USER].[USER_NAME]' />
+          <map key='[PLAN_TYPE]' value='[DIM_USER].[PLAN_TYPE]' />
+          <map key='[GEOGRAPHIC_REGION]' value='[DIM_USER].[GEOGRAPHIC_REGION]' />
+          <map key='[USER_ROLE]' value='[DIM_USER].[USER_ROLE]' />
+          <map key='[USER_ID]' value='[DIM_USER].[USER_ID]' />
+          <!-- DIM_DATE columns -->
           <map key='[DATE_KEY (DIM_DATE)]' value='[DIM_DATE].[DATE_KEY]' />
           <map key='[DATE_VALUE]' value='[DIM_DATE].[DATE_VALUE]' />
           <map key='[YEAR]' value='[DIM_DATE].[YEAR]' />
           <map key='[MONTH]' value='[DIM_DATE].[MONTH]' />
           <map key='[QUARTER]' value='[DIM_DATE].[QUARTER]' />
           <map key='[MONTH_NAME]' value='[DIM_DATE].[MONTH_NAME]' />
-          <map key='[DAY_NAME]' value='[DIM_DATE].[DAY_NAME]' />
-          <map key='[DAY_OF_MONTH]' value='[DIM_DATE].[DAY_OF_MONTH]' />
-          <map key='[DAY_OF_WEEK]' value='[DIM_DATE].[DAY_OF_WEEK]' />
-          <map key='[WEEK_OF_YEAR]' value='[DIM_DATE].[WEEK_OF_YEAR]' />
-          <map key='[IS_WEEKEND]' value='[DIM_DATE].[IS_WEEKEND]' />
-          <map key='[IS_HOLIDAY]' value='[DIM_DATE].[IS_HOLIDAY]' />
-          <map key='[FISCAL_YEAR]' value='[DIM_DATE].[FISCAL_YEAR]' />
-          <map key='[FISCAL_QUARTER]' value='[DIM_DATE].[FISCAL_QUARTER]' />
-          <map key='[USER_DIM_ID]' value='[DIM_USER].[USER_DIM_ID]' />
-          <map key='[USER_KEY (DIM_USER)]' value='[DIM_USER].[USER_KEY]' />
-          <map key='[USER_ID]' value='[DIM_USER].[USER_ID]' />
-          <map key='[USER_NAME]' value='[DIM_USER].[USER_NAME]' />
-          <map key='[PLAN_TYPE]' value='[DIM_USER].[PLAN_TYPE]' />
-          <map key='[GEOGRAPHIC_REGION]' value='[DIM_USER].[GEOGRAPHIC_REGION]' />
-          <map key='[USER_ROLE]' value='[DIM_USER].[USER_ROLE]' />
-          <map key='[ACCOUNT_TYPE]' value='[DIM_USER].[ACCOUNT_TYPE]' />
-          <map key='[COMPANY]' value='[DIM_USER].[COMPANY]' />
-          <map key='[EMAIL_DOMAIN]' value='[DIM_USER].[EMAIL_DOMAIN]' />
-          <map key='[INDUSTRY_SECTOR]' value='[DIM_USER].[INDUSTRY_SECTOR]' />
-          <map key='[LANGUAGE_PREFERENCE]' value='[DIM_USER].[LANGUAGE_PREFERENCE]' />
-          <map key='[REGISTRATION_DATE]' value='[DIM_USER].[REGISTRATION_DATE]' />
-          <map key='[USER_STATUS]' value='[DIM_USER].[USER_STATUS]' />
-          <map key='[IS_CURRENT_RECORD]' value='[DIM_USER].[IS_CURRENT_RECORD]' />
-          <map key='[MEETING_DIM_ID]' value='[DIM_MEETING].[MEETING_DIM_ID]' />
+          <!-- DIM_MEETING columns -->
           <map key='[MEETING_KEY (DIM_MEETING)]' value='[DIM_MEETING].[MEETING_KEY]' />
-          <map key='[MEETING_ID]' value='[DIM_MEETING].[MEETING_ID]' />
           <map key='[MEETING_TYPE]' value='[DIM_MEETING].[MEETING_TYPE]' />
           <map key='[MEETING_CATEGORY]' value='[DIM_MEETING].[MEETING_CATEGORY]' />
           <map key='[BUSINESS_PURPOSE]' value='[DIM_MEETING].[BUSINESS_PURPOSE]' />
-          <map key='[FEATURE_DIM_ID]' value='[DIM_FEATURE].[FEATURE_DIM_ID]' />
-          <map key='[FEATURE_KEY (DIM_FEATURE)]' value='[DIM_FEATURE].[FEATURE_KEY]' />
-          <map key='[FEATURE_ID]' value='[DIM_FEATURE].[FEATURE_ID]' />
+          <!-- DIM_FEATURE columns -->
+          <map key='[FEATURE_KEY]' value='[DIM_FEATURE].[FEATURE_KEY]' />
           <map key='[FEATURE_NAME]' value='[DIM_FEATURE].[FEATURE_NAME]' />
           <map key='[FEATURE_CATEGORY]' value='[DIM_FEATURE].[FEATURE_CATEGORY]' />
-          <map key='[FEATURE_TYPE]' value='[DIM_FEATURE].[FEATURE_TYPE]' />
-          <map key='[FEATURE_STATUS]' value='[DIM_FEATURE].[FEATURE_STATUS]' />
+          <!-- DIM_SUPPORT_CATEGORY columns -->
+          <map key='[SUPPORT_CATEGORY_KEY (DIM_SUPPORT_CATEGORY)]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY_KEY]' />
+          <map key='[SUPPORT_CATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY]' />
+          <map key='[SUPPORT_SUBCATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_SUBCATEGORY]' />
+          <map key='[PRIORITY_LEVEL (DIM_SUPPORT_CATEGORY)]' value='[DIM_SUPPORT_CATEGORY].[PRIORITY_LEVEL]' />
         </cols>
         <metadata-records>
+          <!-- FACT_MEETING_ACTIVITY metadata -->
           <metadata-record class='column'>
             <remote-name>MEETING_ACTIVITY_ID</remote-name>
             <remote-type>131</remote-type>
@@ -117,63 +107,12 @@
             <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
-            <remote-name>USER_KEY</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[USER_KEY]</local-name>
-            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
-            <remote-alias>USER_KEY</remote-alias>
-            <ordinal>2</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <width>32</width>
-            <contains-null>true</contains-null>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>MEETING_KEY</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[MEETING_KEY]</local-name>
-            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
-            <remote-alias>MEETING_KEY</remote-alias>
-            <ordinal>3</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <width>32</width>
-            <contains-null>true</contains-null>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>DATE_KEY</remote-name>
-            <remote-type>7</remote-type>
-            <local-name>[DATE_KEY]</local-name>
-            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
-            <remote-alias>DATE_KEY</remote-alias>
-            <ordinal>4</ordinal>
-            <local-type>date</local-type>
-            <aggregation>Year</aggregation>
-            <contains-null>true</contains-null>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>MEETING_TOPIC</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[MEETING_TOPIC]</local-name>
-            <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
-            <remote-alias>MEETING_TOPIC</remote-alias>
-            <ordinal>5</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <width>16777216</width>
-            <contains-null>true</contains-null>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
-          <metadata-record class='column'>
             <remote-name>DURATION_MINUTES</remote-name>
             <remote-type>131</remote-type>
             <local-name>[DURATION_MINUTES]</local-name>
             <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
             <remote-alias>DURATION_MINUTES</remote-alias>
-            <ordinal>6</ordinal>
+            <ordinal>2</ordinal>
             <local-type>integer</local-type>
             <aggregation>Sum</aggregation>
             <precision>18</precision>
@@ -187,7 +126,7 @@
             <local-name>[PARTICIPANT_COUNT]</local-name>
             <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
             <remote-alias>PARTICIPANT_COUNT</remote-alias>
-            <ordinal>7</ordinal>
+            <ordinal>3</ordinal>
             <local-type>integer</local-type>
             <aggregation>Sum</aggregation>
             <precision>18</precision>
@@ -196,82 +135,226 @@
             <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
-            <remote-name>FEATURES_USED_COUNT</remote-name>
-            <remote-type>131</remote-type>
-            <local-name>[FEATURES_USED_COUNT]</local-name>
+            <remote-name>MEETING_TOPIC</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MEETING_TOPIC]</local-name>
             <parent-name>[FACT_MEETING_ACTIVITY]</parent-name>
-            <remote-alias>FEATURES_USED_COUNT</remote-alias>
+            <remote-alias>MEETING_TOPIC</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <!-- FACT_SUPPORT_ACTIVITY metadata -->
+          <metadata-record class='column'>
+            <remote-name>SUPPORT_ACTIVITY_ID</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[SUPPORT_ACTIVITY_ID]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>SUPPORT_ACTIVITY_ID</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>18</precision>
+            <scale>0</scale>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>RESOLUTION_STATUS</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[RESOLUTION_STATUS]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>RESOLUTION_STATUS</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PRIORITY_LEVEL</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[PRIORITY_LEVEL]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>PRIORITY_LEVEL</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>RESOLUTION_TIME_HOURS</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[RESOLUTION_TIME_HOURS]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>RESOLUTION_TIME_HOURS</remote-alias>
             <ordinal>8</ordinal>
             <local-type>integer</local-type>
             <aggregation>Sum</aggregation>
             <precision>18</precision>
             <scale>0</scale>
             <contains-null>true</contains-null>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <!-- DIM_USER metadata -->
+          <metadata-record class='column'>
+            <remote-name>USER_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_NAME]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>USER_NAME</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER (DB_POC_Z.DIM_USER)_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PLAN_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[PLAN_TYPE]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>PLAN_TYPE</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>10</width>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER (DB_POC_Z.DIM_USER)_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <!-- DIM_MEETING metadata -->
+          <metadata-record class='column'>
+            <remote-name>MEETING_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MEETING_TYPE]</local-name>
+            <parent-name>[DIM_MEETING]</parent-name>
+            <remote-alias>MEETING_TYPE</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_MEETING (DB_POC_Z.DIM_MEETING)_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MEETING_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MEETING_CATEGORY]</local-name>
+            <parent-name>[DIM_MEETING]</parent-name>
+            <remote-alias>MEETING_CATEGORY</remote-alias>
+            <ordinal>12</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_MEETING (DB_POC_Z.DIM_MEETING)_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <!-- DIM_SUPPORT_CATEGORY metadata -->
+          <metadata-record class='column'>
+            <remote-name>SUPPORT_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[SUPPORT_CATEGORY]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>SUPPORT_CATEGORY</remote-alias>
+            <ordinal>13</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_SUPPORT_CATEGORY (DB_POC_Z.DIM_SUPPORT_CATEGORY)_E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SUPPORT_SUBCATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[SUPPORT_SUBCATEGORY]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>SUPPORT_SUBCATEGORY</remote-alias>
+            <ordinal>14</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>16777216</width>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_SUPPORT_CATEGORY (DB_POC_Z.DIM_SUPPORT_CATEGORY)_E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
         </metadata-records>
       </connection>
       <aliases enabled='yes' />
-      <column caption='Meeting Activity Id' datatype='integer' name='[MEETING_ACTIVITY_ID]' role='dimension' type='ordinal' />
-      <column caption='User Key' datatype='string' name='[USER_KEY]' role='dimension' type='nominal' />
-      <column caption='Meeting Key' datatype='string' name='[MEETING_KEY]' role='dimension' type='nominal' />
-      <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
-      <column caption='Meeting Topic' datatype='string' name='[MEETING_TOPIC]' role='dimension' type='nominal' />
+      <!-- Column definitions with calculated fields -->
+      <column caption='Meeting Activity ID' datatype='integer' name='[MEETING_ACTIVITY_ID]' role='dimension' type='ordinal' />
       <column caption='Duration Minutes' datatype='integer' name='[DURATION_MINUTES]' role='measure' type='quantitative' />
       <column caption='Participant Count' datatype='integer' name='[PARTICIPANT_COUNT]' role='measure' type='quantitative' />
-      <column caption='Features Used Count' datatype='integer' name='[FEATURES_USED_COUNT]' role='measure' type='quantitative' />
+      <column caption='Meeting Topic' datatype='string' name='[MEETING_TOPIC]' role='dimension' type='nominal' />
+      <column caption='Support Activity ID' datatype='integer' name='[SUPPORT_ACTIVITY_ID]' role='dimension' type='ordinal' />
+      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+      <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
+      <column caption='Resolution Time Hours' datatype='integer' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
       <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
       <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
       <column caption='Geographic Region' datatype='string' name='[GEOGRAPHIC_REGION]' role='dimension' type='nominal' />
       <column caption='User Role' datatype='string' name='[USER_ROLE]' role='dimension' type='nominal' />
+      <column caption='User ID' datatype='string' name='[USER_ID]' role='dimension' type='nominal' />
       <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
       <column caption='Meeting Category' datatype='string' name='[MEETING_CATEGORY]' role='dimension' type='nominal' />
-      <column caption='Business Purpose' datatype='string' name='[BUSINESS_PURPOSE]' role='dimension' type='nominal' />
-      <column caption='Feature Name' datatype='string' name='[FEATURE_NAME]' role='dimension' type='nominal' />
-      <column caption='Feature Category' datatype='string' name='[FEATURE_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Support Subcategory' datatype='string' name='[SUPPORT_SUBCATEGORY]' role='dimension' type='nominal' />
       <column caption='Year' datatype='integer' name='[YEAR]' role='dimension' type='quantitative' />
       <column caption='Month' datatype='integer' name='[MONTH]' role='dimension' type='quantitative' />
       <column caption='Quarter' datatype='integer' name='[QUARTER]' role='dimension' type='quantitative' />
       <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+      
+      <!-- Calculated Fields for KPIs -->
       <column caption='Total Meeting Minutes' datatype='integer' name='[Total_Meeting_Minutes]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='SUM([DURATION_MINUTES])' />
       </column>
       <column caption='Active Users Count' datatype='integer' name='[Active_Users_Count]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNTD([USER_KEY])' />
+        <calculation class='tableau' formula='COUNTD([USER_ID])' />
       </column>
-      <column caption='Average Meeting Duration' datatype='real' name='[Average_Meeting_Duration]' role='measure' type='quantitative'>
+      <column caption='Average Meeting Duration' datatype='real' name='[Avg_Meeting_Duration]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='AVG([DURATION_MINUTES])' />
       </column>
-      <column caption='Meeting Count Per User' datatype='integer' name='[Meeting_Count_Per_User]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='{FIXED [USER_KEY] : COUNT([MEETING_ACTIVITY_ID])}' />
+      <column caption='Meetings Per User' datatype='integer' name='[Meetings_Per_User]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='{FIXED [USER_ID] : COUNT([MEETING_ACTIVITY_ID])}' />
       </column>
       <column caption='User Engagement Score' datatype='real' name='[User_Engagement_Score]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='COUNTD([USER_KEY]) / TOTAL(COUNTD([USER_KEY]))' />
+        <calculation class='tableau' formula='COUNTD([USER_ID]) / TOTAL(COUNTD([USER_ID]))' />
       </column>
-      <column caption='Feature Adoption Rate' datatype='real' name='[Feature_Adoption_Rate]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='SUM([FEATURES_USED_COUNT]) / COUNT([MEETING_ACTIVITY_ID])' />
+      <column caption='Support Activities Count' datatype='integer' name='[Support_Activities_Count]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
       </column>
-      <column caption='Monthly Growth Rate' datatype='real' name='[Monthly_Growth_Rate]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='(SUM([DURATION_MINUTES]) - LOOKUP(SUM([DURATION_MINUTES]), -1)) / LOOKUP(SUM([DURATION_MINUTES]), -1)' />
+      <column caption='Resolution Rate' datatype='real' name='[Resolution_Rate]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [RESOLUTION_STATUS] = &quot;Resolved&quot; THEN 1 ELSE 0 END) / COUNT([SUPPORT_ACTIVITY_ID])' />
       </column>
-      <column caption='User Engagement Bins' datatype='string' name='[User_Engagement_Bins]' role='dimension' type='nominal'>
-        <calculation class='tableau' formula='IF [Meeting_Count_Per_User] &lt;= 5 THEN &quot;Low (1-5)&quot;
-ELSEIF [Meeting_Count_Per_User] &lt;= 15 THEN &quot;Medium (6-15)&quot;
-ELSEIF [Meeting_Count_Per_User] &lt;= 30 THEN &quot;High (16-30)&quot;
-ELSE &quot;Very High (30+)&quot;
-END' />
+      <column caption='Average Resolution Time' datatype='real' name='[Avg_Resolution_Time]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
       </column>
-      <_.fcp.ObjectModelTableType.true...column caption='FACT_MEETING_ACTIVITY' datatype='table' name='[__tableau_internal_object_id__].[FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]' role='measure' type='quantitative' />
-      <_.fcp.ObjectModelTableType.true...column caption='FACT_FEATURE_USAGE' datatype='table' name='[__tableau_internal_object_id__].[FACT_FEATURE_USAGE (DB_POC_Z.FACT_FEATURE_USAGE)_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]' role='measure' type='quantitative' />
-      <_.fcp.ObjectModelTableType.true...column caption='DIM_DATE' datatype='table' name='[__tableau_internal_object_id__].[DIM_DATE (DB_POC_Z.DIM_DATE)_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]' role='measure' type='quantitative' />
-      <_.fcp.ObjectModelTableType.true...column caption='DIM_USER' datatype='table' name='[__tableau_internal_object_id__].[DIM_USER (DB_POC_Z.DIM_USER)_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]' role='measure' type='quantitative' />
-      <_.fcp.ObjectModelTableType.true...column caption='DIM_MEETING' datatype='table' name='[__tableau_internal_object_id__].[DIM_MEETING (DB_POC_Z.DIM_MEETING)_E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0]' role='measure' type='quantitative' />
-      <_.fcp.ObjectModelTableType.true...column caption='DIM_FEATURE' datatype='table' name='[__tableau_internal_object_id__].[DIM_FEATURE (DB_POC_Z.DIM_FEATURE)_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1]' role='measure' type='quantitative' />
-      <column-instance column='[MEETING_TOPIC]' derivation='None' name='[none:MEETING_TOPIC:nk]' pivot='key' type='nominal' />
+      <column caption='Support Users Count' datatype='integer' name='[Support_Users_Count]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD([USER_KEY (SUPPORT)])' />
+      </column>
+      <column caption='Priority Distribution' datatype='real' name='[Priority_Distribution]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID]) / TOTAL(COUNT([SUPPORT_ACTIVITY_ID]))' />
+      </column>
+      
+      <!-- Column instances -->
       <column-instance column='[MEETING_TYPE]' derivation='None' name='[none:MEETING_TYPE:nk]' pivot='key' type='nominal' />
       <column-instance column='[MEETING_CATEGORY]' derivation='None' name='[none:MEETING_CATEGORY:nk]' pivot='key' type='nominal' />
+      <column-instance column='[MEETING_TOPIC]' derivation='None' name='[none:MEETING_TOPIC:nk]' pivot='key' type='nominal' />
+      <column-instance column='[SUPPORT_CATEGORY]' derivation='None' name='[none:SUPPORT_CATEGORY:nk]' pivot='key' type='nominal' />
+      <column-instance column='[SUPPORT_SUBCATEGORY]' derivation='None' name='[none:SUPPORT_SUBCATEGORY:nk]' pivot='key' type='nominal' />
+      <column-instance column='[RESOLUTION_STATUS]' derivation='None' name='[none:RESOLUTION_STATUS:nk]' pivot='key' type='nominal' />
+      <column-instance column='[PRIORITY_LEVEL]' derivation='None' name='[none:PRIORITY_LEVEL:nk]' pivot='key' type='nominal' />
       <column-instance column='[USER_NAME]' derivation='None' name='[none:USER_NAME:nk]' pivot='key' type='nominal' />
+      <column-instance column='[PLAN_TYPE]' derivation='None' name='[none:PLAN_TYPE:nk]' pivot='key' type='nominal' />
+      <column-instance column='[MONTH]' derivation='Month' name='[mn:MONTH:ok]' pivot='key' type='ordinal' />
+      
       <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      
       <style>
         <style-rule element='mark'>
           <encoding attr='color' field='[none:MEETING_TYPE:nk]' type='palette'>
@@ -279,78 +362,73 @@ END' />
               <bucket>%null%</bucket>
             </map>
             <map to='#59a14f'>
-              <bucket>&quot;Team Meeting&quot;</bucket>
+              <bucket>&quot;Webinar&quot;</bucket>
             </map>
             <map to='#76b7b2'>
-              <bucket>&quot;Client Meeting&quot;</bucket>
+              <bucket>&quot;Conference&quot;</bucket>
             </map>
             <map to='#b07aa1'>
-              <bucket>&quot;Training&quot;</bucket>
+              <bucket>&quot;Team Meeting&quot;</bucket>
             </map>
             <map to='#e15759'>
-              <bucket>&quot;Webinar&quot;</bucket>
+              <bucket>&quot;Training&quot;</bucket>
             </map>
             <map to='#edc948'>
               <bucket>&quot;One-on-One&quot;</bucket>
             </map>
-            <map to='#f28e2b'>
-              <bucket>&quot;All Hands&quot;</bucket>
-            </map>
           </encoding>
         </style-rule>
       </style>
-      <semantic-values>
-        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
-      </semantic-values>
+      
+      <_.fcp.ObjectModelTableType.true...column caption='FACT_MEETING_ACTIVITY' datatype='table' name='[__tableau_internal_object_id__].[FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='FACT_SUPPORT_ACTIVITY' datatype='table' name='[__tableau_internal_object_id__].[FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_USER' datatype='table' name='[__tableau_internal_object_id__].[DIM_USER (DB_POC_Z.DIM_USER)_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_MEETING' datatype='table' name='[__tableau_internal_object_id__].[DIM_MEETING (DB_POC_Z.DIM_MEETING)_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_SUPPORT_CATEGORY' datatype='table' name='[__tableau_internal_object_id__].[DIM_SUPPORT_CATEGORY (DB_POC_Z.DIM_SUPPORT_CATEGORY)_E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_DATE' datatype='table' name='[__tableau_internal_object_id__].[DIM_DATE (DB_POC_Z.DIM_DATE)_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1]' role='measure' type='quantitative' />
+      
       <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
         <objects>
           <object caption='FACT_MEETING_ACTIVITY' id='FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6'>
             <properties context=''>
-              <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='FACT_MEETING_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
+              <relation connection='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r' name='FACT_MEETING_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
             </properties>
           </object>
-          <object caption='FACT_FEATURE_USAGE' id='FACT_FEATURE_USAGE (DB_POC_Z.FACT_FEATURE_USAGE)_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7'>
+          <object caption='FACT_SUPPORT_ACTIVITY' id='FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7'>
             <properties context=''>
-              <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='FACT_FEATURE_USAGE' table='[DB_POC_Z].[GOLD].[FACT_FEATURE_USAGE]' type='table' />
+              <relation connection='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
             </properties>
           </object>
-          <object caption='DIM_DATE' id='DIM_DATE (DB_POC_Z.DIM_DATE)_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8'>
+          <object caption='DIM_USER' id='DIM_USER (DB_POC_Z.DIM_USER)_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8'>
             <properties context=''>
-              <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
+              <relation connection='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r' name='DIM_USER' table='[DB_POC_Z].[GOLD].[DIM_USER]' type='table' />
             </properties>
           </object>
-          <object caption='DIM_USER' id='DIM_USER (DB_POC_Z.DIM_USER)_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9'>
+          <object caption='DIM_MEETING' id='DIM_MEETING (DB_POC_Z.DIM_MEETING)_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9'>
             <properties context=''>
-              <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='DIM_USER' table='[DB_POC_Z].[GOLD].[DIM_USER]' type='table' />
+              <relation connection='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r' name='DIM_MEETING' table='[DB_POC_Z].[GOLD].[DIM_MEETING]' type='table' />
             </properties>
           </object>
-          <object caption='DIM_MEETING' id='DIM_MEETING (DB_POC_Z.DIM_MEETING)_E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0'>
+          <object caption='DIM_SUPPORT_CATEGORY' id='DIM_SUPPORT_CATEGORY (DB_POC_Z.DIM_SUPPORT_CATEGORY)_E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0'>
             <properties context=''>
-              <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='DIM_MEETING' table='[DB_POC_Z].[GOLD].[DIM_MEETING]' type='table' />
+              <relation connection='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_Z].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
             </properties>
           </object>
-          <object caption='DIM_FEATURE' id='DIM_FEATURE (DB_POC_Z.DIM_FEATURE)_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1'>
+          <object caption='DIM_DATE' id='DIM_DATE (DB_POC_Z.DIM_DATE)_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1'>
             <properties context=''>
-              <relation connection='snowflake.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' name='DIM_FEATURE' table='[DB_POC_Z].[GOLD].[DIM_FEATURE]' type='table' />
+              <relation connection='snowflake.2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
             </properties>
           </object>
         </objects>
         <relationships>
-          <relationship>
-            <expression op='='>
-              <expression op='[DATE_KEY]' />
-              <expression op='[DATE_KEY (DIM_DATE)]' />
-            </expression>
-            <first-end-point object-id='FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6' />
-            <second-end-point object-id='DIM_DATE (DB_POC_Z.DIM_DATE)_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8' />
-          </relationship>
+          <!-- FACT_MEETING_ACTIVITY relationships -->
           <relationship>
             <expression op='='>
               <expression op='[USER_KEY]' />
               <expression op='[USER_KEY (DIM_USER)]' />
             </expression>
             <first-end-point object-id='FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6' />
-            <second-end-point object-id='DIM_USER (DB_POC_Z.DIM_USER)_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9' />
+            <second-end-point object-id='DIM_USER (DB_POC_Z.DIM_USER)_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8' />
           </relationship>
           <relationship>
             <expression op='='>
@@ -358,42 +436,53 @@ END' />
               <expression op='[MEETING_KEY (DIM_MEETING)]' />
             </expression>
             <first-end-point object-id='FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6' />
-            <second-end-point object-id='DIM_MEETING (DB_POC_Z.DIM_MEETING)_E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0' />
+            <second-end-point object-id='DIM_MEETING (DB_POC_Z.DIM_MEETING)_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9' />
           </relationship>
           <relationship>
             <expression op='='>
-              <expression op='[DATE_KEY (FACT_FEATURE_USAGE)]' />
+              <expression op='[DATE_KEY]' />
               <expression op='[DATE_KEY (DIM_DATE)]' />
             </expression>
-            <first-end-point object-id='FACT_FEATURE_USAGE (DB_POC_Z.FACT_FEATURE_USAGE)_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7' />
-            <second-end-point object-id='DIM_DATE (DB_POC_Z.DIM_DATE)_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8' />
+            <first-end-point object-id='FACT_MEETING_ACTIVITY (DB_POC_Z.FACT_MEETING_ACTIVITY)_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6' />
+            <second-end-point object-id='DIM_DATE (DB_POC_Z.DIM_DATE)_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1' />
           </relationship>
+          <!-- FACT_SUPPORT_ACTIVITY relationships -->
           <relationship>
             <expression op='='>
-              <expression op='[USER_KEY (FACT_FEATURE_USAGE)]' />
+              <expression op='[USER_KEY (SUPPORT)]' />
               <expression op='[USER_KEY (DIM_USER)]' />
             </expression>
-            <first-end-point object-id='FACT_FEATURE_USAGE (DB_POC_Z.FACT_FEATURE_USAGE)_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7' />
-            <second-end-point object-id='DIM_USER (DB_POC_Z.DIM_USER)_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9' />
+            <first-end-point object-id='FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7' />
+            <second-end-point object-id='DIM_USER (DB_POC_Z.DIM_USER)_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8' />
           </relationship>
           <relationship>
             <expression op='='>
-              <expression op='[FEATURE_KEY]' />
-              <expression op='[FEATURE_KEY (DIM_FEATURE)]' />
+              <expression op='[SUPPORT_CATEGORY_KEY]' />
+              <expression op='[SUPPORT_CATEGORY_KEY (DIM_SUPPORT_CATEGORY)]' />
             </expression>
-            <first-end-point object-id='FACT_FEATURE_USAGE (DB_POC_Z.FACT_FEATURE_USAGE)_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7' />
-            <second-end-point object-id='DIM_FEATURE (DB_POC_Z.DIM_FEATURE)_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1' />
+            <first-end-point object-id='FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7' />
+            <second-end-point object-id='DIM_SUPPORT_CATEGORY (DB_POC_Z.DIM_SUPPORT_CATEGORY)_E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0' />
+          </relationship>
+          <relationship>
+            <expression op='='>
+              <expression op='[DATE_KEY (SUPPORT)]' />
+              <expression op='[DATE_KEY (DIM_DATE)]' />
+            </expression>
+            <first-end-point object-id='FACT_SUPPORT_ACTIVITY (DB_POC_Z.FACT_SUPPORT_ACTIVITY)_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7' />
+            <second-end-point object-id='DIM_DATE (DB_POC_Z.DIM_DATE)_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1' />
           </relationship>
         </relationships>
       </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
     </datasource>
   </datasources>
+  
   <worksheets>
+    <!-- Platform Usage KPI Cards -->
     <worksheet name='Total Meeting Minutes KPI'>
       <layout-options>
         <title>
           <formatted-text>
-            <run fontalignment='1' fontsize='16'>Total Meeting Minutes</run>
+            <run fontalignment='1' fontsize='14'>Total Meeting Minutes</run>
           </formatted-text>
         </title>
       </layout-options>
@@ -417,7 +506,8 @@ END' />
           <style-rule element='mark'>
             <format attr='mark-labels-show' value='true' />
             <format attr='mark-labels-cull' value='false' />
-            <format attr='size' value='2.0' />
+            <format attr='font-size' value='24' />
+            <format attr='font-weight' value='bold' />
           </style-rule>
         </style>
         <panes>
@@ -429,13 +519,6 @@ END' />
             <encodings>
               <text column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Total_Meeting_Minutes:qk]' />
             </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='font-size' value='24' />
-                <format attr='font-weight' value='bold' />
-                <format attr='color' value='#1f77b4' />
-              </style-rule>
-            </style>
           </pane>
         </panes>
         <rows />
@@ -443,11 +526,12 @@ END' />
       </table>
       <simple-id uuid='{A1B2C3D4-E5F6-A7B8-C9D0-E1F2A3B4C5D6}' />
     </worksheet>
+    
     <worksheet name='Active Users KPI'>
       <layout-options>
         <title>
           <formatted-text>
-            <run fontalignment='1' fontsize='16'>Active Users</run>
+            <run fontalignment='1' fontsize='14'>Active Users</run>
           </formatted-text>
         </title>
       </layout-options>
@@ -458,7 +542,7 @@ END' />
           </datasources>
           <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
             <column caption='Active Users Count' datatype='integer' name='[Active_Users_Count]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='COUNTD([USER_KEY])' />
+              <calculation class='tableau' formula='COUNTD([USER_ID])' />
             </column>
             <column-instance column='[Active_Users_Count]' derivation='User' name='[usr:Active_Users_Count:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
@@ -471,7 +555,8 @@ END' />
           <style-rule element='mark'>
             <format attr='mark-labels-show' value='true' />
             <format attr='mark-labels-cull' value='false' />
-            <format attr='size' value='2.0' />
+            <format attr='font-size' value='24' />
+            <format attr='font-weight' value='bold' />
           </style-rule>
         </style>
         <panes>
@@ -483,13 +568,6 @@ END' />
             <encodings>
               <text column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Active_Users_Count:qk]' />
             </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='font-size' value='24' />
-                <format attr='font-weight' value='bold' />
-                <format attr='color' value='#ff7f0e' />
-              </style-rule>
-            </style>
           </pane>
         </panes>
         <rows />
@@ -497,7 +575,9 @@ END' />
       </table>
       <simple-id uuid='{B2C3D4E5-F6A7-B8C9-D0E1-F2A3B4C5D6E7}' />
     </worksheet>
-    <worksheet name='Average Meeting Duration by Type'>
+    
+    <!-- Average Meeting Duration by Type and Category -->
+    <worksheet name='Avg Duration by Type Category'>
       <layout-options>
         <title>
           <formatted-text>
@@ -511,40 +591,41 @@ END' />
             <datasource caption='Platform_Analytics_DS' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
           </datasources>
           <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
-            <column caption='Average Meeting Duration' datatype='real' name='[Average_Meeting_Duration]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='AVG([DURATION_MINUTES])' />
-            </column>
             <column caption='Meeting Type' datatype='string' name='[MEETING_TYPE]' role='dimension' type='nominal' />
             <column caption='Meeting Category' datatype='string' name='[MEETING_CATEGORY]' role='dimension' type='nominal' />
+            <column caption='Average Meeting Duration' datatype='real' name='[Avg_Meeting_Duration]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([DURATION_MINUTES])' />
+            </column>
             <column-instance column='[MEETING_TYPE]' derivation='None' name='[none:MEETING_TYPE:nk]' pivot='key' type='nominal' />
             <column-instance column='[MEETING_CATEGORY]' derivation='None' name='[none:MEETING_CATEGORY:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Average_Meeting_Duration]' derivation='User' name='[usr:Average_Meeting_Duration:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Avg_Meeting_Duration]' derivation='User' name='[usr:Avg_Meeting_Duration:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
-        <style />
+        <style>
+          <style-rule element='mark'>
+            <format attr='mark-labels-show' value='true' />
+            <format attr='mark-labels-cull' value='true' />
+          </style-rule>
+        </style>
         <panes>
           <pane selection-relaxation-option='selection-relaxation-allow'>
             <view>
               <breakdown value='auto' />
             </view>
-            <mark class='Automatic' />
+            <mark class='Bar' />
             <encodings>
               <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:MEETING_TYPE:nk]' />
             </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
           </pane>
         </panes>
-        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Average_Meeting_Duration:qk]</rows>
+        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Avg_Meeting_Duration:qk]</rows>
         <cols>([federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:MEETING_CATEGORY:nk] / [federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:MEETING_TYPE:nk])</cols>
       </table>
       <simple-id uuid='{C3D4E5F6-A7B8-C9D0-E1F2-A3B4C5D6E7F8}' />
     </worksheet>
+    
+    <!-- Meeting Topics Heat Map -->
     <worksheet name='Meeting Topics Heat Map'>
       <layout-options>
         <title>
@@ -559,18 +640,19 @@ END' />
             <datasource caption='Platform_Analytics_DS' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
           </datasources>
           <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
-            <column caption='Active Users Count' datatype='integer' name='[Active_Users_Count]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='COUNTD([USER_KEY])' />
-            </column>
             <column caption='Meeting Topic' datatype='string' name='[MEETING_TOPIC]' role='dimension' type='nominal' />
+            <column caption='Active Users Count' datatype='integer' name='[Active_Users_Count]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD([USER_ID])' />
+            </column>
             <column-instance column='[MEETING_TOPIC]' derivation='None' name='[none:MEETING_TOPIC:nk]' pivot='key' type='nominal' />
             <column-instance column='[Active_Users_Count]' derivation='User' name='[usr:Active_Users_Count:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
         <style>
-          <style-rule element='cell'>
-            <format attr='width' field='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:MEETING_TOPIC:nk]' value='200' />
+          <style-rule element='mark'>
+            <format attr='mark-labels-show' value='true' />
+            <format attr='mark-labels-cull' value='true' />
           </style-rule>
         </style>
         <panes>
@@ -583,12 +665,6 @@ END' />
               <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Active_Users_Count:qk]' />
               <size column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Active_Users_Count:qk]' />
             </encodings>
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
           </pane>
         </panes>
         <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Active_Users_Count:qk]</rows>
@@ -596,7 +672,9 @@ END' />
       </table>
       <simple-id uuid='{D4E5F6A7-B8C9-D0E1-F2A3-B4C5D6E7F8A9}' />
     </worksheet>
-    <worksheet name='User Meeting Frequency Distribution'>
+    
+    <!-- Meetings per User Histogram -->
+    <worksheet name='Meetings per User Histogram'>
       <layout-options>
         <title>
           <formatted-text>
@@ -610,51 +688,194 @@ END' />
             <datasource caption='Platform_Analytics_DS' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
           </datasources>
           <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
-            <column caption='User Engagement Bins' datatype='string' name='[User_Engagement_Bins]' role='dimension' type='nominal'>
-              <calculation class='tableau' formula='IF [Meeting_Count_Per_User] &lt;= 5 THEN &quot;Low (1-5)&quot;
-ELSEIF [Meeting_Count_Per_User] &lt;= 15 THEN &quot;Medium (6-15)&quot;
-ELSEIF [Meeting_Count_Per_User] &lt;= 30 THEN &quot;High (16-30)&quot;
-ELSE &quot;Very High (30+)&quot;
-END' />
+            <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+            <column caption='Meetings Per User' datatype='integer' name='[Meetings_Per_User]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='{FIXED [USER_ID] : COUNT([MEETING_ACTIVITY_ID])}' />
             </column>
-            <column caption='Active Users Count' datatype='integer' name='[Active_Users_Count]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='COUNTD([USER_KEY])' />
-            </column>
-            <column-instance column='[User_Engagement_Bins]' derivation='None' name='[none:User_Engagement_Bins:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Active_Users_Count]' derivation='User' name='[usr:Active_Users_Count:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[USER_NAME]' derivation='None' name='[none:USER_NAME:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Meetings_Per_User]' derivation='User' name='[usr:Meetings_Per_User:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
-        <style />
+        <style>
+          <style-rule element='mark'>
+            <format attr='mark-labels-show' value='false' />
+          </style-rule>
+        </style>
         <panes>
           <pane selection-relaxation-option='selection-relaxation-allow'>
             <view>
               <breakdown value='auto' />
             </view>
-            <mark class='Automatic' />
-            <style>
-              <style-rule element='mark'>
-                <format attr='mark-labels-show' value='true' />
-                <format attr='mark-labels-cull' value='true' />
-              </style-rule>
-            </style>
+            <mark class='Bar' />
           </pane>
         </panes>
-        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Active_Users_Count:qk]</rows>
-        <cols>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:User_Engagement_Bins:nk]</cols>
+        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Meetings_Per_User:qk]</rows>
+        <cols>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:USER_NAME:nk]</cols>
       </table>
       <simple-id uuid='{E5F6A7B8-C9D0-E1F2-A3B4-C5D6E7F8A9B0}' />
     </worksheet>
+    
+    <!-- Support Category Analysis -->
+    <worksheet name='Support Category Analysis'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='12'>Number of Users by Support Category and Subcategory</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Platform_Analytics_DS' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
+            <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
+            <column caption='Support Subcategory' datatype='string' name='[SUPPORT_SUBCATEGORY]' role='dimension' type='nominal' />
+            <column caption='Support Users Count' datatype='integer' name='[Support_Users_Count]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD([USER_KEY (SUPPORT)])' />
+            </column>
+            <column-instance column='[SUPPORT_CATEGORY]' derivation='None' name='[none:SUPPORT_CATEGORY:nk]' pivot='key' type='nominal' />
+            <column-instance column='[SUPPORT_SUBCATEGORY]' derivation='None' name='[none:SUPPORT_SUBCATEGORY:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Support_Users_Count]' derivation='User' name='[usr:Support_Users_Count:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <format attr='mark-labels-show' value='true' />
+            <format attr='mark-labels-cull' value='true' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:SUPPORT_CATEGORY:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Support_Users_Count:qk]</rows>
+        <cols>([federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:SUPPORT_SUBCATEGORY:nk] / [federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:SUPPORT_CATEGORY:nk])</cols>
+      </table>
+      <simple-id uuid='{F6A7B8C9-D0E1-F2A3-B4C5-D6E7F8A9B0C1}' />
+    </worksheet>
+    
+    <!-- Support Resolution Status -->
+    <worksheet name='Support Resolution Status'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='12'>Number of Support Activities by Resolution Status</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Platform_Analytics_DS' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
+            <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+            <column caption='Support Activities Count' datatype='integer' name='[Support_Activities_Count]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
+            </column>
+            <column-instance column='[RESOLUTION_STATUS]' derivation='None' name='[none:RESOLUTION_STATUS:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Support_Activities_Count]' derivation='User' name='[usr:Support_Activities_Count:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <format attr='mark-labels-show' value='true' />
+            <format attr='mark-labels-cull' value='true' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Pie' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:RESOLUTION_STATUS:nk]' />
+              <size column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Support_Activities_Count:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{A7B8C9D0-E1F2-A3B4-C5D6-E7F8A9B0C1D2}' />
+    </worksheet>
+    
+    <!-- Support Priority Analysis -->
+    <worksheet name='Support Priority Analysis'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='12'>Number of Support Activities by Priority</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Platform_Analytics_DS' name='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p'>
+            <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
+            <column caption='Support Activities Count' datatype='integer' name='[Support_Activities_Count]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
+            </column>
+            <column caption='Average Resolution Time' datatype='real' name='[Avg_Resolution_Time]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AVG([RESOLUTION_TIME_HOURS])' />
+            </column>
+            <column-instance column='[PRIORITY_LEVEL]' derivation='None' name='[none:PRIORITY_LEVEL:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Support_Activities_Count]' derivation='User' name='[usr:Support_Activities_Count:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Avg_Resolution_Time]' derivation='User' name='[usr:Avg_Resolution_Time:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <format attr='mark-labels-show' value='true' />
+            <format attr='mark-labels-cull' value='true' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Avg_Resolution_Time:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Support_Activities_Count:qk]</rows>
+        <cols>[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:PRIORITY_LEVEL:nk]</cols>
+      </table>
+      <simple-id uuid='{B8C9D0E1-F2A3-B4C5-D6E7-F8A9B0C1D2E3}' />
+    </worksheet>
   </worksheets>
+  
   <dashboards>
-    <dashboard _.fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder='true' name='Platform Usage Analytics Dashboard'>
+    <!-- Platform Usage & Adoption Dashboard -->
+    <dashboard _.fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder='true' name='Platform Usage Dashboard'>
       <style />
       <size maxheight='800' maxwidth='1200' minheight='800' minwidth='1200' />
       <zones>
         <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
           <zone h='98000' id='7' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
-            <zone h='20000' id='8' param='horz' type-v2='layout-flow' w='98400' x='800' y='1000'>
-              <zone h='20000' id='5' name='Total Meeting Minutes KPI' w='49200' x='800' y='1000'>
+            <!-- KPI Row -->
+            <zone h='20000' id='5' param='horz' type-v2='layout-flow' w='98400' x='800' y='1000'>
+              <zone h='20000' id='1' name='Total Meeting Minutes KPI' w='49200' x='800' y='1000'>
                 <zone-style>
                   <format attr='border-color' value='#000000' />
                   <format attr='border-style' value='solid' />
@@ -662,7 +883,7 @@ END' />
                   <format attr='margin' value='4' />
                 </zone-style>
               </zone>
-              <zone h='20000' id='6' name='Active Users KPI' w='49200' x='50000' y='1000'>
+              <zone h='20000' id='2' name='Active Users KPI' w='49200' x='50000' y='1000'>
                 <zone-style>
                   <format attr='border-color' value='#000000' />
                   <format attr='border-style' value='solid' />
@@ -671,234 +892,84 @@ END' />
                 </zone-style>
               </zone>
             </zone>
-            <zone h='39000' id='9' name='Average Meeting Duration by Type' w='98400' x='800' y='21000'>
+            <!-- Charts Row -->
+            <zone h='39000' id='6' param='horz' type-v2='layout-flow' w='98400' x='800' y='21000'>
+              <zone h='39000' id='3' name='Avg Duration by Type Category' w='49200' x='800' y='21000'>
+                <zone-style>
+                  <format attr='border-color' value='#000000' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
+                  <format attr='margin' value='4' />
+                </zone-style>
+              </zone>
+              <zone h='39000' id='8' name='Meeting Topics Heat Map' w='49200' x='50000' y='21000'>
+                <zone-style>
+                  <format attr='border-color' value='#000000' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
+                  <format attr='margin' value='4' />
+                </zone-style>
+              </zone>
+            </zone>
+            <!-- Bottom Chart -->
+            <zone h='39000' id='9' name='Meetings per User Histogram' w='98400' x='800' y='60000'>
               <zone-style>
                 <format attr='border-color' value='#000000' />
-                <format attr='border-style' value='solid' />
-                <format attr='border-width' value='1' />
+                <format attr='border-style' value='none' />
+                <format attr='border-width' value='0' />
                 <format attr='margin' value='4' />
               </zone-style>
             </zone>
-            <zone h='39000' id='10' param='horz' type-v2='layout-flow' w='98400' x='800' y='60000'>
-              <zone h='39000' id='11' name='Meeting Topics Heat Map' w='49200' x='800' y='60000'>
+          </zone>
+        </zone>
+      </zones>
+      <simple-id uuid='{C9D0E1F2-A3B4-C5D6-E7F8-A9B0C1D2E3F4}' />
+    </dashboard>
+    
+    <!-- Service Reliability & Support Dashboard -->
+    <dashboard _.fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder='true' name='Service Reliability Dashboard'>
+      <style />
+      <size maxheight='800' maxwidth='1200' minheight='800' minwidth='1200' />
+      <zones>
+        <zone h='100000' id='14' type-v2='layout-basic' w='100000' x='0' y='0'>
+          <zone h='98000' id='17' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
+            <!-- Top Chart -->
+            <zone h='49000' id='13' name='Support Category Analysis' w='98400' x='800' y='1000'>
+              <zone-style>
+                <format attr='border-color' value='#000000' />
+                <format attr='border-style' value='none' />
+                <format attr='border-width' value='0' />
+                <format attr='margin' value='4' />
+              </zone-style>
+            </zone>
+            <!-- Bottom Row -->
+            <zone h='49000' id='16' param='horz' type-v2='layout-flow' w='98400' x='800' y='50000'>
+              <zone h='49000' id='15' name='Support Resolution Status' w='49200' x='800' y='50000'>
                 <zone-style>
                   <format attr='border-color' value='#000000' />
-                  <format attr='border-style' value='solid' />
-                  <format attr='border-width' value='1' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
                   <format attr='margin' value='4' />
                 </zone-style>
               </zone>
-              <zone h='39000' id='12' name='User Meeting Frequency Distribution' w='49200' x='50000' y='60000'>
+              <zone h='49000' id='18' name='Support Priority Analysis' w='49200' x='50000' y='50000'>
                 <zone-style>
                   <format attr='border-color' value='#000000' />
-                  <format attr='border-style' value='solid' />
-                  <format attr='border-width' value='1' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
                   <format attr='margin' value='4' />
                 </zone-style>
               </zone>
             </zone>
           </zone>
-          <zone-style>
-            <format attr='border-color' value='#000000' />
-            <format attr='border-style' value='none' />
-            <format attr='border-width' value='0' />
-            <format attr='margin' value='8' />
-          </zone-style>
         </zone>
       </zones>
-      <devicelayouts>
-        <devicelayout auto-generated='true' name='Phone'>
-          <size maxheight='900' minheight='900' sizing-mode='vscroll' />
-          <zones>
-            <zone h='100000' id='14' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98000' id='13' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
-                <zone fixed-size='200' h='20000' id='5' is-fixed='true' name='Total Meeting Minutes KPI' w='98400' x='800' y='1000'>
-                  <zone-style>
-                    <format attr='border-color' value='#000000' />
-                    <format attr='border-style' value='solid' />
-                    <format attr='border-width' value='1' />
-                    <format attr='margin' value='4' />
-                    <format attr='padding' value='0' />
-                  </zone-style>
-                </zone>
-                <zone fixed-size='200' h='20000' id='6' is-fixed='true' name='Active Users KPI' w='98400' x='800' y='21000'>
-                  <zone-style>
-                    <format attr='border-color' value='#000000' />
-                    <format attr='border-style' value='solid' />
-                    <format attr='border-width' value='1' />
-                    <format attr='margin' value='4' />
-                    <format attr='padding' value='0' />
-                  </zone-style>
-                </zone>
-                <zone fixed-size='300' h='39000' id='9' is-fixed='true' name='Average Meeting Duration by Type' w='98400' x='800' y='42000'>
-                  <zone-style>
-                    <format attr='border-color' value='#000000' />
-                    <format attr='border-style' value='solid' />
-                    <format attr='border-width' value='1' />
-                    <format attr='margin' value='4' />
-                    <format attr='padding' value='0' />
-                  </zone-style>
-                </zone>
-                <zone fixed-size='300' h='39000' id='11' is-fixed='true' name='Meeting Topics Heat Map' w='98400' x='800' y='81000'>
-                  <zone-style>
-                    <format attr='border-color' value='#000000' />
-                    <format attr='border-style' value='solid' />
-                    <format attr='border-width' value='1' />
-                    <format attr='margin' value='4' />
-                    <format attr='padding' value='0' />
-                  </zone-style>
-                </zone>
-                <zone fixed-size='300' h='39000' id='12' is-fixed='true' name='User Meeting Frequency Distribution' w='98400' x='800' y='120000'>
-                  <zone-style>
-                    <format attr='border-color' value='#000000' />
-                    <format attr='border-style' value='solid' />
-                    <format attr='border-width' value='1' />
-                    <format attr='margin' value='4' />
-                    <format attr='padding' value='0' />
-                  </zone-style>
-                </zone>
-              </zone>
-              <zone-style>
-                <format attr='border-color' value='#000000' />
-                <format attr='border-style' value='none' />
-                <format attr='border-width' value='0' />
-                <format attr='margin' value='8' />
-              </zone-style>
-            </zone>
-          </zones>
-        </devicelayout>
-      </devicelayouts>
-      <simple-id uuid='{F6A7B8C9-D0E1-F2A3-B4C5-D6E7F8A9B0C1}' />
+      <simple-id uuid='{D0E1F2A3-B4C5-D6E7-F8A9-B0C1D2E3F4A5}' />
     </dashboard>
   </dashboards>
+  
   <windows saved-dpi-scale-factor='1.5' source-height='44'>
-    <window class='worksheet' name='Total Meeting Minutes KPI'>
-      <cards>
-        <edge name='left'>
-          <strip size='160'>
-            <card type='pages' />
-            <card type='filters' />
-            <card type='marks' />
-          </strip>
-        </edge>
-        <edge name='top'>
-          <strip size='2147483647'>
-            <card type='columns' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='rows' />
-          </strip>
-          <strip size='30'>
-            <card type='title' />
-          </strip>
-        </edge>
-      </cards>
-      <simple-id uuid='{A7B8C9D0-E1F2-A3B4-C5D6-E7F8A9B0C1D2}' />
-    </window>
-    <window class='worksheet' name='Active Users KPI'>
-      <cards>
-        <edge name='left'>
-          <strip size='160'>
-            <card type='pages' />
-            <card type='filters' />
-            <card type='marks' />
-          </strip>
-        </edge>
-        <edge name='top'>
-          <strip size='2147483647'>
-            <card type='columns' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='rows' />
-          </strip>
-          <strip size='30'>
-            <card type='title' />
-          </strip>
-        </edge>
-      </cards>
-      <simple-id uuid='{B8C9D0E1-F2A3-B4C5-D6E7-F8A9B0C1D2E3}' />
-    </window>
-    <window class='worksheet' name='Average Meeting Duration by Type'>
-      <cards>
-        <edge name='left'>
-          <strip size='160'>
-            <card type='pages' />
-            <card type='filters' />
-            <card type='marks' />
-          </strip>
-        </edge>
-        <edge name='top'>
-          <strip size='2147483647'>
-            <card type='columns' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='rows' />
-          </strip>
-          <strip size='30'>
-            <card type='title' />
-          </strip>
-        </edge>
-        <edge name='right'>
-          <strip size='160'>
-            <card pane-specification-id='0' param='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[none:MEETING_TYPE:nk]' type='color' />
-          </strip>
-        </edge>
-      </cards>
-      <simple-id uuid='{C9D0E1F2-A3B4-C5D6-E7F8-A9B0C1D2E3F4}' />
-    </window>
-    <window class='worksheet' name='Meeting Topics Heat Map'>
-      <cards>
-        <edge name='left'>
-          <strip size='160'>
-            <card type='pages' />
-            <card type='filters' />
-            <card type='marks' />
-          </strip>
-        </edge>
-        <edge name='top'>
-          <strip size='2147483647'>
-            <card type='columns' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='rows' />
-          </strip>
-          <strip size='30'>
-            <card type='title' />
-          </strip>
-        </edge>
-        <edge name='right'>
-          <strip size='160'>
-            <card pane-specification-id='0' param='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Active_Users_Count:qk]' type='color' />
-            <card pane-specification-id='0' param='[federated.1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p].[usr:Active_Users_Count:qk]' type='size' />
-          </strip>
-        </edge>
-      </cards>
-      <simple-id uuid='{D0E1F2A3-B4C5-D6E7-F8A9-B0C1D2E3F4A5}' />
-    </window>
-    <window class='worksheet' name='User Meeting Frequency Distribution'>
-      <cards>
-        <edge name='left'>
-          <strip size='160'>
-            <card type='pages' />
-            <card type='filters' />
-            <card type='marks' />
-          </strip>
-        </edge>
-        <edge name='top'>
-          <strip size='2147483647'>
-            <card type='columns' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='rows' />
-          </strip>
-          <strip size='30'>
-            <card type='title' />
-          </strip>
-        </edge>
-      </cards>
-      <simple-id uuid='{E1F2A3B4-C5D6-E7F8-A9B0-C1D2E3F4A5B6}' />
-    </window>
-    <window class='dashboard' maximized='true' name='Platform Usage Analytics Dashboard'>
+    <window class='dashboard' maximized='true' name='Platform Usage Dashboard'>
       <viewpoints>
         <viewpoint name='Total Meeting Minutes KPI'>
           <zoom type='entire-view' />
@@ -906,13 +977,28 @@ END' />
         <viewpoint name='Active Users KPI'>
           <zoom type='entire-view' />
         </viewpoint>
-        <viewpoint name='Average Meeting Duration by Type'>
+        <viewpoint name='Avg Duration by Type Category'>
           <zoom type='entire-view' />
         </viewpoint>
         <viewpoint name='Meeting Topics Heat Map'>
           <zoom type='entire-view' />
         </viewpoint>
-        <viewpoint name='User Meeting Frequency Distribution'>
+        <viewpoint name='Meetings per User Histogram'>
+          <zoom type='entire-view' />
+        </viewpoint>
+      </viewpoints>
+      <active id='-1' />
+      <simple-id uuid='{E1F2A3B4-C5D6-E7F8-A9B0-C1D2E3F4A5B6}' />
+    </window>
+    <window class='dashboard' name='Service Reliability Dashboard'>
+      <viewpoints>
+        <viewpoint name='Support Category Analysis'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Support Resolution Status'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Support Priority Analysis'>
           <zoom type='entire-view' />
         </viewpoint>
       </viewpoints>
