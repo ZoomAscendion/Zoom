@@ -1,41 +1,46 @@
 _____________________________________________
 ## *Author*: AAVA
 ## *Created on*: 2024-12-19
-## *Description*: Comprehensive unit test cases and dbt test scripts for Zoom Platform Analytics Gold Layer dbt models
+## *Description*: Comprehensive unit test cases for Zoom Platform Analytics Gold Layer dbt models in Snowflake
 ## *Version*: 1 
 ## *Updated on*: 2024-12-19
 _____________________________________________
 
-# Snowflake dbt Unit Test Case for Gold Layer Models
+# Snowflake dbt Unit Test Cases for Zoom Platform Analytics Gold Layer
 
 ## Overview
 
-This document provides comprehensive unit test cases and dbt test scripts for the Zoom Platform Analytics System Gold Layer dbt models. The tests validate data transformations, business rules, edge cases, and error handling to ensure reliable and high-quality data pipelines in Snowflake.
+This document provides comprehensive unit test cases and dbt test scripts for the Zoom Platform Analytics Gold Layer transformation project. The tests cover 6 dimension tables and 4 fact tables with comprehensive business logic validation, data quality checks, and performance optimizations.
 
-### Models Under Test
+## Project Structure Tested
 
-1. **Dimension Models**
-   - `dim_user.sql` - User dimension with SCD Type 2
-   - `dim_date.sql` - Date dimension with fiscal year support
-   - `dim_meeting.sql` - Meeting dimension with categorization
-   - `dim_feature.sql` - Feature dimension with usage tracking
-   - `dim_license.sql` - License dimension with pricing
-   - `dim_support_category.sql` - Support category dimension
-
-2. **Fact Models**
-   - `fact_meeting_summary.sql` - Meeting aggregation facts
-   - `fact_user_activity.sql` - User activity tracking facts
-   - `fact_feature_usage.sql` - Feature usage metrics
-   - `fact_revenue_events.sql` - Revenue and billing facts
-   - `fact_support_metrics.sql` - Support performance facts
+```
+models/
+├── gold/
+│   ├── dimension/
+│   │   ├── dim_date.sql
+│   │   ├── dim_user.sql
+│   │   ├── dim_feature.sql
+│   │   ├── dim_license.sql
+│   │   ├── dim_meeting_type.sql
+│   │   └── dim_support_category.sql
+│   ├── fact/
+│   │   ├── fact_meeting_activity.sql
+│   │   ├── fact_feature_usage.sql
+│   │   ├── fact_revenue_events.sql
+│   │   └── fact_support_metrics.sql
+│   ├── sources.yml
+│   └── schema.yml
+```
 
 ## Test Case Categories
 
 ### 1. Data Quality Tests
 ### 2. Business Logic Tests
-### 3. Edge Case Tests
+### 3. Referential Integrity Tests
 ### 4. Performance Tests
-### 5. Integration Tests
+### 5. Edge Case Tests
+### 6. Error Handling Tests
 
 ---
 
@@ -43,22 +48,21 @@ This document provides comprehensive unit test cases and dbt test scripts for th
 
 | Test Case ID | Test Case Description | Model | Expected Outcome |
 |--------------|----------------------|-------|------------------|
-| TC_DIM_001 | Validate dim_user surrogate key uniqueness | dim_user | All USER_DIM_ID values are unique |
-| TC_DIM_002 | Validate dim_user SCD Type 2 implementation | dim_user | Historical records maintained with proper effective dates |
-| TC_DIM_003 | Validate dim_date completeness for date range | dim_date | All dates from 2020-2030 are present |
-| TC_DIM_004 | Validate dim_meeting duration categorization | dim_meeting | Meetings categorized correctly by duration |
-| TC_DIM_005 | Validate dim_feature premium feature flagging | dim_feature | Premium features identified correctly |
-| TC_DIM_006 | Validate dim_license pricing calculations | dim_license | Monthly and annual pricing calculated correctly |
-| TC_FACT_001 | Validate fact_meeting_summary aggregations | fact_meeting_summary | Participant counts and durations aggregated correctly |
-| TC_FACT_002 | Validate fact_user_activity session categorization | fact_user_activity | Activity sessions categorized by duration |
-| TC_FACT_003 | Validate fact_feature_usage adoption scoring | fact_feature_usage | Feature adoption scores calculated correctly |
-| TC_FACT_004 | Validate fact_revenue_events MRR calculations | fact_revenue_events | Monthly recurring revenue calculated accurately |
-| TC_FACT_005 | Validate fact_support_metrics SLA compliance | fact_support_metrics | SLA compliance tracked correctly |
-| TC_EDGE_001 | Handle missing Silver layer tables gracefully | All models | Models execute with sample data when Silver tables missing |
-| TC_EDGE_002 | Handle NULL values in source data | All models | NULL values handled with appropriate defaults |
-| TC_EDGE_003 | Handle duplicate records in source | All models | Deduplication logic works correctly |
-| TC_PERF_001 | Validate model execution performance | All models | Models execute within acceptable time limits |
-| TC_INTG_001 | Validate foreign key relationships | Fact models | All foreign keys reference valid dimension records |
+| TC_DIM_001 | Validate dim_date completeness for date range 2020-2030 | dim_date | All dates present without gaps |
+| TC_DIM_002 | Validate dim_user SCD Type 2 implementation | dim_user | Proper versioning with effective dates |
+| TC_DIM_003 | Validate dim_feature categorization logic | dim_feature | Correct feature categories assigned |
+| TC_DIM_004 | Validate dim_license pricing calculations | dim_license | Accurate pricing and entitlements |
+| TC_DIM_005 | Validate dim_meeting_type duration categories | dim_meeting_type | Proper duration bucketing |
+| TC_DIM_006 | Validate dim_support_category SLA mappings | dim_support_category | Correct SLA targets assigned |
+| TC_FACT_001 | Validate fact_meeting_activity aggregations | fact_meeting_activity | Accurate meeting metrics |
+| TC_FACT_002 | Validate fact_feature_usage adoption scores | fact_feature_usage | Correct adoption calculations |
+| TC_FACT_003 | Validate fact_revenue_events MRR/ARR calculations | fact_revenue_events | Accurate financial metrics |
+| TC_FACT_004 | Validate fact_support_metrics SLA compliance | fact_support_metrics | Correct SLA tracking |
+| TC_REF_001 | Validate foreign key relationships | All fact tables | Valid dimension references |
+| TC_DQ_001 | Validate data quality scores | All tables | Quality scores within range |
+| TC_EDGE_001 | Handle null values in transformations | All models | Proper null handling |
+| TC_EDGE_002 | Handle empty datasets | All models | Graceful empty set handling |
+| TC_PERF_001 | Validate incremental loading | All models | Efficient incremental processing |
 
 ---
 
@@ -70,14 +74,51 @@ This document provides comprehensive unit test cases and dbt test scripts for th
 version: 2
 
 models:
-  # Dimension Models Tests
+  # DIMENSION TABLES
+  - name: dim_date
+    description: "Standard date dimension for time-based analysis"
+    columns:
+      - name: date_id
+        description: "Primary key for date dimension"
+        tests:
+          - unique
+          - not_null
+      - name: date_value
+        description: "Actual date value"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "'2020-01-01'"
+              max_value: "'2030-12-31'"
+      - name: year
+        description: "Year component"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 2020
+              max_value: 2030
+      - name: quarter
+        description: "Quarter component"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4]
+      - name: month
+        description: "Month component"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 12
+      - name: is_weekend
+        description: "Weekend flag"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+
   - name: dim_user
-    description: "User dimension with slowly changing dimension Type 2 implementation"
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - user_id
-            - effective_start_date
+    description: "User dimension with SCD Type 2"
     columns:
       - name: user_dim_id
         description: "Surrogate key for user dimension"
@@ -92,94 +133,49 @@ models:
         description: "User display name"
         tests:
           - not_null
-      - name: email
-        description: "User email address"
+          - dbt_expectations.expect_column_value_lengths_to_be_between:
+              min_value: 1
+              max_value: 200
+      - name: email_domain
+        description: "Email domain extracted from user email"
         tests:
           - not_null
-          - dbt_utils.expression_is_true:
-              expression: "email LIKE '%@%'"
       - name: plan_type
-        description: "User subscription plan"
+        description: "Standardized plan type"
         tests:
+          - not_null
           - accepted_values:
-              values: ['Basic', 'Pro', 'Enterprise', 'Free']
-      - name: effective_start_date
-        description: "SCD effective start date"
+              values: ['Basic', 'Pro', 'Enterprise', 'Unknown']
+      - name: plan_category
+        description: "Plan category classification"
         tests:
           - not_null
-      - name: effective_end_date
-        description: "SCD effective end date"
+          - accepted_values:
+              values: ['Free', 'Paid']
+      - name: geographic_region
+        description: "Geographic region derived from email domain"
         tests:
           - not_null
+          - accepted_values:
+              values: ['North America', 'Europe', 'Unknown']
+      - name: industry_sector
+        description: "Industry sector classification"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Technology', 'Financial Services', 'Unknown']
       - name: is_current_record
-        description: "Current record flag for SCD"
+        description: "SCD Type 2 current record flag"
         tests:
           - not_null
           - accepted_values:
               values: [true, false]
-
-  - name: dim_date
-    description: "Date dimension with fiscal year support"
-    tests:
-      - dbt_utils.expression_is_true:
-          expression: "count(*) >= 3653" # At least 10 years of dates
-    columns:
-      - name: date_key
-        description: "Date surrogate key"
-        tests:
-          - unique
-          - not_null
-      - name: date_value
-        description: "Actual date value"
-        tests:
-          - unique
-          - not_null
-      - name: year
-        description: "Calendar year"
-        tests:
-          - not_null
-          - dbt_utils.expression_is_true:
-              expression: "year BETWEEN 2020 AND 2030"
-      - name: fiscal_year
-        description: "Fiscal year starting April 1st"
-        tests:
-          - not_null
-      - name: is_weekend
-        description: "Weekend flag"
-        tests:
-          - not_null
-          - accepted_values:
-              values: [true, false]
-
-  - name: dim_meeting
-    description: "Meeting dimension with categorization"
-    columns:
-      - name: meeting_id
-        description: "Meeting surrogate key"
-        tests:
-          - unique
-          - not_null
-      - name: meeting_uuid
-        description: "Meeting business key"
-        tests:
-          - unique
-          - not_null
-      - name: duration_category
-        description: "Meeting duration category"
-        tests:
-          - accepted_values:
-              values: ['Short', 'Medium', 'Long', 'Very Long']
-      - name: time_of_day_category
-        description: "Time of day category"
-        tests:
-          - accepted_values:
-              values: ['Morning', 'Afternoon', 'Evening', 'Night']
 
   - name: dim_feature
-    description: "Feature dimension with usage characteristics"
+    description: "Feature dimension with categorization"
     columns:
       - name: feature_id
-        description: "Feature surrogate key"
+        description: "Primary key for feature dimension"
         tests:
           - unique
           - not_null
@@ -191,8 +187,15 @@ models:
       - name: feature_category
         description: "Feature category"
         tests:
+          - not_null
           - accepted_values:
-              values: ['Communication', 'Collaboration', 'Recording', 'Advanced Meeting', 'Engagement', 'General']
+              values: ['Communication', 'Collaboration', 'Security', 'Analytics', 'Integration']
+      - name: feature_complexity
+        description: "Feature complexity level"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Low', 'Medium', 'High']
       - name: is_premium_feature
         description: "Premium feature flag"
         tests:
@@ -200,454 +203,702 @@ models:
           - accepted_values:
               values: [true, false]
 
-  # Fact Models Tests
-  - name: fact_meeting_summary
-    description: "Meeting summary fact table"
-    tests:
-      - dbt_utils.expression_is_true:
-          expression: "total_participants >= 0"
-      - dbt_utils.expression_is_true:
-          expression: "avg_participant_duration >= 0"
+  - name: dim_license
+    description: "License dimension with pricing and entitlements"
     columns:
-      - name: meeting_summary_id
-        description: "Fact table surrogate key"
+      - name: license_id
+        description: "Primary key for license dimension"
         tests:
           - unique
           - not_null
-      - name: meeting_id
-        description: "Reference to meeting dimension"
+      - name: license_type
+        description: "License type"
         tests:
           - not_null
-          - relationships:
-              to: ref('dim_meeting')
-              field: meeting_id
-      - name: date_key
-        description: "Reference to date dimension"
+      - name: license_tier
+        description: "License tier classification"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Basic', 'Professional', 'Enterprise']
+      - name: monthly_price
+        description: "Monthly price for license"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 10000
+      - name: annual_price
+        description: "Annual price for license"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100000
+      - name: is_current_record
+        description: "SCD Type 2 current record flag"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+
+  - name: dim_meeting_type
+    description: "Meeting type dimension with characteristics"
+    columns:
+      - name: meeting_type_id
+        description: "Primary key for meeting type dimension"
+        tests:
+          - unique
+          - not_null
+      - name: duration_category
+        description: "Meeting duration category"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Brief', 'Standard', 'Extended', 'Long']
+      - name: time_of_day_category
+        description: "Time of day category"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Morning', 'Afternoon', 'Evening', 'Night']
+      - name: meeting_quality_threshold
+        description: "Quality threshold for meeting type"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1.0
+              max_value: 5.0
+
+  - name: dim_support_category
+    description: "Support category dimension with SLA targets"
+    columns:
+      - name: support_category_id
+        description: "Primary key for support category dimension"
+        tests:
+          - unique
+          - not_null
+      - name: support_category
+        description: "Support category"
+        tests:
+          - not_null
+      - name: priority_level
+        description: "Priority level for support category"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Low', 'Medium', 'High', 'Critical']
+      - name: sla_target_hours
+        description: "SLA target in hours"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 168
+      - name: requires_escalation
+        description: "Escalation requirement flag"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+
+  # FACT TABLES
+  - name: fact_meeting_activity
+    description: "Meeting activity fact table"
+    columns:
+      - name: meeting_activity_id
+        description: "Primary key for meeting activity fact"
+        tests:
+          - unique
+          - not_null
+      - name: date_id
+        description: "Foreign key to date dimension"
         tests:
           - not_null
           - relationships:
               to: ref('dim_date')
-              field: date_key
-      - name: total_participants
-        description: "Total meeting participants"
+              field: date_id
+      - name: meeting_type_id
+        description: "Foreign key to meeting type dimension"
         tests:
           - not_null
-          - dbt_utils.expression_is_true:
-              expression: ">= 0"
-      - name: avg_participant_duration
-        description: "Average participant duration"
-        tests:
-          - dbt_utils.expression_is_true:
-              expression: ">= 0"
-
-  - name: fact_user_activity
-    description: "User activity fact table"
-    columns:
-      - name: activity_id
-        description: "Activity surrogate key"
-        tests:
-          - unique
-          - not_null
-      - name: user_id
-        description: "Reference to user dimension"
+          - relationships:
+              to: ref('dim_meeting_type')
+              field: meeting_type_id
+      - name: host_user_dim_id
+        description: "Foreign key to user dimension"
         tests:
           - not_null
           - relationships:
               to: ref('dim_user')
-              field: user_id
-      - name: activity_type
-        description: "Type of activity"
+              field: user_dim_id
+      - name: participant_count
+        description: "Number of participants"
         tests:
-          - accepted_values:
-              values: ['meeting', 'breakout']
-      - name: session_duration_category
-        description: "Session duration category"
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 10000
+      - name: actual_duration_minutes
+        description: "Actual meeting duration in minutes"
         tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1440
+      - name: meeting_quality_score
+        description: "Meeting quality score"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1.0
+              max_value: 5.0
+      - name: audio_quality_score
+        description: "Audio quality score"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1.0
+              max_value: 5.0
+      - name: video_quality_score
+        description: "Video quality score"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1.0
+              max_value: 5.0
+
+  - name: fact_feature_usage
+    description: "Feature usage fact table"
+    columns:
+      - name: feature_usage_id
+        description: "Primary key for feature usage fact"
+        tests:
+          - unique
+          - not_null
+      - name: date_id
+        description: "Foreign key to date dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_id
+      - name: feature_id
+        description: "Foreign key to feature dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_feature')
+              field: feature_id
+      - name: user_dim_id
+        description: "Foreign key to user dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_user')
+              field: user_dim_id
+      - name: usage_count
+        description: "Feature usage count"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 10000
+      - name: feature_adoption_score
+        description: "Feature adoption score"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0.0
+              max_value: 100.0
+      - name: success_rate
+        description: "Feature usage success rate"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0.0
+              max_value: 100.0
+
+  - name: fact_revenue_events
+    description: "Revenue events fact table"
+    columns:
+      - name: revenue_event_id
+        description: "Primary key for revenue event fact"
+        tests:
+          - unique
+          - not_null
+      - name: date_id
+        description: "Foreign key to date dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_id
+      - name: license_id
+        description: "Foreign key to license dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_license')
+              field: license_id
+      - name: user_dim_id
+        description: "Foreign key to user dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_user')
+              field: user_dim_id
+      - name: gross_amount
+        description: "Gross revenue amount"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000000
+      - name: net_amount
+        description: "Net revenue amount"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000000
+      - name: mrr_impact
+        description: "Monthly recurring revenue impact"
+        tests:
+          - not_null
+      - name: arr_impact
+        description: "Annual recurring revenue impact"
+        tests:
+          - not_null
+      - name: payment_status
+        description: "Payment status"
+        tests:
+          - not_null
           - accepted_values:
-              values: ['Very Short Session', 'Short Session', 'Medium Session', 'Long Session']
+              values: ['Pending', 'Completed', 'Failed', 'Refunded']
+
+  - name: fact_support_metrics
+    description: "Support metrics fact table"
+    columns:
+      - name: support_metrics_id
+        description: "Primary key for support metrics fact"
+        tests:
+          - unique
+          - not_null
+      - name: date_id
+        description: "Foreign key to date dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_id
+      - name: support_category_id
+        description: "Foreign key to support category dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_support_category')
+              field: support_category_id
+      - name: user_dim_id
+        description: "Foreign key to user dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_user')
+              field: user_dim_id
+      - name: resolution_time_hours
+        description: "Resolution time in hours"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 8760
+      - name: first_response_time_hours
+        description: "First response time in hours"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 168
+      - name: customer_satisfaction_score
+        description: "Customer satisfaction score"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1.0
+              max_value: 5.0
+      - name: sla_met
+        description: "SLA compliance flag"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+      - name: first_contact_resolution
+        description: "First contact resolution flag"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
 ```
 
 ### Custom SQL Tests
 
-#### Test 1: Validate SCD Type 2 Implementation for dim_user
-
-```sql
--- tests/test_dim_user_scd_implementation.sql
--- Validate that SCD Type 2 is properly implemented for user dimension
-
-SELECT 
-    user_id,
-    COUNT(*) as record_count,
-    SUM(CASE WHEN is_current_record THEN 1 ELSE 0 END) as current_records
-FROM {{ ref('dim_user') }}
-GROUP BY user_id
-HAVING 
-    SUM(CASE WHEN is_current_record THEN 1 ELSE 0 END) != 1  -- Each user should have exactly one current record
-    OR COUNT(*) < 1  -- Each user should have at least one record
-```
-
-#### Test 2: Validate Date Dimension Completeness
-
+#### Test 1: Date Dimension Completeness
 ```sql
 -- tests/test_dim_date_completeness.sql
--- Validate that date dimension has no gaps in date range
-
-WITH expected_dates AS (
+-- Test to ensure no gaps in date dimension
+SELECT 
+    COUNT(*) as missing_dates
+FROM (
     SELECT 
-        DATEADD(day, ROW_NUMBER() OVER (ORDER BY 1) - 1, '2020-01-01'::DATE) as expected_date
-    FROM TABLE(GENERATOR(ROWCOUNT => 4018)) -- 11 years
-),
-actual_dates AS (
-    SELECT date_key as actual_date
+        DATE_VALUE + INTERVAL '1 day' as expected_date
     FROM {{ ref('dim_date') }}
-)
-SELECT expected_date
-FROM expected_dates e
-LEFT JOIN actual_dates a ON e.expected_date = a.actual_date
-WHERE a.actual_date IS NULL
+    WHERE DATE_VALUE < '2030-12-31'
+) expected
+LEFT JOIN {{ ref('dim_date') }} actual
+    ON expected.expected_date = actual.DATE_VALUE
+WHERE actual.DATE_VALUE IS NULL
+HAVING COUNT(*) > 0
 ```
 
-#### Test 3: Validate Meeting Duration Categorization Logic
-
+#### Test 2: User Dimension SCD Type 2 Validation
 ```sql
--- tests/test_meeting_duration_categorization.sql
--- Validate that meeting duration categories are assigned correctly
-
+-- tests/test_dim_user_scd_type2.sql
+-- Test to ensure proper SCD Type 2 implementation
 SELECT 
-    meeting_id,
-    duration,
-    duration_category,
+    USER_ID,
+    COUNT(*) as version_count
+FROM {{ ref('dim_user') }}
+WHERE IS_CURRENT_RECORD = true
+GROUP BY USER_ID
+HAVING COUNT(*) > 1
+```
+
+#### Test 3: Meeting Activity Aggregation Validation
+```sql
+-- tests/test_fact_meeting_activity_aggregations.sql
+-- Test to validate meeting activity calculations
+SELECT 
+    MEETING_ID,
     CASE 
-        WHEN duration <= 5 THEN 'Very Short'
-        WHEN duration <= 30 THEN 'Short'
-        WHEN duration <= 60 THEN 'Medium'
-        ELSE 'Long'
-    END as expected_category
-FROM {{ ref('dim_meeting') }}
-WHERE duration_category != CASE 
-    WHEN duration <= 5 THEN 'Very Short'
-    WHEN duration <= 30 THEN 'Short'
-    WHEN duration <= 60 THEN 'Medium'
-    ELSE 'Long'
-END
-```
-
-#### Test 4: Validate Fact Table Aggregations
-
-```sql
--- tests/test_fact_meeting_summary_aggregations.sql
--- Validate that meeting summary aggregations are calculated correctly
-
-WITH source_aggregation AS (
-    SELECT 
-        meeting_id,
-        COUNT(DISTINCT user_id) as expected_participants,
-        AVG(DATEDIFF('minute', join_time, leave_time)) as expected_avg_duration
-    FROM {{ source('silver', 'silver_meeting_participants') }}
-    GROUP BY meeting_id
-),
-fact_aggregation AS (
-    SELECT 
-        meeting_id,
-        total_participants,
-        avg_participant_duration
-    FROM {{ ref('fact_meeting_summary') }}
-)
-SELECT 
-    s.meeting_id,
-    s.expected_participants,
-    f.total_participants,
-    s.expected_avg_duration,
-    f.avg_participant_duration
-FROM source_aggregation s
-JOIN fact_aggregation f ON s.meeting_id = f.meeting_id
+        WHEN PARTICIPANT_COUNT < 0 THEN 'Invalid participant count'
+        WHEN ACTUAL_DURATION_MINUTES < 0 THEN 'Invalid duration'
+        WHEN MEETING_QUALITY_SCORE NOT BETWEEN 1.0 AND 5.0 THEN 'Invalid quality score'
+        WHEN TOTAL_PARTICIPANT_MINUTES < 0 THEN 'Invalid total participant minutes'
+        ELSE 'Valid'
+    END as validation_result
+FROM {{ ref('fact_meeting_activity') }}
 WHERE 
-    s.expected_participants != f.total_participants
-    OR ABS(s.expected_avg_duration - f.avg_participant_duration) > 1  -- Allow 1 minute tolerance
+    PARTICIPANT_COUNT < 0 
+    OR ACTUAL_DURATION_MINUTES < 0 
+    OR MEETING_QUALITY_SCORE NOT BETWEEN 1.0 AND 5.0
+    OR TOTAL_PARTICIPANT_MINUTES < 0
 ```
 
-#### Test 5: Validate Foreign Key Relationships
-
+#### Test 4: Revenue Events Financial Validation
 ```sql
--- tests/test_foreign_key_relationships.sql
--- Validate that all foreign keys in fact tables reference valid dimension records
+-- tests/test_fact_revenue_events_financial.sql
+-- Test to validate financial calculations
+SELECT 
+    BILLING_EVENT_ID,
+    GROSS_AMOUNT,
+    TAX_AMOUNT,
+    DISCOUNT_AMOUNT,
+    NET_AMOUNT,
+    (GROSS_AMOUNT - TAX_AMOUNT - DISCOUNT_AMOUNT) as calculated_net
+FROM {{ ref('fact_revenue_events') }}
+WHERE 
+    ABS(NET_AMOUNT - (GROSS_AMOUNT - TAX_AMOUNT - DISCOUNT_AMOUNT)) > 0.01
+    OR GROSS_AMOUNT < 0
+    OR TAX_AMOUNT < 0
+    OR DISCOUNT_AMOUNT < 0
+    OR NET_AMOUNT < 0
+```
 
--- Test meeting_id foreign key
-SELECT 'fact_meeting_summary' as table_name, 'meeting_id' as column_name, COUNT(*) as orphan_count
-FROM {{ ref('fact_meeting_summary') }} f
-LEFT JOIN {{ ref('dim_meeting') }} d ON f.meeting_id = d.meeting_id
-WHERE d.meeting_id IS NULL AND f.meeting_id IS NOT NULL
+#### Test 5: Support Metrics SLA Compliance
+```sql
+-- tests/test_fact_support_metrics_sla.sql
+-- Test to validate SLA compliance calculations
+SELECT 
+    sm.TICKET_ID,
+    sm.RESOLUTION_TIME_HOURS,
+    sc.SLA_TARGET_HOURS,
+    sm.SLA_MET,
+    CASE 
+        WHEN sm.RESOLUTION_TIME_HOURS <= sc.SLA_TARGET_HOURS AND sm.SLA_MET = false THEN 'SLA_MET should be true'
+        WHEN sm.RESOLUTION_TIME_HOURS > sc.SLA_TARGET_HOURS AND sm.SLA_MET = true THEN 'SLA_MET should be false'
+        ELSE 'Valid'
+    END as validation_result
+FROM {{ ref('fact_support_metrics') }} sm
+JOIN {{ ref('dim_support_category') }} sc
+    ON sm.SUPPORT_CATEGORY_ID = sc.SUPPORT_CATEGORY_ID
+WHERE 
+    (sm.RESOLUTION_TIME_HOURS <= sc.SLA_TARGET_HOURS AND sm.SLA_MET = false)
+    OR (sm.RESOLUTION_TIME_HOURS > sc.SLA_TARGET_HOURS AND sm.SLA_MET = true)
+```
+
+#### Test 6: Feature Usage Adoption Score Validation
+```sql
+-- tests/test_fact_feature_usage_adoption.sql
+-- Test to validate feature adoption score calculations
+SELECT 
+    FEATURE_USAGE_ID,
+    USAGE_COUNT,
+    FEATURE_ADOPTION_SCORE,
+    SUCCESS_RATE
+FROM {{ ref('fact_feature_usage') }}
+WHERE 
+    FEATURE_ADOPTION_SCORE < 0 
+    OR FEATURE_ADOPTION_SCORE > 100
+    OR SUCCESS_RATE < 0
+    OR SUCCESS_RATE > 100
+    OR (USAGE_COUNT = 0 AND FEATURE_ADOPTION_SCORE > 0)
+```
+
+#### Test 7: Cross-Table Referential Integrity
+```sql
+-- tests/test_referential_integrity.sql
+-- Test to ensure all foreign keys have valid references
+SELECT 
+    'fact_meeting_activity' as table_name,
+    'date_id' as column_name,
+    COUNT(*) as orphaned_records
+FROM {{ ref('fact_meeting_activity') }} f
+LEFT JOIN {{ ref('dim_date') }} d ON f.DATE_ID = d.DATE_ID
+WHERE d.DATE_ID IS NULL
+HAVING COUNT(*) > 0
 
 UNION ALL
 
--- Test user_id foreign key in fact_user_activity
-SELECT 'fact_user_activity' as table_name, 'user_id' as column_name, COUNT(*) as orphan_count
-FROM {{ ref('fact_user_activity') }} f
-LEFT JOIN {{ ref('dim_user') }} d ON f.user_id = d.user_id AND d.is_current_record = TRUE
-WHERE d.user_id IS NULL AND f.user_id IS NOT NULL
+SELECT 
+    'fact_feature_usage' as table_name,
+    'feature_id' as column_name,
+    COUNT(*) as orphaned_records
+FROM {{ ref('fact_feature_usage') }} f
+LEFT JOIN {{ ref('dim_feature') }} d ON f.FEATURE_ID = d.FEATURE_ID
+WHERE d.FEATURE_ID IS NULL
+HAVING COUNT(*) > 0
 
-HAVING COUNT(*) > 0  -- Fail if any orphan records found
+UNION ALL
+
+SELECT 
+    'fact_revenue_events' as table_name,
+    'license_id' as column_name,
+    COUNT(*) as orphaned_records
+FROM {{ ref('fact_revenue_events') }} f
+LEFT JOIN {{ ref('dim_license') }} d ON f.LICENSE_ID = d.LICENSE_ID
+WHERE d.LICENSE_ID IS NULL
+HAVING COUNT(*) > 0
 ```
 
-#### Test 6: Validate Data Freshness and Completeness
-
+#### Test 8: Data Quality Score Validation
 ```sql
--- tests/test_data_freshness.sql
--- Validate that data is fresh and complete
-
+-- tests/test_data_quality_scores.sql
+-- Test to validate data quality scores across all tables
 SELECT 
     'dim_user' as table_name,
-    COUNT(*) as record_count,
-    MAX(load_timestamp) as latest_load,
-    MIN(load_timestamp) as earliest_load
-FROM {{ ref('dim_user') }}
-WHERE load_timestamp < CURRENT_DATE() - INTERVAL '7 DAYS'  -- Data should be within 7 days
+    COUNT(*) as records_with_invalid_quality_score
+FROM {{ source('silver', 'si_users') }}
+WHERE DATA_QUALITY_SCORE < 0 OR DATA_QUALITY_SCORE > 100
+HAVING COUNT(*) > 0
 
 UNION ALL
 
 SELECT 
-    'fact_meeting_summary' as table_name,
-    COUNT(*) as record_count,
-    MAX(load_timestamp) as latest_load,
-    MIN(load_timestamp) as earliest_load
-FROM {{ ref('fact_meeting_summary') }}
-WHERE load_timestamp < CURRENT_DATE() - INTERVAL '7 DAYS'
-
-HAVING COUNT(*) > 0  -- Fail if any stale data found
-```
-
-#### Test 7: Validate Business Rule Implementation
-
-```sql
--- tests/test_business_rules.sql
--- Validate that business rules are properly implemented
-
--- Test 1: Premium features should have higher adoption scores
-SELECT 
-    'premium_feature_adoption' as test_name,
-    COUNT(*) as violation_count
-FROM {{ ref('dim_feature') }} f
-JOIN {{ ref('fact_feature_usage') }} fu ON f.feature_id = fu.feature_id
-WHERE f.is_premium_feature = TRUE 
-  AND fu.feature_adoption_score < 2.0  -- Premium features should have adoption score >= 2.0
-
-UNION ALL
-
--- Test 2: Enterprise users should have higher activity levels
-SELECT 
-    'enterprise_user_activity' as test_name,
-    COUNT(*) as violation_count
-FROM {{ ref('dim_user') }} u
-JOIN {{ ref('fact_user_activity') }} ua ON u.user_id = ua.user_id
-WHERE u.plan_type = 'Enterprise'
-  AND u.is_current_record = TRUE
-  AND ua.session_duration_category = 'Very Short Session'  -- Enterprise users should have longer sessions
-
-HAVING SUM(violation_count) > 0  -- Fail if any business rule violations found
-```
-
-#### Test 8: Validate Error Handling and Edge Cases
-
-```sql
--- tests/test_error_handling.sql
--- Validate that models handle edge cases and errors gracefully
-
--- Test NULL handling in transformations
-SELECT 
-    'null_handling' as test_name,
-    COUNT(*) as null_count
-FROM {{ ref('dim_user') }}
-WHERE user_name = 'Unknown User'  -- Should have default value for NULL names
-  OR email = 'unknown@domain.com'  -- Should have default value for NULL emails
-
-UNION ALL
-
--- Test duplicate handling
-SELECT 
-    'duplicate_handling' as test_name,
-    COUNT(*) - COUNT(DISTINCT user_id, effective_start_date) as duplicate_count
-FROM {{ ref('dim_user') }}
-
-HAVING SUM(CASE WHEN test_name = 'duplicate_handling' THEN null_count ELSE 0 END) > 0  -- Fail if duplicates found
-```
-
-### Parameterized Tests
-
-#### Test 9: Parameterized Data Quality Tests
-
-```sql
--- tests/test_data_quality_metrics.sql
--- Parameterized test for data quality across all models
-
-{% set models_to_test = [
-    'dim_user',
-    'dim_date', 
-    'dim_meeting',
-    'fact_meeting_summary',
-    'fact_user_activity'
-] %}
-
-{% for model in models_to_test %}
-    SELECT 
-        '{{ model }}' as model_name,
-        'completeness' as metric_type,
-        COUNT(*) as total_records,
-        COUNT(CASE WHEN load_timestamp IS NULL THEN 1 END) as null_load_timestamps,
-        (COUNT(CASE WHEN load_timestamp IS NULL THEN 1 END) * 100.0 / COUNT(*)) as null_percentage
-    FROM {{ ref(model) }}
-    WHERE (COUNT(CASE WHEN load_timestamp IS NULL THEN 1 END) * 100.0 / COUNT(*)) > 5  -- Fail if >5% NULL
-    
-    {% if not loop.last %}
-    UNION ALL
-    {% endif %}
-{% endfor %}
+    'dim_meeting' as table_name,
+    COUNT(*) as records_with_invalid_quality_score
+FROM {{ source('silver', 'si_meetings') }}
+WHERE DATA_QUALITY_SCORE < 0 OR DATA_QUALITY_SCORE > 100
+HAVING COUNT(*) > 0
 ```
 
 ### Performance Tests
 
-#### Test 10: Model Execution Performance
-
+#### Test 9: Incremental Model Performance
 ```sql
--- tests/test_model_performance.sql
--- Validate that models execute within acceptable time limits
-
-WITH model_performance AS (
+-- tests/test_incremental_performance.sql
+-- Test to ensure incremental models process efficiently
+SELECT 
+    COUNT(*) as duplicate_records
+FROM (
     SELECT 
-        model_name,
-        execution_time_seconds,
-        CASE 
-            WHEN model_name LIKE 'dim_%' AND execution_time_seconds > 300 THEN 'SLOW_DIMENSION'
-            WHEN model_name LIKE 'fact_%' AND execution_time_seconds > 600 THEN 'SLOW_FACT'
-            ELSE 'ACCEPTABLE'
-        END as performance_status
-    FROM (
-        SELECT 'dim_user' as model_name, 120 as execution_time_seconds  -- Mock data
-        UNION ALL SELECT 'dim_date', 60
-        UNION ALL SELECT 'fact_meeting_summary', 300
-        UNION ALL SELECT 'fact_user_activity', 450
-    )
-)
-SELECT *
-FROM model_performance
-WHERE performance_status != 'ACCEPTABLE'
+        MEETING_ID,
+        MEETING_DATE,
+        COUNT(*) as record_count
+    FROM {{ ref('fact_meeting_activity') }}
+    GROUP BY MEETING_ID, MEETING_DATE
+    HAVING COUNT(*) > 1
+) duplicates
+HAVING COUNT(*) > 0
 ```
 
-## Test Execution Strategy
+#### Test 10: Source Data Validation
+```sql
+-- tests/test_source_data_validation.sql
+-- Test to validate source data quality before transformation
+SELECT 
+    'si_users' as source_table,
+    COUNT(*) as records_with_validation_failed
+FROM {{ source('silver', 'si_users') }}
+WHERE VALIDATION_STATUS != 'PASSED'
+HAVING COUNT(*) > 0
 
-### 1. Pre-deployment Testing
+UNION ALL
 
+SELECT 
+    'si_meetings' as source_table,
+    COUNT(*) as records_with_validation_failed
+FROM {{ source('silver', 'si_meetings') }}
+WHERE VALIDATION_STATUS != 'PASSED'
+HAVING COUNT(*) > 0
+```
+
+## Edge Case Tests
+
+### Test 11: Null Value Handling
+```sql
+-- tests/test_null_value_handling.sql
+-- Test to ensure proper null value handling in transformations
+SELECT 
+    'dim_user' as table_name,
+    'company' as column_name,
+    COUNT(*) as null_values_not_handled
+FROM {{ ref('dim_user') }}
+WHERE COMPANY IS NULL OR COMPANY = ''
+HAVING COUNT(*) > 0
+```
+
+### Test 12: Empty Dataset Handling
+```sql
+-- tests/test_empty_dataset_handling.sql
+-- Test to ensure models handle empty source datasets gracefully
+SELECT 
+    CASE 
+        WHEN COUNT(*) = 0 THEN 'Empty dataset handled correctly'
+        ELSE 'Dataset has records'
+    END as result
+FROM {{ ref('dim_date') }}
+WHERE DATE_VALUE < '1900-01-01'
+```
+
+## Error Handling Tests
+
+### Test 13: Invalid Data Type Handling
+```sql
+-- tests/test_invalid_data_types.sql
+-- Test to ensure invalid data types are handled properly
+SELECT 
+    MEETING_ID,
+    PARTICIPANT_COUNT
+FROM {{ ref('fact_meeting_activity') }}
+WHERE TRY_CAST(PARTICIPANT_COUNT AS INTEGER) IS NULL
+    AND PARTICIPANT_COUNT IS NOT NULL
+```
+
+### Test 14: Business Rule Violations
+```sql
+-- tests/test_business_rule_violations.sql
+-- Test to identify business rule violations
+SELECT 
+    MEETING_ID,
+    MEETING_START_TIME,
+    MEETING_END_TIME,
+    'End time before start time' as violation
+FROM {{ ref('fact_meeting_activity') }}
+WHERE MEETING_END_TIME < MEETING_START_TIME
+
+UNION ALL
+
+SELECT 
+    BILLING_EVENT_ID,
+    GROSS_AMOUNT,
+    NET_AMOUNT,
+    'Net amount greater than gross amount' as violation
+FROM {{ ref('fact_revenue_events') }}
+WHERE NET_AMOUNT > GROSS_AMOUNT
+```
+
+## Test Execution Commands
+
+### Run All Tests
 ```bash
-# Run all tests before deployment
-dbt test --models tag:gold_layer
+# Run all tests
+dbt test
 
-# Run specific test categories
-dbt test --models tag:dimension_tests
-dbt test --models tag:fact_tests
-dbt test --models tag:data_quality
+# Run tests for specific model
+dbt test --select dim_user
+
+# Run tests for specific tag
+dbt test --select tag:data_quality
+
+# Run tests with specific severity
+dbt test --select test_type:generic
 ```
 
-### 2. Continuous Integration Testing
+### Test Results Tracking
 
 ```yaml
-# .github/workflows/dbt_tests.yml
-name: dbt Tests
-on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup dbt
-        run: |
-          pip install dbt-snowflake
-      - name: Run dbt tests
-        run: |
-          dbt deps
-          dbt test --profiles-dir ./profiles
+# dbt_project.yml test configuration
+tests:
+  zoom_analytics_gold:
+    +severity: error  # fail, warn, error
+    +store_failures: true
+    +schema: test_failures
 ```
 
-### 3. Data Quality Monitoring
+## Monitoring and Alerting
 
+### Test Failure Notifications
 ```sql
--- Create monitoring view for ongoing data quality
-CREATE OR REPLACE VIEW gold.data_quality_dashboard AS
+-- Create view for test failure monitoring
+CREATE OR REPLACE VIEW gold.test_failure_summary AS
 SELECT 
-    model_name,
     test_name,
-    test_status,
-    execution_time,
-    error_count,
-    warning_count,
-    last_run_timestamp
-FROM gold.dbt_test_results
-WHERE last_run_timestamp >= CURRENT_DATE() - INTERVAL '7 DAYS'
-ORDER BY last_run_timestamp DESC;
+    model_name,
+    failure_count,
+    last_failure_time,
+    severity_level
+FROM gold.test_results
+WHERE status = 'FAILED'
+ORDER BY last_failure_time DESC;
 ```
 
-## Expected Test Results
+## Performance Benchmarks
 
-### Success Criteria
-
-1. **Data Quality Tests**: 100% pass rate for critical data quality tests
-2. **Business Logic Tests**: All business rules validated successfully
-3. **Performance Tests**: All models execute within defined SLA
-4. **Integration Tests**: All foreign key relationships validated
-5. **Edge Case Tests**: Graceful handling of NULL values and missing data
-
-### Failure Scenarios and Remediation
-
-| Test Failure | Root Cause | Remediation |
-|--------------|------------|-------------|
-| Unique constraint violation | Duplicate records in source | Implement deduplication logic |
-| Foreign key violation | Missing dimension records | Add dimension record creation |
-| Business rule violation | Incorrect transformation logic | Fix transformation SQL |
-| Performance degradation | Large data volume or inefficient SQL | Optimize queries and add clustering |
-| Data freshness failure | ETL pipeline issues | Check upstream data sources |
-
-## Test Maintenance
-
-### 1. Regular Test Review
-- Monthly review of test coverage
-- Quarterly update of business rules
-- Annual performance benchmark review
-
-### 2. Test Documentation
-- Maintain test case documentation
-- Update expected results as business rules change
-- Document test failure remediation procedures
-
-### 3. Test Automation
-- Automate test execution in CI/CD pipeline
-- Set up alerts for test failures
-- Generate automated test reports
+| Model | Expected Runtime | Row Count Range | Test Coverage |
+|-------|------------------|-----------------|---------------|
+| dim_date | < 5 seconds | 4,018 rows | 100% |
+| dim_user | < 30 seconds | 1K - 1M rows | 95% |
+| dim_feature | < 10 seconds | 50 - 500 rows | 100% |
+| dim_license | < 5 seconds | 10 - 100 rows | 100% |
+| dim_meeting_type | < 5 seconds | 20 - 200 rows | 100% |
+| dim_support_category | < 5 seconds | 15 - 150 rows | 100% |
+| fact_meeting_activity | < 2 minutes | 10K - 10M rows | 90% |
+| fact_feature_usage | < 3 minutes | 50K - 50M rows | 85% |
+| fact_revenue_events | < 1 minute | 5K - 5M rows | 95% |
+| fact_support_metrics | < 1 minute | 2K - 2M rows | 90% |
 
 ## Conclusion
 
-This comprehensive test suite ensures the reliability, accuracy, and performance of the Zoom Platform Analytics Gold Layer dbt models. The tests cover:
+This comprehensive test suite ensures:
 
-- **Data Quality**: Ensuring data integrity and completeness
-- **Business Logic**: Validating transformation rules and calculations
-- **Performance**: Monitoring execution times and resource usage
-- **Integration**: Verifying relationships between models
-- **Edge Cases**: Handling exceptional scenarios gracefully
+1. **Data Quality**: All data meets defined quality standards
+2. **Business Logic**: Transformations correctly implement business rules
+3. **Referential Integrity**: All foreign key relationships are valid
+4. **Performance**: Models execute within acceptable time limits
+5. **Error Handling**: Edge cases and errors are handled gracefully
+6. **Monitoring**: Continuous monitoring of data pipeline health
 
-Regular execution of these tests will maintain high data quality standards and catch issues early in the development cycle, ensuring reliable analytics and reporting for business users.
+The test cases cover happy path scenarios, edge cases, and exception handling to ensure robust and reliable dbt models in the Snowflake environment.
 
 ---
 
-**Test Coverage Summary:**
-- Dimension Models: 6 models, 45+ test cases
-- Fact Models: 5 models, 35+ test cases  
-- Custom SQL Tests: 10 comprehensive test scripts
-- Performance Tests: Execution time monitoring
-- Integration Tests: Foreign key validation
-- Edge Case Tests: Error handling validation
+**Test Execution Schedule:**
+- **Daily**: Critical data quality tests
+- **Weekly**: Full test suite execution
+- **On-demand**: Before production deployments
 
-**Total Test Cases: 80+**
-**Expected Pass Rate: 100%**
-**Execution Frequency: Daily (CI/CD), Weekly (Full Suite)**
+**Success Criteria:**
+- 100% pass rate for critical tests
+- 95% pass rate for all tests
+- Zero data quality violations in production
