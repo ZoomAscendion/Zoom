@@ -1,0 +1,106 @@
+{{ config(
+    materialized='table',
+    pre_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PROCESSING_START', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'",
+    post_hook="INSERT INTO {{ ref('SI_Audit_Log') }} (AUDIT_ID, TABLE_NAME, OPERATION_TYPE, AUDIT_TIMESTAMP, PROCESSED_BY) SELECT UUID_STRING(), 'SI_LICENSES', 'PROCESSING_END', CURRENT_TIMESTAMP(), 'DBT_SILVER_PIPELINE' WHERE '{{ this.name }}' != 'SI_Audit_Log'"
+) }}
+
+-- Silver layer transformation for Licenses
+-- Cleansed and standardized license data with critical DD/MM/YYYY date format conversion
+
+WITH bronze_licenses AS (
+    SELECT 
+        LICENSE_ID,
+        LICENSE_TYPE,
+        ASSIGNED_TO_USER_ID,
+        START_DATE,
+        END_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM {{ source('bronze', 'BZ_LICENSES') }}
+    WHERE LICENSE_ID IS NOT NULL
+),
+
+cleansed_licenses AS (
+    SELECT 
+        LICENSE_ID,
+        UPPER(TRIM(LICENSE_TYPE)) AS LICENSE_TYPE,
+        ASSIGNED_TO_USER_ID,
+        -- Critical P1: DD/MM/YYYY date format conversion ("27/08/2024" error fix)
+        COALESCE(
+            TRY_TO_DATE(START_DATE::STRING, 'YYYY-MM-DD'),
+            TRY_TO_DATE(START_DATE::STRING, 'DD/MM/YYYY'),
+            TRY_TO_DATE(START_DATE::STRING, 'DD-MM-YYYY'),
+            TRY_TO_DATE(START_DATE::STRING, 'MM/DD/YYYY'),
+            TRY_TO_DATE(START_DATE::STRING)
+        ) AS CLEAN_START_DATE,
+        COALESCE(
+            TRY_TO_DATE(END_DATE::STRING, 'YYYY-MM-DD'),
+            TRY_TO_DATE(END_DATE::STRING, 'DD/MM/YYYY'),
+            TRY_TO_DATE(END_DATE::STRING, 'DD-MM-YYYY'),
+            TRY_TO_DATE(END_DATE::STRING, 'MM/DD/YYYY'),
+            TRY_TO_DATE(END_DATE::STRING)
+        ) AS CLEAN_END_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM
+    FROM bronze_licenses
+),
+
+validated_licenses AS (
+    SELECT 
+        LICENSE_ID,
+        LICENSE_TYPE,
+        ASSIGNED_TO_USER_ID,
+        CLEAN_START_DATE AS START_DATE,
+        CLEAN_END_DATE AS END_DATE,
+        LOAD_TIMESTAMP,
+        UPDATE_TIMESTAMP,
+        SOURCE_SYSTEM,
+        -- Silver layer metadata
+        DATE(LOAD_TIMESTAMP) AS LOAD_DATE,
+        DATE(UPDATE_TIMESTAMP) AS UPDATE_DATE,
+        -- Data quality scoring with date format conversion compliance
+        CASE 
+            WHEN LICENSE_ID IS NOT NULL AND LICENSE_TYPE IS NOT NULL AND ASSIGNED_TO_USER_ID IS NOT NULL 
+                 AND CLEAN_START_DATE IS NOT NULL AND CLEAN_END_DATE IS NOT NULL 
+                 AND CLEAN_END_DATE >= CLEAN_START_DATE THEN 100
+            WHEN LICENSE_ID IS NOT NULL AND LICENSE_TYPE IS NOT NULL AND ASSIGNED_TO_USER_ID IS NOT NULL THEN 80
+            WHEN LICENSE_ID IS NOT NULL THEN 60
+            ELSE 0
+        END AS DATA_QUALITY_SCORE,
+        -- Validation status
+        CASE 
+            WHEN LICENSE_ID IS NOT NULL AND LICENSE_TYPE IS NOT NULL AND ASSIGNED_TO_USER_ID IS NOT NULL 
+                 AND CLEAN_START_DATE IS NOT NULL AND CLEAN_END_DATE IS NOT NULL 
+                 AND CLEAN_END_DATE >= CLEAN_START_DATE THEN 'PASSED'
+            WHEN LICENSE_ID IS NOT NULL AND LICENSE_TYPE IS NOT NULL AND ASSIGNED_TO_USER_ID IS NOT NULL THEN 'WARNING'
+            ELSE 'FAILED'
+        END AS VALIDATION_STATUS
+    FROM cleansed_licenses
+),
+
+deduped_licenses AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY LICENSE_ID ORDER BY UPDATE_TIMESTAMP DESC) AS rn
+    FROM validated_licenses
+)
+
+SELECT 
+    LICENSE_ID,
+    LICENSE_TYPE,
+    ASSIGNED_TO_USER_ID,
+    START_DATE,
+    END_DATE,
+    CURRENT_TIMESTAMP() AS LOAD_TIMESTAMP,
+    CURRENT_TIMESTAMP() AS UPDATE_TIMESTAMP,
+    SOURCE_SYSTEM,
+    LOAD_DATE,
+    UPDATE_DATE,
+    DATA_QUALITY_SCORE,
+    VALIDATION_STATUS
+FROM deduped_licenses
+WHERE rn = 1
+  AND DATA_QUALITY_SCORE >= 60
+  AND START_DATE IS NOT NULL
+  AND END_DATE IS NOT NULL
