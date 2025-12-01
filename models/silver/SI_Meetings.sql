@@ -5,7 +5,7 @@
 ) }}
 
 -- Silver layer transformation for Meetings
--- Cleansed and standardized meeting information with critical numeric field cleaning
+-- Cleansed and standardized meeting information with critical format fixes
 
 WITH bronze_meetings AS (
     SELECT 
@@ -27,17 +27,21 @@ cleansed_meetings AS (
         MEETING_ID,
         HOST_ID,
         TRIM(MEETING_TOPIC) AS MEETING_TOPIC,
-        -- Enhanced timestamp handling with EST timezone support
-        CASE 
-            WHEN START_TIME::STRING LIKE '%EST%' THEN 
-                TRY_TO_TIMESTAMP(REGEXP_REPLACE(START_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS')
-            ELSE START_TIME
-        END AS START_TIME,
-        CASE 
-            WHEN END_TIME::STRING LIKE '%EST%' THEN 
-                TRY_TO_TIMESTAMP(REGEXP_REPLACE(END_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS')
-            ELSE END_TIME
-        END AS END_TIME,
+        -- Enhanced timestamp handling with universal multi-format parsing
+        COALESCE(
+            TRY_TO_TIMESTAMP(REGEXP_REPLACE(START_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(START_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(START_TIME::STRING, 'DD-MM-YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(START_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(START_TIME::STRING)
+        ) AS START_TIME,
+        COALESCE(
+            TRY_TO_TIMESTAMP(REGEXP_REPLACE(END_TIME::STRING, '\\s*(EST|PST|CST|IST|UTC)', ''), 'YYYY-MM-DD HH24:MI:SS'),
+            TRY_TO_TIMESTAMP(END_TIME::STRING, 'DD/MM/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(END_TIME::STRING, 'DD-MM-YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(END_TIME::STRING, 'MM/DD/YYYY HH24:MI'),
+            TRY_TO_TIMESTAMP(END_TIME::STRING)
+        ) AS END_TIME,
         -- Critical P1: Clean numeric field text units ("108 mins" error fix)
         CASE 
             WHEN TRY_TO_NUMBER(REGEXP_REPLACE(DURATION_MINUTES::STRING, '[^0-9.]', '')) IS NOT NULL THEN
