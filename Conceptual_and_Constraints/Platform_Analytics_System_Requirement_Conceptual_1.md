@@ -1,16 +1,16 @@
 _____________________________________________
 ## *Author*: AAVA
 ## *Created on*:   11-11-2025
-## *Description*: Conceptual data model for Zoom Platform Analytics System supporting usage, reliability, and revenue reporting
+## *Description*: Conceptual data model for Platform Analytics System supporting usage, reliability, and revenue reporting
 ## *Version*: 1 
 ## *Updated on*: 11-11-2025
 _____________________________________________
 
-# Zoom Platform Analytics System - Conceptual Data Model
+# Platform Analytics System - Conceptual Data Model
 
 ## 1. Domain Overview
 
-The Zoom Platform Analytics System operates within the **Video Communications and Collaboration** domain. This system manages and analyzes data related to user activities, meeting operations, platform performance, customer support interactions, and revenue generation. The primary focus areas include:
+The Platform Analytics System operates within the **Video Communications and Collaboration** domain. This system manages and analyzes data related to user activities, meeting operations, platform performance, customer support interactions, and revenue generation. The primary focus areas include:
 
 - **Platform Usage & Adoption**: Tracking user engagement, meeting activities, and feature utilization
 - **Service Reliability & Support**: Managing customer support tickets and platform stability metrics
@@ -18,7 +18,7 @@ The Zoom Platform Analytics System operates within the **Video Communications an
 
 ## 2. List of Entity Name with Description
 
-1. **Users** - Represents individual users of the Zoom platform with their profile information and subscription details
+1. **Users** - Represents individual users of the platform with their profile information and subscription details
 2. **Meetings** - Contains information about video meetings conducted on the platform
 3. **Attendees** - Tracks participants who join meetings, linking users to specific meetings
 4. **Features_Usage** - Records usage of specific platform features during meetings
