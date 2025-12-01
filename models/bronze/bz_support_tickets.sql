@@ -21,7 +21,7 @@ WITH source_data AS (
         LOAD_TIMESTAMP,
         UPDATE_TIMESTAMP,
         SOURCE_SYSTEM
-    FROM {{ source('raw_schema', 'support_tickets') }}
+    FROM {{ source('raw', 'support_tickets') }}
     WHERE TICKET_ID IS NOT NULL  -- Filter out null primary keys
 ),
 
