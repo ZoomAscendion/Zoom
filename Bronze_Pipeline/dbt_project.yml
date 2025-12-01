@@ -1,0 +1,235 @@
+# =====================================================
+# DBT PROJECT CONFIGURATION - BRONZE LAYER
+# =====================================================
+# Name: Bronze Layer Data Pipeline
+# Purpose: Zoom Platform Analytics System - Medallion Architecture
+# Author: AAVA
+# Created: 2024-11-11
+# Version: 1.0
+# =====================================================
+
+name: 'zoom_bronze_pipeline'
+version: '1.0.0'
+config-version: 2
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'zoom_bronze_pipeline'
+
+# These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"  # directory which will store compiled SQL files
+clean-targets:         # directories to be removed by `dbt clean`
+  - "target"
+  - "dbt_packages"
+
+# =====================================================
+# MODEL CONFIGURATIONS
+# =====================================================
+models:
+  zoom_bronze_pipeline:
+    # Global model configurations
+    +materialized: incremental
+    +on_schema_change: "fail"
+    +snowflake_warehouse: "WH_POC_Z_DEV_XSMALL"
+    
+    # Bronze layer specific configurations
+    bronze:
+      +materialized: incremental
+      +on_schema_change: "fail"
+      +tags: ["bronze", "raw_data"]
+      +meta:
+        layer: "bronze"
+        owner: "data_engineering"
+        description: "Raw data ingestion layer with minimal transformations"
+      
+      # Audit model configuration
+      bz_data_audit:
+        +materialized: incremental
+        +unique_key: "record_id"
+        +tags: ["bronze", "audit", "monitoring"]
+        +meta:
+          critical: true
+          refresh_frequency: "continuous"
+      
+      # User data configuration (PII handling)
+      bz_users:
+        +materialized: incremental
+        +unique_key: "user_id"
+        +tags: ["bronze", "users", "pii"]
+        +meta:
+          contains_pii: true
+          data_classification: "confidential"
+      
+      # Meeting data configuration
+      bz_meetings:
+        +materialized: incremental
+        +unique_key: "meeting_id"
+        +tags: ["bronze", "meetings"]
+        +meta:
+          contains_pii: false
+          data_classification: "internal"
+      
+      # Participant data configuration
+      bz_participants:
+        +materialized: incremental
+        +unique_key: "participant_id"
+        +tags: ["bronze", "participants"]
+        +meta:
+          contains_pii: false
+          data_classification: "internal"
+      
+      # Feature usage configuration
+      bz_feature_usage:
+        +materialized: incremental
+        +unique_key: "usage_id"
+        +tags: ["bronze", "feature_usage", "analytics"]
+        +meta:
+          contains_pii: false
+          data_classification: "internal"
+      
+      # Support tickets configuration
+      bz_support_tickets:
+        +materialized: incremental
+        +unique_key: "ticket_id"
+        +tags: ["bronze", "support_tickets"]
+        +meta:
+          contains_pii: false
+          data_classification: "internal"
+      
+      # Billing events configuration (Financial data)
+      bz_billing_events:
+        +materialized: incremental
+        +unique_key: "event_id"
+        +tags: ["bronze", "billing_events", "financial"]
+        +meta:
+          contains_pii: false
+          data_classification: "confidential"
+          financial_data: true
+      
+      # License data configuration
+      bz_licenses:
+        +materialized: incremental
+        +unique_key: "license_id"
+        +tags: ["bronze", "licenses"]
+        +meta:
+          contains_pii: false
+          data_classification: "internal"
+
+# =====================================================
+# SNAPSHOT CONFIGURATIONS
+# =====================================================
+snapshots:
+  zoom_bronze_pipeline:
+    +target_schema: "bronze_snapshots"
+    +strategy: "timestamp"
+    +updated_at: "update_timestamp"
+
+# =====================================================
+# SEED CONFIGURATIONS
+# =====================================================
+seeds:
+  zoom_bronze_pipeline:
+    +schema: "bronze_seeds"
+    +quote_columns: false
+
+# =====================================================
+# TEST CONFIGURATIONS
+# =====================================================
+tests:
+  zoom_bronze_pipeline:
+    +store_failures: true
+    +schema: "bronze_test_failures"
+
+# =====================================================
+# MACRO CONFIGURATIONS
+# =====================================================
+macros:
+  zoom_bronze_pipeline:
+    +meta:
+      layer: "bronze"
+      purpose: "data_quality_and_transformation"
+
+# =====================================================
+# VARIABLES
+# =====================================================
+vars:
+  # Date variables for incremental processing
+  start_date: '1900-01-01'
+  end_date: '2099-12-31'
+  
+  # Environment variables
+  environment: 'dev'
+  
+  # Data quality thresholds
+  max_null_percentage: 0.05
+  min_row_count: 1
+  
+  # Audit configuration
+  enable_audit_logging: true
+  audit_retention_days: 90
+  
+  # PII handling
+  mask_pii_in_dev: true
+  pii_fields: ['user_name', 'email', 'meeting_topic']
+  
+  # Performance tuning
+  snowflake_warehouse: 'WH_POC_Z_DEV_XSMALL'
+  query_timeout: 3600
+  
+  # Bronze layer specific variables
+  bronze_schema: 'bronze'
+  raw_schema: 'raw'
+  source_database: 'DB_POC_ZOOM'
+  
+  # Incremental processing
+  lookback_days: 7
+  full_refresh_on_schema_change: false
+
+# =====================================================
+# HOOKS
+# =====================================================
+on-run-start:
+  - "{{ log('Starting Bronze Layer Pipeline Execution', info=True) }}"
+  - "CREATE SCHEMA IF NOT EXISTS {{ target.schema }}_audit"
+
+on-run-end:
+  - "{{ log('Bronze Layer Pipeline Execution Completed', info=True) }}"
+  - "INSERT INTO {{ target.schema }}_audit.pipeline_runs (run_id, start_time, end_time, status) VALUES ('{{ invocation_id }}', '{{ run_started_at }}', CURRENT_TIMESTAMP(), 'SUCCESS')"
+
+# =====================================================
+# DISPATCH CONFIGURATION
+# =====================================================
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['zoom_bronze_pipeline', 'dbt_utils']
+
+# =====================================================
+# QUERY COMMENT
+# =====================================================
+query-comment:
+  comment: "dbt {{ dbt_version }}; project: {{ project_name }}; model: {{ node.name }}; invocation_id: {{ invocation_id }}"
+  append: true
+
+# =====================================================
+# REQUIRE DBT VERSION
+# =====================================================
+require-dbt-version: [">=1.0.0", "<2.0.0"]
+
+# =====================================================
+# FLAGS
+# =====================================================
+flags:
+  send_anonymous_usage_stats: false
+  use_colors: true
+  partial_parse: true
+  static_parser: true
+  warn_error: false
+  log_format: text
