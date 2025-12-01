@@ -1,250 +1,348 @@
 _____________________________________________
 ## *Author*: AAVA
 ## *Created on*: 
-## *Description*: Tableau Dashboard Visuals Recommender for Platform Analytics System Reports
+## *Description*: Tableau Dashboard Visuals Recommender for Platform Usage & Adoption Report
 ## *Version*: 1
 ## *Updated on*: 
 _____________________________________________
 
 # Tableau Dashboard Visuals Recommender
-## Platform Analytics System - Reports & Requirements
+## Platform Usage & Adoption Report
 
-### **1. Visual Recommendations**
+## **Data Model and Relationships**
 
-#### **Report 1: Platform Usage & Adoption Report**
+### **Star Schema Design for Platform Usage Analytics**
 
-**Data Element:** Total Meeting Minutes by User
-- **Recommended Visual:** Horizontal Bar Chart
-- **Data Fields:** USER_NAME, SUM(DURATION_MINUTES)
-- **Calculations:** 
-  - Total Meeting Minutes: `SUM([Duration Minutes])`
-  - Average Meeting Duration: `AVG([Duration Minutes])`
+This report focuses on platform usage patterns, meeting activities, and user adoption metrics.
+
+#### **Primary Fact Table:**
+- **FACT_MEETING_ACTIVITY** (Grain: One record per meeting)
+- **FACT_FEATURE_USAGE** (Grain: One record per feature usage event)
+
+#### **Supporting Dimension Tables:**
+- **DIM_USER** (User characteristics and demographics)
+- **DIM_DATE** (Time dimension for temporal analysis)
+- **DIM_MEETING_TYPE** (Meeting characteristics and categories)
+- **DIM_FEATURE** (Feature details and classifications)
+
+### **Key Relationships for Platform Usage Report**
+
+**Primary Data Flow:**
+```
+FACT_MEETING_ACTIVITY (Grain: One record per meeting)
+├── → DIM_USER (USER_DIM_ID) [Many-to-One]
+├── → DIM_MEETING_TYPE (MEETING_TYPE_ID) [Many-to-One]
+├── → DIM_DATE (DATE_ID) [Many-to-One]
+
+FACT_FEATURE_USAGE (Grain: One record per feature usage)
+├── → DIM_USER (USER_DIM_ID) [Many-to-One]
+├── → DIM_FEATURE (FEATURE_ID) [Many-to-One]
+├── → DIM_DATE (DATE_ID) [Many-to-One]
+```
+
+## **1. Visual Recommendations**
+
+### **KPI Overview Section**
+
+#### **Metric 1: Total Meeting Minutes and Active Users**
+- **Data Element:** Key Platform Usage KPIs
+- **Recommended Visual:** KPI Cards with Trend Sparklines
+- **Data Fields:** 
+  - ACTUAL_DURATION_MINUTES from FACT_MEETING_ACTIVITY
+  - USER_DIM_ID from FACT_MEETING_ACTIVITY
+  - DATE_ID for trend analysis
+- **Query/Tableau Calculation:** 
+  ```
+  // Total Meeting Minutes
+  SUM([Actual Duration Minutes])
+  
+  // Active Users
+  COUNTD([User Dim Id])
+  
+  // Month-over-Month Growth Rate
+  (SUM([Actual Duration Minutes]) - LOOKUP(SUM([Actual Duration Minutes]), -1)) / ABS(LOOKUP(SUM([Actual Duration Minutes]), -1))
+  
+  // Weekly Active Users Trend
+  {FIXED DATETRUNC('week', [Date Id]) : COUNTD([User Dim Id])}
+  ```
+- **Calculations:** Period-over-period percentage change, rolling averages, trend indicators
 - **Interactivity:** 
-  - Filter by Date Range (Date Key)
-  - Filter by User Status
-  - Filter by Geographic Region
-  - Drill-down from User to Meeting Details
-- **Justification:** Horizontal bar charts effectively show ranking and comparison of users by total meeting time, making it easy to identify top users
-- **Optimization Tips:** Use extract with aggregated data, apply context filter on date range, index on USER_KEY and DATE_KEY
+  - Date range filter (Last 30 days, Last Quarter, Last Year)
+  - Drill-down to daily/weekly granularity
+  - Hover tooltips showing previous period comparison
+- **Justification:** KPI cards provide immediate visibility into key performance indicators with historical context
+- **Optimization Tips:** 
+  - Use extract with daily aggregations
+  - Implement incremental refresh for recent data
+  - Create indexed views for date-based queries
 
 ---
 
-**Data Element:** Average Meeting Duration by Type and Category
-- **Recommended Visual:** Grouped Bar Chart (Side-by-Side)
-- **Data Fields:** MEETING_TYPE, MEETING_CATEGORY, AVG(DURATION_MINUTES)
-- **Calculations:** 
-  - Average Duration by Type: `{FIXED [Meeting Type] : AVG([Duration Minutes])}`
-  - Average Duration by Category: `{FIXED [Meeting Category] : AVG([Duration Minutes])}`
+#### **Metric 2: Meeting Quality Score Trends**
+- **Data Element:** Platform Performance Quality Metrics
+- **Recommended Visual:** Dual-Axis Line Chart with Area Fill
+- **Data Fields:** 
+  - MEETING_QUALITY_SCORE from FACT_MEETING_ACTIVITY
+  - AUDIO_QUALITY_SCORE from FACT_MEETING_ACTIVITY
+  - VIDEO_QUALITY_SCORE from FACT_MEETING_ACTIVITY
+  - DATE_ID for time series
+- **Query/Tableau Calculation:** 
+  ```
+  // Average Quality Scores by Date
+  AVG([Meeting Quality Score])
+  AVG([Audio Quality Score])
+  AVG([Video Quality Score])
+  
+  // Quality Trend Indicator
+  INDEX() = SIZE() AND AVG([Meeting Quality Score]) >= WINDOW_AVG(AVG([Meeting Quality Score]))
+  
+  // Quality Score Distribution
+  PERCENTILE([Meeting Quality Score], 0.25)
+  PERCENTILE([Meeting Quality Score], 0.75)
+  ```
+- **Calculations:** Moving averages, percentile bands, trend indicators
 - **Interactivity:** 
-  - Parameter to switch between Meeting Type and Meeting Category view
-  - Filter by Date Range
-  - Tooltip showing participant count and quality scores
-- **Justification:** Grouped bar charts allow easy comparison across multiple dimensions simultaneously
-- **Optimization Tips:** Use LOD calculations sparingly, pre-aggregate in data source, use extract refresh strategy
+  - Parameter to switch between quality metrics
+  - Filter by meeting type and user segment
+  - Reference bands for quality thresholds
+- **Justification:** Dual-axis shows multiple quality dimensions with trend context
+- **Optimization Tips:** Pre-aggregate quality scores by date, use continuous date axis
 
 ---
 
-**Data Element:** Number of Users by Meeting Topics
-- **Recommended Visual:** Tree Map
-- **Data Fields:** MEETING_TOPIC, COUNT(DISTINCT USER_KEY)
-- **Calculations:** 
-  - Unique Users per Topic: `COUNTD([User Key])`
-  - Topic Popularity Score: `COUNTD([User Key]) / TOTAL(COUNTD([User Key]))`
+### **Usage Analysis Section**
+
+#### **Metric 3: Average Meeting Duration by Type and Category**
+- **Data Element:** Meeting Duration Analysis
+- **Recommended Visual:** Grouped Bar Chart with Reference Lines
+- **Data Fields:** 
+  - MEETING_TYPE from DIM_MEETING_TYPE
+  - MEETING_CATEGORY from DIM_MEETING_TYPE
+  - ACTUAL_DURATION_MINUTES from FACT_MEETING_ACTIVITY
+  - SCHEDULED_DURATION_MINUTES from FACT_MEETING_ACTIVITY
+- **Query/Tableau Calculation:** 
+  ```
+  // Average Actual Duration by Type
+  {FIXED [Meeting Type] : AVG([Actual Duration Minutes])}
+  
+  // Duration Variance (Actual vs Scheduled)
+  AVG([Actual Duration Minutes]) - AVG([Scheduled Duration Minutes])
+  
+  // Overall Average Reference Line
+  WINDOW_AVG(AVG([Actual Duration Minutes]))
+  
+  // Duration Efficiency Ratio
+  AVG([Actual Duration Minutes]) / AVG([Scheduled Duration Minutes])
+  ```
+- **Calculations:** Fixed LOD for consistent averages, variance calculations, efficiency ratios
 - **Interactivity:** 
-  - Filter by Date Range
-  - Filter by Meeting Type
-  - Click to filter other views
-  - Drill-through to detailed user list
-- **Justification:** Tree maps effectively show hierarchical data and relative sizes, perfect for topic popularity visualization
-- **Optimization Tips:** Limit to top 50 topics, use context filters, consider data extract with topic aggregation
+  - Parameter to switch between Actual vs Scheduled duration
+  - Filter by business purpose and time period
+  - Tooltip showing participant statistics
+  - Sort by duration or meeting count
+- **Justification:** Grouped bars allow comparison across categorical dimensions with benchmark context
+- **Optimization Tips:** 
+  - Use context filters for date ranges
+  - Pre-aggregate at meeting type level
+  - Limit to top 15 meeting types for performance
 
 ---
 
-**Data Element:** Number of Meetings per User
-- **Recommended Visual:** Histogram with Distribution Curve
-- **Data Fields:** USER_NAME, COUNT(MEETING_ACTIVITY_ID)
-- **Calculations:** 
-  - Meetings per User: `{FIXED [User Key] : COUNTD([Meeting Activity Id])}`
-  - User Engagement Percentile: `PERCENTILE([Meetings per User], 0.75)`
+#### **Metric 4: Participant Engagement Metrics**
+- **Data Element:** Meeting Participation Analysis
+- **Recommended Visual:** Scatter Plot with Size and Color Encoding
+- **Data Fields:** 
+  - PARTICIPANT_COUNT from FACT_MEETING_ACTIVITY
+  - AVERAGE_PARTICIPATION_MINUTES from FACT_MEETING_ACTIVITY
+  - PEAK_CONCURRENT_PARTICIPANTS from FACT_MEETING_ACTIVITY
+  - MEETING_SATISFACTION_SCORE from FACT_MEETING_ACTIVITY
+- **Query/Tableau Calculation:** 
+  ```
+  // Engagement Rate
+  [Average Participation Minutes] / [Actual Duration Minutes]
+  
+  // Participation Efficiency
+  [Peak Concurrent Participants] / [Participant Count]
+  
+  // Engagement Score Bins
+  IF [Engagement Rate] >= 0.8 THEN "High Engagement"
+  ELSEIF [Engagement Rate] >= 0.5 THEN "Medium Engagement"
+  ELSE "Low Engagement"
+  END
+  
+  // Meeting Size Categories
+  IF [Participant Count] <= 5 THEN "Small (1-5)"
+  ELSEIF [Participant Count] <= 15 THEN "Medium (6-15)"
+  ELSEIF [Participant Count] <= 50 THEN "Large (16-50)"
+  ELSE "Very Large (50+)"
+  END
+  ```
+- **Calculations:** Engagement ratios, categorical binning, efficiency metrics
 - **Interactivity:** 
-  - Parameter for bin size adjustment
-  - Filter by User Role and Plan Type
-  - Highlight action to show user details
-- **Justification:** Histograms show distribution patterns and help identify user engagement segments
-- **Optimization Tips:** Pre-calculate user meeting counts, use parameters for dynamic binning, limit to active users
+  - Size by participant count, color by satisfaction score
+  - Filter by meeting type and date range
+  - Highlight action to filter other views
+  - Drill-through to meeting details
+- **Justification:** Scatter plot reveals relationships between multiple engagement dimensions
+- **Optimization Tips:** 
+  - Sample large datasets for scatter plot performance
+  - Use calculated fields for binning
+  - Implement data density controls
 
 ---
 
-**Data Element:** Feature Usage Trends Over Time
-- **Recommended Visual:** Multi-Line Chart with Dual Axis
-- **Data Fields:** DATE_KEY, FEATURE_NAME, SUM(USAGE_COUNT), AVG(USAGE_DURATION_MINUTES)
-- **Calculations:** 
-  - Daily Usage Count: `SUM([Usage Count])`
-  - 7-Day Moving Average: `WINDOW_AVG(SUM([Usage Count]), -6, 0)`
-  - Usage Duration Trend: `AVG([Usage Duration Minutes])`
+### **Feature Usage Section**
+
+#### **Metric 5: Feature Adoption and Usage Patterns**
+- **Data Element:** Platform Feature Utilization
+- **Recommended Visual:** Highlight Table (Heat Map Style) with Nested Sorting
+- **Data Fields:** 
+  - FEATURE_NAME from DIM_FEATURE
+  - FEATURE_CATEGORY from DIM_FEATURE
+  - USAGE_COUNT from FACT_FEATURE_USAGE
+  - FEATURE_ADOPTION_SCORE from FACT_FEATURE_USAGE
+  - USER_EXPERIENCE_RATING from FACT_FEATURE_USAGE
+- **Query/Tableau Calculation:** 
+  ```
+  // Feature Usage Frequency
+  SUM([Usage Count])
+  
+  // Unique Users per Feature
+  COUNTD([User Dim Id])
+  
+  // Feature Adoption Rate
+  COUNTD([User Dim Id]) / TOTAL(COUNTD([User Dim Id]))
+  
+  // Average User Experience Rating
+  AVG([User Experience Rating])
+  
+  // Feature Usage Intensity
+  SUM([Usage Count]) / COUNTD([User Dim Id])
+  
+  // Category Performance Score
+  {FIXED [Feature Category] : AVG([Feature Adoption Score])}
+  ```
+- **Calculations:** Adoption rates, usage intensity, experience ratings, category aggregations
 - **Interactivity:** 
-  - Date range filter with relative date options
-  - Feature multi-select filter
-  - Parameter to switch between daily/weekly/monthly view
-  - Synchronized dual axis for count and duration
-- **Justification:** Line charts show trends over time effectively, dual axis allows comparison of different metrics
-- **Optimization Tips:** Use continuous dates, limit to top 10 features, use table calculations for moving averages
+  - Hierarchical filter: Category → Feature
+  - Sort by adoption rate, usage count, or experience rating
+  - Color coding by performance thresholds
+  - Click to filter usage trends
+- **Justification:** Heat map format shows both feature popularity and user satisfaction intensity
+- **Optimization Tips:** 
+  - Limit to top 50 features for performance
+  - Use string aggregation for feature grouping
+  - Pre-calculate adoption metrics
 
 ---
 
-#### **Report 2: Service Reliability & Support Report**
-
-**Data Element:** Number of Users by Support Category and Subcategory
-- **Recommended Visual:** Nested Bar Chart (Stacked)
-- **Data Fields:** SUPPORT_CATEGORY, SUPPORT_SUBCATEGORY, COUNT(DISTINCT USER_KEY)
-- **Calculations:** 
-  - Users per Category: `COUNTD([User Key])`
-  - Category Distribution: `SUM([Users per Category]) / TOTAL(SUM([Users per Category]))`
+#### **Metric 6: User Engagement Distribution**
+- **Data Element:** User Activity Level Analysis
+- **Recommended Visual:** Histogram with Box Plot Overlay
+- **Data Fields:** 
+  - USER_DIM_ID from FACT_MEETING_ACTIVITY
+  - MEETING_ACTIVITY_ID count
+  - PLAN_TYPE from DIM_USER
+  - USER_ROLE from DIM_USER
+- **Query/Tableau Calculation:** 
+  ```
+  // Meetings per User
+  {FIXED [User Dim Id] : COUNT([Meeting Activity Id])}
+  
+  // User Engagement Segments
+  IF [Meetings per User] <= 2 THEN "Inactive (0-2)"
+  ELSEIF [Meetings per User] <= 10 THEN "Low (3-10)"
+  ELSEIF [Meetings per User] <= 25 THEN "Medium (11-25)"
+  ELSEIF [Meetings per User] <= 50 THEN "High (26-50)"
+  ELSE "Very High (50+)"
+  END
+  
+  // Percentile Rankings
+  PERCENTILE([Meetings per User], 0.25)
+  PERCENTILE([Meetings per User], 0.5)
+  PERCENTILE([Meetings per User], 0.75)
+  
+  // Engagement Score by Plan Type
+  {FIXED [Plan Type] : AVG([Meetings per User])}
+  ```
+- **Calculations:** User-level aggregation, binning logic, percentile calculations, plan comparisons
 - **Interactivity:** 
-  - Drill-down from Category to Subcategory
-  - Filter by Priority Level
-  - Filter by Date Range
-  - Sort by count or alphabetically
-- **Justification:** Stacked bars show both total and breakdown by subcategory in a single view
-- **Optimization Tips:** Use extract with pre-aggregated support data, context filter on date, index on support category keys
+  - Dynamic bin size parameter (5, 10, 15 meetings)
+  - Filter by user role, plan type, and geographic region
+  - Drill-through to individual user analysis
+  - Color by plan type or user role
+- **Justification:** Histogram shows engagement distribution patterns, box plot adds statistical context
+- **Optimization Tips:** 
+  - Create user-level extract for performance
+  - Use calculated bins instead of Tableau's automatic binning
+  - Implement user sampling for large datasets
 
 ---
 
-**Data Element:** Support Activities by Resolution Status
-- **Recommended Visual:** Donut Chart with KPI Cards
-- **Data Fields:** RESOLUTION_STATUS, COUNT(SUPPORT_ACTIVITY_ID)
-- **Calculations:** 
-  - Total Support Activities: `COUNT([Support Activity Id])`
-  - Resolution Rate: `SUM(IF [Resolution Status] = 'Resolved' THEN 1 ELSE 0 END) / COUNT([Support Activity Id])`
-  - Average Resolution Time: `AVG([Resolution Time Hours])`
-- **Interactivity:** 
-  - Filter by Date Range
-  - Filter by Priority Level
-  - Click to filter detailed views
-  - Parameter for time period comparison
-- **Justification:** Donut charts show proportions clearly, KPI cards provide key metrics at a glance
-- **Optimization Tips:** Use calculated fields for percentages, limit status categories, use quick filters
+## **2. Overall Dashboard Design**
 
----
+### **Layout Suggestions:**
+- **Header Section (15% height):** 
+  - KPI cards for total minutes, active users, and quality scores
+  - Global date range filter and reset button
+- **Main Content Area (70% height):**
+  - **Left Panel (40%):** Meeting duration analysis and participant engagement scatter plot
+  - **Right Panel (60%):** Feature adoption heat map and usage trends
+- **Footer Section (15% height):** 
+  - User engagement histogram
+  - Filter controls for user segments and meeting types
 
-**Data Element:** Support Activities by Priority Level
-- **Recommended Visual:** Bullet Graph with Target Lines
-- **Data Fields:** PRIORITY_LEVEL, COUNT(SUPPORT_ACTIVITY_ID), SLA_TARGET_HOURS
-- **Calculations:** 
-  - Activities by Priority: `COUNT([Support Activity Id])`
-  - SLA Compliance Rate: `SUM(IF [Sla Met] = TRUE THEN 1 ELSE 0 END) / COUNT([Support Activity Id])`
-  - Target vs Actual: `AVG([Resolution Time Hours]) - AVG([Sla Target Hours])`
-- **Interactivity:** 
-  - Parameter for SLA target adjustment
-  - Filter by Support Category
-  - Drill-through to ticket details
-  - Color coding for SLA performance
-- **Justification:** Bullet graphs effectively show performance against targets with clear visual indicators
-- **Optimization Tips:** Use parameters for dynamic targets, pre-calculate SLA metrics, use color coding for quick identification
-
----
-
-**Data Element:** Support Resolution Time Analysis
-- **Recommended Visual:** Box and Whisker Plot
-- **Data Fields:** SUPPORT_CATEGORY, RESOLUTION_TIME_HOURS, PRIORITY_LEVEL
-- **Calculations:** 
-  - Median Resolution Time: `MEDIAN([Resolution Time Hours])`
-  - 95th Percentile: `PERCENTILE([Resolution Time Hours], 0.95)`
-  - Outlier Detection: `IF [Resolution Time Hours] > PERCENTILE([Resolution Time Hours], 0.95) THEN 'Outlier' ELSE 'Normal' END`
-- **Interactivity:** 
-  - Filter by Priority Level
-  - Filter by Date Range
-  - Highlight outliers
-  - Drill-down to specific tickets
-- **Justification:** Box plots show distribution, median, and outliers effectively for time-based analysis
-- **Optimization Tips:** Use statistical functions efficiently, limit to recent data, use reference lines for SLA targets
-
----
-
-### **2. Overall Dashboard Design**
-
-#### **Layout Suggestions:**
-- **Dashboard Structure:** Use a 3-tier layout approach
-  - **Top Tier:** Executive KPI cards (Total Users, Total Meetings, Average Resolution Time, Platform Uptime)
-  - **Middle Tier:** Primary analytical views (Usage trends, Support status overview)
-  - **Bottom Tier:** Detailed drill-down views and distribution analysis
-- **Navigation:** Implement tab-based navigation for different report sections
-- **Responsive Design:** Use device-specific layouts for mobile and desktop viewing
-- **White Space:** Maintain adequate spacing between visualizations for clarity
-
-#### **Performance Optimization:**
+### **Performance Optimization:**
 - **Extract Strategy:** 
-  - Create extracts for fact tables with incremental refresh daily
-  - Full refresh weekly for dimension tables
-  - Use aggregate extracts for summary-level dashboards
-- **Data Source Optimization:**
-  - Create custom SQL connections with pre-joined tables
-  - Use indexed views in the database for frequently accessed combinations
-  - Implement data source filters to limit historical data (e.g., last 2 years)
+  - Daily incremental refresh for FACT_MEETING_ACTIVITY and FACT_FEATURE_USAGE
+  - Weekly full refresh for dimension tables
+  - Separate extracts for meeting and feature analysis
+- **Query Optimization:**
+  - Use custom SQL with pre-aggregated metrics
+  - Implement date partitioning for large fact tables
+  - Create indexed views for frequently used joins
 - **Calculation Optimization:**
   - Move complex calculations to data source level
   - Use context filters before dimension filters
-  - Limit LOD calculations and prefer table calculations where possible
-- **Filter Optimization:**
-  - Use single-value dropdown filters instead of multi-select where appropriate
-  - Implement cascading filters to reduce data scanning
-  - Use "Only Relevant Values" option for filters
+  - Minimize nested LOD calculations
 
-#### **Color Scheme:**
-- **Primary Colors:** 
-  - Blue (#1f77b4) for primary metrics and positive indicators
-  - Orange (#ff7f0e) for secondary metrics and warnings
-  - Red (#d62728) for alerts and critical issues
-  - Green (#2ca02c) for success metrics and targets met
-- **Supporting Colors:**
-  - Light gray (#f0f0f0) for backgrounds
-  - Dark gray (#333333) for text and borders
-  - Light blue (#aec7e8) for hover states
-- **Accessibility:** Ensure color combinations meet WCAG 2.1 AA standards
-- **Consistency:** Use the same color for the same metric across all views
+### **Color Scheme:**
+- **Primary:** Blue (#1f77b4) for meeting metrics
+- **Secondary:** Green (#2ca02c) for positive trends and targets met
+- **Accent:** Orange (#ff7f0e) for feature usage and comparisons
+- **Alert:** Red (#d62728) for low performance or issues
+- **Neutral:** Gray (#7f7f7f) for supporting elements and backgrounds
 
-#### **Typography:**
-- **Headers:** Tableau Book, 14-16pt, Bold
-- **Axis Labels:** Tableau Book, 10-12pt, Regular
-- **Data Labels:** Tableau Book, 9-10pt, Regular
+### **Typography:**
+- **Dashboard Title:** Tableau Book, 18pt, Bold
+- **Section Headers:** Tableau Book, 14pt, Bold
+- **Chart Titles:** Tableau Book, 12pt, Bold
+- **KPI Values:** Tableau Book, 24pt, Bold
+- **Labels and Legends:** Tableau Book, 10pt, Regular
 - **Tooltips:** Tableau Book, 9pt, Regular
-- **KPI Values:** Tableau Book, 18-24pt, Bold
-- **Hierarchy:** Use font size and weight to establish visual hierarchy
 
-#### **Interactive Elements:**
+### **Interactive Elements:**
 
 | Element Type | Purpose | Implementation | Data Fields |
 |--------------|---------|----------------|-------------|
-| **Date Range Filter** | Time period selection | Relative date filter with custom ranges | DATE_KEY, with options for Last 7 days, Last 30 days, Last Quarter |
-| **User Segment Filter** | Filter by user characteristics | Multi-select dropdown | PLAN_TYPE, USER_ROLE, GEOGRAPHIC_REGION |
-| **Meeting Type Parameter** | Switch between meeting analysis views | Single-select parameter | MEETING_TYPE, MEETING_CATEGORY |
-| **Priority Level Filter** | Support ticket priority filtering | Single-select with "All" option | PRIORITY_LEVEL (High, Medium, Low) |
-| **Feature Category Filter** | Feature usage analysis | Hierarchical filter | FEATURE_CATEGORY, FEATURE_TYPE |
-| **Drill-Down Action** | Navigate from summary to detail | Filter action on click | USER_KEY → Meeting details, MEETING_KEY → Feature usage |
-| **Highlight Action** | Cross-highlight related data | Highlight action on hover | Highlight related records across multiple sheets |
-| **URL Action** | Link to external systems | URL action with parameters | Link to support ticket system with SUPPORT_ACTIVITY_ID |
-| **Reset Filters** | Clear all applied filters | Button with reset action | Reset all dashboard filters to default state |
-| **Export Options** | Data export capabilities | Download actions | PDF for executive summary, Excel for detailed data |
+| **Date Range Filter** | Time period selection | Relative date filter with custom ranges | DATE_ID (Last 7 days, Last 30 days, Last Quarter, Last Year, Custom) |
+| **User Segment Filter** | User demographic filtering | Multi-select dropdown with "All" option | PLAN_TYPE, USER_ROLE, GEOGRAPHIC_REGION, INDUSTRY_SECTOR |
+| **Meeting Type Parameter** | Analysis focus switching | Single-select parameter with radio buttons | MEETING_TYPE vs MEETING_CATEGORY vs BUSINESS_PURPOSE |
+| **Quality Threshold Parameter** | Performance benchmark adjustment | Slider parameter (1-10 scale) | MEETING_QUALITY_SCORE threshold for color coding |
+| **Feature Category Filter** | Feature analysis filtering | Hierarchical filter with expand/collapse | FEATURE_CATEGORY → FEATURE_NAME |
+| **Engagement Bin Parameter** | User segmentation adjustment | Single-select parameter | Bin sizes: 5, 10, 15, 20 meetings |
+| **Cross-Filter Actions** | Related data highlighting | Filter actions between related charts | USER_DIM_ID, MEETING_TYPE_ID cross-filtering |
+| **Drill-Down Actions** | Navigate to detailed views | URL actions to detailed dashboards | Meeting details, User profiles, Feature analysis |
+| **Reset Dashboard Action** | Clear all selections | Button action | Return to default filter state |
+| **Export Data Action** | Data extraction | Download action | Filtered data export to CSV/Excel |
 
-#### **Dashboard Performance Monitoring:**
-- **Load Time Targets:** 
-  - Initial load: < 10 seconds
-  - Filter interactions: < 3 seconds
-  - Drill-down actions: < 5 seconds
-- **Data Freshness Indicators:** Display last refresh timestamp
-- **Error Handling:** Implement graceful error messages for data connection issues
-- **Usage Analytics:** Track dashboard usage patterns using Tableau Server logs
+### **Dashboard Performance Tips:**
+1. **Data Connection:** Use extracts instead of live connections for better performance
+2. **Filter Order:** Apply context filters first, then dimension filters, then measure filters
+3. **Calculation Placement:** Move calculations to data source when possible
+4. **Visual Optimization:** Limit mark count to under 10,000 per worksheet
+5. **Refresh Strategy:** Schedule extract refreshes during off-peak hours
+6. **Mobile Optimization:** Create device-specific layouts for mobile access
 
-#### **Mobile Optimization:**
-- **Device Layouts:** Create specific layouts for phone and tablet views
-- **Touch Interactions:** Ensure filters and actions work well with touch interfaces
-- **Simplified Views:** Reduce complexity for mobile versions while maintaining key insights
-- **Vertical Scrolling:** Design for vertical scrolling on mobile devices
-
-#### **Security and Governance:**
-- **Row-Level Security:** Implement user-based data filtering where required
-- **Data Source Permissions:** Ensure appropriate access controls on underlying data
-- **Refresh Schedules:** Coordinate with data pipeline schedules
-- **Version Control:** Maintain dashboard versioning and change documentation
-
-This comprehensive Tableau Dashboard Visuals Recommender provides a structured approach to building effective analytics dashboards for the Platform Analytics System, ensuring optimal performance, user experience, and actionable insights.
+**Output URL:** https://github.com/DIAscendion/Ascendion/blob/Agent_Output/Tableau_Dashboard_TWB_1
+**Pipeline ID:** 9468
