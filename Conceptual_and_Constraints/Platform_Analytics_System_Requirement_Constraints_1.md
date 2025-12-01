@@ -1,12 +1,12 @@
 ____________________________________________
 ## *Author*: AAVA
 ## *Created on*:   11-11-2025
-## *Description*: Model Data Constraints for Zoom Platform Analytics System supporting usage, reliability, and revenue reporting
+## *Description*: Model Data Constraints for Platform Analytics System supporting usage, reliability, and revenue reporting
 ## *Version*: 1 
 ## *Updated on*: 11-11-2025
 _____________________________________________
 
-# Zoom Platform Analytics System - Model Data Constraints
+#  Platform Analytics System - Model Data Constraints
 
 ## 1. Data Expectations
 
