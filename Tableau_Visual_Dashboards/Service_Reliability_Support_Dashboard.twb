@@ -34,21 +34,12 @@
         </named-connections>
         <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
         <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='collection'>
-          <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_USER' table='[DB_POC_Z].[GOLD].[DIM_USER]' type='table' />
           <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
-          <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
+          <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_USER' table='[DB_POC_Z].[GOLD].[DIM_USER]' type='table' />
           <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_Z].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
+          <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
         </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
         <cols>
-          <map key='[SUPPORT_CATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY]' />
-          <map key='[SUPPORT_SUBCATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_SUBCATEGORY]' />
-          <map key='[PRIORITY_LEVEL]' value='[DIM_SUPPORT_CATEGORY].[PRIORITY_LEVEL]' />
-          <map key='[SUPPORT_CATEGORY_KEY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY_KEY]' />
-          <map key='[USER_KEY]' value='[DIM_USER].[USER_KEY]' />
-          <map key='[USER_NAME]' value='[DIM_USER].[USER_NAME]' />
-          <map key='[COMPANY]' value='[DIM_USER].[COMPANY]' />
-          <map key='[PLAN_TYPE]' value='[DIM_USER].[PLAN_TYPE]' />
-          <map key='[PLAN_CATEGORY]' value='[DIM_USER].[PLAN_CATEGORY]' />
           <map key='[SUPPORT_ACTIVITY_ID]' value='[FACT_SUPPORT_ACTIVITY].[SUPPORT_ACTIVITY_ID]' />
           <map key='[USER_KEY (FACT_SUPPORT_ACTIVITY)]' value='[FACT_SUPPORT_ACTIVITY].[USER_KEY]' />
           <map key='[SUPPORT_CATEGORY_KEY (FACT_SUPPORT_ACTIVITY)]' value='[FACT_SUPPORT_ACTIVITY].[SUPPORT_CATEGORY_KEY]' />
@@ -59,126 +50,32 @@
           <map key='[FIRST_CONTACT_RESOLUTION_FLAG]' value='[FACT_SUPPORT_ACTIVITY].[FIRST_CONTACT_RESOLUTION_FLAG]' />
           <map key='[CUSTOMER_SATISFACTION_SCORE]' value='[FACT_SUPPORT_ACTIVITY].[CUSTOMER_SATISFACTION_SCORE]' />
           <map key='[ESCALATION_COUNT]' value='[FACT_SUPPORT_ACTIVITY].[ESCALATION_COUNT]' />
+          <map key='[USER_KEY]' value='[DIM_USER].[USER_KEY]' />
+          <map key='[USER_NAME]' value='[DIM_USER].[USER_NAME]' />
+          <map key='[COMPANY]' value='[DIM_USER].[COMPANY]' />
+          <map key='[PLAN_TYPE]' value='[DIM_USER].[PLAN_TYPE]' />
+          <map key='[SUPPORT_CATEGORY_KEY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY_KEY]' />
+          <map key='[SUPPORT_CATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY]' />
+          <map key='[SUPPORT_SUBCATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_SUBCATEGORY]' />
+          <map key='[PRIORITY_LEVEL]' value='[DIM_SUPPORT_CATEGORY].[PRIORITY_LEVEL]' />
           <map key='[DATE_KEY]' value='[DIM_DATE].[DATE_KEY]' />
           <map key='[DATE_VALUE]' value='[DIM_DATE].[DATE_VALUE]' />
-          <map key='[YEAR]' value='[DIM_DATE].[YEAR]' />
-          <map key='[MONTH]' value='[DIM_DATE].[MONTH]' />
           <map key='[MONTH_NAME]' value='[DIM_DATE].[MONTH_NAME]' />
           <map key='[QUARTER]' value='[DIM_DATE].[QUARTER]' />
+          <map key='[YEAR]' value='[DIM_DATE].[YEAR]' />
         </cols>
         <metadata-records>
-          <metadata-record class='column'>
-            <remote-name>USER_KEY</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[USER_KEY]</local-name>
-            <parent-name>[DIM_USER]</parent-name>
-            <remote-alias>USER_KEY</remote-alias>
-            <ordinal>1</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <width>32</width>
-            <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>USER_NAME</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[USER_NAME]</local-name>
-            <parent-name>[DIM_USER]</parent-name>
-            <remote-alias>USER_NAME</remote-alias>
-            <ordinal>2</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <width>16777216</width>
-            <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>COMPANY</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[COMPANY]</local-name>
-            <parent-name>[DIM_USER]</parent-name>
-            <remote-alias>COMPANY</remote-alias>
-            <ordinal>3</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <width>16777216</width>
-            <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>PLAN_TYPE</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[PLAN_TYPE]</local-name>
-            <parent-name>[DIM_USER]</parent-name>
-            <remote-alias>PLAN_TYPE</remote-alias>
-            <ordinal>4</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <width>10</width>
-            <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>PLAN_CATEGORY</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[PLAN_CATEGORY]</local-name>
-            <parent-name>[DIM_USER]</parent-name>
-            <remote-alias>PLAN_CATEGORY</remote-alias>
-            <ordinal>5</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <width>7</width>
-            <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
           <metadata-record class='column'>
             <remote-name>SUPPORT_ACTIVITY_ID</remote-name>
             <remote-type>131</remote-type>
             <local-name>[SUPPORT_ACTIVITY_ID]</local-name>
             <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
             <remote-alias>SUPPORT_ACTIVITY_ID</remote-alias>
-            <ordinal>6</ordinal>
+            <ordinal>1</ordinal>
             <local-type>integer</local-type>
-            <aggregation>Sum</aggregation>
-            <precision>18</precision>
-            <scale>0</scale>
+            <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_DECIMAL&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_NUMERIC&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>USER_KEY</remote-name>
@@ -186,18 +83,11 @@
             <local-name>[USER_KEY (FACT_SUPPORT_ACTIVITY)]</local-name>
             <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
             <remote-alias>USER_KEY</remote-alias>
-            <ordinal>7</ordinal>
+            <ordinal>2</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
-            <width>32</width>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>SUPPORT_CATEGORY_KEY</remote-name>
@@ -205,18 +95,11 @@
             <local-name>[SUPPORT_CATEGORY_KEY (FACT_SUPPORT_ACTIVITY)]</local-name>
             <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
             <remote-alias>SUPPORT_CATEGORY_KEY</remote-alias>
-            <ordinal>8</ordinal>
+            <ordinal>3</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
-            <width>32</width>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>DATE_KEY</remote-name>
@@ -224,15 +107,11 @@
             <local-name>[DATE_KEY (FACT_SUPPORT_ACTIVITY)]</local-name>
             <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
             <remote-alias>DATE_KEY</remote-alias>
-            <ordinal>9</ordinal>
+            <ordinal>4</ordinal>
             <local-type>date</local-type>
             <aggregation>Year</aggregation>
             <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_TYPE_DATE&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_TYPE_DATE&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>RESOLUTION_STATUS</remote-name>
@@ -240,18 +119,11 @@
             <local-name>[RESOLUTION_STATUS]</local-name>
             <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
             <remote-alias>RESOLUTION_STATUS</remote-alias>
-            <ordinal>10</ordinal>
+            <ordinal>5</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
-            <width>20</width>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>RESOLUTION_TIME_HOURS</remote-name>
@@ -259,17 +131,11 @@
             <local-name>[RESOLUTION_TIME_HOURS]</local-name>
             <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
             <remote-alias>RESOLUTION_TIME_HOURS</remote-alias>
-            <ordinal>11</ordinal>
+            <ordinal>6</ordinal>
             <local-type>real</local-type>
             <aggregation>Sum</aggregation>
-            <precision>10</precision>
-            <scale>2</scale>
             <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_DECIMAL&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_NUMERIC&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>SLA_MET</remote-name>
@@ -277,15 +143,11 @@
             <local-name>[SLA_MET]</local-name>
             <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
             <remote-alias>SLA_MET</remote-alias>
-            <ordinal>12</ordinal>
+            <ordinal>7</ordinal>
             <local-type>boolean</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_BIT&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_BIT&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>FIRST_CONTACT_RESOLUTION_FLAG</remote-name>
@@ -293,15 +155,11 @@
             <local-name>[FIRST_CONTACT_RESOLUTION_FLAG]</local-name>
             <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
             <remote-alias>FIRST_CONTACT_RESOLUTION_FLAG</remote-alias>
-            <ordinal>13</ordinal>
+            <ordinal>8</ordinal>
             <local-type>boolean</local-type>
             <aggregation>Count</aggregation>
             <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_BIT&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_BIT&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>CUSTOMER_SATISFACTION_SCORE</remote-name>
@@ -309,17 +167,11 @@
             <local-name>[CUSTOMER_SATISFACTION_SCORE]</local-name>
             <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
             <remote-alias>CUSTOMER_SATISFACTION_SCORE</remote-alias>
-            <ordinal>14</ordinal>
+            <ordinal>9</ordinal>
             <local-type>real</local-type>
             <aggregation>Sum</aggregation>
-            <precision>3</precision>
-            <scale>1</scale>
             <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_DECIMAL&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_NUMERIC&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>ESCALATION_COUNT</remote-name>
@@ -327,17 +179,71 @@
             <local-name>[ESCALATION_COUNT]</local-name>
             <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
             <remote-alias>ESCALATION_COUNT</remote-alias>
-            <ordinal>15</ordinal>
+            <ordinal>10</ordinal>
             <local-type>integer</local-type>
             <aggregation>Sum</aggregation>
-            <precision>5</precision>
-            <scale>0</scale>
             <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_DECIMAL&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_NUMERIC&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_KEY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_KEY]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>USER_KEY</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_NAME]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>USER_NAME</remote-alias>
+            <ordinal>12</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COMPANY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[COMPANY]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>COMPANY</remote-alias>
+            <ordinal>13</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PLAN_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[PLAN_TYPE]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>PLAN_TYPE</remote-alias>
+            <ordinal>14</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SUPPORT_CATEGORY_KEY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[SUPPORT_CATEGORY_KEY]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>SUPPORT_CATEGORY_KEY</remote-alias>
+            <ordinal>15</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_SUPPORT_CATEGORY_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
             <remote-name>SUPPORT_CATEGORY</remote-name>
@@ -348,14 +254,7 @@
             <ordinal>16</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
-            <width>50</width>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
-            </attributes>
             <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_SUPPORT_CATEGORY_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
@@ -367,14 +266,7 @@
             <ordinal>17</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
-            <width>50</width>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
-            </attributes>
             <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_SUPPORT_CATEGORY_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
@@ -386,33 +278,7 @@
             <ordinal>18</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
-            <width>10</width>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_SUPPORT_CATEGORY_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>SUPPORT_CATEGORY_KEY</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[SUPPORT_CATEGORY_KEY]</local-name>
-            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
-            <remote-alias>SUPPORT_CATEGORY_KEY</remote-alias>
-            <ordinal>19</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <width>32</width>
-            <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
-            </attributes>
             <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_SUPPORT_CATEGORY_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
@@ -421,14 +287,10 @@
             <local-name>[DATE_KEY]</local-name>
             <parent-name>[DIM_DATE]</parent-name>
             <remote-alias>DATE_KEY</remote-alias>
-            <ordinal>20</ordinal>
+            <ordinal>19</ordinal>
             <local-type>date</local-type>
             <aggregation>Year</aggregation>
             <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_TYPE_DATE&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_TYPE_DATE&quot;</attribute>
-            </attributes>
             <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_DATE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
@@ -437,50 +299,10 @@
             <local-name>[DATE_VALUE]</local-name>
             <parent-name>[DIM_DATE]</parent-name>
             <remote-alias>DATE_VALUE</remote-alias>
-            <ordinal>21</ordinal>
+            <ordinal>20</ordinal>
             <local-type>date</local-type>
             <aggregation>Year</aggregation>
             <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_TYPE_DATE&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_TYPE_DATE&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_DATE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>YEAR</remote-name>
-            <remote-type>131</remote-type>
-            <local-name>[YEAR]</local-name>
-            <parent-name>[DIM_DATE]</parent-name>
-            <remote-alias>YEAR</remote-alias>
-            <ordinal>22</ordinal>
-            <local-type>integer</local-type>
-            <aggregation>Sum</aggregation>
-            <precision>4</precision>
-            <scale>0</scale>
-            <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_DECIMAL&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_NUMERIC&quot;</attribute>
-            </attributes>
-            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_DATE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>MONTH</remote-name>
-            <remote-type>131</remote-type>
-            <local-name>[MONTH]</local-name>
-            <parent-name>[DIM_DATE]</parent-name>
-            <remote-alias>MONTH</remote-alias>
-            <ordinal>23</ordinal>
-            <local-type>integer</local-type>
-            <aggregation>Sum</aggregation>
-            <precision>2</precision>
-            <scale>0</scale>
-            <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_DECIMAL&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_NUMERIC&quot;</attribute>
-            </attributes>
             <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_DATE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
@@ -489,17 +311,10 @@
             <local-name>[MONTH_NAME]</local-name>
             <parent-name>[DIM_DATE]</parent-name>
             <remote-alias>MONTH_NAME</remote-alias>
-            <ordinal>24</ordinal>
+            <ordinal>21</ordinal>
             <local-type>string</local-type>
             <aggregation>Count</aggregation>
-            <width>3</width>
             <contains-null>true</contains-null>
-            <collation flag='0' name='binary' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
-              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
-            </attributes>
             <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_DATE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
           <metadata-record class='column'>
@@ -508,35 +323,52 @@
             <local-name>[QUARTER]</local-name>
             <parent-name>[DIM_DATE]</parent-name>
             <remote-alias>QUARTER</remote-alias>
-            <ordinal>25</ordinal>
+            <ordinal>22</ordinal>
             <local-type>integer</local-type>
             <aggregation>Sum</aggregation>
-            <precision>2</precision>
-            <scale>0</scale>
             <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_DECIMAL&quot;</attribute>
-              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_NUMERIC&quot;</attribute>
-            </attributes>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_DATE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>YEAR</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[YEAR]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>YEAR</remote-alias>
+            <ordinal>23</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
             <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_DATE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
           </metadata-record>
         </metadata-records>
       </connection>
       <aliases enabled='yes' />
+      <column caption='Support Activity ID' datatype='integer' name='[SUPPORT_ACTIVITY_ID]' role='dimension' type='ordinal' />
+      <column caption='User Key (Support Activity)' datatype='string' name='[USER_KEY (FACT_SUPPORT_ACTIVITY)]' role='dimension' type='nominal' />
+      <column caption='Support Category Key (Support Activity)' datatype='string' name='[SUPPORT_CATEGORY_KEY (FACT_SUPPORT_ACTIVITY)]' role='dimension' type='nominal' />
+      <column caption='Date Key (Support Activity)' datatype='date' name='[DATE_KEY (FACT_SUPPORT_ACTIVITY)]' role='dimension' type='ordinal' />
+      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+      <column caption='Resolution Time Hours' datatype='real' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
+      <column caption='SLA Met' datatype='boolean' name='[SLA_MET]' role='dimension' type='nominal' />
+      <column caption='First Contact Resolution Flag' datatype='boolean' name='[FIRST_CONTACT_RESOLUTION_FLAG]' role='dimension' type='nominal' />
+      <column caption='Customer Satisfaction Score' datatype='real' name='[CUSTOMER_SATISFACTION_SCORE]' role='measure' type='quantitative' />
+      <column caption='Escalation Count' datatype='integer' name='[ESCALATION_COUNT]' role='measure' type='quantitative' />
+      <column caption='User Key' datatype='string' name='[USER_KEY]' role='dimension' type='nominal' />
+      <column caption='User Name' datatype='string' name='[USER_NAME]' role='dimension' type='nominal' />
+      <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
+      <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Support Category Key' datatype='string' name='[SUPPORT_CATEGORY_KEY]' role='dimension' type='nominal' />
       <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
       <column caption='Support Subcategory' datatype='string' name='[SUPPORT_SUBCATEGORY]' role='dimension' type='nominal' />
       <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
-      <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
-      <column caption='Resolution Time Hours' datatype='real' name='[RESOLUTION_TIME_HOURS]' role='measure' type='quantitative' />
-      <column caption='Customer Satisfaction Score' datatype='real' name='[CUSTOMER_SATISFACTION_SCORE]' role='measure' type='quantitative' />
-      <column caption='Escalation Count' datatype='integer' name='[ESCALATION_COUNT]' role='measure' type='quantitative' />
-      <column caption='Company' datatype='string' name='[COMPANY]' role='dimension' type='nominal' />
-      <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
-      <column caption='Plan Category' datatype='string' name='[PLAN_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
       <column caption='Date Value' datatype='date' name='[DATE_VALUE]' role='dimension' type='ordinal' />
-      <column caption='Year' datatype='integer' name='[YEAR]' role='dimension' type='ordinal' />
       <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
       <column caption='Quarter' datatype='integer' name='[QUARTER]' role='dimension' type='ordinal' />
+      <column caption='Year' datatype='integer' name='[YEAR]' role='dimension' type='ordinal' />
+      
+      <!-- Calculated Fields for KPIs -->
       <column caption='Unique Users' datatype='integer' name='[Unique_Users]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='COUNTD([USER_KEY])' />
       </column>
@@ -558,6 +390,9 @@
       <column caption='Status Distribution' datatype='real' name='[Status_Distribution]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID]) / TOTAL(COUNT([SUPPORT_ACTIVITY_ID]))' />
       </column>
+      <column caption='Activity Count by Priority' datatype='integer' name='[Activity_Count_by_Priority]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNT([SUPPORT_ACTIVITY_ID])' />
+      </column>
       <column caption='SLA Compliance Rate' datatype='real' name='[SLA_Compliance_Rate]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='SUM(IF [SLA_MET] = TRUE THEN 1 ELSE 0 END) / COUNT([SUPPORT_ACTIVITY_ID])' />
       </column>
@@ -576,19 +411,26 @@
       <column caption='Escalation Rate' datatype='real' name='[Escalation_Rate]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='SUM([ESCALATION_COUNT]) / COUNT([SUPPORT_ACTIVITY_ID])' />
       </column>
+      
+      <_.fcp.ObjectModelTableType.true...column caption='FACT_SUPPORT_ACTIVITY' datatype='table' name='[__tableau_internal_object_id__].[FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_USER' datatype='table' name='[__tableau_internal_object_id__].[DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_SUPPORT_CATEGORY' datatype='table' name='[__tableau_internal_object_id__].[DIM_SUPPORT_CATEGORY_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_DATE' datatype='table' name='[__tableau_internal_object_id__].[DIM_DATE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]' role='measure' type='quantitative' />
+      
       <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
       <semantic-values>
         <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
       </semantic-values>
-      <_.fcp.ObjectModelTableType.true...column caption='DIM_DATE' datatype='table' name='[__tableau_internal_object_id__].[DIM_DATE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]' role='measure' type='quantitative' />
-      <_.fcp.ObjectModelTableType.true...column caption='DIM_SUPPORT_CATEGORY' datatype='table' name='[__tableau_internal_object_id__].[DIM_SUPPORT_CATEGORY_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]' role='measure' type='quantitative' />
-      <_.fcp.ObjectModelTableType.true...column caption='DIM_USER' datatype='table' name='[__tableau_internal_object_id__].[DIM_USER_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]' role='measure' type='quantitative' />
-      <_.fcp.ObjectModelTableType.true...column caption='FACT_SUPPORT_ACTIVITY' datatype='table' name='[__tableau_internal_object_id__].[FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]' role='measure' type='quantitative' />
       <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
         <objects>
-          <object caption='DIM_DATE' id='DIM_DATE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9'>
+          <object caption='FACT_SUPPORT_ACTIVITY' id='FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6'>
             <properties context=''>
-              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
+              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
+            </properties>
+          </object>
+          <object caption='DIM_USER' id='DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7'>
+            <properties context=''>
+              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_USER' table='[DB_POC_Z].[GOLD].[DIM_USER]' type='table' />
             </properties>
           </object>
           <object caption='DIM_SUPPORT_CATEGORY' id='DIM_SUPPORT_CATEGORY_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8'>
@@ -596,48 +438,43 @@
               <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_Z].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
             </properties>
           </object>
-          <object caption='DIM_USER' id='DIM_USER_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6'>
+          <object caption='DIM_DATE' id='DIM_DATE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9'>
             <properties context=''>
-              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_USER' table='[DB_POC_Z].[GOLD].[DIM_USER]' type='table' />
-            </properties>
-          </object>
-          <object caption='FACT_SUPPORT_ACTIVITY' id='FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7'>
-            <properties context=''>
-              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
+              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
             </properties>
           </object>
         </objects>
         <relationships>
           <relationship>
             <expression op='='>
-              <expression op='[DATE_KEY (FACT_SUPPORT_ACTIVITY)]' />
-              <expression op='[DATE_KEY]' />
+              <expression op='[USER_KEY (FACT_SUPPORT_ACTIVITY)]' />
+              <expression op='[USER_KEY]' />
             </expression>
-            <first-end-point object-id='FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7' />
-            <second-end-point object-id='DIM_DATE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9' />
+            <first-end-point object-id='FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6' />
+            <second-end-point object-id='DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7' />
           </relationship>
           <relationship>
             <expression op='='>
               <expression op='[SUPPORT_CATEGORY_KEY (FACT_SUPPORT_ACTIVITY)]' />
               <expression op='[SUPPORT_CATEGORY_KEY]' />
             </expression>
-            <first-end-point object-id='FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7' />
+            <first-end-point object-id='FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6' />
             <second-end-point object-id='DIM_SUPPORT_CATEGORY_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8' />
           </relationship>
           <relationship>
             <expression op='='>
-              <expression op='[USER_KEY]' />
-              <expression op='[USER_KEY (FACT_SUPPORT_ACTIVITY)]' />
+              <expression op='[DATE_KEY (FACT_SUPPORT_ACTIVITY)]' />
+              <expression op='[DATE_KEY]' />
             </expression>
-            <first-end-point object-id='DIM_USER_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6' />
-            <second-end-point object-id='FACT_SUPPORT_ACTIVITY_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7' />
+            <first-end-point object-id='FACT_SUPPORT_ACTIVITY_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6' />
+            <second-end-point object-id='DIM_DATE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9' />
           </relationship>
         </relationships>
       </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
     </datasource>
   </datasources>
   <worksheets>
-    <worksheet name='Users by Support Category Treemap'>
+    <worksheet name='Support Category Treemap'>
       <layout-options>
         <title>
           <formatted-text>
@@ -651,14 +488,14 @@
             <datasource caption='Support Analytics (DB_POC_Z.GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
           </datasources>
           <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
-            <column datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
-            <column datatype='string' name='[SUPPORT_SUBCATEGORY]' role='dimension' type='nominal' />
-            <column datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
-            <column datatype='integer' name='[Unique_Users]' role='measure' type='quantitative' />
+            <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
+            <column caption='Support Subcategory' datatype='string' name='[SUPPORT_SUBCATEGORY]' role='dimension' type='nominal' />
+            <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
+            <column caption='Unique Users' datatype='integer' name='[Unique_Users]' role='measure' type='quantitative' />
             <column-instance column='[SUPPORT_CATEGORY]' derivation='None' name='[none:SUPPORT_CATEGORY:nk]' pivot='key' type='nominal' />
             <column-instance column='[SUPPORT_SUBCATEGORY]' derivation='None' name='[none:SUPPORT_SUBCATEGORY:nk]' pivot='key' type='nominal' />
             <column-instance column='[PRIORITY_LEVEL]' derivation='None' name='[none:PRIORITY_LEVEL:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Unique_Users]' derivation='Sum' name='[sum:Unique_Users:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Unique_Users]' derivation='User:Attribute' name='[attr:Unique_Users:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
@@ -674,10 +511,10 @@
             </view>
             <mark class='Square' />
             <encodings>
-              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:Unique_Users:qk]' />
-              <size column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:Unique_Users:qk]' />
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[attr:Unique_Users:qk]' />
+              <size column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[attr:Unique_Users:qk]' />
               <text column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:SUPPORT_CATEGORY:nk]' />
-              <text column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:SUPPORT_SUBCATEGORY:nk]' />
+              <detail column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:SUPPORT_SUBCATEGORY:nk]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -696,7 +533,8 @@
       </table>
       <simple-id uuid='{A1B2C3D4-E5F6-A7B8-C9D0-E1F2A3B4C5D6}' />
     </worksheet>
-    <worksheet name='Support Activities by Resolution Status'>
+    
+    <worksheet name='Resolution Status Donut'>
       <layout-options>
         <title>
           <formatted-text>
@@ -710,12 +548,11 @@
             <datasource caption='Support Analytics (DB_POC_Z.GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
           </datasources>
           <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
-            <column datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
-            <column datatype='integer' name='[Activity_Count]' role='measure' type='quantitative' />
-            <column datatype='real' name='[Resolution_Rate]' role='measure' type='quantitative' />
+            <column caption='Resolution Status' datatype='string' name='[RESOLUTION_STATUS]' role='dimension' type='nominal' />
+            <column caption='Activity Count' datatype='integer' name='[Activity_Count]' role='measure' type='quantitative' />
+            <column caption='Resolution Rate' datatype='real' name='[Resolution_Rate]' role='measure' type='quantitative' />
             <column-instance column='[RESOLUTION_STATUS]' derivation='None' name='[none:RESOLUTION_STATUS:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Activity_Count]' derivation='Sum' name='[sum:Activity_Count:qk]' pivot='key' type='quantitative' />
-            <column-instance column='[Resolution_Rate]' derivation='Sum' name='[sum:Resolution_Rate:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Activity_Count]' derivation='User:Attribute' name='[attr:Activity_Count:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
@@ -728,7 +565,7 @@
             <mark class='Pie' />
             <encodings>
               <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:RESOLUTION_STATUS:nk]' />
-              <size column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:Activity_Count:qk]' />
+              <angle column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[attr:Activity_Count:qk]' />
               <text column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:RESOLUTION_STATUS:nk]' />
             </encodings>
             <style>
@@ -744,7 +581,8 @@
       </table>
       <simple-id uuid='{B2C3D4E5-F6A7-B8C9-D0E1-F2A3B4C5D6E7}' />
     </worksheet>
-    <worksheet name='Support Activities by Priority'>
+    
+    <worksheet name='Priority Distribution Bar Chart'>
       <layout-options>
         <title>
           <formatted-text>
@@ -758,12 +596,11 @@
             <datasource caption='Support Analytics (DB_POC_Z.GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
           </datasources>
           <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
-            <column datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
-            <column datatype='integer' name='[Activity_Count]' role='measure' type='quantitative' />
-            <column datatype='real' name='[SLA_Compliance_Rate]' role='measure' type='quantitative' />
+            <column caption='Priority Level' datatype='string' name='[PRIORITY_LEVEL]' role='dimension' type='nominal' />
+            <column caption='Activity Count by Priority' datatype='integer' name='[Activity_Count_by_Priority]' role='measure' type='quantitative' />
+            <column caption='SLA Compliance Rate' datatype='real' name='[SLA_Compliance_Rate]' role='measure' type='quantitative' />
             <column-instance column='[PRIORITY_LEVEL]' derivation='None' name='[none:PRIORITY_LEVEL:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Activity_Count]' derivation='Sum' name='[sum:Activity_Count:qk]' pivot='key' type='quantitative' />
-            <column-instance column='[SLA_Compliance_Rate]' derivation='Sum' name='[sum:SLA_Compliance_Rate:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Activity_Count_by_Priority]' derivation='User:Attribute' name='[attr:Activity_Count_by_Priority:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
@@ -775,7 +612,7 @@
             </view>
             <mark class='Bar' />
             <encodings>
-              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:SLA_Compliance_Rate:qk]' />
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:PRIORITY_LEVEL:nk]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -785,11 +622,12 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:Activity_Count:qk]</rows>
-        <cols>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:PRIORITY_LEVEL:nk]</cols>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:PRIORITY_LEVEL:nk]</rows>
+        <cols>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[attr:Activity_Count_by_Priority:qk]</cols>
       </table>
       <simple-id uuid='{C3D4E5F6-A7B8-C9D0-E1F2-A3B4C5D6E7F8}' />
     </worksheet>
+    
     <worksheet name='Support Efficiency Metrics'>
       <layout-options>
         <title>
@@ -804,12 +642,12 @@
             <datasource caption='Support Analytics (DB_POC_Z.GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
           </datasources>
           <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
-            <column datatype='real' name='[First_Contact_Resolution_Rate]' role='measure' type='quantitative' />
-            <column datatype='real' name='[Average_Customer_Satisfaction]' role='measure' type='quantitative' />
-            <column datatype='real' name='[Escalation_Rate]' role='measure' type='quantitative' />
-            <column-instance column='[First_Contact_Resolution_Rate]' derivation='Sum' name='[sum:First_Contact_Resolution_Rate:qk]' pivot='key' type='quantitative' />
-            <column-instance column='[Average_Customer_Satisfaction]' derivation='Sum' name='[sum:Average_Customer_Satisfaction:qk]' pivot='key' type='quantitative' />
-            <column-instance column='[Escalation_Rate]' derivation='Sum' name='[sum:Escalation_Rate:qk]' pivot='key' type='quantitative' />
+            <column caption='First Contact Resolution Rate' datatype='real' name='[First_Contact_Resolution_Rate]' role='measure' type='quantitative' />
+            <column caption='Average Customer Satisfaction' datatype='real' name='[Average_Customer_Satisfaction]' role='measure' type='quantitative' />
+            <column caption='Escalation Rate' datatype='real' name='[Escalation_Rate]' role='measure' type='quantitative' />
+            <column-instance column='[First_Contact_Resolution_Rate]' derivation='User:Attribute' name='[attr:First_Contact_Resolution_Rate:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Average_Customer_Satisfaction]' derivation='User:Attribute' name='[attr:Average_Customer_Satisfaction:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Escalation_Rate]' derivation='User:Attribute' name='[attr:Escalation_Rate:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='true' />
         </view>
@@ -819,11 +657,11 @@
             <view>
               <breakdown value='auto' />
             </view>
-            <mark class='Circle' />
+            <mark class='Text' />
             <encodings>
-              <text column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:First_Contact_Resolution_Rate:qk]' />
-              <text column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:Average_Customer_Satisfaction:qk]' />
-              <text column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:Escalation_Rate:qk]' />
+              <text column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[attr:First_Contact_Resolution_Rate:qk]' />
+              <text column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[attr:Average_Customer_Satisfaction:qk]' />
+              <text column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[attr:Escalation_Rate:qk]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -839,6 +677,7 @@
       <simple-id uuid='{D4E5F6A7-B8C9-D0E1-F2A3-B4C5D6E7F8A9}' />
     </worksheet>
   </worksheets>
+  
   <dashboards>
     <dashboard _.fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder='true' name='Service Reliability Support Dashboard'>
       <style />
@@ -846,16 +685,18 @@
       <zones>
         <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
           <zone h='98000' id='10' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
-            <zone h='48000' id='11' param='horz' type-v2='layout-flow' w='98400' x='800' y='1000'>
-              <zone h='48000' id='5' name='Users by Support Category Treemap' w='49200' x='800' y='1000'>
-                <zone-style>
-                  <format attr='border-color' value='#000000' />
-                  <format attr='border-style' value='none' />
-                  <format attr='border-width' value='0' />
-                  <format attr='margin' value='4' />
-                </zone-style>
+            <zone h='48000' id='7' param='horz' type-v2='layout-flow' w='98400' x='800' y='1000'>
+              <zone h='48000' id='5' type-v2='layout-basic' w='49200' x='800' y='1000'>
+                <zone h='48000' id='3' name='Support Category Treemap' w='49200' x='800' y='1000'>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                  </zone-style>
+                </zone>
               </zone>
-              <zone h='48000' id='6' name='Support Activities by Resolution Status' w='49200' x='50000' y='1000'>
+              <zone h='48000' id='8' name='Resolution Status Donut' w='49200' x='50000' y='1000'>
                 <zone-style>
                   <format attr='border-color' value='#000000' />
                   <format attr='border-style' value='none' />
@@ -864,8 +705,8 @@
                 </zone-style>
               </zone>
             </zone>
-            <zone h='48000' id='12' param='horz' type-v2='layout-flow' w='98400' x='800' y='50000'>
-              <zone h='48000' id='7' name='Support Activities by Priority' w='49200' x='800' y='50000'>
+            <zone h='48000' id='11' param='horz' type-v2='layout-flow' w='98400' x='800' y='49000'>
+              <zone h='48000' id='9' name='Priority Distribution Bar Chart' w='49200' x='800' y='49000'>
                 <zone-style>
                   <format attr='border-color' value='#000000' />
                   <format attr='border-style' value='none' />
@@ -873,7 +714,7 @@
                   <format attr='margin' value='4' />
                 </zone-style>
               </zone>
-              <zone h='48000' id='8' name='Support Efficiency Metrics' w='49200' x='50000' y='50000'>
+              <zone h='48000' id='12' name='Support Efficiency Metrics' w='49200' x='50000' y='49000'>
                 <zone-style>
                   <format attr='border-color' value='#000000' />
                   <format attr='border-style' value='none' />
@@ -897,7 +738,7 @@
           <zones>
             <zone h='100000' id='16' type-v2='layout-basic' w='100000' x='0' y='0'>
               <zone h='98000' id='15' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
-                <zone fixed-size='280' h='24000' id='5' is-fixed='true' name='Users by Support Category Treemap' w='49200' x='800' y='1000'>
+                <zone fixed-size='280' h='24000' id='3' is-fixed='true' name='Support Category Treemap' w='98400' x='800' y='1000'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -906,7 +747,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone fixed-size='280' h='24000' id='6' is-fixed='true' name='Support Activities by Resolution Status' w='49200' x='50000' y='25000'>
+                <zone fixed-size='280' h='24000' id='8' is-fixed='true' name='Resolution Status Donut' w='98400' x='800' y='25000'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -915,7 +756,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone fixed-size='280' h='24000' id='7' is-fixed='true' name='Support Activities by Priority' w='49200' x='800' y='50000'>
+                <zone fixed-size='280' h='24000' id='9' is-fixed='true' name='Priority Distribution Bar Chart' w='98400' x='800' y='50000'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -924,7 +765,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone fixed-size='280' h='24000' id='8' is-fixed='true' name='Support Efficiency Metrics' w='49200' x='50000' y='75000'>
+                <zone fixed-size='280' h='24000' id='12' is-fixed='true' name='Support Efficiency Metrics' w='98400' x='800' y='75000'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -947,8 +788,9 @@
       <simple-id uuid='{E5F6A7B8-C9D0-E1F2-A3B4-C5D6E7F8A9B0}' />
     </dashboard>
   </dashboards>
+  
   <windows saved-dpi-scale-factor='1.5' source-height='44'>
-    <window class='worksheet' name='Users by Support Category Treemap'>
+    <window class='worksheet' name='Support Category Treemap'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -970,13 +812,14 @@
         </edge>
         <edge name='right'>
           <strip size='160'>
-            <card pane-specification-id='0' param='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:Unique_Users:qk]' type='color' />
+            <card pane-specification-id='0' param='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[attr:Unique_Users:qk]' type='color' />
           </strip>
         </edge>
       </cards>
       <simple-id uuid='{F6A7B8C9-D0E1-F2A3-B4C5-D6E7F8A9B0C1}' />
     </window>
-    <window class='worksheet' name='Support Activities by Resolution Status'>
+    
+    <window class='worksheet' name='Resolution Status Donut'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -1004,7 +847,8 @@
       </cards>
       <simple-id uuid='{A7B8C9D0-E1F2-A3B4-C5D6-E7F8A9B0C1D2}' />
     </window>
-    <window class='worksheet' name='Support Activities by Priority'>
+    
+    <window class='worksheet' name='Priority Distribution Bar Chart'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -1026,12 +870,13 @@
         </edge>
         <edge name='right'>
           <strip size='160'>
-            <card pane-specification-id='0' param='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:SLA_Compliance_Rate:qk]' type='color' />
+            <card pane-specification-id='0' param='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:PRIORITY_LEVEL:nk]' type='color' />
           </strip>
         </edge>
       </cards>
       <simple-id uuid='{B8C9D0E1-F2A3-B4C5-D6E7-F8A9B0C1D2E3}' />
     </window>
+    
     <window class='worksheet' name='Support Efficiency Metrics'>
       <cards>
         <edge name='left'>
@@ -1055,13 +900,12 @@
       </cards>
       <simple-id uuid='{C9D0E1F2-A3B4-C5D6-E7F8-A9B0C1D2E3F4}' />
     </window>
+    
     <window class='dashboard' maximized='true' name='Service Reliability Support Dashboard'>
       <viewpoints>
-        <viewpoint name='Users by Support Category Treemap' />
-        <viewpoint name='Support Activities by Resolution Status' />
-        <viewpoint name='Support Activities by Priority'>
-          <zoom type='entire-view' />
-        </viewpoint>
+        <viewpoint name='Support Category Treemap' />
+        <viewpoint name='Resolution Status Donut' />
+        <viewpoint name='Priority Distribution Bar Chart' />
         <viewpoint name='Support Efficiency Metrics' />
       </viewpoints>
       <active id='-1' />
