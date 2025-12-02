@@ -1,9 +1,9 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*: 2024-12-19
+## *Created on*: 2025-12-01
 ## *Description*: Bronze Layer Logical Data Model for Medallion Architecture
 ## *Version*: 1 
-## *Updated on*: 2024-12-19
+## *Updated on*: 2025-12-01
 _____________________________________________
 
 # Bronze Layer Logical Data Model
