@@ -89,27 +89,8 @@ _____________________________________________
   - Use color encoding for meeting categories
   - Add reference line for overall average
 
-### Visual 4: Users by Meeting Topics (Top 10)
-- **Data Element:** Popular Meeting Topics
-- **Recommended Visual:** Tree Map
-- **Data Fields:**
-  - MEETING_TOPIC (from FACT_MEETING_ACTIVITY)
-  - USER_KEY (from FACT_MEETING_ACTIVITY)
-- **Query/Tableau Calculation:**
-  ```
-  COUNTD([USER_KEY])
-  ```
-- **Interactivity:**
-  - Top N parameter (default 10)
-  - Filter by date range
-  - Click to filter other views
-- **Justification:** Tree map effectively shows relative sizes and allows quick identification of most popular topics
-- **Optimization Tips:**
-  - Limit to top 10-15 topics to avoid clutter
-  - Use color intensity to show engagement levels
-  - Consider using sets for dynamic top N
 
-### Visual 5: Meetings per User Distribution
+### Visual 4: Meetings per User Distribution
 - **Data Element:** User Engagement Distribution
 - **Recommended Visual:** Histogram
 - **Data Fields:**
@@ -129,7 +110,7 @@ _____________________________________________
   - Create bins with appropriate size (1, 2-5, 6-10, 11-20, 21+)
   - Add statistical reference lines (median, quartiles)
 
-### Visual 6: Feature Usage Adoption Score
+### Visual 5: Feature Usage Adoption Score
 - **Data Element:** Feature Adoption Analysis
 - **Recommended Visual:** Bullet Graph
 - **Data Fields:**
