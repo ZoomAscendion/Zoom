@@ -14,20 +14,16 @@ Monitor user engagement and platform adoption rates to identify growth trends an
 ## Data Model Overview
 **Primary Fact Tables:**
 - FACT_MEETING_ACTIVITY
-- FACT_FEATURE_USAGE
 
 **Primary Dimension Tables:**
 - DIM_USER
 - DIM_MEETING
-- DIM_FEATURE
 - DIM_DATE
 
 **Key Relationships:**
 - FACT_MEETING_ACTIVITY → DIM_USER (USER_KEY)
 - FACT_MEETING_ACTIVITY → DIM_MEETING (MEETING_KEY)
 - FACT_MEETING_ACTIVITY → DIM_DATE (DATE_KEY)
-- FACT_FEATURE_USAGE → DIM_FEATURE (FEATURE_KEY)
-- FACT_FEATURE_USAGE → DIM_DATE (DATE_KEY)
 
 ## 1. Visual Recommendations
 
