@@ -15,21 +15,16 @@ Monitor user engagement and platform adoption rates to identify growth trends an
 ### **Data Model Overview**
 **Primary Facts:**
 - FACT_MEETING_ACTIVITY
-- FACT_FEATURE_USAGE
 
 **Primary Dimensions:**
 - DIM_USER
 - DIM_MEETING
-- DIM_FEATURE
 - DIM_DATE
 
 **Key Relationships:**
 - FACT_MEETING_ACTIVITY → DIM_USER (USER_KEY)
 - FACT_MEETING_ACTIVITY → DIM_MEETING (MEETING_KEY)
 - FACT_MEETING_ACTIVITY → DIM_DATE (DATE_KEY)
-- FACT_FEATURE_USAGE → DIM_FEATURE (FEATURE_KEY)
-- FACT_FEATURE_USAGE → DIM_DATE (DATE_KEY)
-
 ---
 
 ## **1. Visual Recommendations**
@@ -148,28 +143,6 @@ Monitor user engagement and platform adoption rates to identify growth trends an
   - Create user segment dimension
   - Use extract for complex calculations
 
-### **Visual 6: Feature Usage Adoption KPI Cards**
-- **Data Element:** Key metrics for feature adoption
-- **Query / Tableau Calculation:** Various KPI calculations
-- **Recommended Visual:** KPI Cards Dashboard
-- **Data Fields:**
-  - Individual cards for each metric
-  - Sparklines for trends
-- **Calculations:**
-  - Total Features Used: `COUNTD([Feature Name])`
-  - Feature Adoption Rate: `COUNTD([Feature Key]) / {FIXED : COUNTD([Feature Key])}`
-  - Average Usage Duration: `AVG([Usage Duration Minutes])`
-  - Top Feature: `{FIXED : MAX(IF RANK(SUM([Usage Count])) = 1 THEN [Feature Name] END)}`
-- **Interactivity:**
-  - Time period selector
-  - Feature category filter
-  - Click to drill into feature details
-- **Justification:** KPI cards provide quick overview of key metrics at a glance
-- **Optimization Tips:**
-  - Use parameters for dynamic KPI selection
-  - Pre-calculate complex metrics
-  - Use dashboard actions for interactivity
-
 ---
 
 ## **2. Overall Dashboard Design**
@@ -218,13 +191,11 @@ Monitor user engagement and platform adoption rates to identify growth trends an
 | Top N Parameter | Limit displayed items | Integer parameter with calculated field | Topic and feature views |
 | Drill Down Action | Navigate time hierarchies | Filter action on date fields | Trend charts |
 | Highlight Action | Cross-highlight related data | Highlight action between sheets | All sheets |
-| URL Action | Link to detailed reports | URL action with parameters | KPI cards |
 | Filter Action | Cross-filter dashboard | Filter action on category selection | Category-based charts |
 
 ### **Dashboard Actions Configuration**
 - **Filter Actions:** Click on meeting type to filter all related views
 - **Highlight Actions:** Hover over user segments to highlight across charts
-- **URL Actions:** Click on KPI cards to open detailed feature usage reports
 - **Parameter Actions:** Click on time periods to update date range parameter
 
 ### **Performance Monitoring**
