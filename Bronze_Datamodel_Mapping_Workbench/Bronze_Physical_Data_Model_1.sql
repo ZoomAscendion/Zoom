@@ -1,9 +1,9 @@
 _____________________________________________
 ## *Author*: AAVA
-## *Created on*:   
+## *Created on*: 2025-12-01  
 ## *Description*: Bronze layer physical data model DDL scripts for Zoom Platform Analytics System
 ## *Version*: 1 
-## *Updated on*: 
+## *Updated on*: 2025-12-01
 _____________________________________________
 
 -- =====================================================
