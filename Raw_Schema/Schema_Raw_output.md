@@ -6,92 +6,91 @@ This document contains metadata for all tables and views in the Snowflake RAW la
 | Column Name | Business Description | Data Type | Constraints | Domain Values |
 |-------------|---------------------|-----------|-------------|---------------|
 | EVENT_ID | Unique identifier for each billing event | VARCHAR(16777216) | Primary Key, Not Null | N/A |
-| USER_ID | Identifier linking to the user who generated the billing event | VARCHAR(16777216) | Foreign Key, Not Null | N/A |
-| EVENT_TYPE | Type of billing event that occurred | VARCHAR(16777216) | Not Null | N/A |
-| AMOUNT | Monetary amount associated with the billing event | VARCHAR(16777216) | Not Null | N/A |
+| USER_ID | Foreign key reference to user account | VARCHAR(16777216) | Not Null | N/A |
+| EVENT_TYPE | Type of billing event | VARCHAR(16777216) | Not Null | N/A |
+| AMOUNT | Billing amount for the event | VARCHAR(16777216) | Not Null | N/A |
 | EVENT_DATE | Date when the billing event occurred | DATE | Not Null | N/A |
-| LOAD_TIMESTAMP | Timestamp when the record was loaded into the system | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| UPDATE_TIMESTAMP | Timestamp when the record was last updated | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| SOURCE_SYSTEM | System from which the data originated | VARCHAR(16777216) | Not Null | N/A |
+| LOAD_TIMESTAMP | Timestamp when record was loaded into system | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| UPDATE_TIMESTAMP | Timestamp when record was last updated | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| SOURCE_SYSTEM | Source system that provided the data | VARCHAR(16777216) | Not Null | N/A |
 
 ## FEATURE_USAGE
 | Column Name | Business Description | Data Type | Constraints | Domain Values |
 |-------------|---------------------|-----------|-------------|---------------|
 | USAGE_ID | Unique identifier for each feature usage record | VARCHAR(16777216) | Primary Key, Not Null | N/A |
-| MEETING_ID | Identifier linking to the meeting where feature was used | VARCHAR(16777216) | Foreign Key, Not Null | N/A |
-| FEATURE_NAME | Name of the feature that was used | VARCHAR(16777216) | Not Null | N/A |
-| USAGE_COUNT | Number of times the feature was used | NUMBER(38,0) | Not Null | N/A |
-| USAGE_DATE | Date when the feature usage occurred | DATE | Not Null | N/A |
-| LOAD_TIMESTAMP | Timestamp when the record was loaded into the system | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| UPDATE_TIMESTAMP | Timestamp when the record was last updated | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| SOURCE_SYSTEM | System from which the data originated | VARCHAR(16777216) | Not Null | N/A |
+| MEETING_ID | Foreign key reference to meeting | VARCHAR(16777216) | Not Null | N/A |
+| FEATURE_NAME | Name of the feature being used | VARCHAR(16777216) | Not Null | N/A |
+| USAGE_COUNT | Number of times feature was used | NUMBER(38,0) | Not Null | N/A |
+| USAGE_DATE | Date when feature was used | DATE | Not Null | N/A |
+| LOAD_TIMESTAMP | Timestamp when record was loaded into system | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| UPDATE_TIMESTAMP | Timestamp when record was last updated | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| SOURCE_SYSTEM | Source system that provided the data | VARCHAR(16777216) | Not Null | N/A |
 
 ## LICENSES
 | Column Name | Business Description | Data Type | Constraints | Domain Values |
 |-------------|---------------------|-----------|-------------|---------------|
 | LICENSE_ID | Unique identifier for each license | VARCHAR(16777216) | Primary Key, Not Null | N/A |
-| LICENSE_TYPE | Type or category of the license | VARCHAR(16777216) | Not Null | N/A |
-| ASSIGNED_TO_USER_ID | User ID to whom the license is assigned | VARCHAR(16777216) | Foreign Key, Not Null | N/A |
-| START_DATE | Date when the license becomes active | DATE | Not Null | N/A |
-| END_DATE | Date when the license expires | VARCHAR(16777216) | Nullable | N/A |
-| LOAD_TIMESTAMP | Timestamp when the record was loaded into the system | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| UPDATE_TIMESTAMP | Timestamp when the record was last updated | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| SOURCE_SYSTEM | System from which the data originated | VARCHAR(16777216) | Not Null | N/A |
+| LICENSE_TYPE | Type of license | VARCHAR(16777216) | Not Null | N/A |
+| ASSIGNED_TO_USER_ID | Foreign key reference to user assigned the license | VARCHAR(16777216) | Not Null | N/A |
+| START_DATE | License start date | DATE | Not Null | N/A |
+| END_DATE | License end date | VARCHAR(16777216) | Nullable | N/A |
+| LOAD_TIMESTAMP | Timestamp when record was loaded into system | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| UPDATE_TIMESTAMP | Timestamp when record was last updated | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| SOURCE_SYSTEM | Source system that provided the data | VARCHAR(16777216) | Not Null | N/A |
 
 ## MEETINGS
 | Column Name | Business Description | Data Type | Constraints | Domain Values |
 |-------------|---------------------|-----------|-------------|---------------|
 | MEETING_ID | Unique identifier for each meeting | VARCHAR(16777216) | Primary Key, Not Null | N/A |
-| HOST_ID | User ID of the meeting host | VARCHAR(16777216) | Foreign Key, Not Null | N/A |
-| MEETING_TOPIC | Subject or topic of the meeting | VARCHAR(16777216) | Not Null | N/A |
-| START_TIME | Timestamp when the meeting started | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| END_TIME | Timestamp when the meeting ended | VARCHAR(16777216) | Nullable | N/A |
-| DURATION_MINUTES | Duration of the meeting in minutes | VARCHAR(16777216) | Nullable | N/A |
-| LOAD_TIMESTAMP | Timestamp when the record was loaded into the system | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| UPDATE_TIMESTAMP | Timestamp when the record was last updated | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| SOURCE_SYSTEM | System from which the data originated | VARCHAR(16777216) | Not Null | N/A |
+| HOST_ID | Foreign key reference to meeting host user | VARCHAR(16777216) | Not Null | N/A |
+| MEETING_TOPIC | Topic or title of the meeting | VARCHAR(16777216) | Not Null | N/A |
+| START_TIME | Meeting start timestamp | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| END_TIME | Meeting end timestamp | VARCHAR(16777216) | Nullable | N/A |
+| DURATION_MINUTES | Meeting duration in minutes | VARCHAR(16777216) | Nullable | N/A |
+| LOAD_TIMESTAMP | Timestamp when record was loaded into system | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| UPDATE_TIMESTAMP | Timestamp when record was last updated | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| SOURCE_SYSTEM | Source system that provided the data | VARCHAR(16777216) | Not Null | N/A |
 
 ## PARTICIPANTS
 | Column Name | Business Description | Data Type | Constraints | Domain Values |
 |-------------|---------------------|-----------|-------------|---------------|
 | PARTICIPANT_ID | Unique identifier for each meeting participant | VARCHAR(16777216) | Primary Key, Not Null | N/A |
-| MEETING_ID | Identifier linking to the meeting | VARCHAR(16777216) | Foreign Key, Not Null | N/A |
-| USER_ID | Identifier of the user who participated | VARCHAR(16777216) | Foreign Key, Not Null | N/A |
-| JOIN_TIME | Timestamp when the participant joined the meeting | VARCHAR(16777216) | Nullable | N/A |
-| LEAVE_TIME | Timestamp when the participant left the meeting | TIMESTAMP_NTZ(9) | Nullable | N/A |
-| LOAD_TIMESTAMP | Timestamp when the record was loaded into the system | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| UPDATE_TIMESTAMP | Timestamp when the record was last updated | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| SOURCE_SYSTEM | System from which the data originated | VARCHAR(16777216) | Not Null | N/A |
+| MEETING_ID | Foreign key reference to meeting | VARCHAR(16777216) | Not Null | N/A |
+| USER_ID | Foreign key reference to participant user | VARCHAR(16777216) | Not Null | N/A |
+| JOIN_TIME | Time when participant joined the meeting | VARCHAR(16777216) | Nullable | N/A |
+| LEAVE_TIME | Time when participant left the meeting | TIMESTAMP_NTZ(9) | Nullable | N/A |
+| LOAD_TIMESTAMP | Timestamp when record was loaded into system | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| UPDATE_TIMESTAMP | Timestamp when record was last updated | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| SOURCE_SYSTEM | Source system that provided the data | VARCHAR(16777216) | Not Null | N/A |
 
 ## SUPPORT_TICKETS
 | Column Name | Business Description | Data Type | Constraints | Domain Values |
 |-------------|---------------------|-----------|-------------|---------------|
 | TICKET_ID | Unique identifier for each support ticket | VARCHAR(16777216) | Primary Key, Not Null | N/A |
-| USER_ID | Identifier of the user who created the ticket | VARCHAR(16777216) | Foreign Key, Not Null | N/A |
-| TICKET_TYPE | Category or type of the support ticket | VARCHAR(16777216) | Not Null | N/A |
-| RESOLUTION_STATUS | Current status of the ticket resolution | VARCHAR(16777216) | Not Null | N/A |
-| OPEN_DATE | Date when the support ticket was opened | DATE | Not Null | N/A |
-| LOAD_TIMESTAMP | Timestamp when the record was loaded into the system | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| UPDATE_TIMESTAMP | Timestamp when the record was last updated | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| SOURCE_SYSTEM | System from which the data originated | VARCHAR(16777216) | Not Null | N/A |
+| USER_ID | Foreign key reference to user who created ticket | VARCHAR(16777216) | Not Null | N/A |
+| TICKET_TYPE | Type or category of support ticket | VARCHAR(16777216) | Not Null | N/A |
+| RESOLUTION_STATUS | Current status of ticket resolution | VARCHAR(16777216) | Not Null | N/A |
+| OPEN_DATE | Date when ticket was opened | DATE | Not Null | N/A |
+| LOAD_TIMESTAMP | Timestamp when record was loaded into system | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| UPDATE_TIMESTAMP | Timestamp when record was last updated | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| SOURCE_SYSTEM | Source system that provided the data | VARCHAR(16777216) | Not Null | N/A |
 
 ## USERS
 | Column Name | Business Description | Data Type | Constraints | Domain Values |
 |-------------|---------------------|-----------|-------------|---------------|
 | USER_ID | Unique identifier for each user account | VARCHAR(16777216) | Primary Key, Not Null | N/A |
 | USER_NAME | Display name of the user | VARCHAR(16777216) | Not Null | N/A |
-| EMAIL | Email address of the user | VARCHAR(16777216) | Not Null, Unique | N/A |
+| EMAIL | Email address of the user | VARCHAR(16777216) | Not Null | N/A |
 | COMPANY | Company or organization the user belongs to | VARCHAR(16777216) | Nullable | N/A |
-| PLAN_TYPE | Type of subscription plan the user has | VARCHAR(16777216) | Not Null | N/A |
-| LOAD_TIMESTAMP | Timestamp when the record was loaded into the system | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| UPDATE_TIMESTAMP | Timestamp when the record was last updated | TIMESTAMP_NTZ(9) | Not Null | N/A |
-| SOURCE_SYSTEM | System from which the data originated | VARCHAR(16777216) | Not Null | N/A |
+| PLAN_TYPE | Type of subscription plan for the user | VARCHAR(16777216) | Not Null | N/A |
+| LOAD_TIMESTAMP | Timestamp when record was loaded into system | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| UPDATE_TIMESTAMP | Timestamp when record was last updated | TIMESTAMP_NTZ(9) | Not Null | N/A |
+| SOURCE_SYSTEM | Source system that provided the data | VARCHAR(16777216) | Not Null | N/A |
 
 ---
 
-**Metadata Summary:**
-- Total Tables: 7
-- Total Views: 0
-- Schema: RAW
-- Generated: $(date)
-- Pipeline ID: 8083
+**Pipeline ID:** 8083
+**Running Instance ID:** 122324
+**Generated:** $(date)
+**Total Tables:** 7
+**Total Columns:** 56
