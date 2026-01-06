@@ -4,8 +4,8 @@ _____________________________________________
 ## *Description*: Bronze Layer Logical Data Model for Medallion Architecture
 ## *Version*: 4 
 ## *Updated on*: 2025-12-02
-## *Changes*: Enhanced audit table with data quality tracking fields and improved column descriptions
-## *Reason*: Updated as requested with Do_You_Need_Any_Changes = Yes to improve data governance and monitoring capabilities
+## *Changes*: Convert JOIN_TIME Data type from VARCHAR to TIMESTAMP
+## *Reason*: Data type optimization for JOIN_TIME field to improve temporal data handling and query performance
 _____________________________________________
 
 # Bronze Layer Logical Data Model
@@ -26,97 +26,97 @@ _____________________________________________
 ## 2. Bronze Layer Logical Model
 
 ### 2.1 Bz_Billing_Events
-**Description**: Stores raw billing event data from source systems without transformation, maintaining complete transaction history
+**Description**: Stores raw billing event data from source systems without transformation
 
 | Column Name | Description | Data Type |
 |-------------|-------------|----------|
-| EVENT_TYPE | Type of billing event that occurred (subscription, upgrade, refund, etc.) | VARCHAR(100) |
-| AMOUNT | Monetary amount associated with the billing event in source currency | VARCHAR(100) |
-| EVENT_DATE | Date when the billing event occurred in source system | DATE |
-| LOAD_TIMESTAMP | Timestamp when record was loaded into the Bronze layer | TIMESTAMP_NTZ(9) |
-| UPDATE_TIMESTAMP | Timestamp when record was last updated in the Bronze layer | TIMESTAMP_NTZ(9) |
-| SOURCE_SYSTEM | Source system from which the data originated (billing system identifier) | VARCHAR(100) |
+| EVENT_TYPE | Type of billing event that occurred | VARCHAR(100) |
+| AMOUNT | Monetary amount associated with the billing event | VARCHAR(100) |
+| EVENT_DATE | Date when the billing event occurred | DATE |
+| LOAD_TIMESTAMP | Timestamp when record was loaded into the system | TIMESTAMP_NTZ(9) |
+| UPDATE_TIMESTAMP | Timestamp when record was last updated | TIMESTAMP_NTZ(9) |
+| SOURCE_SYSTEM | Source system from which the data originated | VARCHAR(100) |
 
 ### 2.2 Bz_Feature_Usage
-**Description**: Captures raw feature usage data from source systems, tracking platform feature adoption and utilization
+**Description**: Captures raw feature usage data from source systems
 
 | Column Name | Description | Data Type |
 |-------------|-------------|----------|
-| FEATURE_NAME | Name of the feature that was used (screen share, recording, chat, etc.) | VARCHAR(100) |
-| USAGE_COUNT | Number of times the feature was used during the session | NUMBER(38,0) |
+| FEATURE_NAME | Name of the feature that was used | VARCHAR(100) |
+| USAGE_COUNT | Number of times the feature was used | NUMBER(38,0) |
 | USAGE_DATE | Date when the feature usage occurred | DATE |
-| LOAD_TIMESTAMP | Timestamp when record was loaded into the Bronze layer | TIMESTAMP_NTZ(9) |
-| UPDATE_TIMESTAMP | Timestamp when record was last updated in the Bronze layer | TIMESTAMP_NTZ(9) |
-| SOURCE_SYSTEM | Source system from which the data originated (platform system identifier) | VARCHAR(100) |
+| LOAD_TIMESTAMP | Timestamp when record was loaded into the system | TIMESTAMP_NTZ(9) |
+| UPDATE_TIMESTAMP | Timestamp when record was last updated | TIMESTAMP_NTZ(9) |
+| SOURCE_SYSTEM | Source system from which the data originated | VARCHAR(100) |
 
 ### 2.3 Bz_Licenses
-**Description**: Stores raw license information from source systems, tracking license assignments and lifecycle
+**Description**: Stores raw license information from source systems
 
 | Column Name | Description | Data Type |
 |-------------|-------------|----------|
-| LICENSE_TYPE | Type or category of the license (basic, pro, enterprise, add-on) | VARCHAR(100) |
-| ASSIGNED_TO_USER | User identifier to whom the license is assigned | VARCHAR(100) |
-| START_DATE | Date when the license becomes active and usable | DATE |
-| END_DATE | Date when the license expires or becomes inactive | VARCHAR(100) |
-| LOAD_TIMESTAMP | Timestamp when record was loaded into the Bronze layer | TIMESTAMP_NTZ(9) |
-| UPDATE_TIMESTAMP | Timestamp when record was last updated in the Bronze layer | TIMESTAMP_NTZ(9) |
-| SOURCE_SYSTEM | Source system from which the data originated (license management system) | VARCHAR(100) |
+| LICENSE_TYPE | Type or category of the license | VARCHAR(100) |
+| ASSIGNED_TO_USER | User to whom the license is assigned | VARCHAR(100) |
+| START_DATE | Date when the license becomes active | DATE |
+| END_DATE | Date when the license expires | VARCHAR(100) |
+| LOAD_TIMESTAMP | Timestamp when record was loaded into the system | TIMESTAMP_NTZ(9) |
+| UPDATE_TIMESTAMP | Timestamp when record was last updated | TIMESTAMP_NTZ(9) |
+| SOURCE_SYSTEM | Source system from which the data originated | VARCHAR(100) |
 
 ### 2.4 Bz_Meetings
-**Description**: Contains raw meeting data from source systems, capturing all meeting activities and metadata
+**Description**: Contains raw meeting data from source systems
 
 | Column Name | Description | Data Type |
 |-------------|-------------|----------|
 | HOST | Identifier of the user hosting the meeting | VARCHAR(100) |
-| MEETING_TOPIC | Subject or topic of the meeting as entered by host | VARCHAR(100) |
-| START_TIME | Timestamp when the meeting started in source system timezone | TIMESTAMP_NTZ(9) |
-| END_TIME | Timestamp when the meeting ended in source system timezone | VARCHAR(100) |
-| DURATION_MINUTES | Duration of the meeting in minutes as calculated by source system | VARCHAR(100) |
-| LOAD_TIMESTAMP | Timestamp when record was loaded into the Bronze layer | TIMESTAMP_NTZ(9) |
-| UPDATE_TIMESTAMP | Timestamp when record was last updated in the Bronze layer | TIMESTAMP_NTZ(9) |
-| SOURCE_SYSTEM | Source system from which the data originated (meeting platform identifier) | VARCHAR(100) |
+| MEETING_TOPIC | Subject or topic of the meeting | VARCHAR(100) |
+| START_TIME | Timestamp when the meeting started | TIMESTAMP_NTZ(9) |
+| END_TIME | Timestamp when the meeting ended | VARCHAR(100) |
+| DURATION_MINUTES | Duration of the meeting in minutes | VARCHAR(100) |
+| LOAD_TIMESTAMP | Timestamp when record was loaded into the system | TIMESTAMP_NTZ(9) |
+| UPDATE_TIMESTAMP | Timestamp when record was last updated | TIMESTAMP_NTZ(9) |
+| SOURCE_SYSTEM | Source system from which the data originated | VARCHAR(100) |
 
 ### 2.5 Bz_Participants
-**Description**: Stores raw participant data for meetings from source systems, tracking attendance patterns
+**Description**: Stores raw participant data for meetings from source systems
 
 | Column Name | Description | Data Type |
 |-------------|-------------|----------|
-| PARTICIPANT | Identifier of the participating user in the meeting | VARCHAR(100) |
-| JOIN_TIME | Time when participant joined the meeting session | VARCHAR(100) |
-| LEAVE_TIME | Time when participant left the meeting session | TIMESTAMP_NTZ(9) |
-| LOAD_TIMESTAMP | Timestamp when record was loaded into the Bronze layer | TIMESTAMP_NTZ(9) |
-| UPDATE_TIMESTAMP | Timestamp when record was last updated in the Bronze layer | TIMESTAMP_NTZ(9) |
-| SOURCE_SYSTEM | Source system from which the data originated (meeting platform identifier) | VARCHAR(100) |
+| PARTICIPANT | Identifier of the participating user | VARCHAR(100) |
+| JOIN_TIME | Time when participant joined the meeting | TIMESTAMP_NTZ(9) |
+| LEAVE_TIME | Time when participant left the meeting | TIMESTAMP_NTZ(9) |
+| LOAD_TIMESTAMP | Timestamp when record was loaded into the system | TIMESTAMP_NTZ(9) |
+| UPDATE_TIMESTAMP | Timestamp when record was last updated | TIMESTAMP_NTZ(9) |
+| SOURCE_SYSTEM | Source system from which the data originated | VARCHAR(100) |
 
 ### 2.6 Bz_Support_Tickets
-**Description**: Contains raw support ticket data from source systems, maintaining complete support interaction history
+**Description**: Contains raw support ticket data from source systems
 
 | Column Name | Description | Data Type |
 |-------------|-------------|----------|
-| TICKET_TYPE | Category or type of the support ticket (technical, billing, feature request) | VARCHAR(100) |
-| RESOLUTION_STATUS | Current status of the ticket resolution (open, in progress, resolved, closed) | VARCHAR(100) |
-| OPEN_DATE | Date when the support ticket was opened by user | DATE |
-| LOAD_TIMESTAMP | Timestamp when record was loaded into the Bronze layer | TIMESTAMP_NTZ(9) |
-| UPDATE_TIMESTAMP | Timestamp when record was last updated in the Bronze layer | TIMESTAMP_NTZ(9) |
-| SOURCE_SYSTEM | Source system from which the data originated (support system identifier) | VARCHAR(100) |
+| TICKET_TYPE | Category or type of the support ticket | VARCHAR(100) |
+| RESOLUTION_STATUS | Current status of the ticket resolution | VARCHAR(100) |
+| OPEN_DATE | Date when the support ticket was opened | DATE |
+| LOAD_TIMESTAMP | Timestamp when record was loaded into the system | TIMESTAMP_NTZ(9) |
+| UPDATE_TIMESTAMP | Timestamp when record was last updated | TIMESTAMP_NTZ(9) |
+| SOURCE_SYSTEM | Source system from which the data originated | VARCHAR(100) |
 
 ### 2.7 Bz_Users
-**Description**: Stores raw user account data from source systems, maintaining complete user profile information
+**Description**: Stores raw user account data from source systems
 
 | Column Name | Description | Data Type |
 |-------------|-------------|----------|
-| USER_NAME | Display name of the user as registered in the system | VARCHAR(100) |
-| EMAIL | Email address of the user for communication and authentication | VARCHAR(100) |
+| USER_NAME | Display name of the user | VARCHAR(100) |
+| EMAIL | Email address of the user | VARCHAR(100) |
 | COMPANY | Company or organization the user belongs to | VARCHAR(100) |
-| PLAN_TYPE | Type of subscription plan the user has (free, basic, pro, enterprise) | VARCHAR(100) |
-| LOAD_TIMESTAMP | Timestamp when record was loaded into the Bronze layer | TIMESTAMP_NTZ(9) |
-| UPDATE_TIMESTAMP | Timestamp when record was last updated in the Bronze layer | TIMESTAMP_NTZ(9) |
-| SOURCE_SYSTEM | Source system from which the data originated (user management system) | VARCHAR(100) |
+| PLAN_TYPE | Type of subscription plan the user has | VARCHAR(100) |
+| LOAD_TIMESTAMP | Timestamp when record was loaded into the system | TIMESTAMP_NTZ(9) |
+| UPDATE_TIMESTAMP | Timestamp when record was last updated | TIMESTAMP_NTZ(9) |
+| SOURCE_SYSTEM | Source system from which the data originated | VARCHAR(100) |
 
 ## 3. Audit Table Design
 
 ### 3.1 Bz_Audit_Log
-**Description**: Tracks data processing activities across all Bronze layer tables with enhanced monitoring capabilities
+**Description**: Tracks data processing activities across all Bronze layer tables
 
 | Field Name | Description | Data Type |
 |------------|-------------|----------|
@@ -124,11 +124,8 @@ _____________________________________________
 | SOURCE_TABLE | Name of the source table being processed | VARCHAR(100) |
 | LOAD_TIMESTAMP | Timestamp when the data processing occurred | TIMESTAMP_NTZ(9) |
 | PROCESSED_BY | System or process that handled the data | VARCHAR(100) |
-| PROCESSING_TIME | Duration taken to process the data in milliseconds | NUMBER(38,0) |
+| PROCESSING_TIME | Duration taken to process the data | NUMBER(38,0) |
 | STATUS | Status of the processing operation (SUCCESS, FAILED, PARTIAL) | VARCHAR(100) |
-| RECORDS_PROCESSED | Number of records processed in the operation | NUMBER(38,0) |
-| ERROR_MESSAGE | Error message if processing failed | VARCHAR(500) |
-| DATA_QUALITY_SCORE | Quality score of the processed data (0-100) | NUMBER(3,0) |
 
 ## 4. Conceptual Data Model Diagram
 
@@ -181,20 +178,7 @@ _____________________________________________
 │   USER          │       │ - USAGE_COUNT   │
 │ - START_DATE    │       │ - USAGE_DATE    │
 │ - END_DATE      │       └─────────────────┘
-└─────────────────┘                │
-                                   │
-                                   │ (Connected via MEETING reference)
-                                   │
-                                   ▼
-                          ┌─────────────────┐
-                          │ Bz_Audit_Log    │
-                          │                 │
-                          │ - RECORD_ID     │
-                          │ - SOURCE_TABLE  │
-                          │ - LOAD_TIMESTAMP│
-                          │ - PROCESSED_BY  │
-                          │ - STATUS        │
-                          └─────────────────┘
+└─────────────────┘
 ```
 
 ### 4.2 Key Relationships
@@ -220,9 +204,9 @@ _____________________________________________
 2. **Data Preservation**: All source data fields preserved except primary/foreign key fields as instructed
 3. **Metadata Columns**: Standard metadata columns (LOAD_TIMESTAMP, UPDATE_TIMESTAMP, SOURCE_SYSTEM) included for data lineage
 4. **PII Classification**: Implemented based on GDPR and common data privacy standards
-5. **Audit Trail**: Enhanced audit table design for tracking all data processing activities with quality metrics
-6. **Data Type Optimization**: VARCHAR fields sized at 100 characters for improved storage efficiency and performance
-7. **Enhanced Monitoring**: Added data quality tracking and error handling capabilities
+5. **Audit Trail**: Comprehensive audit table design for tracking all data processing activities
+6. **Data Type Optimization**: Updated VARCHAR fields from 16777216 to 100 characters for improved storage efficiency and performance
+7. **Temporal Data Handling**: Updated JOIN_TIME from VARCHAR to TIMESTAMP_NTZ(9) for proper temporal data processing
 
 ### 5.2 Assumptions Made
 
@@ -232,7 +216,7 @@ _____________________________________________
 4. **Compliance Requirements**: Assumed GDPR and similar data privacy regulations apply
 5. **Scalability**: Designed for horizontal scaling in cloud environments
 6. **Field Length Requirements**: Assumed 100 characters is sufficient for VARCHAR fields based on typical business data patterns
-7. **Data Quality**: Assumed need for data quality monitoring and tracking
+7. **Temporal Precision**: Assumed nanosecond precision is required for JOIN_TIME to support accurate meeting analytics
 
 ### 5.3 Rationale
 
@@ -241,5 +225,4 @@ _____________________________________________
 3. **Flexibility**: Schema design allows for easy extension and modification as business requirements evolve
 4. **Data Governance**: PII classification and audit capabilities support compliance and governance requirements
 5. **Performance Optimization**: Reduced VARCHAR sizes improve query performance and reduce storage costs while maintaining data integrity
-6. **Enhanced Monitoring**: Additional audit fields enable better data quality tracking and operational monitoring
-7. **Error Handling**: Improved error tracking capabilities for better data pipeline management
+6. **Temporal Analytics**: TIMESTAMP data type for JOIN_TIME enables precise time-based calculations and meeting duration analytics
