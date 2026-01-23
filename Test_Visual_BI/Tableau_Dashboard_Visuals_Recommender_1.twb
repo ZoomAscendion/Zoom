@@ -1,0 +1,1129 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20233.23.1017.0948 -->
+<workbook original-version='18.1' source-build='2023.3.0 (20233.23.1017.0948)' source-platform='win' version='18.1' xml:base='https://prod-in-a.online.tableau.com' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AccessibleZoneTabOrder.true...AccessibleZoneTabOrder />
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <AutoCreateAndUpdateDSDPhoneLayouts />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <SetMembershipControl />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <repository-location id='Tableau_Dashboard_Visuals_Recommender' path='/workbooks' revision='1.0' />
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
+  <datasources>
+    <datasource caption='Advanced Analytics (DB_POC_Z.GOLD)' inline='true' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='a8977680256071-ascendion_partner.snowflakecomputing.com' name='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
+            <connection authentication='oauth' class='snowflake' dbname='DB_POC_Z' instanceurl='https://a8977680256071-ascendion_partner.snowflakecomputing.com' odbc-connect-string-extras='' one-time-sql='' role='FR__POC__ADMIN__Z' schema='GOLD' server='a8977680256071-ascendion_partner.snowflakecomputing.com' server-oauth='' service='FR__POC__ADMIN__Z' username='SATHYANARAYANA.P@ASCENDION.COM' warehouse='WH_POC_Z_DEV_XSMALL' workgroup-auth-mode='prompt' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='collection'>
+          <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
+          <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_FEATURE' table='[DB_POC_Z].[GOLD].[DIM_FEATURE]' type='table' />
+          <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_LICENSE' table='[DB_POC_Z].[GOLD].[DIM_LICENSE]' type='table' />
+          <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_MEETING' table='[DB_POC_Z].[GOLD].[DIM_MEETING]' type='table' />
+          <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_Z].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
+          <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_USER' table='[DB_POC_Z].[GOLD].[DIM_USER]' type='table' />
+          <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='FACT_FEATURE_USAGE' table='[DB_POC_Z].[GOLD].[FACT_FEATURE_USAGE]' type='table' />
+          <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='FACT_MEETING_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
+          <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='FACT_REVENUE_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_REVENUE_ACTIVITY]' type='table' />
+          <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
+        </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <cols>
+          <!-- DIM_DATE columns -->
+          <map key='[DATE_KEY]' value='[DIM_DATE].[DATE_KEY]' />
+          <map key='[DATE_VALUE]' value='[DIM_DATE].[DATE_VALUE]' />
+          <map key='[YEAR]' value='[DIM_DATE].[YEAR]' />
+          <map key='[QUARTER]' value='[DIM_DATE].[QUARTER]' />
+          <map key='[MONTH]' value='[DIM_DATE].[MONTH]' />
+          <map key='[MONTH_NAME]' value='[DIM_DATE].[MONTH_NAME]' />
+          <map key='[DAY_OF_MONTH]' value='[DIM_DATE].[DAY_OF_MONTH]' />
+          <map key='[DAY_OF_WEEK]' value='[DIM_DATE].[DAY_OF_WEEK]' />
+          <map key='[DAY_NAME]' value='[DIM_DATE].[DAY_NAME]' />
+          <map key='[WEEK_OF_YEAR]' value='[DIM_DATE].[WEEK_OF_YEAR]' />
+          <map key='[FISCAL_QUARTER]' value='[DIM_DATE].[FISCAL_QUARTER]' />
+          <map key='[FISCAL_YEAR]' value='[DIM_DATE].[FISCAL_YEAR]' />
+          <map key='[IS_WEEKEND]' value='[DIM_DATE].[IS_WEEKEND]' />
+          <map key='[IS_HOLIDAY]' value='[DIM_DATE].[IS_HOLIDAY]' />
+          <!-- DIM_USER columns -->
+          <map key='[USER_KEY]' value='[DIM_USER].[USER_KEY]' />
+          <map key='[USER_ID]' value='[DIM_USER].[USER_ID]' />
+          <map key='[USER_NAME]' value='[DIM_USER].[USER_NAME]' />
+          <map key='[GEOGRAPHIC_REGION]' value='[DIM_USER].[GEOGRAPHIC_REGION]' />
+          <map key='[INDUSTRY_SECTOR]' value='[DIM_USER].[INDUSTRY_SECTOR]' />
+          <map key='[PLAN_TYPE]' value='[DIM_USER].[PLAN_TYPE]' />
+          <map key='[PLAN_CATEGORY]' value='[DIM_USER].[PLAN_CATEGORY]' />
+          <map key='[COMPANY]' value='[DIM_USER].[COMPANY]' />
+          <map key='[EMAIL_DOMAIN]' value='[DIM_USER].[EMAIL_DOMAIN]' />
+          <map key='[ACCOUNT_TYPE]' value='[DIM_USER].[ACCOUNT_TYPE]' />
+          <map key='[USER_STATUS]' value='[DIM_USER].[USER_STATUS]' />
+          <map key='[USER_ROLE]' value='[DIM_USER].[USER_ROLE]' />
+          <map key='[LANGUAGE_PREFERENCE]' value='[DIM_USER].[LANGUAGE_PREFERENCE]' />
+          <map key='[REGISTRATION_DATE]' value='[DIM_USER].[REGISTRATION_DATE]' />
+          <!-- DIM_FEATURE columns -->
+          <map key='[FEATURE_KEY]' value='[DIM_FEATURE].[FEATURE_KEY]' />
+          <map key='[FEATURE_NAME]' value='[DIM_FEATURE].[FEATURE_NAME]' />
+          <map key='[FEATURE_CATEGORY]' value='[DIM_FEATURE].[FEATURE_CATEGORY]' />
+          <map key='[FEATURE_TYPE]' value='[DIM_FEATURE].[FEATURE_TYPE]' />
+          <map key='[FEATURE_COMPLEXITY]' value='[DIM_FEATURE].[FEATURE_COMPLEXITY]' />
+          <!-- DIM_LICENSE columns -->
+          <map key='[LICENSE_KEY]' value='[DIM_LICENSE].[LICENSE_KEY]' />
+          <map key='[LICENSE_TYPE]' value='[DIM_LICENSE].[LICENSE_TYPE]' />
+          <map key='[LICENSE_TIER]' value='[DIM_LICENSE].[LICENSE_TIER]' />
+          <map key='[LICENSE_CATEGORY]' value='[DIM_LICENSE].[LICENSE_CATEGORY]' />
+          <map key='[MONTHLY_PRICE]' value='[DIM_LICENSE].[MONTHLY_PRICE]' />
+          <map key='[ANNUAL_PRICE]' value='[DIM_LICENSE].[ANNUAL_PRICE]' />
+          <map key='[MAX_PARTICIPANTS]' value='[DIM_LICENSE].[MAX_PARTICIPANTS]' />
+          <!-- DIM_SUPPORT_CATEGORY columns -->
+          <map key='[SUPPORT_CATEGORY_KEY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY_KEY]' />
+          <map key='[SUPPORT_CATEGORY]' value='[DIM_SUPPORT_CATEGORY].[SUPPORT_CATEGORY]' />
+          <map key='[PRIORITY_LEVEL]' value='[DIM_SUPPORT_CATEGORY].[PRIORITY_LEVEL]' />
+          <map key='[SLA_TARGET_HOURS]' value='[DIM_SUPPORT_CATEGORY].[SLA_TARGET_HOURS]' />
+          <!-- FACT_FEATURE_USAGE columns -->
+          <map key='[FEATURE_USAGE_ID]' value='[FACT_FEATURE_USAGE].[FEATURE_USAGE_ID]' />
+          <map key='[USER_KEY (FACT_FEATURE_USAGE)]' value='[FACT_FEATURE_USAGE].[USER_KEY]' />
+          <map key='[FEATURE_KEY (FACT_FEATURE_USAGE)]' value='[FACT_FEATURE_USAGE].[FEATURE_KEY]' />
+          <map key='[DATE_KEY (FACT_FEATURE_USAGE)]' value='[FACT_FEATURE_USAGE].[DATE_KEY]' />
+          <map key='[USAGE_COUNT]' value='[FACT_FEATURE_USAGE].[USAGE_COUNT]' />
+          <map key='[USAGE_DURATION_MINUTES]' value='[FACT_FEATURE_USAGE].[USAGE_DURATION_MINUTES]' />
+          <map key='[SESSION_DURATION_MINUTES]' value='[FACT_FEATURE_USAGE].[SESSION_DURATION_MINUTES]' />
+          <map key='[FEATURE_ADOPTION_SCORE]' value='[FACT_FEATURE_USAGE].[FEATURE_ADOPTION_SCORE]' />
+          <map key='[USER_EXPERIENCE_RATING]' value='[FACT_FEATURE_USAGE].[USER_EXPERIENCE_RATING]' />
+          <map key='[PERFORMANCE_SCORE]' value='[FACT_FEATURE_USAGE].[PERFORMANCE_SCORE]' />
+          <!-- FACT_MEETING_ACTIVITY columns -->
+          <map key='[MEETING_ACTIVITY_ID]' value='[FACT_MEETING_ACTIVITY].[MEETING_ACTIVITY_ID]' />
+          <map key='[USER_KEY (FACT_MEETING_ACTIVITY)]' value='[FACT_MEETING_ACTIVITY].[USER_KEY]' />
+          <map key='[DATE_KEY (FACT_MEETING_ACTIVITY)]' value='[FACT_MEETING_ACTIVITY].[DATE_KEY]' />
+          <map key='[MEETING_KEY]' value='[FACT_MEETING_ACTIVITY].[MEETING_KEY]' />
+          <map key='[MEETING_DATE]' value='[FACT_MEETING_ACTIVITY].[MEETING_DATE]' />
+          <map key='[START_TIME]' value='[FACT_MEETING_ACTIVITY].[START_TIME]' />
+          <map key='[END_TIME]' value='[FACT_MEETING_ACTIVITY].[END_TIME]' />
+          <map key='[DURATION_MINUTES]' value='[FACT_MEETING_ACTIVITY].[DURATION_MINUTES]' />
+          <map key='[PARTICIPANT_COUNT]' value='[FACT_MEETING_ACTIVITY].[PARTICIPANT_COUNT]' />
+          <map key='[PEAK_CONCURRENT_PARTICIPANTS]' value='[FACT_MEETING_ACTIVITY].[PEAK_CONCURRENT_PARTICIPANTS]' />
+          <map key='[AVERAGE_PARTICIPATION_MINUTES]' value='[FACT_MEETING_ACTIVITY].[AVERAGE_PARTICIPATION_MINUTES]' />
+          <map key='[MEETING_QUALITY_SCORE]' value='[FACT_MEETING_ACTIVITY].[MEETING_QUALITY_SCORE]' />
+          <map key='[MEETING_SATISFACTION_SCORE]' value='[FACT_MEETING_ACTIVITY].[MEETING_SATISFACTION_SCORE]' />
+          <map key='[AUDIO_QUALITY_SCORE]' value='[FACT_MEETING_ACTIVITY].[AUDIO_QUALITY_SCORE]' />
+          <map key='[VIDEO_QUALITY_SCORE]' value='[FACT_MEETING_ACTIVITY].[VIDEO_QUALITY_SCORE]' />
+          <!-- FACT_REVENUE_ACTIVITY columns -->
+          <map key='[REVENUE_ACTIVITY_ID]' value='[FACT_REVENUE_ACTIVITY].[REVENUE_ACTIVITY_ID]' />
+          <map key='[USER_KEY (FACT_REVENUE_ACTIVITY)]' value='[FACT_REVENUE_ACTIVITY].[USER_KEY]' />
+          <map key='[LICENSE_KEY (FACT_REVENUE_ACTIVITY)]' value='[FACT_REVENUE_ACTIVITY].[LICENSE_KEY]' />
+          <map key='[DATE_KEY (FACT_REVENUE_ACTIVITY)]' value='[FACT_REVENUE_ACTIVITY].[DATE_KEY]' />
+          <map key='[TRANSACTION_DATE]' value='[FACT_REVENUE_ACTIVITY].[TRANSACTION_DATE]' />
+          <map key='[EVENT_TYPE]' value='[FACT_REVENUE_ACTIVITY].[EVENT_TYPE]' />
+          <map key='[NET_REVENUE_AMOUNT]' value='[FACT_REVENUE_ACTIVITY].[NET_REVENUE_AMOUNT]' />
+          <map key='[SUBSCRIPTION_REVENUE_AMOUNT]' value='[FACT_REVENUE_ACTIVITY].[SUBSCRIPTION_REVENUE_AMOUNT]' />
+          <map key='[ONE_TIME_REVENUE_AMOUNT]' value='[FACT_REVENUE_ACTIVITY].[ONE_TIME_REVENUE_AMOUNT]' />
+          <map key='[MRR_IMPACT]' value='[FACT_REVENUE_ACTIVITY].[MRR_IMPACT]' />
+          <map key='[ARR_IMPACT]' value='[FACT_REVENUE_ACTIVITY].[ARR_IMPACT]' />
+          <map key='[CUSTOMER_LIFETIME_VALUE]' value='[FACT_REVENUE_ACTIVITY].[CUSTOMER_LIFETIME_VALUE]' />
+          <map key='[CHURN_RISK_SCORE]' value='[FACT_REVENUE_ACTIVITY].[CHURN_RISK_SCORE]' />
+          <!-- FACT_SUPPORT_ACTIVITY columns -->
+          <map key='[SUPPORT_ACTIVITY_ID]' value='[FACT_SUPPORT_ACTIVITY].[SUPPORT_ACTIVITY_ID]' />
+          <map key='[USER_KEY (FACT_SUPPORT_ACTIVITY)]' value='[FACT_SUPPORT_ACTIVITY].[USER_KEY]' />
+          <map key='[SUPPORT_CATEGORY_KEY (FACT_SUPPORT_ACTIVITY)]' value='[FACT_SUPPORT_ACTIVITY].[SUPPORT_CATEGORY_KEY]' />
+          <map key='[DATE_KEY (FACT_SUPPORT_ACTIVITY)]' value='[FACT_SUPPORT_ACTIVITY].[DATE_KEY]' />
+          <map key='[TICKET_OPEN_DATE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_OPEN_DATE]' />
+          <map key='[TICKET_CLOSE_DATE]' value='[FACT_SUPPORT_ACTIVITY].[TICKET_CLOSE_DATE]' />
+          <map key='[RESOLUTION_STATUS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_STATUS]' />
+          <map key='[SLA_MET]' value='[FACT_SUPPORT_ACTIVITY].[SLA_MET]' />
+          <map key='[CUSTOMER_SATISFACTION_SCORE]' value='[FACT_SUPPORT_ACTIVITY].[CUSTOMER_SATISFACTION_SCORE]' />
+          <map key='[RESOLUTION_TIME_HOURS]' value='[FACT_SUPPORT_ACTIVITY].[RESOLUTION_TIME_HOURS]' />
+        </cols>
+        <metadata-records>
+          <!-- DIM_DATE metadata -->
+          <metadata-record class='column'>
+            <remote-name>DATE_KEY</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[DATE_KEY]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>DATE_KEY</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>false</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_DATE_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DATE_VALUE</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[DATE_VALUE]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>DATE_VALUE</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>false</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_DATE_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>YEAR</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[YEAR]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>YEAR</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>false</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_DATE_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MONTH_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MONTH_NAME]</local-name>
+            <parent-name>[DIM_DATE]</parent-name>
+            <remote-alias>MONTH_NAME</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>false</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_DATE_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <!-- DIM_USER metadata -->
+          <metadata-record class='column'>
+            <remote-name>USER_KEY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[USER_KEY]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>USER_KEY</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>false</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>GEOGRAPHIC_REGION</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[GEOGRAPHIC_REGION]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>GEOGRAPHIC_REGION</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>INDUSTRY_SECTOR</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[INDUSTRY_SECTOR]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>INDUSTRY_SECTOR</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PLAN_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[PLAN_TYPE]</local-name>
+            <parent-name>[DIM_USER]</parent-name>
+            <remote-alias>PLAN_TYPE</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <!-- DIM_FEATURE metadata -->
+          <metadata-record class='column'>
+            <remote-name>FEATURE_KEY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[FEATURE_KEY]</local-name>
+            <parent-name>[DIM_FEATURE]</parent-name>
+            <remote-alias>FEATURE_KEY</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>false</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_FEATURE_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FEATURE_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[FEATURE_CATEGORY]</local-name>
+            <parent-name>[DIM_FEATURE]</parent-name>
+            <remote-alias>FEATURE_CATEGORY</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_FEATURE_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <!-- DIM_LICENSE metadata -->
+          <metadata-record class='column'>
+            <remote-name>LICENSE_KEY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[LICENSE_KEY]</local-name>
+            <parent-name>[DIM_LICENSE]</parent-name>
+            <remote-alias>LICENSE_KEY</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>false</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_LICENSE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>LICENSE_TYPE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[LICENSE_TYPE]</local-name>
+            <parent-name>[DIM_LICENSE]</parent-name>
+            <remote-alias>LICENSE_TYPE</remote-alias>
+            <ordinal>12</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_LICENSE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <!-- DIM_SUPPORT_CATEGORY metadata -->
+          <metadata-record class='column'>
+            <remote-name>SUPPORT_CATEGORY_KEY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[SUPPORT_CATEGORY_KEY]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>SUPPORT_CATEGORY_KEY</remote-alias>
+            <ordinal>13</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>false</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_SUPPORT_CATEGORY_E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SUPPORT_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[SUPPORT_CATEGORY]</local-name>
+            <parent-name>[DIM_SUPPORT_CATEGORY]</parent-name>
+            <remote-alias>SUPPORT_CATEGORY</remote-alias>
+            <ordinal>14</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[DIM_SUPPORT_CATEGORY_E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <!-- FACT_FEATURE_USAGE metadata -->
+          <metadata-record class='column'>
+            <remote-name>USAGE_COUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[USAGE_COUNT]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>USAGE_COUNT</remote-alias>
+            <ordinal>15</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_FEATURE_USAGE_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USAGE_DURATION_MINUTES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[USAGE_DURATION_MINUTES]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>USAGE_DURATION_MINUTES</remote-alias>
+            <ordinal>16</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_FEATURE_USAGE_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SESSION_DURATION_MINUTES</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[SESSION_DURATION_MINUTES]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>SESSION_DURATION_MINUTES</remote-alias>
+            <ordinal>17</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_FEATURE_USAGE_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>FEATURE_ADOPTION_SCORE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[FEATURE_ADOPTION_SCORE]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>FEATURE_ADOPTION_SCORE</remote-alias>
+            <ordinal>18</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_FEATURE_USAGE_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>USER_EXPERIENCE_RATING</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[USER_EXPERIENCE_RATING]</local-name>
+            <parent-name>[FACT_FEATURE_USAGE]</parent-name>
+            <remote-alias>USER_EXPERIENCE_RATING</remote-alias>
+            <ordinal>19</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_FEATURE_USAGE_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <!-- FACT_REVENUE_ACTIVITY metadata -->
+          <metadata-record class='column'>
+            <remote-name>NET_REVENUE_AMOUNT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[NET_REVENUE_AMOUNT]</local-name>
+            <parent-name>[FACT_REVENUE_ACTIVITY]</parent-name>
+            <remote-alias>NET_REVENUE_AMOUNT</remote-alias>
+            <ordinal>20</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_REVENUE_ACTIVITY_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MRR_IMPACT</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[MRR_IMPACT]</local-name>
+            <parent-name>[FACT_REVENUE_ACTIVITY]</parent-name>
+            <remote-alias>MRR_IMPACT</remote-alias>
+            <ordinal>21</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_REVENUE_ACTIVITY_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <!-- FACT_SUPPORT_ACTIVITY metadata -->
+          <metadata-record class='column'>
+            <remote-name>SUPPORT_ACTIVITY_ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[SUPPORT_ACTIVITY_ID]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>SUPPORT_ACTIVITY_ID</remote-alias>
+            <ordinal>22</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>false</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TICKET_OPEN_DATE</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[TICKET_OPEN_DATE]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>TICKET_OPEN_DATE</remote-alias>
+            <ordinal>23</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TICKET_CLOSE_DATE</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[TICKET_CLOSE_DATE]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>TICKET_CLOSE_DATE</remote-alias>
+            <ordinal>24</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SLA_MET</remote-name>
+            <remote-type>11</remote-type>
+            <local-name>[SLA_MET]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>SLA_MET</remote-alias>
+            <ordinal>25</ordinal>
+            <local-type>boolean</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>CUSTOMER_SATISFACTION_SCORE</remote-name>
+            <remote-type>131</remote-type>
+            <local-name>[CUSTOMER_SATISFACTION_SCORE]</local-name>
+            <parent-name>[FACT_SUPPORT_ACTIVITY]</parent-name>
+            <remote-alias>CUSTOMER_SATISFACTION_SCORE</remote-alias>
+            <ordinal>26</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[FACT_SUPPORT_ACTIVITY_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <!-- Column definitions with calculated fields -->
+      <column caption='Date Key' datatype='date' name='[DATE_KEY]' role='dimension' type='ordinal' />
+      <column caption='Date Value' datatype='date' name='[DATE_VALUE]' role='dimension' type='ordinal' />
+      <column caption='Year' datatype='integer' name='[YEAR]' role='dimension' type='ordinal' />
+      <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+      <column caption='Geographic Region' datatype='string' name='[GEOGRAPHIC_REGION]' role='dimension' type='nominal' />
+      <column caption='Industry Sector' datatype='string' name='[INDUSTRY_SECTOR]' role='dimension' type='nominal' />
+      <column caption='Plan Type' datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+      <column caption='Feature Category' datatype='string' name='[FEATURE_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='License Type' datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
+      <column caption='Support Category' datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Usage Count' datatype='integer' name='[USAGE_COUNT]' role='measure' type='quantitative' />
+      <column caption='Usage Duration Minutes' datatype='real' name='[USAGE_DURATION_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Session Duration Minutes' datatype='real' name='[SESSION_DURATION_MINUTES]' role='measure' type='quantitative' />
+      <column caption='Feature Adoption Score' datatype='real' name='[FEATURE_ADOPTION_SCORE]' role='measure' type='quantitative' />
+      <column caption='User Experience Rating' datatype='real' name='[USER_EXPERIENCE_RATING]' role='measure' type='quantitative' />
+      <column caption='Net Revenue Amount' datatype='real' name='[NET_REVENUE_AMOUNT]' role='measure' type='quantitative' />
+      <column caption='MRR Impact' datatype='real' name='[MRR_IMPACT]' role='measure' type='quantitative' />
+      <column caption='Support Activity ID' datatype='string' name='[SUPPORT_ACTIVITY_ID]' role='dimension' type='nominal' />
+      <column caption='Ticket Open Date' datatype='date' name='[TICKET_OPEN_DATE]' role='dimension' type='ordinal' />
+      <column caption='Ticket Close Date' datatype='date' name='[TICKET_CLOSE_DATE]' role='dimension' type='ordinal' />
+      <column caption='SLA Met' datatype='boolean' name='[SLA_MET]' role='dimension' type='nominal' />
+      <column caption='Customer Satisfaction Score' datatype='real' name='[CUSTOMER_SATISFACTION_SCORE]' role='measure' type='quantitative' />
+      
+      <!-- Calculated Fields for KPIs and Metrics -->
+      <column caption='Average Adoption Score by Region-Industry' datatype='real' name='[Avg_Adoption_Score_Region_Industry]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='{ FIXED [GEOGRAPHIC_REGION], [INDUSTRY_SECTOR] : AVG([FEATURE_ADOPTION_SCORE]) }' />
+      </column>
+      
+      <column caption='Usage Intensity Score' datatype='real' name='[Usage_Intensity_Score]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='[USAGE_COUNT] * [USAGE_DURATION_MINUTES] / [SESSION_DURATION_MINUTES]' />
+      </column>
+      
+      <column caption='Monthly Recurring Revenue' datatype='real' name='[Monthly_Recurring_Revenue]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([MRR_IMPACT])' />
+      </column>
+      
+      <column caption='Support Satisfaction Trend' datatype='real' name='[Support_Satisfaction_Trend]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='WINDOW_AVG(AVG([CUSTOMER_SATISFACTION_SCORE]))' />
+      </column>
+      
+      <column caption='SLA Breach Count' datatype='integer' name='[SLA_Breach_Count]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM(IF [SLA_MET] = FALSE THEN 1 ELSE 0 END)' />
+      </column>
+      
+      <column caption='Revenue by License Type' datatype='real' name='[Revenue_by_License_Type]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([NET_REVENUE_AMOUNT])' />
+      </column>
+      
+      <column caption='Percentage of Total Usage by Category' datatype='real' name='[Pct_Total_Usage_Category]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([USAGE_COUNT]) / TOTAL(SUM([USAGE_COUNT]))' />
+      </column>
+      
+      <column caption='Running Total Percentage' datatype='real' name='[Running_Total_Percentage]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='RUNNING_SUM(SUM([NET_REVENUE_AMOUNT])) / TOTAL(SUM([NET_REVENUE_AMOUNT]))' />
+      </column>
+      
+      <column caption='Gantt Duration' datatype='integer' name='[Gantt_Duration]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='DATEDIFF(&quot;day&quot;, [TICKET_OPEN_DATE], IFNULL([TICKET_CLOSE_DATE], TODAY()))' />
+      </column>
+      
+      <column caption='Dynamic Status' datatype='string' name='[Dynamic_Status]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='IF [SLA_MET] THEN &quot;Met&quot; ELSE &quot;Breached&quot; END' />
+      </column>
+      
+      <!-- Parameters -->
+      <column caption='Metric Selector' datatype='string' name='[Parameters].[Metric Selector]' role='dimension' type='nominal' value='&quot;Revenue&quot;'>
+        <aliases>
+          <alias key='&quot;Revenue&quot;' value='Revenue' />
+          <alias key='&quot;Usage&quot;' value='Usage' />
+          <alias key='&quot;Support&quot;' value='Support' />
+          <alias key='&quot;Adoption&quot;' value='Adoption' />
+        </aliases>
+        <members>
+          <member alias='Revenue' value='&quot;Revenue&quot;' />
+          <member alias='Usage' value='&quot;Usage&quot;' />
+          <member alias='Support' value='&quot;Support&quot;' />
+          <member alias='Adoption' value='&quot;Adoption&quot;' />
+        </members>
+      </column>
+      
+      <column caption='Dynamic Measure' datatype='real' name='[Dynamic_Measure]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='CASE [Parameters].[Metric Selector]
+WHEN &quot;Revenue&quot; THEN SUM([NET_REVENUE_AMOUNT])
+WHEN &quot;Usage&quot; THEN AVG([USAGE_DURATION_MINUTES])
+WHEN &quot;Support&quot; THEN AVG([CUSTOMER_SATISFACTION_SCORE])
+WHEN &quot;Adoption&quot; THEN AVG([FEATURE_ADOPTION_SCORE])
+END' />
+      </column>
+      
+      <!-- ObjectModel columns -->
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_DATE' datatype='table' name='[__tableau_internal_object_id__].[DIM_DATE_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_USER' datatype='table' name='[__tableau_internal_object_id__].[DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_FEATURE' datatype='table' name='[__tableau_internal_object_id__].[DIM_FEATURE_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_LICENSE' datatype='table' name='[__tableau_internal_object_id__].[DIM_LICENSE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='DIM_SUPPORT_CATEGORY' datatype='table' name='[__tableau_internal_object_id__].[DIM_SUPPORT_CATEGORY_E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='FACT_FEATURE_USAGE' datatype='table' name='[__tableau_internal_object_id__].[FACT_FEATURE_USAGE_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='FACT_MEETING_ACTIVITY' datatype='table' name='[__tableau_internal_object_id__].[FACT_MEETING_ACTIVITY_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='FACT_REVENUE_ACTIVITY' datatype='table' name='[__tableau_internal_object_id__].[FACT_REVENUE_ACTIVITY_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='FACT_SUPPORT_ACTIVITY' datatype='table' name='[__tableau_internal_object_id__].[FACT_SUPPORT_ACTIVITY_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3]' role='measure' type='quantitative' />
+      
+      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      
+      <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+        <objects>
+          <object caption='DIM_DATE' id='DIM_DATE_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6'>
+            <properties context=''>
+              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_DATE' table='[DB_POC_Z].[GOLD].[DIM_DATE]' type='table' />
+            </properties>
+          </object>
+          <object caption='DIM_USER' id='DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7'>
+            <properties context=''>
+              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_USER' table='[DB_POC_Z].[GOLD].[DIM_USER]' type='table' />
+            </properties>
+          </object>
+          <object caption='DIM_FEATURE' id='DIM_FEATURE_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8'>
+            <properties context=''>
+              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_FEATURE' table='[DB_POC_Z].[GOLD].[DIM_FEATURE]' type='table' />
+            </properties>
+          </object>
+          <object caption='DIM_LICENSE' id='DIM_LICENSE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9'>
+            <properties context=''>
+              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_LICENSE' table='[DB_POC_Z].[GOLD].[DIM_LICENSE]' type='table' />
+            </properties>
+          </object>
+          <object caption='DIM_SUPPORT_CATEGORY' id='DIM_SUPPORT_CATEGORY_E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0'>
+            <properties context=''>
+              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='DIM_SUPPORT_CATEGORY' table='[DB_POC_Z].[GOLD].[DIM_SUPPORT_CATEGORY]' type='table' />
+            </properties>
+          </object>
+          <object caption='FACT_FEATURE_USAGE' id='FACT_FEATURE_USAGE_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1'>
+            <properties context=''>
+              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='FACT_FEATURE_USAGE' table='[DB_POC_Z].[GOLD].[FACT_FEATURE_USAGE]' type='table' />
+            </properties>
+          </object>
+          <object caption='FACT_MEETING_ACTIVITY' id='FACT_MEETING_ACTIVITY_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2'>
+            <properties context=''>
+              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='FACT_MEETING_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_MEETING_ACTIVITY]' type='table' />
+            </properties>
+          </object>
+          <object caption='FACT_REVENUE_ACTIVITY' id='FACT_REVENUE_ACTIVITY_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2'>
+            <properties context=''>
+              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='FACT_REVENUE_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_REVENUE_ACTIVITY]' type='table' />
+            </properties>
+          </object>
+          <object caption='FACT_SUPPORT_ACTIVITY' id='FACT_SUPPORT_ACTIVITY_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3'>
+            <properties context=''>
+              <relation connection='snowflake.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' name='FACT_SUPPORT_ACTIVITY' table='[DB_POC_Z].[GOLD].[FACT_SUPPORT_ACTIVITY]' type='table' />
+            </properties>
+          </object>
+        </objects>
+        <relationships>
+          <relationship>
+            <expression op='='>
+              <expression op='[DATE_KEY (FACT_FEATURE_USAGE)]' />
+              <expression op='[DATE_KEY]' />
+            </expression>
+            <first-end-point object-id='FACT_FEATURE_USAGE_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1' />
+            <second-end-point object-id='DIM_DATE_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6' />
+          </relationship>
+          <relationship>
+            <expression op='='>
+              <expression op='[USER_KEY (FACT_FEATURE_USAGE)]' />
+              <expression op='[USER_KEY]' />
+            </expression>
+            <first-end-point object-id='FACT_FEATURE_USAGE_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1' />
+            <second-end-point object-id='DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7' />
+          </relationship>
+          <relationship>
+            <expression op='='>
+              <expression op='[FEATURE_KEY (FACT_FEATURE_USAGE)]' />
+              <expression op='[FEATURE_KEY]' />
+            </expression>
+            <first-end-point object-id='FACT_FEATURE_USAGE_F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1' />
+            <second-end-point object-id='DIM_FEATURE_C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8' />
+          </relationship>
+          <relationship>
+            <expression op='='>
+              <expression op='[DATE_KEY (FACT_REVENUE_ACTIVITY)]' />
+              <expression op='[DATE_KEY]' />
+            </expression>
+            <first-end-point object-id='FACT_REVENUE_ACTIVITY_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2' />
+            <second-end-point object-id='DIM_DATE_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6' />
+          </relationship>
+          <relationship>
+            <expression op='='>
+              <expression op='[USER_KEY (FACT_REVENUE_ACTIVITY)]' />
+              <expression op='[USER_KEY]' />
+            </expression>
+            <first-end-point object-id='FACT_REVENUE_ACTIVITY_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2' />
+            <second-end-point object-id='DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7' />
+          </relationship>
+          <relationship>
+            <expression op='='>
+              <expression op='[LICENSE_KEY (FACT_REVENUE_ACTIVITY)]' />
+              <expression op='[LICENSE_KEY]' />
+            </expression>
+            <first-end-point object-id='FACT_REVENUE_ACTIVITY_A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2' />
+            <second-end-point object-id='DIM_LICENSE_D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9' />
+          </relationship>
+          <relationship>
+            <expression op='='>
+              <expression op='[DATE_KEY (FACT_SUPPORT_ACTIVITY)]' />
+              <expression op='[DATE_KEY]' />
+            </expression>
+            <first-end-point object-id='FACT_SUPPORT_ACTIVITY_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3' />
+            <second-end-point object-id='DIM_DATE_A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6' />
+          </relationship>
+          <relationship>
+            <expression op='='>
+              <expression op='[USER_KEY (FACT_SUPPORT_ACTIVITY)]' />
+              <expression op='[USER_KEY]' />
+            </expression>
+            <first-end-point object-id='FACT_SUPPORT_ACTIVITY_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3' />
+            <second-end-point object-id='DIM_USER_B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7' />
+          </relationship>
+          <relationship>
+            <expression op='='>
+              <expression op='[SUPPORT_CATEGORY_KEY (FACT_SUPPORT_ACTIVITY)]' />
+              <expression op='[SUPPORT_CATEGORY_KEY]' />
+            </expression>
+            <first-end-point object-id='FACT_SUPPORT_ACTIVITY_B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3' />
+            <second-end-point object-id='DIM_SUPPORT_CATEGORY_E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0' />
+          </relationship>
+        </relationships>
+      </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+    </datasource>
+  </datasources>
+  
+  <worksheets>
+    <!-- 1. Scatter/Bubble Chart with Multiple Dimensions -->
+    <worksheet name='Feature Usage Scatter Analysis'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='14'>Feature Usage Analysis by User Segments</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Advanced Analytics (DB_POC_Z.GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
+            <column datatype='string' name='[GEOGRAPHIC_REGION]' role='dimension' type='nominal' />
+            <column datatype='string' name='[INDUSTRY_SECTOR]' role='dimension' type='nominal' />
+            <column datatype='string' name='[FEATURE_CATEGORY]' role='dimension' type='nominal' />
+            <column datatype='real' name='[USAGE_DURATION_MINUTES]' role='measure' type='quantitative' />
+            <column datatype='real' name='[USER_EXPERIENCE_RATING]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[USAGE_COUNT]' role='measure' type='quantitative' />
+            <column datatype='real' name='[FEATURE_ADOPTION_SCORE]' role='measure' type='quantitative' />
+            <column-instance column='[GEOGRAPHIC_REGION]' derivation='None' name='[none:GEOGRAPHIC_REGION:nk]' pivot='key' type='nominal' />
+            <column-instance column='[INDUSTRY_SECTOR]' derivation='None' name='[none:INDUSTRY_SECTOR:nk]' pivot='key' type='nominal' />
+            <column-instance column='[FEATURE_CATEGORY]' derivation='None' name='[none:FEATURE_CATEGORY:nk]' pivot='key' type='nominal' />
+            <column-instance column='[USAGE_DURATION_MINUTES]' derivation='Avg' name='[avg:USAGE_DURATION_MINUTES:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[USER_EXPERIENCE_RATING]' derivation='Avg' name='[avg:USER_EXPERIENCE_RATING:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[USAGE_COUNT]' derivation='Sum' name='[sum:USAGE_COUNT:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[FEATURE_ADOPTION_SCORE]' derivation='Avg' name='[avg:FEATURE_ADOPTION_SCORE:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Circle' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:FEATURE_CATEGORY:nk]' />
+              <size column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:USAGE_COUNT:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='false' />
+                <format attr='mark-transparency' value='200' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:GEOGRAPHIC_REGION:nk]</rows>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:INDUSTRY_SECTOR:nk]</rows>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[avg:USER_EXPERIENCE_RATING:qk]</rows>
+        <cols>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[avg:USAGE_DURATION_MINUTES:qk]</cols>
+      </table>
+      <simple-id uuid='{A1B2C3D4-E5F6-A7B8-C9D0-E1F2A3B4C5D6}' />
+    </worksheet>
+    
+    <!-- 2. Combination Chart: Area + Line + Markers -->
+    <worksheet name='Revenue Trends with Support Overlay'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='14'>Revenue Trends with Support Incident Overlay</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Advanced Analytics (DB_POC_Z.GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
+            <column datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+            <column datatype='real' name='[NET_REVENUE_AMOUNT]' role='measure' type='quantitative' />
+            <column datatype='real' name='[CUSTOMER_SATISFACTION_SCORE]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[SLA_Breach_Count]' role='measure' type='quantitative' />
+            <column-instance column='[MONTH_NAME]' derivation='None' name='[none:MONTH_NAME:nk]' pivot='key' type='nominal' />
+            <column-instance column='[NET_REVENUE_AMOUNT]' derivation='Sum' name='[sum:NET_REVENUE_AMOUNT:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[CUSTOMER_SATISFACTION_SCORE]' derivation='Avg' name='[avg:CUSTOMER_SATISFACTION_SCORE:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[SLA_Breach_Count]' derivation='Sum' name='[sum:SLA_Breach_Count:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Area' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:NET_REVENUE_AMOUNT:qk]' />
+            </encodings>
+          </pane>
+          <pane id='1' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[avg:CUSTOMER_SATISFACTION_SCORE:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[avg:CUSTOMER_SATISFACTION_SCORE:qk]' />
+            </encodings>
+          </pane>
+          <pane id='2' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:SLA_Breach_Count:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Circle' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:SLA_Breach_Count:qk]' />
+              <size column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:SLA_Breach_Count:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:NET_REVENUE_AMOUNT:qk]</rows>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[avg:CUSTOMER_SATISFACTION_SCORE:qk]</rows>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:SLA_Breach_Count:qk]</rows>
+        <cols>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:MONTH_NAME:nk]</cols>
+      </table>
+      <simple-id uuid='{B2C3D4E5-F6A7-B8C9-D0E1-F2A3B4C5D6E7}' />
+    </worksheet>
+    
+    <!-- 3. Dynamic KPI Dashboard -->
+    <worksheet name='Dynamic KPI Dashboard'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='14'>KPI Dashboard with Dynamic Measures</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Advanced Analytics (DB_POC_Z.GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
+            <column datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+            <column datatype='string' name='[PLAN_TYPE]' role='dimension' type='nominal' />
+            <column datatype='real' name='[Dynamic_Measure]' role='measure' type='quantitative' />
+            <column-instance column='[MONTH_NAME]' derivation='None' name='[none:MONTH_NAME:nk]' pivot='key' type='nominal' />
+            <column-instance column='[PLAN_TYPE]' derivation='None' name='[none:PLAN_TYPE:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Dynamic_Measure]' derivation='Sum' name='[sum:Dynamic_Measure:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Text' />
+            <encodings>
+              <text column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:Dynamic_Measure:qk]' />
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:Dynamic_Measure:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='font-size' value='16' />
+                <format attr='font-weight' value='bold' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:PLAN_TYPE:nk]</rows>
+        <cols>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:MONTH_NAME:nk]</cols>
+      </table>
+      <simple-id uuid='{C3D4E5F6-A7B8-C9D0-E1F2-A3B4C5D6E7F8}' />
+    </worksheet>
+    
+    <!-- 4. Marimekko Chart -->
+    <worksheet name='License Revenue Marimekko'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='14'>License Revenue Contribution Analysis</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Advanced Analytics (DB_POC_Z.GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
+            <column datatype='string' name='[LICENSE_TYPE]' role='dimension' type='nominal' />
+            <column datatype='real' name='[NET_REVENUE_AMOUNT]' role='measure' type='quantitative' />
+            <column datatype='real' name='[Running_Total_Percentage]' role='measure' type='quantitative' />
+            <column-instance column='[LICENSE_TYPE]' derivation='None' name='[none:LICENSE_TYPE:nk]' pivot='key' type='nominal' />
+            <column-instance column='[NET_REVENUE_AMOUNT]' derivation='Sum' name='[sum:NET_REVENUE_AMOUNT:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Running_Total_Percentage]' derivation='Sum' name='[sum:Running_Total_Percentage:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:LICENSE_TYPE:nk]' />
+              <size column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:NET_REVENUE_AMOUNT:qk]' />
+            </encodings>
+          </pane>
+          <pane id='1' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:Running_Total_Percentage:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:Running_Total_Percentage:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:NET_REVENUE_AMOUNT:qk]</rows>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:Running_Total_Percentage:qk]</rows>
+        <cols>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:LICENSE_TYPE:nk]</cols>
+      </table>
+      <simple-id uuid='{D4E5F6A7-B8C9-D0E1-F2A3-B4C5D6E7F8A9}' />
+    </worksheet>
+    
+    <!-- 5. 100% Stacked Bar Chart -->
+    <worksheet name='Feature Usage Distribution'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='14'>Feature Usage Distribution with Total Usage</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Advanced Analytics (DB_POC_Z.GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
+            <column datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+            <column datatype='string' name='[FEATURE_CATEGORY]' role='dimension' type='nominal' />
+            <column datatype='integer' name='[USAGE_COUNT]' role='measure' type='quantitative' />
+            <column datatype='real' name='[Pct_Total_Usage_Category]' role='measure' type='quantitative' />
+            <column-instance column='[MONTH_NAME]' derivation='None' name='[none:MONTH_NAME:nk]' pivot='key' type='nominal' />
+            <column-instance column='[FEATURE_CATEGORY]' derivation='None' name='[none:FEATURE_CATEGORY:nk]' pivot='key' type='nominal' />
+            <column-instance column='[USAGE_COUNT]' derivation='Sum' name='[sum:USAGE_COUNT:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Pct_Total_Usage_Category]' derivation='Sum' name='[sum:Pct_Total_Usage_Category:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <mark-sizing mark-sizing-setting='marks-scaling-off' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:FEATURE_CATEGORY:nk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-stack' value='normalize' />
+              </style-rule>
+            </style>
+          </pane>
+          <pane id='1' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:USAGE_COUNT:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:USAGE_COUNT:qk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:Pct_Total_Usage_Category:qk]</rows>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:USAGE_COUNT:qk]</rows>
+        <cols>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:MONTH_NAME:nk]</cols>
+      </table>
+      <simple-id uuid='{E5F6A7B8-C9D0-E1F2-A3B4-C5D6E7F8A9B0}' />
+    </worksheet>
+    
+    <!-- 6. Gantt Chart -->
+    <worksheet name='Support Ticket Timeline'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontalignment='1' fontsize='14'>Support Ticket Resolution Timeline</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Advanced Analytics (DB_POC_Z.GOLD)' name='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d'>
+            <column datatype='string' name='[SUPPORT_CATEGORY]' role='dimension' type='nominal' />
+            <column datatype='string' name='[SUPPORT_ACTIVITY_ID]' role='dimension' type='nominal' />
+            <column datatype='date' name='[TICKET_OPEN_DATE]' role='dimension' type='ordinal' />
+            <column datatype='integer' name='[Gantt_Duration]' role='measure' type='quantitative' />
+            <column datatype='string' name='[Dynamic_Status]' role='dimension' type='nominal' />
+            <column-instance column='[SUPPORT_CATEGORY]' derivation='None' name='[none:SUPPORT_CATEGORY:nk]' pivot='key' type='nominal' />
+            <column-instance column='[SUPPORT_ACTIVITY_ID]' derivation='None' name='[none:SUPPORT_ACTIVITY_ID:nk]' pivot='key' type='nominal' />
+            <column-instance column='[TICKET_OPEN_DATE]' derivation='None' name='[none:TICKET_OPEN_DATE:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Gantt_Duration]' derivation='Sum' name='[sum:Gantt_Duration:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Dynamic_Status]' derivation='None' name='[none:Dynamic_Status:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Gantt' />
+            <encodings>
+              <color column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:Dynamic_Status:nk]' />
+              <size column='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:Gantt_Duration:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='false' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:SUPPORT_CATEGORY:nk]</rows>
+        <rows>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:SUPPORT_ACTIVITY_ID:nk]</rows>
+        <cols>[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:TICKET_OPEN_DATE:ok]</cols>
+      </table>
+      <simple-id uuid='{F6A7B8C9-D0E1-F2A3-B4C5-D6E7F8A9B0C1}' />
+    </worksheet>
+  </worksheets>
+  
+  <dashboards>
+    <dashboard _.fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder='true' name='Advanced Analytics Dashboard'>
+      <style />
+      <size maxheight='800' maxwidth='1200' minheight='800' minwidth='1200' />
+      <zones>
+        <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
+          <zone h='32000' id='10' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
+            <zone h='32000' id='5' type-v2='layout-basic' w='49200' x='800' y='1000'>
+              <zone h='32000' id='3' name='Feature Usage Scatter Analysis' w='49200' x='800' y='1000' />
+            </zone>
+            <zone h='32000' id='6' type-v2='layout-basic' w='49200' x='50000' y='1000'>
+              <zone h='32000' id='7' name='Revenue Trends with Support Overlay' w='49200' x='50000' y='1000' />
+            </zone>
+          </zone>
+          <zone h='32000' id='11' param='vert' type-v2='layout-flow' w='98400' x='800' y='33000'>
+            <zone h='32000' id='8' type-v2='layout-basic' w='49200' x='800' y='33000'>
+              <zone h='32000' id='9' name='Dynamic KPI Dashboard' w='49200' x='800' y='33000' />
+            </zone>
+            <zone h='32000' id='12' type-v2='layout-basic' w='49200' x='50000' y='33000'>
+              <zone h='32000' id='13' name='License Revenue Marimekko' w='49200' x='50000' y='33000' />
+            </zone>
+          </zone>
+          <zone h='32000' id='14' param='vert' type-v2='layout-flow' w='98400' x='800' y='65000'>
+            <zone h='32000' id='15' type-v2='layout-basic' w='49200' x='800' y='65000'>
+              <zone h='32000' id='16' name='Feature Usage Distribution' w='49200' x='800' y='65000' />
+            </zone>
+            <zone h='32000' id='17' type-v2='layout-basic' w='49200' x='50000' y='65000'>
+              <zone h='32000' id='18' name='Support Ticket Timeline' w='49200' x='50000' y='65000' />
+            </zone>
+          </zone>
+        </zone>
+      </zones>
+      <simple-id uuid='{A7B8C9D0-E1F2-A3B4-C5D6-E7F8A9B0C1D2}' />
+    </dashboard>
+  </dashboards>
+  
+  <windows saved-dpi-scale-factor='1.5' source-height='44'>
+    <window class='worksheet' name='Feature Usage Scatter Analysis'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[none:FEATURE_CATEGORY:nk]' type='color' />
+            <card pane-specification-id='0' param='[federated.1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d].[sum:USAGE_COUNT:qk]' type='size' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{B8C9D0E1-F2A3-B4C5-D6E7-F8A9B0C1D2E3}' />
+    </window>
+    <window class='dashboard' maximized='true' name='Advanced Analytics Dashboard'>
+      <viewpoints>
+        <viewpoint name='Feature Usage Scatter Analysis' />
+        <viewpoint name='Revenue Trends with Support Overlay' />
+        <viewpoint name='Dynamic KPI Dashboard' />
+        <viewpoint name='License Revenue Marimekko' />
+        <viewpoint name='Feature Usage Distribution' />
+        <viewpoint name='Support Ticket Timeline' />
+      </viewpoints>
+      <active id='-1' />
+      <simple-id uuid='{C9D0E1F2-A3B4-C5D6-E7F8-A9B0C1D2E3F4}' />
+    </window>
+  </windows>
+</workbook>
