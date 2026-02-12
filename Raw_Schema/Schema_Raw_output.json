@@ -1,451 +1,452 @@
 {
-  "RAW_LAYER_METADATA": {
-    "extraction_timestamp": "2024-12-19",
-    "pipeline_id": "8083",
+  "metadata_extraction_info": {
+    "extraction_date": "2024-12-19",
+    "database": "DB_POC_ZOOM",
+    "schema": "RAW",
     "total_tables": 7,
-    "total_views": 0,
-    "tables": {
-      "BILLING_EVENTS": {
-        "type": "TABLE",
-        "description": "Contains billing event records for user transactions and charges",
-        "columns": [
-          {
-            "name": "EVENT_ID",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Unique identifier for each billing event",
-            "constraints": "Primary Key, Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "USER_ID",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Foreign key reference to user who triggered the billing event",
-            "constraints": "Foreign Key, Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "EVENT_TYPE",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Type of billing event (subscription, usage, refund, etc.)",
-            "constraints": "Not Null",
-            "domain_values": "subscription, usage, refund, charge"
-          },
-          {
-            "name": "AMOUNT",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Monetary amount associated with the billing event",
-            "constraints": "Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "EVENT_DATE",
-            "data_type": "DATE",
-            "business_description": "Date when the billing event occurred",
-            "constraints": "Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "LOAD_TIMESTAMP",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when record was first loaded into the system",
-            "constraints": "Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "UPDATE_TIMESTAMP",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when record was last updated",
-            "constraints": "Nullable",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "SOURCE_SYSTEM",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Source system that provided the billing event data",
-            "constraints": "Not Null",
-            "domain_values": "billing_system, payment_gateway"
-          }
-        ]
-      },
-      "FEATURE_USAGE": {
-        "type": "TABLE",
-        "description": "Tracks usage of various features within meetings",
-        "columns": [
-          {
-            "name": "USAGE_ID",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Unique identifier for each feature usage record",
-            "constraints": "Primary Key, Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "MEETING_ID",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Foreign key reference to the meeting where feature was used",
-            "constraints": "Foreign Key, Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "FEATURE_NAME",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Name of the feature that was used",
-            "constraints": "Not Null",
-            "domain_values": "screen_share, chat, recording, breakout_rooms"
-          },
-          {
-            "name": "USAGE_COUNT",
-            "data_type": "NUMBER(38,0)",
-            "business_description": "Number of times the feature was used in the meeting",
-            "constraints": "Not Null, >= 0",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "USAGE_DATE",
-            "data_type": "DATE",
-            "business_description": "Date when the feature usage occurred",
-            "constraints": "Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "LOAD_TIMESTAMP",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when record was first loaded into the system",
-            "constraints": "Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "UPDATE_TIMESTAMP",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when record was last updated",
-            "constraints": "Nullable",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "SOURCE_SYSTEM",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Source system that provided the feature usage data",
-            "constraints": "Not Null",
-            "domain_values": "meeting_platform, analytics_system"
-          }
-        ]
-      },
-      "LICENSES": {
-        "type": "TABLE",
-        "description": "Contains license information and assignments to users",
-        "columns": [
-          {
-            "name": "LICENSE_ID",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Unique identifier for each license",
-            "constraints": "Primary Key, Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "LICENSE_TYPE",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Type of license (basic, pro, enterprise)",
-            "constraints": "Not Null",
-            "domain_values": "basic, pro, enterprise"
-          },
-          {
-            "name": "ASSIGNED_TO_USER_ID",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Foreign key reference to user assigned to this license",
-            "constraints": "Foreign Key, Nullable",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "START_DATE",
-            "data_type": "DATE",
-            "business_description": "Date when the license becomes active",
-            "constraints": "Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "END_DATE",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Date when the license expires",
-            "constraints": "Nullable",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "LOAD_TIMESTAMP",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when record was first loaded into the system",
-            "constraints": "Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "UPDATE_TIMESTAMP",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when record was last updated",
-            "constraints": "Nullable",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "SOURCE_SYSTEM",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Source system that provided the license data",
-            "constraints": "Not Null",
-            "domain_values": "license_management, admin_portal"
-          }
-        ]
-      },
-      "MEETINGS": {
-        "type": "TABLE",
-        "description": "Contains meeting information and session details",
-        "columns": [
-          {
-            "name": "MEETING_ID",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Unique identifier for each meeting session",
-            "constraints": "Primary Key, Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "HOST_ID",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Foreign key reference to user who hosted the meeting",
-            "constraints": "Foreign Key, Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "MEETING_TOPIC",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Topic or title of the meeting",
-            "constraints": "Nullable",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "START_TIME",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when the meeting started",
-            "constraints": "Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "END_TIME",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Timestamp when the meeting ended",
-            "constraints": "Nullable",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "DURATION_MINUTES",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Duration of the meeting in minutes",
-            "constraints": "Nullable, >= 0",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "LOAD_TIMESTAMP",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when record was first loaded into the system",
-            "constraints": "Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "UPDATE_TIMESTAMP",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when record was last updated",
-            "constraints": "Nullable",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "SOURCE_SYSTEM",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Source system that provided the meeting data",
-            "constraints": "Not Null",
-            "domain_values": "meeting_platform, calendar_system"
-          }
-        ]
-      },
-      "PARTICIPANTS": {
-        "type": "TABLE",
-        "description": "Contains participant information for meetings",
-        "columns": [
-          {
-            "name": "PARTICIPANT_ID",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Unique identifier for each participant session",
-            "constraints": "Primary Key, Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "MEETING_ID",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Foreign key reference to the meeting",
-            "constraints": "Foreign Key, Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "USER_ID",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Foreign key reference to the participating user",
-            "constraints": "Foreign Key, Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "JOIN_TIME",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Timestamp when participant joined the meeting",
-            "constraints": "Nullable",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "LEAVE_TIME",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when participant left the meeting",
-            "constraints": "Nullable",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "LOAD_TIMESTAMP",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when record was first loaded into the system",
-            "constraints": "Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "UPDATE_TIMESTAMP",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when record was last updated",
-            "constraints": "Nullable",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "SOURCE_SYSTEM",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Source system that provided the participant data",
-            "constraints": "Not Null",
-            "domain_values": "meeting_platform, attendance_tracker"
-          }
-        ]
-      },
-      "SUPPORT_TICKETS": {
-        "type": "TABLE",
-        "description": "Contains customer support ticket information",
-        "columns": [
-          {
-            "name": "TICKET_ID",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Unique identifier for each support ticket",
-            "constraints": "Primary Key, Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "USER_ID",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Foreign key reference to user who created the ticket",
-            "constraints": "Foreign Key, Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "TICKET_TYPE",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Category or type of support ticket",
-            "constraints": "Not Null",
-            "domain_values": "technical, billing, feature_request, bug_report"
-          },
-          {
-            "name": "RESOLUTION_STATUS",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Current status of the support ticket",
-            "constraints": "Not Null",
-            "domain_values": "open, in_progress, resolved, closed"
-          },
-          {
-            "name": "OPEN_DATE",
-            "data_type": "DATE",
-            "business_description": "Date when the support ticket was opened",
-            "constraints": "Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "LOAD_TIMESTAMP",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when record was first loaded into the system",
-            "constraints": "Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "UPDATE_TIMESTAMP",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when record was last updated",
-            "constraints": "Nullable",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "SOURCE_SYSTEM",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Source system that provided the support ticket data",
-            "constraints": "Not Null",
-            "domain_values": "support_portal, helpdesk_system"
-          }
-        ]
-      },
-      "USERS": {
-        "type": "TABLE",
-        "description": "Contains user account information and profile details",
-        "columns": [
-          {
-            "name": "USER_ID",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Unique identifier for each user account",
-            "constraints": "Primary Key, Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "USER_NAME",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Display name of the user",
-            "constraints": "Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "EMAIL",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Email address of the user",
-            "constraints": "Unique, Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "COMPANY",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Company or organization the user belongs to",
-            "constraints": "Nullable",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "PLAN_TYPE",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Subscription plan type for the user",
-            "constraints": "Not Null",
-            "domain_values": "free, basic, pro, enterprise"
-          },
-          {
-            "name": "LOAD_TIMESTAMP",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when record was first loaded into the system",
-            "constraints": "Not Null",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "UPDATE_TIMESTAMP",
-            "data_type": "TIMESTAMP_NTZ(9)",
-            "business_description": "Timestamp when record was last updated",
-            "constraints": "Nullable",
-            "domain_values": "N/A"
-          },
-          {
-            "name": "SOURCE_SYSTEM",
-            "data_type": "VARCHAR(16777216)",
-            "business_description": "Source system that provided the user data",
-            "constraints": "Not Null",
-            "domain_values": "user_management, registration_system"
-          }
-        ]
-      }
+    "total_views": 0
+  },
+  "raw_layer_metadata": {
+    "BILLING_EVENTS": {
+      "object_type": "TABLE",
+      "business_description": "Contains billing event records for user transactions and charges",
+      "columns": [
+        {
+          "column_name": "EVENT_ID",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Unique identifier for each billing event",
+          "constraints": "Primary Key, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "USER_ID",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Reference to the user associated with the billing event",
+          "constraints": "Foreign Key, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "EVENT_TYPE",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Type of billing event (charge, refund, adjustment)",
+          "constraints": "Not Null",
+          "domain_values": "charge, refund, adjustment"
+        },
+        {
+          "column_name": "AMOUNT",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Monetary amount of the billing event",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "EVENT_DATE",
+          "data_type": "DATE",
+          "business_description": "Date when the billing event occurred",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "LOAD_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was loaded into the system",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "UPDATE_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was last updated",
+          "constraints": "Nullable",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "SOURCE_SYSTEM",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Source system from which the data originated",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        }
+      ]
+    },
+    "FEATURE_USAGE": {
+      "object_type": "TABLE",
+      "business_description": "Tracks usage of various features within meetings",
+      "columns": [
+        {
+          "column_name": "USAGE_ID",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Unique identifier for each feature usage record",
+          "constraints": "Primary Key, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "MEETING_ID",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Reference to the meeting where feature was used",
+          "constraints": "Foreign Key, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "FEATURE_NAME",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Name of the feature that was used",
+          "constraints": "Not Null",
+          "domain_values": "screen_share, chat, recording, breakout_rooms"
+        },
+        {
+          "column_name": "USAGE_COUNT",
+          "data_type": "NUMBER(38,0)",
+          "business_description": "Number of times the feature was used",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "USAGE_DATE",
+          "data_type": "DATE",
+          "business_description": "Date when the feature usage occurred",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "LOAD_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was loaded into the system",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "UPDATE_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was last updated",
+          "constraints": "Nullable",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "SOURCE_SYSTEM",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Source system from which the data originated",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        }
+      ]
+    },
+    "LICENSES": {
+      "object_type": "TABLE",
+      "business_description": "Manages license assignments and their validity periods",
+      "columns": [
+        {
+          "column_name": "LICENSE_ID",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Unique identifier for each license",
+          "constraints": "Primary Key, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "LICENSE_TYPE",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Type of license (Basic, Pro, Enterprise)",
+          "constraints": "Not Null",
+          "domain_values": "Basic, Pro, Enterprise"
+        },
+        {
+          "column_name": "ASSIGNED_TO_USER_ID",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "User ID to whom the license is assigned",
+          "constraints": "Foreign Key, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "START_DATE",
+          "data_type": "DATE",
+          "business_description": "Start date of the license validity",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "END_DATE",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "End date of the license validity",
+          "constraints": "Nullable",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "LOAD_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was loaded into the system",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "UPDATE_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was last updated",
+          "constraints": "Nullable",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "SOURCE_SYSTEM",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Source system from which the data originated",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        }
+      ]
+    },
+    "MEETINGS": {
+      "object_type": "TABLE",
+      "business_description": "Contains meeting details and scheduling information",
+      "columns": [
+        {
+          "column_name": "MEETING_ID",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Unique identifier for each meeting",
+          "constraints": "Primary Key, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "HOST_ID",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "User ID of the meeting host",
+          "constraints": "Foreign Key, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "MEETING_TOPIC",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Topic or title of the meeting",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "START_TIME",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Scheduled start time of the meeting",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "END_TIME",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Actual or scheduled end time of the meeting",
+          "constraints": "Nullable",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "DURATION_MINUTES",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Duration of the meeting in minutes",
+          "constraints": "Nullable",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "LOAD_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was loaded into the system",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "UPDATE_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was last updated",
+          "constraints": "Nullable",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "SOURCE_SYSTEM",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Source system from which the data originated",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        }
+      ]
+    },
+    "PARTICIPANTS": {
+      "object_type": "TABLE",
+      "business_description": "Tracks meeting participants and their attendance details",
+      "columns": [
+        {
+          "column_name": "PARTICIPANT_ID",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Unique identifier for each participant record",
+          "constraints": "Primary Key, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "MEETING_ID",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Reference to the meeting the participant joined",
+          "constraints": "Foreign Key, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "USER_ID",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "User ID of the meeting participant",
+          "constraints": "Foreign Key, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "JOIN_TIME",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Time when the participant joined the meeting",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "LEAVE_TIME",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Time when the participant left the meeting",
+          "constraints": "Nullable",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "LOAD_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was loaded into the system",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "UPDATE_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was last updated",
+          "constraints": "Nullable",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "SOURCE_SYSTEM",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Source system from which the data originated",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        }
+      ]
+    },
+    "SUPPORT_TICKETS": {
+      "object_type": "TABLE",
+      "business_description": "Manages customer support tickets and their resolution status",
+      "columns": [
+        {
+          "column_name": "TICKET_ID",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Unique identifier for each support ticket",
+          "constraints": "Primary Key, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "USER_ID",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "User ID who created the support ticket",
+          "constraints": "Foreign Key, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "TICKET_TYPE",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Category or type of the support ticket",
+          "constraints": "Not Null",
+          "domain_values": "technical, billing, feature_request, bug_report"
+        },
+        {
+          "column_name": "RESOLUTION_STATUS",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Current status of the ticket resolution",
+          "constraints": "Not Null",
+          "domain_values": "open, in_progress, resolved, closed"
+        },
+        {
+          "column_name": "OPEN_DATE",
+          "data_type": "DATE",
+          "business_description": "Date when the support ticket was opened",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "LOAD_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was loaded into the system",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "UPDATE_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was last updated",
+          "constraints": "Nullable",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "SOURCE_SYSTEM",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Source system from which the data originated",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        }
+      ]
+    },
+    "USERS": {
+      "object_type": "TABLE",
+      "business_description": "Contains user account information and profile details",
+      "columns": [
+        {
+          "column_name": "USER_ID",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Unique identifier for each user account",
+          "constraints": "Primary Key, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "USER_NAME",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Display name of the user",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "EMAIL",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Email address of the user",
+          "constraints": "Unique, Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "COMPANY",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Company or organization the user belongs to",
+          "constraints": "Nullable",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "PLAN_TYPE",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Subscription plan type of the user",
+          "constraints": "Not Null",
+          "domain_values": "Basic, Pro, Enterprise"
+        },
+        {
+          "column_name": "LOAD_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was loaded into the system",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "UPDATE_TIMESTAMP",
+          "data_type": "TIMESTAMP_NTZ(9)",
+          "business_description": "Timestamp when the record was last updated",
+          "constraints": "Nullable",
+          "domain_values": "N/A"
+        },
+        {
+          "column_name": "SOURCE_SYSTEM",
+          "data_type": "VARCHAR(16777216)",
+          "business_description": "Source system from which the data originated",
+          "constraints": "Not Null",
+          "domain_values": "N/A"
+        }
+      ]
     }
   }
 }
